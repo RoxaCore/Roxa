@@ -244,6 +244,20 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    private void AutoSortAfterTest(string metric)
+    {
+        foreach (var g in Groups)
+        {
+            List<ServerInfo> sorted;
+            if (metric == "latency")
+                sorted = g.Servers.OrderBy(s => s.LatencyMs < 0 ? int.MaxValue : s.LatencyMs).ToList();
+            else
+                sorted = g.Servers.OrderByDescending(s => s.DownloadMbps < 0 ? 0 : s.DownloadMbps).ToList();
+            g.Servers.Clear();
+            foreach (var s in sorted) g.Servers.Add(s);
+        }
+    }
+
     partial void OnSortFieldChanged(string value)
     {
         _settings.SortField = value;
@@ -582,10 +596,11 @@ public partial class MainViewModel : ViewModelBase
          }
          catch (OperationCanceledException) { }
          int okCount = Servers.Count(s => s.LatencyMs >= 0);
-         IsTesting = false;
-         Status = $"پینگ تمام شد: {okCount} از {Servers.Count} پاسخ داد";
-         AppendLog(Status);
-         SaveServers();
+          IsTesting = false;
+          Status = $"پینگ تمام شد: {okCount} از {Servers.Count} پاسخ داد";
+          AppendLog(Status);
+          AutoSortAfterTest("latency");
+          SaveServers();
          ConnectCommand.NotifyCanExecuteChanged();
      }
 
@@ -623,10 +638,11 @@ public partial class MainViewModel : ViewModelBase
          foreach (var s in targets)
              if (s.DownloadMbps == -1) s.RecordSpeed(-2);
          int okCount = targets.Count(s => s.DownloadMbps >= 0);
-         IsTesting = false;
-         Status = $"سرعت تمام شد: {okCount} از {targets.Count} موفق";
-         AppendLog(Status);
-         SaveServers();
+          IsTesting = false;
+          Status = $"سرعت تمام شد: {okCount} از {targets.Count} موفق";
+          AppendLog(Status);
+          AutoSortAfterTest("speed");
+          SaveServers();
          ConnectCommand.NotifyCanExecuteChanged();
      }
 
@@ -748,6 +764,7 @@ public partial class MainViewModel : ViewModelBase
         await Task.WhenAll(tasks);
         IsTesting = false;
         Status = $"پینگ منتخب‌ها تمام شد ({targets.Count(t => t.LatencyMs >= 0)} موفق)";
+        AutoSortAfterTest("latency");
         SaveServers();
     }
 
@@ -774,6 +791,7 @@ public partial class MainViewModel : ViewModelBase
         await Task.WhenAll(tasks);
         IsTesting = false;
         Status = $"سرعت منتخب‌ها تمام شد ({targets.Count(t => t.DownloadMbps >= 0)} موفق)";
+        AutoSortAfterTest("speed");
         SaveServers();
     }
 
@@ -842,6 +860,7 @@ public partial class MainViewModel : ViewModelBase
          int okCount = targets.Count(t => t.LatencyMs >= 0);
          IsTesting = false;
          Status = $"پینگ گروه تمام شد ({okCount} موفق)";
+         AutoSortAfterTest("latency");
          SaveServers();
      }
 
@@ -875,9 +894,10 @@ public partial class MainViewModel : ViewModelBase
          }
          catch (OperationCanceledException) { }
          int okCount = targets.Count(t => t.LatencyMs >= 0);
-         IsTesting = false;
-          Status = $"پینگ واقعی گروه تمام شد ({okCount} موفق)";
-         SaveServers();
+          IsTesting = false;
+           Status = $"پینگ واقعی گروه تمام شد ({okCount} موفق)";
+          AutoSortAfterTest("latency");
+          SaveServers();
      }
 
      [RelayCommand]
@@ -912,9 +932,10 @@ public partial class MainViewModel : ViewModelBase
          foreach (var s in targets)
              if (s.DownloadMbps == -1) s.RecordSpeed(-2);
          int okCount = targets.Count(s => s.DownloadMbps >= 0);
-         IsTesting = false;
-         Status = $"سرعت گروه تمام شد ({okCount} موفق)";
-         SaveServers();
+          IsTesting = false;
+          Status = $"سرعت گروه تمام شد ({okCount} موفق)";
+          AutoSortAfterTest("speed");
+          SaveServers();
      }
 
      [RelayCommand]
@@ -946,9 +967,10 @@ public partial class MainViewModel : ViewModelBase
          foreach (var s in targets)
              if (s.LatencyMs == -1) s.LatencyMs = -2;
          int okCount = targets.Count(s => s.LatencyMs >= 0);
-         IsTesting = false;
-         Status = $"بروزرسانی گروه تمام شد ({okCount} موفق)";
-         SaveServers();
+          IsTesting = false;
+          Status = $"بروزرسانی گروه تمام شد ({okCount} موفق)";
+          AutoSortAfterTest("latency");
+          SaveServers();
      }
 
      // ---------- تب پینگ واقعی ----------
@@ -987,6 +1009,7 @@ public partial class MainViewModel : ViewModelBase
         int okCount = targets.Count(t => t.LatencyMs >= 0);
         IsTesting = false;
         Status = $"پینگ واقعی تمام شد ({okCount} موفق)";
+        AutoSortAfterTest("latency");
         SaveServers();
     }
 
@@ -1022,6 +1045,7 @@ public partial class MainViewModel : ViewModelBase
             if (s.LatencyMs == -1) s.RecordLatency(-2);
         IsTesting = false;
         Status = $"پینگ واقعی منتخب‌ها تمام شد ({targets.Count(t => t.LatencyMs >= 0)} موفق)";
+        AutoSortAfterTest("latency");
         SaveServers();
     }
 

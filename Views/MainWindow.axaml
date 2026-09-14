@@ -45,32 +45,24 @@
         <Border.Effect>
           <DropShadowEffect BlurRadius="4" OffsetY="2" Opacity="0.08" Color="#000000"/>
         </Border.Effect>
-        
-        <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" RowSpacing="8">
-          <Grid.ContextMenu>
-            <ContextMenu Padding="4">
-              <!-- Connection Section -->
-              <MenuItem Header="اتصال" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}"/>
-              <MenuItem Header="قطع اتصال" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}"/>
-              <Separator/>
-              
-              <!-- Edit Section -->
-              <MenuItem Header="ویرایش سرور" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}"/>
-              <MenuItem Header="کپی سرور" Command="{Binding Owner.CloneServerCommand}" CommandParameter="{Binding}"/>
-              <MenuItem Header="اشتراک‌گذاری" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}"/>
-              <Separator/>
-              
-              <!-- Test Section -->
-              <MenuItem Header="تست Ping" Command="{Binding Owner.TestOneServerCommand}" CommandParameter="{Binding}"/>
-              <MenuItem Header="تست پینگ واقعی" Command="{Binding Owner.TestOneRealDelayCommand}" CommandParameter="{Binding}"/>
-              <MenuItem Header="تست سرعت" Command="{Binding Owner.TestOneSpeedCommand}" CommandParameter="{Binding}"/>
-              <Separator/>
-              
-              <!-- Delete Section -->
-              <MenuItem Header="حذف سرور" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Foreground="{StaticResource ErrorBrush}"/>
-            </ContextMenu>
-          </Grid.ContextMenu>
+        <Border.ContextMenu>
+          <ContextMenu Padding="4">
+            <MenuItem Header="اتصال" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}"/>
+            <MenuItem Header="قطع اتصال" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}"/>
+            <Separator/>
+            <MenuItem Header="ویرایش سرور" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}"/>
+            <MenuItem Header="کپی سرور" Command="{Binding Owner.CloneServerCommand}" CommandParameter="{Binding}"/>
+            <MenuItem Header="اشتراک‌گذاری" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}"/>
+            <Separator/>
+            <MenuItem Header="تست Ping" Command="{Binding Owner.TestOneServerCommand}" CommandParameter="{Binding}"/>
+            <MenuItem Header="تست پینگ واقعی" Command="{Binding Owner.TestOneRealDelayCommand}" CommandParameter="{Binding}"/>
+            <MenuItem Header="تست سرعت" Command="{Binding Owner.TestOneSpeedCommand}" CommandParameter="{Binding}"/>
+            <Separator/>
+            <MenuItem Header="حذف سرور" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Foreground="{StaticResource ErrorBrush}"/>
+          </ContextMenu>
+        </Border.ContextMenu>
 
+        <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" RowSpacing="8">
           <!-- Checkbox -->
           <CheckBox Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,8,0"/>
 

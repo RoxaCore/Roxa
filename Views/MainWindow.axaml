@@ -134,11 +134,11 @@
     </DataTemplate>
   </Window.Resources>
 
-  <Grid Background="#F8F9FA" ColumnDefinitions="*" RowDefinitions="Auto,*">
+  <Panel>
+  <DockPanel Background="#F8F9FA">
     <!-- Top Bar -->
-    <Border Grid.Row="0" Padding="0,0,0,12" Background="#FFFFFF" BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1">
+    <Border DockPanel.Dock="Top" Padding="0,0,0,12" Background="#FFFFFF" BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1">
       <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,12" VerticalAlignment="Center">
-        <!-- Logo & Title -->
         <Border Background="{StaticResource PrimaryBrush}" CornerRadius="8" Width="36" Height="36" VerticalAlignment="Center">
           <TextBlock Text="⚡" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
         </Border>
@@ -146,25 +146,20 @@
           <TextBlock Text="XrayClient" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
           <TextBlock Text="{Binding Status}" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
         </StackPanel>
-        <!-- Separator -->
         <Border Width="1" Background="{StaticResource BorderLight}" Margin="4,4"/>
-        <!-- Active Server -->
         <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessBrush}" IsVisible="{Binding IsConnected}" VerticalAlignment="Center"/>
         <Ellipse Width="10" Height="10" Fill="{StaticResource TextSecondary}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" VerticalAlignment="Center"/>
         <StackPanel Spacing="0" VerticalAlignment="Center">
           <TextBlock Text="سرور فعال" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
           <TextBlock Text="{Binding HomeServerName}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" MaxWidth="280" TextTrimming="CharacterEllipsis"/>
         </StackPanel>
-        <!-- Spacer -->
         <Border HorizontalAlignment="Stretch" Width="20"/>
-        <!-- Port -->
         <Border Background="#F5F5F5" CornerRadius="6" Padding="12,6" VerticalAlignment="Center">
           <StackPanel Orientation="Horizontal" Spacing="6">
             <TextBlock Text="پورت:" FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
             <TextBlock Text="{Binding PortText}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" FlowDirection="LeftToRight" VerticalAlignment="Center"/>
           </StackPanel>
         </Border>
-        <!-- Connect/Disconnect Button -->
         <Button Command="{Binding ConnectCommand}" Padding="14,8" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" Background="{StaticResource SuccessBrush}" Foreground="White" CornerRadius="6" VerticalAlignment="Center">
           <StackPanel Orientation="Horizontal" Spacing="6">
             <TextBlock Text="▶" FontSize="10" VerticalAlignment="Center"/>
@@ -181,7 +176,7 @@
     </Border>
 
     <!-- Main Content -->
-    <TabControl Grid.Row="1" Margin="0" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <TabControl Margin="0" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
       <TabControl.Styles>
         <Style Selector="TabControl">
           <Setter Property="Background" Value="Transparent"/>
@@ -337,11 +332,11 @@
         </ScrollViewer>
       </TabItem>
     </TabControl>
-
+  </DockPanel>
   <!-- Toast Notification -->
   <Border x:Name="ToastBorder" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" ZIndex="999"
           Background="#122A25" CornerRadius="10" Padding="20,12" MaxWidth="400">
     <TextBlock x:Name="ToastText" Text="" FontSize="13" Foreground="White" TextWrapping="Wrap" TextAlignment="Center"/>
   </Border>
-  </Grid>
+  </Panel>
 </Window>

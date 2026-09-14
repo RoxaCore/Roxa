@@ -48,6 +48,7 @@ public partial class MainWindow : Window
             await dlg.ShowDialog(this);
         };
         vm.ToastHandler = message => ShowToast(message);
+        vm.OpenDnsSettingsHandler = () => OpenDnsDialog();
         vm.ConfirmDeleteHandler = async message =>
         {
             bool result = false;
@@ -136,5 +137,98 @@ public partial class MainWindow : Window
                 };
             }
         }
+    }
+
+    private void OpenDnsDialog()
+    {
+        if (DataContext is not MainViewModel vm) return;
+
+        var txtServers = new TextBox
+        {
+            Text = vm.CustomDnsServers,
+            PlaceholderText = "1.1.1.1, 8.8.8.8",
+            Padding = new Avalonia.Thickness(10, 8),
+            CornerRadius = new Avalonia.CornerRadius(6),
+            FontSize = 13,
+            Margin = new Avalonia.Thickness(0, 0, 0, 4)
+        };
+
+        var txtJson = new TextBox
+        {
+            Text = vm.CustomDnsAdvancedJson,
+            AcceptsReturn = true,
+            TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+            Height = 140,
+            Padding = new Avalonia.Thickness(10, 8),
+            CornerRadius = new Avalonia.CornerRadius(6),
+            FontFamily = "Consolas",
+            FontSize = 12
+        };
+
+        var btnSave = new Button
+        {
+            Content = "ذخیره",
+            Padding = new Avalonia.Thickness(24, 10),
+            CornerRadius = new Avalonia.CornerRadius(8),
+            Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#0E7C6B")),
+            Foreground = Avalonia.Media.Brushes.White,
+            FontSize = 13,
+            FontWeight = Avalonia.Media.FontWeight.SemiBold
+        };
+
+        var btnCancel = new Button
+        {
+            Content = "لغو",
+            Padding = new Avalonia.Thickness(24, 10),
+            CornerRadius = new Avalonia.CornerRadius(8),
+            FontSize = 13
+        };
+
+        var window = new Window
+        {
+            Title = "تنظیمات DNS",
+            Width = 500,
+            Height = 420,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#F8F9FA")),
+            Content = new StackPanel
+            {
+                Margin = new Avalonia.Thickness(20),
+                Spacing = 12,
+                Children =
+                {
+                    new TextBlock { Text = "DNS ساده", FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 13 },
+                    txtServers,
+                    new TextBlock { Text = "IPv4/IPv6 با کاما جدا شده", FontSize = 11, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#888888")) },
+                    new TextBlock { Text = "DNS پیشرفته (JSON)", FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 13 },
+                    txtJson,
+                    new TextBlock { Text = "مثال: {\"servers\": [{\"address\": \"1.1.1.1\"}]}", FontSize = 11, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#888888")) },
+                    new TextBlock
+                    {
+                        FontSize = 11,
+                        Margin = new Avalonia.Thickness(0, 4, 0, 0),
+                        Text = "مستندات: https://xtls.github.io/config/dns.html"
+                    },
+                    new StackPanel
+                    {
+                        Orientation = Avalonia.Layout.Orientation.Horizontal,
+                        Spacing = 10,
+                        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                        Margin = new Avalonia.Thickness(0, 8, 0, 0),
+                        Children = { btnCancel, btnSave }
+                    }
+                }
+            }
+        };
+
+        btnSave.Click += (_, _) =>
+        {
+            vm.CustomDnsServers = txtServers.Text ?? "";
+            vm.CustomDnsAdvancedJson = txtJson.Text ?? "";
+            window.Close();
+        };
+        btnCancel.Click += (_, _) => window.Close();
+
+        window.ShowDialog(this);
     }
 }

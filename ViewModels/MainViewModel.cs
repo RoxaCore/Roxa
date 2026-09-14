@@ -22,6 +22,7 @@ public partial class MainViewModel : ViewModelBase
      public Func<string, string, Task>? ShowQrHandler { get; set; }
      public Func<string, Task<bool>>? ConfirmDeleteHandler { get; set; }
      public Action<string>? ToastHandler { get; set; }
+     public Action? OpenDnsSettingsHandler { get; set; }
 
     [ObservableProperty] private ObservableCollection<ServerInfo> _servers = new();
     [ObservableProperty] private ObservableCollection<SubscriptionInfo> _subscriptions = new();
@@ -277,6 +278,9 @@ public partial class MainViewModel : ViewModelBase
     }
     partial void OnCustomDnsServersChanged(string value) { _settings.CustomDnsServers = value; SaveSettings(); }
     partial void OnCustomDnsAdvancedJsonChanged(string value) { _settings.CustomDnsAdvancedJson = value; SaveSettings(); }
+
+    [RelayCommand]
+    private void OpenDnsSettings() => OpenDnsSettingsHandler?.Invoke();
 
     public void SetGroupExpanded(string key, bool expanded)
     {

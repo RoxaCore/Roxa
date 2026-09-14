@@ -3,7 +3,6 @@
         xmlns:vm="using:XrayClient.ViewModels"
         xmlns:models="using:XrayClient.Models"
         xmlns:converters="using:XrayClient.Converters"
-        xmlns:dg="using:Avalonia.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
@@ -13,7 +12,8 @@
         Title="XrayClient" Width="900" Height="700"
         WindowStartupLocation="CenterScreen"
         FlowDirection="RightToLeft"
-        Background="#F8F9FA">
+        FontFamily="Segoe UI"
+        Background="#F6F9F8">
 
   <Design.DataContext>
     <vm:MainViewModel />
@@ -22,168 +22,200 @@
   <Window.Resources>
     <converters:BoolNegateConverter x:Key="Not"/>
     
-    <!-- رنگ‌های مدرن -->
-    <SolidColorBrush x:Key="PrimaryBrush">#2196F3</SolidColorBrush>
-    <SolidColorBrush x:Key="SuccessBrush">#4CAF50</SolidColorBrush>
-    <SolidColorBrush x:Key="WarningBrush">#FF9800</SolidColorBrush>
-    <SolidColorBrush x:Key="ErrorBrush">#F44336</SolidColorBrush>
+    <!-- رنگ‌های تیل -->
+    <SolidColorBrush x:Key="PrimaryBrush">#0E7C6B</SolidColorBrush>
+    <SolidColorBrush x:Key="PrimaryDeepBrush">#0A5D50</SolidColorBrush>
+    <SolidColorBrush x:Key="PrimarySoftBrush">#E1F0EC</SolidColorBrush>
+    <SolidColorBrush x:Key="SuccessBrush">#0E7C6B</SolidColorBrush>
+    <SolidColorBrush x:Key="WarningBrush">#C97A2B</SolidColorBrush>
+    <SolidColorBrush x:Key="WarningSoftBrush">#F7E9DA</SolidColorBrush>
+    <SolidColorBrush x:Key="ErrorBrush">#C4463A</SolidColorBrush>
+    <SolidColorBrush x:Key="ErrorSoftBrush">#F6E1DE</SolidColorBrush>
     <SolidColorBrush x:Key="CardBackground">#FFFFFF</SolidColorBrush>
-    <SolidColorBrush x:Key="BorderLight">#E0E0E0</SolidColorBrush>
-    <SolidColorBrush x:Key="TextPrimary">#333333</SolidColorBrush>
-    <SolidColorBrush x:Key="TextSecondary">#999999</SolidColorBrush>
+    <SolidColorBrush x:Key="BorderLight">#E1E8E6</SolidColorBrush>
+    <SolidColorBrush x:Key="TextPrimary">#122A25</SolidColorBrush>
+    <SolidColorBrush x:Key="TextSecondary">#5C6E6A</SolidColorBrush>
+    <SolidColorBrush x:Key="BgBrush">#F6F9F8</SolidColorBrush>
 
     <DataTemplate x:Key="ServerRowTemplate" DataType="models:ServerInfo">
-      <Border CornerRadius="8" 
-              Padding="16" 
-              Margin="0,8,0,0"
+      <Border CornerRadius="12" 
+              Padding="16,14" 
+              Margin="0,0,0,8"
               Background="{StaticResource CardBackground}"
               BorderBrush="{StaticResource BorderLight}"
               BorderThickness="1">
-        <Border.Effect>
-          <DropShadowEffect BlurRadius="4" OffsetY="2" Opacity="0.08" Color="#000000"/>
-        </Border.Effect>
         
-        <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" RowSpacing="8">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" RowDefinitions="Auto" ColumnSpacing="14">
           <Grid.ContextMenu>
             <ContextMenu Padding="4">
-              <!-- Connection Section -->
               <MenuItem Header="اتصال" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}"/>
               <MenuItem Header="قطع اتصال" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}"/>
               <Separator/>
-              
-              <!-- Edit Section -->
               <MenuItem Header="ویرایش سرور" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}"/>
               <MenuItem Header="کپی سرور" Command="{Binding Owner.CloneServerCommand}" CommandParameter="{Binding}"/>
               <MenuItem Header="اشتراک‌گذاری" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}"/>
               <Separator/>
-              
-              <!-- Test Section -->
               <MenuItem Header="تست Ping" Command="{Binding Owner.TestOneServerCommand}" CommandParameter="{Binding}"/>
               <MenuItem Header="تست RealDelay" Command="{Binding Owner.TestOneRealDelayCommand}" CommandParameter="{Binding}"/>
               <MenuItem Header="تست سرعت" Command="{Binding Owner.TestOneSpeedCommand}" CommandParameter="{Binding}"/>
               <Separator/>
-              
-              <!-- Delete Section -->
               <MenuItem Header="حذف سرور" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Foreground="{StaticResource ErrorBrush}"/>
             </ContextMenu>
           </Grid.ContextMenu>
 
           <!-- Checkbox -->
-          <CheckBox Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-
-          <!-- Status Indicator -->
-          <Ellipse Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Width="12" Height="12" VerticalAlignment="Top" Margin="0,4,0,0" Fill="{StaticResource SuccessBrush}" IsVisible="{Binding IsActiveConnection}"/>
-          <Ellipse Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Width="12" Height="12" VerticalAlignment="Top" Margin="0,4,0,0" Fill="{StaticResource TextSecondary}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}"/>
+          <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center"/>
 
           <!-- Flag -->
-          <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Flag}" FontSize="28" Margin="8,0,12,0" VerticalAlignment="Center"/>
+          <Border Grid.Column="1" Background="{StaticResource PrimarySoftBrush}" CornerRadius="8" Width="34" Height="34">
+            <TextBlock Text="{Binding Flag}" FontSize="13" FontWeight="Bold" Foreground="{StaticResource PrimaryDeepBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
 
           <!-- Server Name & Details -->
-          <StackPanel Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" VerticalAlignment="Center" Spacing="4">
-            <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" TextTrimming="CharacterEllipsis"/>
+          <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="3">
             <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock FontSize="12" Foreground="{StaticResource TextSecondary}">
-                <Run Text="{Binding ProtocolDisplay, Mode=OneWay}"/>
-              </TextBlock>
-              <TextBlock FontSize="12" Foreground="{StaticResource TextSecondary}" Text="•"/>
-              <TextBlock FontSize="12" Foreground="{StaticResource TextSecondary}" FlowDirection="LeftToRight">
-                <Run Text="{Binding Address, Mode=OneWay}"/>
-                <Run Text=":"/>
-                <Run Text="{Binding Port, Mode=OneWay}"/>
-              </TextBlock>
+              <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" TextTrimming="CharacterEllipsis"/>
+              <Border Background="{StaticResource BgBrush}" CornerRadius="5" Padding="7,2">
+                <TextBlock Text="{Binding ProtocolDisplay}" FontSize="10.5" FontWeight="Medium" Foreground="{StaticResource TextSecondary}"/>
+              </Border>
             </StackPanel>
+            <TextBlock FontSize="12" Foreground="{StaticResource TextSecondary}" FlowDirection="LeftToRight">
+              <Run Text="{Binding Address, Mode=OneWay}"/>
+              <Run Text=":"/>
+              <Run Text="{Binding Port, Mode=OneWay}"/>
+            </TextBlock>
           </StackPanel>
 
-          <!-- Metrics -->
-          <StackPanel Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="16,0">
-            <StackPanel Spacing="2">
-              <TextBlock FontSize="10" Foreground="{StaticResource TextSecondary}" Text="پینگ"/>
-              <Border CornerRadius="4" Padding="8,4" Background="#F5F5F5">
-                <TextBlock Text="{Binding LatencyDisplay}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
-              </Border>
-            </StackPanel>
-            <StackPanel Spacing="2">
-              <TextBlock FontSize="10" Foreground="{StaticResource TextSecondary}" Text="سرعت"/>
-              <Border CornerRadius="4" Padding="8,4" Background="#F5F5F5">
-                <TextBlock Text="{Binding SpeedDisplay}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
-              </Border>
-            </StackPanel>
+          <!-- Signal Bars -->
+          <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Spacing="2.5">
+            <Border Width="4" Height="5" CornerRadius="2" Background="{StaticResource BorderLight}"/>
+            <Border Width="4" Height="9" CornerRadius="2" Background="{StaticResource BorderLight}"/>
+            <Border Width="4" Height="13" CornerRadius="2" Background="{StaticResource BorderLight}"/>
+            <Border Width="4" Height="16" CornerRadius="2" Background="{StaticResource BorderLight}"/>
           </StackPanel>
+
+          <!-- Ping Value -->
+          <Border Grid.Column="4" CornerRadius="6" Padding="10,4" MinWidth="70" HorizontalAlignment="Center">
+            <TextBlock Text="{Binding LatencyDisplay}" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center"/>
+          </Border>
 
           <!-- Action Buttons -->
-          <StackPanel Grid.Column="5" Grid.Row="0" Grid.RowSpan="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-            <Button ToolTip.Tip="اتصال" Padding="6,4" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="{StaticResource SuccessBrush}" Foreground="White" CornerRadius="4">
-              <TextBlock Text="▶" FontSize="12"/>
-            </Button>
-            <Button ToolTip.Tip="قطع" Padding="6,4" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="{StaticResource ErrorBrush}" Foreground="White" CornerRadius="4">
-              <TextBlock Text="✕" FontSize="12"/>
-            </Button>
-            <Button ToolTip.Tip="ویرایش" Padding="6,4" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}" Background="{StaticResource PrimaryBrush}" Foreground="White" CornerRadius="4">
-              <TextBlock Text="✎" FontSize="12"/>
-            </Button>
-            <Button ToolTip.Tip="اشتراک" Padding="6,4" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}" Background="{StaticResource WarningBrush}" Foreground="White" CornerRadius="4">
-              <TextBlock Text="📋" FontSize="12"/>
-            </Button>
-            <Button ToolTip.Tip="حذف" Padding="6,4" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Background="{StaticResource ErrorBrush}" Foreground="White" CornerRadius="4">
-              <TextBlock Text="✕" FontSize="12"/>
-            </Button>
+          <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <Border CornerRadius="8" Width="32" Height="32" Background="{StaticResource PrimaryBrush}" Cursor="Hand">
+              <TextBlock Text="▶" FontSize="11" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <Border CornerRadius="8" Width="32" Height="32" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" Background="{StaticResource CardBackground}" Cursor="Hand">
+              <TextBlock Text="✎" FontSize="11" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <Border CornerRadius="8" Width="32" Height="32" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" Background="{StaticResource CardBackground}" Cursor="Hand">
+              <TextBlock Text="✕" FontSize="11" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
           </StackPanel>
         </Grid>
       </Border>
     </DataTemplate>
   </Window.Resources>
 
-  <DockPanel Background="#F8F9FA">
-    <!-- Top Bar -->
-    <Border DockPanel.Dock="Top" Padding="0" Background="#FFFFFF" BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1">
-      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" Margin="20,12">
-        <!-- Logo & Title -->
-        <StackPanel Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-          <Border Background="{StaticResource PrimaryBrush}" CornerRadius="8" Width="36" Height="36">
-            <TextBlock Text="⚡" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+  <DockPanel Background="{StaticResource BgBrush}">
+    <!-- Header -->
+    <Border DockPanel.Dock="Top" Padding="0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,Auto,*,Auto" Margin="28,0" Height="52">
+        <!-- Brand -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+          <Border Background="{StaticResource PrimaryBrush}" CornerRadius="9" Width="34" Height="34">
+            <TextBlock Text="X" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
           </Border>
           <StackPanel Spacing="0">
-            <TextBlock Text="XrayClient" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-            <TextBlock Text="{Binding Status}" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+            <TextBlock Text="XrayClient" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+            <TextBlock Text="مدیریت اتصال امن" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
           </StackPanel>
         </StackPanel>
 
-        <!-- Separator -->
-        <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Width="1" Background="{StaticResource BorderLight}" Margin="16,8"/>
-
-        <!-- Active Server -->
-        <StackPanel Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="8,0">
-          <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessBrush}" IsVisible="{Binding IsConnected}"/>
-          <Ellipse Width="10" Height="10" Fill="{StaticResource TextSecondary}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"/>
-          <StackPanel Spacing="0">
-            <TextBlock Text="سرور فعال" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
-            <TextBlock Text="{Binding HomeServerName}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" MaxWidth="280" TextTrimming="CharacterEllipsis"/>
-          </StackPanel>
+        <!-- Nav Tabs -->
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" HorizontalAlignment="Center">
+          <Border Padding="14,8" CornerRadius="9" Background="{StaticResource PrimarySoftBrush}" Cursor="Hand">
+            <TextBlock Text="سرورها" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource PrimaryDeepBrush}"/>
+          </Border>
+          <Border Padding="14,8" CornerRadius="9" Cursor="Hand">
+            <TextBlock Text="ساب‌اسکریپشن" FontSize="13" Foreground="{StaticResource TextSecondary}"/>
+          </Border>
+          <Border Padding="14,8" CornerRadius="9" Cursor="Hand">
+            <TextBlock Text="لاگ" FontSize="13" Foreground="{StaticResource TextSecondary}"/>
+          </Border>
+          <Border Padding="14,8" CornerRadius="9" Cursor="Hand">
+            <TextBlock Text="تنظیمات" FontSize="13" Foreground="{StaticResource TextSecondary}"/>
+          </Border>
         </StackPanel>
 
-        <!-- Port -->
-        <StackPanel Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-          <Border Background="#F5F5F5" CornerRadius="6" Padding="12,6">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock Text="پورت:" FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
-              <TextBlock Text="{Binding PortText}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" FlowDirection="LeftToRight" VerticalAlignment="Center"/>
+        <!-- Status -->
+        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <Border Background="{StaticResource PrimaryBrush}" CornerRadius="8" Width="30" Height="30">
+            <TextBlock Text="X" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+          </Border>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Hero Section - Connection Status -->
+    <Border DockPanel.Dock="Top" Padding="0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="*,Auto" Margin="32,28">
+        <!-- Server Info -->
+        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+          <TextBlock Text="وضعیت اتصال" FontSize="13" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+          <TextBlock Text="{Binding HomeServerName}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,16"/>
+          <StackPanel Orientation="Horizontal" Spacing="28">
+            <StackPanel Spacing="2">
+              <TextBlock Text="پینگ" FontSize="11.5" Foreground="{StaticResource TextSecondary}"/>
+              <TextBlock Text="—" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
             </StackPanel>
-          </Border>
+            <StackPanel Spacing="2">
+              <TextBlock Text="دانلود" FontSize="11.5" Foreground="{StaticResource TextSecondary}"/>
+              <TextBlock Text="—" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="آپلود" FontSize="11.5" Foreground="{StaticResource TextSecondary}"/>
+              <TextBlock Text="—" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="مدت اتصال" FontSize="11.5" Foreground="{StaticResource TextSecondary}"/>
+              <TextBlock Text="00:00:00" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" FlowDirection="LeftToRight"/>
+            </StackPanel>
+          </StackPanel>
         </StackPanel>
 
-        <!-- Connect/Disconnect Button -->
-        <Button Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Command="{Binding ConnectCommand}" Padding="14,8" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" Background="{StaticResource SuccessBrush}" Foreground="White" CornerRadius="6" VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="▶" FontSize="10" VerticalAlignment="Center"/>
-            <TextBlock Text="اتصال" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        <!-- Connect Button -->
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+          <Border Width="80" Height="80" CornerRadius="40" Background="{StaticResource PrimaryBrush}">
+            <Border.Effect>
+              <DropShadowEffect BlurRadius="20" OffsetY="8" Opacity="0.28" Color="#0E7C6B"/>
+            </Border.Effect>
+            <TextBlock Text="⏻" FontSize="30" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <TextBlock Text="متصل" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource PrimaryDeepBrush}" HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Toolbar -->
+    <Border DockPanel.Dock="Top" Padding="0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="*,Auto,Auto" Margin="32,14" ColumnSpacing="10">
+        <!-- Search / Add Link -->
+        <Border Grid.Column="0" Background="{StaticResource BgBrush}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" CornerRadius="10" Padding="12,0">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="🔍" FontSize="13" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding ServerLink}" PlaceholderText="جستجوی سرور یا افزودن لینک..." Background="Transparent" BorderThickness="0" Padding="0,8" FontSize="13" Width="300"/>
           </StackPanel>
-        </Button>
-        <Button Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Command="{Binding DisconnectCommand}" Padding="14,8" IsVisible="{Binding IsConnected}" Background="{StaticResource ErrorBrush}" Foreground="White" CornerRadius="6" VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="✕" FontSize="10" VerticalAlignment="Center"/>
-            <TextBlock Text="قطع" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
-          </StackPanel>
-        </Button>
+        </Border>
+
+        <!-- Update Button -->
+        <Border Grid.Column="1" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" CornerRadius="10" Padding="14,8" Background="{StaticResource CardBackground}" Cursor="Hand">
+          <TextBlock Text="بروزرسانی همه" FontSize="13" Foreground="{StaticResource TextPrimary}"/>
+        </Border>
+
+        <!-- Remove Duplicates -->
+        <Border Grid.Column="2" BorderBrush="{StaticResource BorderLight}" BorderThickness="1" CornerRadius="10" Padding="14,8" Background="{StaticResource CardBackground}" Cursor="Hand">
+          <TextBlock Text="حذف تکراری" FontSize="13" Foreground="{StaticResource TextPrimary}"/>
+        </Border>
       </Grid>
     </Border>
 
@@ -195,77 +227,38 @@
           <Setter Property="BorderThickness" Value="0"/>
         </Style>
         <Style Selector="TabItem">
-          <Setter Property="FontSize" Value="13"/>
-          <Setter Property="FontWeight" Value="SemiBold"/>
-          <Setter Property="Padding" Value="24,10"/>
-          <Setter Property="Margin" Value="2,0"/>
-          <Setter Property="Foreground" Value="#666666"/>
-          <Setter Property="Background" Value="#E8E8E8"/>
-          <Setter Property="CornerRadius" Value="6"/>
-          <Setter Property="BorderThickness" Value="0"/>
-        </Style>
-        <Style Selector="TabItem:pointerover">
-          <Setter Property="Background" Value="#D0D0D0"/>
-          <Setter Property="Foreground" Value="#333333"/>
-        </Style>
-        <Style Selector="TabItem:selected">
-          <Setter Property="Background" Value="#2196F3"/>
-          <Setter Property="Foreground" Value="White"/>
+          <Setter Property="IsVisible" Value="False"/>
         </Style>
       </TabControl.Styles>
-      <!-- Servers Tab -->
-      <TabItem Header="سرورها" Padding="16">
-        <DockPanel>
-          <!-- Filters & Add Server -->
-          <Border DockPanel.Dock="Top" Padding="0,0,0,16">
-            <StackPanel Spacing="12">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBox Text="{Binding ServerLink}" PlaceholderText="لینک سرور (vmess://, vless://, ...)" Width="400" Padding="10,8" BorderThickness="1" BorderBrush="{StaticResource BorderLight}" CornerRadius="6"/>
-                <Button Content="افزودن" Command="{Binding AddLinkCommand}" Padding="16,8" CornerRadius="6" Background="{StaticResource SuccessBrush}" Foreground="White"/>
-                <CheckBox Content="انتخاب همه" IsChecked="{Binding SelectAllChecked, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding SelectedCountText}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}"/>
-              </StackPanel>
-              
-              <!-- Action Buttons -->
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="پینگ" Command="{Binding TestAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="6" Background="{StaticResource PrimaryBrush}" Foreground="White"/>
-                <Button Content="توقف" Command="{Binding StopTestCommand}" IsVisible="{Binding IsTesting}" Padding="12,8" CornerRadius="6" Background="{StaticResource ErrorBrush}" Foreground="White"/>
-                <Button Content="RealDelay" Command="{Binding TestRealDelayAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="6"/>
-                <Button Content="سرعت" Command="{Binding TestSpeedCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="6"/>
-                <Button Content="حذف تکراری" Command="{Binding RemoveDuplicatesCommand}" Padding="12,8" CornerRadius="6"/>
-              </StackPanel>
-            </StackPanel>
-          </Border>
-
-          <!-- Servers List -->
-          <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Groups}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="vm:ServerGroup">
-                  <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Margin="0,0,0,16">
-                    <Expander.Header>
-                      <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" Margin="0,4">
-                        <CheckBox Grid.Column="0" IsChecked="{Binding AllServersChecked, Mode=TwoWay}" Margin="0,0,12,0"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Title}" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="2" Text="{Binding CountText}" Opacity="0.5" FontSize="12" VerticalAlignment="Center" Margin="8,0"/>
-                        <ComboBox Grid.Column="3" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding GroupSortField, Mode=TwoWay}" Width="120" Padding="6,4" FontSize="11" VerticalAlignment="Center" Margin="8,0" HorizontalAlignment="Left"/>
-                        <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="6">
-                          <Button Content="پینگ" ToolTip.Tip="پینگ گروه" Padding="8,4" Command="{Binding Owner.TestGroupCommand}" CommandParameter="{Binding}" CornerRadius="4" Background="{StaticResource PrimaryBrush}" Foreground="White"/>
-                          <Button Content="RealDelay" ToolTip.Tip="RealDelay" Padding="8,4" Command="{Binding Owner.TestGroupRealDelayCommand}" CommandParameter="{Binding}" CornerRadius="4"/>
-                          <Button Content="سرعت" ToolTip.Tip="سرعت" Padding="8,4" Command="{Binding Owner.TestGroupSpeedCommand}" CommandParameter="{Binding}" CornerRadius="4"/>
-                          <Button Content="بروزرسانی" ToolTip.Tip="بروزرسانی سابسکریپشن" Padding="8,4" IsVisible="{Binding IsSubscription}" Command="{Binding Owner.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding Subscription}" CornerRadius="4" Background="{StaticResource WarningBrush}" Foreground="White"/>
-                          <Button Content="حذف ساب" ToolTip.Tip="حذف" Padding="8,4" IsVisible="{Binding IsSubscription}" Command="{Binding Owner.RemoveSubscriptionCommand}" CommandParameter="{Binding Subscription}" CornerRadius="4" Background="{StaticResource ErrorBrush}" Foreground="White"/>
-                          <Button Content="حذف همه" ToolTip.Tip="حذف همه" Padding="8,4" IsVisible="{Binding IsNotSubscription}" Command="{Binding Owner.RemoveGroupServersCommand}" CommandParameter="{Binding}" CornerRadius="4" Background="{StaticResource ErrorBrush}" Foreground="White"/>
-                        </StackPanel>
-                      </Grid>
-                    </Expander.Header>
-                    <ItemsControl ItemsSource="{Binding Servers}" ItemTemplate="{StaticResource ServerRowTemplate}" Margin="0,0,0,0"/>
-                  </Expander>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </ScrollViewer>
-        </DockPanel>
+      
+      <!-- Servers Tab (محتوای اصلی) -->
+      <TabItem Padding="0">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20,16">
+          <ItemsControl ItemsSource="{Binding Groups}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:ServerGroup">
+                <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Margin="0,0,0,16">
+                  <Expander.Header>
+                    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" Margin="0,4">
+                      <CheckBox Grid.Column="0" IsChecked="{Binding AllServersChecked, Mode=TwoWay}" Margin="0,0,12,0"/>
+                      <TextBlock Grid.Column="1" Text="{Binding Title}" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="2" Text="{Binding CountText}" Opacity="0.5" FontSize="12" VerticalAlignment="Center" Margin="8,0"/>
+                      <ComboBox Grid.Column="3" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding GroupSortField, Mode=TwoWay}" Width="120" Padding="6,4" FontSize="11" VerticalAlignment="Center" Margin="8,0" HorizontalAlignment="Left"/>
+                      <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="6">
+                        <Button Content="پینگ" Padding="8,4" Command="{Binding Owner.TestGroupCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="{StaticResource PrimaryBrush}" Foreground="White" FontSize="11"/>
+                        <Button Content="RealDelay" Padding="8,4" Command="{Binding Owner.TestGroupRealDelayCommand}" CommandParameter="{Binding}" CornerRadius="6" FontSize="11"/>
+                        <Button Content="سرعت" Padding="8,4" Command="{Binding Owner.TestGroupSpeedCommand}" CommandParameter="{Binding}" CornerRadius="6" FontSize="11"/>
+                        <Button Content="بروزرسانی" Padding="8,4" IsVisible="{Binding IsSubscription}" Command="{Binding Owner.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding Subscription}" CornerRadius="6" Background="{StaticResource WarningBrush}" Foreground="White" FontSize="11"/>
+                        <Button Content="حذف همه" Padding="8,4" IsVisible="{Binding IsNotSubscription}" Command="{Binding Owner.RemoveGroupServersCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="{StaticResource ErrorBrush}" Foreground="White" FontSize="11"/>
+                      </StackPanel>
+                    </Grid>
+                  </Expander.Header>
+                  <ItemsControl ItemsSource="{Binding Servers}" ItemTemplate="{StaticResource ServerRowTemplate}" Margin="0,0,0,0"/>
+                </Expander>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
       </TabItem>
 
       <!-- Subscriptions Tab -->
@@ -273,18 +266,18 @@
         <DockPanel>
           <StackPanel DockPanel.Dock="Top" Spacing="12" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBox Text="{Binding SubName}" PlaceholderText="نام" Width="150" Padding="10,8" CornerRadius="6"/>
-              <TextBox Text="{Binding SubUrl}" PlaceholderText="https://..." Width="400" Padding="10,8" CornerRadius="6"/>
-              <Button Content="+ افزودن" Command="{Binding AddSubscriptionCommand}" Padding="16,8" CornerRadius="6" Background="{StaticResource PrimaryBrush}" Foreground="White"/>
+              <TextBox Text="{Binding SubName}" PlaceholderText="نام" Width="150" Padding="10,8" CornerRadius="8"/>
+              <TextBox Text="{Binding SubUrl}" PlaceholderText="https://..." Width="400" Padding="10,8" CornerRadius="8"/>
+              <Button Content="+ افزودن" Command="{Binding AddSubscriptionCommand}" Padding="16,8" CornerRadius="8" Background="{StaticResource PrimaryBrush}" Foreground="White"/>
             </StackPanel>
-            <Button Content="🔄 بروزرسانی همه" Command="{Binding UpdateSubscriptionsCommand}" Padding="12,8" CornerRadius="6"/>
+            <Button Content="بروزرسانی همه" Command="{Binding UpdateSubscriptionsCommand}" Padding="12,8" CornerRadius="8"/>
           </StackPanel>
           
           <ScrollViewer>
             <ItemsControl ItemsSource="{Binding Subscriptions}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Border CornerRadius="6" Padding="16" Margin="0,8,0,0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+                  <Border CornerRadius="10" Padding="16" Margin="0,8,0,0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
                     <Grid ColumnDefinitions="*,Auto,Auto">
                       <StackPanel Spacing="4">
                         <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13"/>
@@ -303,14 +296,14 @@
 
       <!-- Log Tab -->
       <TabItem Header="لاگ" Padding="16">
-        <TextBox Text="{Binding LogText}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Consolas" FontSize="11" Background="#F5F5F5" BorderThickness="0"/>
+        <TextBox Text="{Binding LogText}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Consolas" FontSize="11" Background="{StaticResource BgBrush}" BorderThickness="0"/>
       </TabItem>
 
       <!-- Settings Tab -->
       <TabItem Header="تنظیمات" Padding="16">
         <ScrollViewer>
           <StackPanel Spacing="16">
-            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+            <Border CornerRadius="10" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
                 <TextBlock Text="اتصال" FontWeight="Bold" FontSize="13"/>
                 <StackPanel Orientation="Horizontal" Spacing="8">
@@ -324,14 +317,14 @@
               </StackPanel>
             </Border>
             
-            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+            <Border CornerRadius="10" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
                 <TextBlock Text="سابسکریپشن" FontWeight="Bold" FontSize="13"/>
                 <TextBlock Text="بروزرسانی از طریق تب سابسکریپشن انجام می‌شود" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
               </StackPanel>
             </Border>
 
-            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+            <Border CornerRadius="10" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
                 <TextBlock Text="تنظیمات پیشرفته" FontWeight="Bold" FontSize="13"/>
                 <StackPanel Orientation="Horizontal" Spacing="8">

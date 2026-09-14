@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="XrayClient.Views.QrShareWindow"
+        Title="اشتراک‌گذاری (QR)" Width="400" Height="520"
+        WindowStartupLocation="CenterOwner"
+        FlowDirection="RightToLeft">
+  <StackPanel Margin="16" Spacing="10" HorizontalAlignment="Center">
+    <TextBlock x:Name="NameText" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center"/>
+    <Border CornerRadius="12" Padding="12" Background="White" HorizontalAlignment="Center">
+      <Image x:Name="QrImage" Width="260" Height="260"/>
+    </Border>
+    <TextBox x:Name="LinkBox" Height="70" TextWrapping="Wrap"
+             IsReadOnly="True" FontFamily="Consolas"/>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+      <Button Content="کپی لینک" Width="110" Click="Copy_Click"/>
+      <Button Content="بستن" Width="90" Margin="8,0,0,0" Click="Close_Click"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

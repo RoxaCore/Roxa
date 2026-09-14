@@ -1,0 +1,70 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="using:XrayClient.Models"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="560"
+        x:Class="XrayClient.Views.ServerEditorWindow"
+        x:DataType="models:ServerInfo"
+        Title="ویرایش سرور" Width="440" Height="580"
+        WindowStartupLocation="CenterOwner"
+        FlowDirection="RightToLeft">
+  <Grid Margin="14" RowDefinitions="*,Auto">
+    <ScrollViewer>
+      <StackPanel Spacing="6">
+        <TextBlock Text="نام" FontWeight="Bold"/>
+        <TextBox Text="{Binding Name}"/>
+        <Grid ColumnDefinitions="*,110">
+          <StackPanel Spacing="4" Margin="0,0,8,0">
+            <TextBlock Text="آدرس" FontWeight="Bold"/>
+            <TextBox Text="{Binding Address}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <TextBlock Text="پورت" FontWeight="Bold"/>
+            <NumericUpDown Value="{Binding Port}" Minimum="1" Maximum="65535"/>
+          </StackPanel>
+        </Grid>
+        <TextBlock Text="User ID" FontWeight="Bold"/>
+        <TextBox Text="{Binding UserId}"/>
+        <TextBlock Text="Password" FontWeight="Bold"/>
+        <TextBox Text="{Binding Password}"/>
+        <Grid ColumnDefinitions="*,*">
+          <StackPanel Spacing="4" Margin="0,0,8,0">
+            <TextBlock Text="SNI" FontWeight="Bold"/>
+            <TextBox Text="{Binding SNI}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <TextBlock Text="Host" FontWeight="Bold"/>
+            <TextBox Text="{Binding Host}"/>
+          </StackPanel>
+        </Grid>
+        <Grid ColumnDefinitions="*,*">
+          <StackPanel Spacing="4" Margin="0,0,8,0">
+            <TextBlock Text="Path" FontWeight="Bold"/>
+            <TextBox Text="{Binding Path}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <TextBlock Text="Network" FontWeight="Bold"/>
+            <TextBox Text="{Binding Network}"/>
+          </StackPanel>
+        </Grid>
+        <Grid ColumnDefinitions="*,*">
+          <StackPanel Spacing="4" Margin="0,0,8,0">
+            <TextBlock Text="Security" FontWeight="Bold"/>
+            <TextBox Text="{Binding Security}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <TextBlock Text="Flow" FontWeight="Bold"/>
+            <TextBox Text="{Binding Flow}"/>
+          </StackPanel>
+        </Grid>
+        <TextBlock Text="لینک بازسازی‌شده" FontWeight="Bold"/>
+        <TextBox x:Name="PreviewBox" IsReadOnly="True" TextWrapping="Wrap" Height="70" FontFamily="Consolas"/>
+      </StackPanel>
+    </ScrollViewer>
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0">
+      <Button Content="ذخیره" Width="100" Click="Save_Click"/>
+      <Button Content="انصراف" Width="100" Margin="8,0,0,0" Click="Cancel_Click"/>
+    </StackPanel>
+  </Grid>
+</Window>

@@ -1,0 +1,234 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization.Metadata;
+using XrayClient.Models;
+
+namespace XrayClient.Core;
+
+/// <summary>ساخت کانفیگ JSON موتور xray از روی یک سرور.</summary>
+public static class XrayConfigBuilder
+{
+    public static string Build(ServerInfo server, int socksPort, int httpPort)
+    {
+        var config = new JsonObject
+        {
+            ["log"] = new JsonObject { ["loglevel"] = "warning" },
+            ["inbounds"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["tag"] = "socks-in",
+                    ["listen"] = "127.0.0.1",
+                    ["port"] = socksPort,
+                    ["protocol"] = "socks",
+                    ["settings"] = new JsonObject { ["auth"] = "noauth", ["udp"] = true },
+                    ["sniffing"] = new JsonObject { ["enabled"] = true, ["destOverride"] = new JsonArray("http", "tls") }
+                },
+                new JsonObject
+                {
+                    ["tag"] = "http-in",
+                    ["listen"] = "127.0.0.1",
+                    ["port"] = httpPort,
+                    ["protocol"] = "http"
+                }
+            },
+            ["outbounds"] = new JsonArray
+            {
+                BuildOutbound(server),
+                new JsonObject { ["protocol"] = "freedom", ["tag"] = "direct" },
+                new JsonObject { ["protocol"] = "blackhole", ["tag"] = "block" }
+            },
+            ["routing"] = new JsonObject
+            {
+                ["domainStrategy"] = "AsIs",
+                ["rules"] = new JsonArray
+                {
+                    new JsonObject
+                    {
+                        ["type"] = "field",
+                        ["outboundTag"] = "direct",
+                        ["ip"] = new JsonArray("geoip:private")
+                    }
+                }
+            }
+        };
+
+        return config.ToJsonString(new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+        });
+    }
+
+    private static JsonObject BuildOutbound(ServerInfo s)
+    {
+        var outbound = new JsonObject { ["tag"] = "proxy" };
+        var stream = BuildStreamSettings(s);
+        if (stream is not null) outbound["streamSettings"] = stream;
+
+        switch (s.Protocol)
+        {
+            case ProxyProtocol.VMess:
+                outbound["protocol"] = "vmess";
+                outbound["settings"] = new JsonObject
+                {
+                    ["vnext"] = new JsonArray(new JsonObject
+                    {
+                        ["address"] = s.Address,
+                        ["port"] = s.Port,
+                        ["users"] = new JsonArray(new JsonObject
+                        {
+                            ["id"] = s.UserId,
+                            ["alterId"] = s.AlterId,
+                            ["security"] = string.IsNullOrEmpty(s.Encryption) ? "auto" : s.Encryption
+                        })
+                    })
+                };
+                break;
+            case ProxyProtocol.VLESS:
+                outbound["protocol"] = "vless";
+                outbound["settings"] = new JsonObject
+                {
+                    ["vnext"] = new JsonArray(new JsonObject
+                    {
+                        ["address"] = s.Address,
+                        ["port"] = s.Port,
+                        ["users"] = new JsonArray(new JsonObject
+                        {
+                            ["id"] = s.UserId,
+                            ["encryption"] = string.IsNullOrEmpty(s.Encryption) ? "none" : s.Encryption,
+                            ["flow"] = s.Flow ?? ""
+                        })
+                    })
+                };
+                break;
+            case ProxyProtocol.Shadowsocks:
+                outbound["protocol"] = "shadowsocks";
+                outbound["settings"] = new JsonObject
+                {
+                    ["servers"] = new JsonArray(new JsonObject
+                    {
+                        ["address"] = s.Address,
+                        ["port"] = s.Port,
+                        ["method"] = string.IsNullOrEmpty(s.Method) ? "aes-256-gcm" : s.Method,
+                        ["password"] = s.Password ?? ""
+                    })
+                };
+                break;
+            case ProxyProtocol.Trojan:
+                outbound["protocol"] = "trojan";
+                outbound["settings"] = new JsonObject
+                {
+                    ["servers"] = new JsonArray(new JsonObject
+                    {
+                        ["address"] = s.Address,
+                        ["port"] = s.Port,
+                        ["password"] = s.Password ?? ""
+                    })
+                };
+                break;
+        }
+        return outbound;
+    }
+
+    private static JsonObject BuildStreamSettings(ServerInfo s)
+    {
+        string network = s.Network switch
+        {
+            "h2" => "http",
+            "splithttp" => "xhttp",
+            _ => string.IsNullOrEmpty(s.Network) ? "tcp" : s.Network
+        };
+        var stream = new JsonObject { ["network"] = network };
+
+        switch (network)
+        {
+            case "tcp" when string.Equals(s.HeaderType, "http", StringComparison.OrdinalIgnoreCase):
+                stream["tcpSettings"] = new JsonObject
+                {
+                    ["header"] = new JsonObject
+                    {
+                        ["type"] = "http",
+                        ["request"] = new JsonObject
+                        {
+                            ["path"] = new JsonArray(string.IsNullOrEmpty(s.Path) ? "/" : s.Path),
+                            ["headers"] = new JsonObject
+                            {
+                                ["Host"] = new JsonArray(string.IsNullOrEmpty(s.Host) ? s.Address : s.Host)
+                            }
+                        }
+                    }
+                };
+                break;
+            case "kcp":
+                stream["kcpSettings"] = new JsonObject
+                {
+                    ["header"] = new JsonObject { ["type"] = string.IsNullOrEmpty(s.HeaderType) ? "none" : s.HeaderType },
+                    ["seed"] = s.Path ?? ""
+                };
+                break;
+            case "ws":
+                stream["wsSettings"] = new JsonObject
+                {
+                    ["path"] = string.IsNullOrEmpty(s.Path) ? "/" : s.Path,
+                    ["headers"] = new JsonObject { ["Host"] = s.Host ?? "" }
+                };
+                break;
+            case "http":
+                stream["httpSettings"] = new JsonObject
+                {
+                    ["path"] = string.IsNullOrEmpty(s.Path) ? "/" : s.Path,
+                    ["host"] = new JsonArray(string.IsNullOrEmpty(s.Host) ? s.Address : s.Host)
+                };
+                break;
+            case "grpc":
+                stream["grpcSettings"] = new JsonObject { ["serviceName"] = s.ServiceName ?? "" };
+                break;
+            case "xhttp":
+                stream["xhttpSettings"] = new JsonObject
+                {
+                    ["path"] = string.IsNullOrEmpty(s.Path) ? "/" : s.Path,
+                    ["host"] = s.Host ?? ""
+                };
+                break;
+        }
+
+        switch (s.Security)
+        {
+            case "tls":
+                stream["security"] = "tls";
+                var tls = new JsonObject { ["allowInsecure"] = s.AllowInsecure };
+                tls["serverName"] = !string.IsNullOrEmpty(s.SNI) ? s.SNI
+                    : !string.IsNullOrEmpty(s.Host) ? s.Host : s.Address;
+                if (!string.IsNullOrEmpty(s.Fingerprint)) tls["fingerprint"] = s.Fingerprint;
+                if (!string.IsNullOrEmpty(s.Alpn)) tls["alpn"] = SplitList(s.Alpn);
+                stream["tlsSettings"] = tls;
+                break;
+            case "reality":
+                stream["security"] = "reality";
+                var reality = new JsonObject
+                {
+                    ["show"] = false,
+                    ["fingerprint"] = string.IsNullOrEmpty(s.Fingerprint) ? "chrome" : s.Fingerprint,
+                    ["serverName"] = string.IsNullOrEmpty(s.SNI) ? s.Address : s.SNI,
+                    ["publicKey"] = s.PublicKey ?? "",
+                    ["shortId"] = s.ShortId ?? "",
+                    ["spiderX"] = s.SpiderX ?? ""
+                };
+                stream["realitySettings"] = reality;
+                break;
+            default:
+                stream["security"] = "none";
+                break;
+        }
+        return stream;
+    }
+
+    private static JsonArray SplitList(string value)
+    {
+        var arr = new JsonArray();
+        foreach (var item in value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            arr.Add(item);
+        return arr;
+    }
+}

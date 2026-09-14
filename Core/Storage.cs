@@ -1,0 +1,63 @@
+using System.Text.Json;
+using XrayClient.Models;
+
+namespace XrayClient.Core;
+
+/// <summary>ذخیره‌سازی JSON در پوشه AppData/XrayClient.</summary>
+public static class Storage
+{
+    private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
+
+    public static string DataDir
+    {
+        get
+        {
+            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "XrayClient");
+            Directory.CreateDirectory(dir);
+            return dir;
+        }
+    }
+
+    private static string ServersFile => Path.Combine(DataDir, "servers.json");
+    private static string SubscriptionsFile => Path.Combine(DataDir, "subscriptions.json");
+    private static string SettingsFile => Path.Combine(DataDir, "settings.json");
+
+    public static List<ServerInfo> LoadServers()
+    {
+        try
+        {
+            if (!File.Exists(ServersFile)) return new List<ServerInfo>();
+            return JsonSerializer.Deserialize<List<ServerInfo>>(File.ReadAllText(ServersFile)) ?? new List<ServerInfo>();
+        }
+        catch { return new List<ServerInfo>(); }
+    }
+
+    public static void SaveServers(List<ServerInfo> servers)
+        => File.WriteAllText(ServersFile, JsonSerializer.Serialize(servers, Options));
+
+    public static List<SubscriptionInfo> LoadSubscriptions()
+    {
+        try
+        {
+            if (!File.Exists(SubscriptionsFile)) return new List<SubscriptionInfo>();
+            return JsonSerializer.Deserialize<List<SubscriptionInfo>>(File.ReadAllText(SubscriptionsFile)) ?? new List<SubscriptionInfo>();
+        }
+        catch { return new List<SubscriptionInfo>(); }
+    }
+
+    public static void SaveSubscriptions(List<SubscriptionInfo> subs)
+        => File.WriteAllText(SubscriptionsFile, JsonSerializer.Serialize(subs, Options));
+
+    public static AppSettings LoadSettings()
+    {
+        try
+        {
+            if (!File.Exists(SettingsFile)) return new AppSettings();
+            return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(SettingsFile)) ?? new AppSettings();
+        }
+        catch { return new AppSettings(); }
+    }
+
+    public static void SaveSettings(AppSettings settings)
+        => File.WriteAllText(SettingsFile, JsonSerializer.Serialize(settings, Options));
+}

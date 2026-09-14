@@ -37,6 +37,7 @@
       <Border CornerRadius="8" 
               Padding="16" 
               Margin="0,8,0,0"
+              HorizontalAlignment="Stretch"
               Background="{Binding IsActiveConnection, Converter={StaticResource ActiveBrush}, ConverterParameter='#E1F0EC,#FFFFFF'}"
               BorderBrush="{Binding IsActiveConnection, Converter={StaticResource ActiveBrush}, ConverterParameter='#0E7C6B,#E0E0E0'}"
               BorderThickness="1">
@@ -134,10 +135,9 @@
     </DataTemplate>
   </Window.Resources>
 
-  <Panel>
-  <DockPanel Background="#F8F9FA">
+  <Grid RowDefinitions="Auto,*" Background="#F8F9FA">
     <!-- Top Bar -->
-    <Border DockPanel.Dock="Top" Padding="0,0,0,12" Background="#FFFFFF" BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1">
+    <Border Grid.Row="0" Padding="0,0,0,12" Background="#FFFFFF" BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1">
       <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,12" VerticalAlignment="Center">
         <Border Background="{StaticResource PrimaryBrush}" CornerRadius="8" Width="36" Height="36" VerticalAlignment="Center">
           <TextBlock Text="⚡" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
@@ -176,7 +176,7 @@
     </Border>
 
     <!-- Main Content -->
-    <TabControl Margin="0" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <TabControl Grid.Row="1" Margin="0" Padding="0">
       <TabControl.Styles>
         <Style Selector="TabControl">
           <Setter Property="Background" Value="Transparent"/>
@@ -226,9 +226,14 @@
           <!-- Servers List -->
           <ScrollViewer VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Groups}">
+              <ItemsControl.Styles>
+                <Style Selector="ContentPresenter">
+                  <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                </Style>
+              </ItemsControl.Styles>
               <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="vm:ServerGroup">
-                  <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Margin="0,0,0,16">
+                  <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Margin="0,0,0,16" HorizontalAlignment="Stretch">
                     <Expander.Header>
                       <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" Margin="0,4">
                         <CheckBox Grid.Column="0" IsChecked="{Binding AllServersChecked, Mode=TwoWay}" Margin="0,0,12,0"/>
@@ -245,7 +250,13 @@
                         </StackPanel>
                       </Grid>
                     </Expander.Header>
-                    <ItemsControl ItemsSource="{Binding Servers}" ItemTemplate="{StaticResource ServerRowTemplate}" Margin="0,0,0,0"/>
+                    <ItemsControl ItemsSource="{Binding Servers}" ItemTemplate="{StaticResource ServerRowTemplate}" Margin="0,0,0,0">
+                      <ItemsControl.Styles>
+                        <Style Selector="ContentPresenter">
+                          <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        </Style>
+                      </ItemsControl.Styles>
+                    </ItemsControl>
                   </Expander>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
@@ -332,11 +343,10 @@
         </ScrollViewer>
       </TabItem>
     </TabControl>
-  </DockPanel>
-  <!-- Toast Notification -->
-  <Border x:Name="ToastBorder" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" ZIndex="999"
-          Background="#122A25" CornerRadius="10" Padding="20,12" MaxWidth="400">
-    <TextBlock x:Name="ToastText" Text="" FontSize="13" Foreground="White" TextWrapping="Wrap" TextAlignment="Center"/>
-  </Border>
-  </Panel>
+    <!-- Toast Notification -->
+    <Border x:Name="ToastBorder" IsVisible="False" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" ZIndex="999"
+            Background="#122A25" CornerRadius="10" Padding="20,12" MaxWidth="400">
+      <TextBlock x:Name="ToastText" Text="" FontSize="13" Foreground="White" TextWrapping="Wrap" TextAlignment="Center"/>
+    </Border>
+  </Grid>
 </Window>

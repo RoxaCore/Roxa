@@ -21,7 +21,7 @@ public static class SpeedTester
          {
              using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
              cts.CancelAfter(TimeSpan.FromSeconds(12));
-             await engine.StartAsync(server, setSystemProxy: false, cts.Token);
+              await engine.StartAsync(server, setSystemProxy: false, null, cts.Token);
 
              using var handler = new HttpClientHandler
              {

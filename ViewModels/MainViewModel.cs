@@ -45,6 +45,9 @@ public partial class MainViewModel : ViewModelBase
       [ObservableProperty] private int _selectedCount;
       [ObservableProperty] private bool _selectAllChecked;
       [ObservableProperty] private bool _sortAscending = true;
+      [ObservableProperty] private string _customDnsServers = "";
+      [ObservableProperty] private string _customDnsAdvancedJson = "";
+      [ObservableProperty] private bool _showAdvancedDns;
       [ObservableProperty] private Dictionary<int, double> _columnWidths = new()
       {
           { 0, 80 },   // Type
@@ -78,6 +81,8 @@ public partial class MainViewModel : ViewModelBase
         AutoUpdateIntervalHours = _settings.AutoUpdateIntervalHours <= 0 ? 12 : _settings.AutoUpdateIntervalHours;
         _sortField = _settings.SortField;
         _sortAscending = _settings.SortAscending;
+        _customDnsServers = _settings.CustomDnsServers ?? "";
+        _customDnsAdvancedJson = _settings.CustomDnsAdvancedJson ?? "";
         foreach (var s in Storage.LoadSubscriptions())
             Subscriptions.Add(s);
         foreach (var server in Storage.LoadServers())
@@ -270,6 +275,8 @@ public partial class MainViewModel : ViewModelBase
         SaveSettings();
         RefreshGroups();
     }
+    partial void OnCustomDnsServersChanged(string value) { _settings.CustomDnsServers = value; SaveSettings(); }
+    partial void OnCustomDnsAdvancedJsonChanged(string value) { _settings.CustomDnsAdvancedJson = value; SaveSettings(); }
 
     public void SetGroupExpanded(string key, bool expanded)
     {
@@ -520,7 +527,7 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = "در حال اتصال ...";
-            await _engine.StartAsync(server, SetSystemProxy);
+            await _engine.StartAsync(server, SetSystemProxy, _settings);
             IsConnected = true;
             RefreshConnectionFlags();
             Status = $"متصل به {server.Name}";

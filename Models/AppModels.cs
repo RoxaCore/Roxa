@@ -20,4 +20,6 @@ public class AppSettings
     public string SortField { get; set; } = "بدون مرتب";
     public bool SortAscending { get; set; } = true;
     public Dictionary<string, string> GroupSortFields { get; set; } = new();
+    public string CustomDnsServers { get; set; } = "";
+    public string? CustomDnsAdvancedJson { get; set; }
 }

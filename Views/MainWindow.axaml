@@ -326,6 +326,24 @@
               </StackPanel>
             </Border>
 
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="12">
+                <TextBlock Text="DNS سفارشی" FontWeight="Bold" FontSize="13"/>
+                <TextBox Text="{Binding CustomDnsServers}" PlaceholderText="1.1.1.1, 8.8.8.8" Padding="10,8" CornerRadius="6" FontSize="13"/>
+                <TextBlock Text="IPv4/IPv6 با کاما جدا شده" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                <Expander Header="تنظیمات پیشرفته DNS (JSON)" IsExpanded="{Binding ShowAdvancedDns}">
+                  <StackPanel Spacing="4">
+                    <TextBox Text="{Binding CustomDnsAdvancedJson}" AcceptsReturn="True" TextWrapping="Wrap" Height="120" Padding="10,8" CornerRadius="6" FontFamily="Consolas" FontSize="12"/>
+                    <TextBlock Text='مثال: {"servers": [{"address": "1.1.1.1"}]}' FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                  </StackPanel>
+                </Expander>
+                <TextBlock FontSize="11">
+                  <Run Text=" مستندات DNS: " Foreground="{StaticResource TextSecondary}"/>
+                  <Run Text="https://xtls.github.io/config/dns.html" Foreground="#0E7C6B" TextDecorations="Underline"/>
+                </TextBlock>
+              </StackPanel>
+            </Border>
+
             <TextBlock Text="Roxa 3.0 • Avalonia" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,16,0,0"/>
           </StackPanel>
         </ScrollViewer>

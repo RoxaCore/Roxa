@@ -8,7 +8,7 @@ namespace XrayClient.Core;
 /// <summary>ساخت کانفیگ JSON موتور xray از روی یک سرور.</summary>
 public static class XrayConfigBuilder
 {
-    public static string Build(ServerInfo server, int socksPort, int httpPort)
+    public static string Build(ServerInfo server, int socksPort, int httpPort, AppSettings? settings = null)
     {
         var config = new JsonObject
         {
@@ -53,11 +53,48 @@ public static class XrayConfigBuilder
             }
         };
 
+        var dns = BuildDnsObject(settings);
+        if (dns is not null) config["dns"] = dns;
+
         return config.ToJsonString(new JsonSerializerOptions
         {
             WriteIndented = true,
             TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         });
+    }
+
+    public static JsonObject? BuildDnsObject(AppSettings? settings)
+    {
+        if (settings is null) return null;
+
+        if (!string.IsNullOrWhiteSpace(settings.CustomDnsAdvancedJson))
+        {
+            try
+            {
+                var parsed = JsonNode.Parse(settings.CustomDnsAdvancedJson);
+                if (parsed is JsonObject obj)
+                {
+                    _ = obj.ToJsonString();
+                    return obj;
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(settings.CustomDnsServers))
+        {
+            var servers = new JsonArray();
+            foreach (var part in settings.CustomDnsServers.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                if (System.Net.IPAddress.TryParse(part, out _))
+                    servers.Add(part);
+            }
+            if (servers.Count > 0)
+                return new JsonObject { ["servers"] = servers };
+        }
+
+        return null;
     }
 
     private static JsonObject BuildOutbound(ServerInfo s)

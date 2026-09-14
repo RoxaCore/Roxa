@@ -103,7 +103,7 @@ public sealed class XrayEngine : IDisposable
         Log($"Xray-core {version} ready.");
     }
 
-    public async Task StartAsync(ServerInfo server, bool setSystemProxy, CancellationToken ct = default)
+    public async Task StartAsync(ServerInfo server, bool setSystemProxy, AppSettings? settings = null, CancellationToken ct = default)
     {
         Stop();
         if (!File.Exists(EnginePath))
@@ -114,7 +114,7 @@ public sealed class XrayEngine : IDisposable
 
         SocksPort = FindFreePort();
         HttpPort = FindFreePort();
-        string configJson = XrayConfigBuilder.Build(server, SocksPort, HttpPort);
+        string configJson = XrayConfigBuilder.Build(server, SocksPort, HttpPort, settings);
         string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-config-{Guid.NewGuid():N}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
 

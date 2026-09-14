@@ -109,41 +109,38 @@
     </DataTemplate>
   </Window.Resources>
 
-  <Grid RowDefinitions="Auto,*" Background="#F7F8FA">
+  <Grid RowDefinitions="Auto,Auto,*" Background="#F7F8FA">
     <!-- Top Bar -->
-    <Border Grid.Row="0" Padding="0,0,0,8" Background="#FFFFFF" BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
-      <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,12">
-        <!-- Logo & Title -->
-        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-          <TextBlock Text="⚡" FontSize="20" VerticalAlignment="Center" Foreground="#1A1A1A"/>
-          <TextBlock Text="XrayClient" FontSize="18" FontWeight="Bold" Foreground="#1A1A1A" VerticalAlignment="Center"/>
-        </StackPanel>
+    <Border Grid.Row="0" Padding="0" Background="#FFFFFF" BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,*,Auto" Margin="24,14,24,14">
+        <!-- Logo -->
+        <TextBlock Grid.Column="0" Text="XrayClient" FontSize="16" FontWeight="Bold" Foreground="#1A1A1A" VerticalAlignment="Center"/>
 
-        <!-- Active Server (center) -->
+        <!-- Server Status (center) -->
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center">
-          <Ellipse Width="8" Height="8" Fill="#22C55E" IsVisible="{Binding IsConnected}"/>
-          <Ellipse Width="8" Height="8" Fill="#CCCCCC" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"/>
-          <TextBlock Text="{Binding HomeServerName}" FontSize="13" FontWeight="Medium" Foreground="#555555" MaxWidth="300" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+          <TextBlock Text="{Binding HomeServerName}" FontSize="14" FontWeight="Medium" Foreground="#333333" MaxWidth="300" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+          <Ellipse Width="8" Height="8" Fill="#22C55E" IsVisible="{Binding IsConnected}" VerticalAlignment="Center"/>
+          <Ellipse Width="8" Height="8" Fill="#CCCCCC" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" VerticalAlignment="Center"/>
+          <TextBlock FontSize="12" Foreground="#888888" VerticalAlignment="Center" IsVisible="{Binding IsConnected}">
+            <Run Text="متصل"/>
+            <Run Text=" · "/>
+            <Run Text="{Binding HomeLatency, Mode=OneWay}"/>
+          </TextBlock>
         </StackPanel>
 
-        <!-- Connect Button -->
-        <Button Grid.Column="2" Command="{Binding ConnectCommand}" Padding="20,10" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" Background="#0E7C6B" Foreground="White" CornerRadius="10" VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="▶" FontSize="11" VerticalAlignment="Center"/>
-            <TextBlock Text="اتصال" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
-          </StackPanel>
+        <!-- Connect Button (when not connected) -->
+        <Button Grid.Column="2" Command="{Binding ConnectCommand}" Padding="14,8" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" Background="#0E7C6B" Foreground="White" CornerRadius="8" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold">
+          ▶ اتصال
         </Button>
-        <Button Grid.Column="2" Command="{Binding DisconnectCommand}" Padding="20,10" IsVisible="{Binding IsConnected}" Background="#E53E3E" Foreground="White" CornerRadius="10" VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="✕" FontSize="11" VerticalAlignment="Center"/>
-            <TextBlock Text="قطع" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
-          </StackPanel>
+        <!-- Disconnect Button (when connected) -->
+        <Button Grid.Column="2" Command="{Binding DisconnectCommand}" Padding="14,8" IsVisible="{Binding IsConnected}" Background="#E53E3E" Foreground="White" CornerRadius="8" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold">
+          قطع اتصال
         </Button>
       </Grid>
     </Border>
 
-    <!-- Main Content -->
-    <TabControl Grid.Row="1" Margin="0" Padding="0">
+    <!-- Tabs -->
+    <TabControl Grid.Row="1" Margin="24,0,24,0" Padding="0">
       <TabControl.Styles>
         <Style Selector="TabControl">
           <Setter Property="Background" Value="Transparent"/>
@@ -151,21 +148,23 @@
         </Style>
         <Style Selector="TabItem">
           <Setter Property="FontSize" Value="13"/>
-          <Setter Property="FontWeight" Value="SemiBold"/>
-          <Setter Property="Padding" Value="24,10"/>
-          <Setter Property="Margin" Value="2,0"/>
-          <Setter Property="Foreground" Value="#666666"/>
-          <Setter Property="Background" Value="#E8E8E8"/>
-          <Setter Property="CornerRadius" Value="6"/>
-          <Setter Property="BorderThickness" Value="0"/>
+          <Setter Property="FontWeight" Value="Medium"/>
+          <Setter Property="Padding" Value="16,10"/>
+          <Setter Property="Margin" Value="0"/>
+          <Setter Property="Foreground" Value="#999999"/>
+          <Setter Property="Background" Value="Transparent"/>
+          <Setter Property="CornerRadius" Value="0"/>
+          <Setter Property="BorderThickness" Value="0,0,0,2"/>
+          <Setter Property="BorderBrush" Value="Transparent"/>
         </Style>
         <Style Selector="TabItem:pointerover">
-          <Setter Property="Background" Value="#D0D0D0"/>
-          <Setter Property="Foreground" Value="#333333"/>
+          <Setter Property="Background" Value="Transparent"/>
+          <Setter Property="Foreground" Value="#555555"/>
         </Style>
         <Style Selector="TabItem:selected">
-          <Setter Property="Background" Value="#0E7C6B"/>
-          <Setter Property="Foreground" Value="White"/>
+          <Setter Property="Background" Value="Transparent"/>
+          <Setter Property="Foreground" Value="#0E7C6B"/>
+          <Setter Property="BorderBrush" Value="#0E7C6B"/>
         </Style>
       </TabControl.Styles>
       <!-- Servers Tab -->
@@ -274,7 +273,7 @@
       </TabItem>
 
       <!-- Settings Tab -->
-      <TabItem Header="تنظیمات" Padding="16">
+      <TabItem Header="⚙ تنظیمات" Padding="16">
         <ScrollViewer>
           <StackPanel Spacing="16">
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">

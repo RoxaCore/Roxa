@@ -585,9 +585,9 @@ public partial class MainViewModel : ViewModelBase
                      _ => await RealDelayTester.TestAsync(s, _testCts.Token)
                  };
                  if (!_testCts.Token.IsCancellationRequested)
-                     Post(() => s.RecordLatency(ok ? ms : -2));
+                     Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
              }
-             catch { Post(() => s.RecordLatency(-2)); }
+             catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
              finally { sem.Release(); }
          });
          try
@@ -625,9 +625,9 @@ public partial class MainViewModel : ViewModelBase
                  if (_testCts.Token.IsCancellationRequested) return;
                  Post(() => Status = $"تست سرعت: {s.Name} ...");
                  var (ok, mbps) = await SpeedTester.TestAsync(s, _testCts.Token);
-                 Post(() => s.RecordSpeed(ok ? mbps : -2));
+                 Post(() => { s.RecordSpeed(ok ? mbps : -2); AutoSortAfterTest("speed"); });
              }
-             catch { Post(() => s.RecordSpeed(-2)); }
+             catch { Post(() => { s.RecordSpeed(-2); AutoSortAfterTest("speed"); }); }
              finally { try { sem.Release(); } catch { } }
          });
          try
@@ -756,9 +756,9 @@ public partial class MainViewModel : ViewModelBase
                     PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
                     _ => await RealDelayTester.TestAsync(s)
                 };
-                Post(() => s.RecordLatency(ok ? ms : -2));
+                Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
             }
-            catch { Post(() => s.RecordLatency(-2)); }
+            catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
             finally { sem.Release(); }
         });
         await Task.WhenAll(tasks);
@@ -783,9 +783,9 @@ public partial class MainViewModel : ViewModelBase
             try
             {
                 var (ok, mbps) = await SpeedTester.TestAsync(s);
-                Post(() => s.RecordSpeed(ok ? mbps : -2));
+                Post(() => { s.RecordSpeed(ok ? mbps : -2); AutoSortAfterTest("speed"); });
             }
-            catch { Post(() => s.RecordSpeed(-2)); }
+            catch { Post(() => { s.RecordSpeed(-2); AutoSortAfterTest("speed"); }); }
             finally { sem.Release(); }
         });
         await Task.WhenAll(tasks);
@@ -847,9 +847,9 @@ public partial class MainViewModel : ViewModelBase
                      _ => await RealDelayTester.TestAsync(s, _testCts.Token)
                  };
                  if (!_testCts.Token.IsCancellationRequested)
-                     Post(() => s.RecordLatency(ok ? ms : -2));
+                     Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
              }
-             catch { Post(() => s.RecordLatency(-2)); }
+             catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
              finally { sem.Release(); }
          });
          try
@@ -867,7 +867,7 @@ public partial class MainViewModel : ViewModelBase
      [RelayCommand]
      private async Task TestGroupRealDelay(ServerGroup? group)
      {
-         var targets = group?.Servers.ToList() ?? new List<ServerInfo>();
+          var targets = group?.Servers.ToList() ?? new List<ServerInfo>();
          if (targets.Count == 0 || IsTesting) return;
          _testCts = new CancellationTokenSource();
          IsTesting = true;
@@ -883,9 +883,9 @@ public partial class MainViewModel : ViewModelBase
                  if (_testCts.Token.IsCancellationRequested) return;
                  var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
                  if (!_testCts.Token.IsCancellationRequested)
-                     Post(() => s.RecordLatency(ok ? ms : -2));
+                     Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
              }
-             catch { Post(() => s.RecordLatency(-2)); }
+             catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
              finally { sem.Release(); }
          });
          try
@@ -919,9 +919,9 @@ public partial class MainViewModel : ViewModelBase
                  if (_testCts.Token.IsCancellationRequested) return;
                  Post(() => Status = $"تست سرعت: {s.Name} ...");
                  var (ok, mbps) = await SpeedTester.TestAsync(s, _testCts.Token);
-                 Post(() => s.RecordSpeed(ok ? mbps : -2));
+                 Post(() => { s.RecordSpeed(ok ? mbps : -2); AutoSortAfterTest("speed"); });
              }
-             catch { Post(() => s.RecordSpeed(-2)); }
+             catch { Post(() => { s.RecordSpeed(-2); AutoSortAfterTest("speed"); }); }
              finally { try { sem.Release(); } catch { } }
          });
          try
@@ -957,9 +957,9 @@ public partial class MainViewModel : ViewModelBase
                  if (_testCts.Token.IsCancellationRequested) return;
                  Post(() => Status = $"بروزرسانی: {s.Name} ...");
                  var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                 Post(() => s.LatencyMs = ok ? ms : -2);
+                 Post(() => { s.LatencyMs = ok ? ms : -2; AutoSortAfterTest("latency"); });
              }
-             catch { Post(() => s.LatencyMs = -2); }
+             catch { Post(() => { s.LatencyMs = -2; AutoSortAfterTest("latency"); }); }
              finally { try { sem.Release(); } catch { } }
          });
          try { await Task.WhenAll(tasks); }
@@ -994,9 +994,9 @@ public partial class MainViewModel : ViewModelBase
             {
                 if (_testCts.Token.IsCancellationRequested) return;
                 var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                Post(() => s.RecordLatency(ok ? ms : -2));
+                Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
             }
-            catch { Post(() => s.RecordLatency(-2)); }
+            catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
             finally { try { sem.Release(); } catch { } }
         });
         try
@@ -1031,9 +1031,9 @@ public partial class MainViewModel : ViewModelBase
             {
                 if (_testCts.Token.IsCancellationRequested) return;
                 var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                Post(() => s.RecordLatency(ok ? ms : -2));
+                Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
             }
-            catch { Post(() => s.RecordLatency(-2)); }
+            catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
             finally { try { sem.Release(); } catch { } }
         });
         try

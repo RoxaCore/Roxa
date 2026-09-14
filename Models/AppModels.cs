@@ -22,4 +22,5 @@ public class AppSettings
     public Dictionary<string, string> GroupSortFields { get; set; } = new();
     public string CustomDnsServers { get; set; } = "";
     public string? CustomDnsAdvancedJson { get; set; }
+    public bool UseTunMode { get; set; }
 }

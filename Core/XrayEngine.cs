@@ -112,6 +112,20 @@ public sealed class XrayEngine : IDisposable
             await EnsureEngineAsync(false, ct);
         }
 
+        bool useTun = settings?.UseTunMode == true;
+        if (useTun)
+        {
+            if (!AdminHelper.IsRunningAsAdmin())
+                throw new InvalidOperationException("TUN mode requires Administrator privileges. Run as Administrator.");
+            if (!TunManager.IsWintunAvailable())
+            {
+                bool ok = await TunManager.EnsureWintunDownloadedAsync();
+                if (!ok) throw new InvalidOperationException("wintun.dll not found and could not be downloaded.");
+            }
+            if (!TunManager.IsTunAdapterActive())
+                TunManager.CreateTunAdapter();
+        }
+
         SocksPort = FindFreePort();
         HttpPort = FindFreePort();
         string configJson = XrayConfigBuilder.Build(server, SocksPort, HttpPort, settings);
@@ -142,7 +156,7 @@ public sealed class XrayEngine : IDisposable
         }
 
         CurrentServer = server;
-        Log($"Connecting to {server.Name} ...");
+        Log($"Connecting to {server.Name} {(useTun ? "[TUN Mode]" : "")} ...");
 
         bool ready = false;
         for (int i = 0; i < 60 && !ct.IsCancellationRequested; i++)
@@ -157,12 +171,12 @@ public sealed class XrayEngine : IDisposable
         }
         if (!ready) throw new InvalidOperationException("Proxy port did not come up.");
 
-        if (setSystemProxy && IsWindows)
+        if (!useTun && setSystemProxy && IsWindows)
         {
             SystemProxy.Set($"127.0.0.1:{HttpPort}");
             _proxyActive = true;
         }
-        Log($"Connected. HTTP 127.0.0.1:{HttpPort}  SOCKS 127.0.0.1:{SocksPort}");
+        Log($"Connected. HTTP 127.0.0.1:{HttpPort}  SOCKS 127.0.0.1:{SocksPort} {(useTun ? "[TUN]" : "")}");
         CleanupTempConfig(configPath);
     }
 
@@ -203,6 +217,11 @@ public sealed class XrayEngine : IDisposable
             _proxyActive = false;
             try { SystemProxy.Clear(); }
             catch (Exception ex) { Log($"Clear proxy failed: {ex.Message}"); }
+        }
+        if (TunManager.IsTunAdapterActive())
+        {
+            TunManager.CleanupTunAdapter();
+            Log("TUN adapter cleaned up on stop.");
         }
         CurrentServer = null;
         HttpPort = 0;

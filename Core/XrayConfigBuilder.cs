@@ -13,25 +13,7 @@ public static class XrayConfigBuilder
         var config = new JsonObject
         {
             ["log"] = new JsonObject { ["loglevel"] = "warning" },
-            ["inbounds"] = new JsonArray
-            {
-                new JsonObject
-                {
-                    ["tag"] = "socks-in",
-                    ["listen"] = "127.0.0.1",
-                    ["port"] = socksPort,
-                    ["protocol"] = "socks",
-                    ["settings"] = new JsonObject { ["auth"] = "noauth", ["udp"] = true },
-                    ["sniffing"] = new JsonObject { ["enabled"] = true, ["destOverride"] = new JsonArray("http", "tls") }
-                },
-                new JsonObject
-                {
-                    ["tag"] = "http-in",
-                    ["listen"] = "127.0.0.1",
-                    ["port"] = httpPort,
-                    ["protocol"] = "http"
-                }
-            },
+            ["inbounds"] = new JsonArray(),
             ["outbounds"] = new JsonArray
             {
                 BuildOutbound(server),
@@ -52,6 +34,68 @@ public static class XrayConfigBuilder
                 }
             }
         };
+
+        var inbounds = (JsonArray)config["inbounds"]!;
+
+        bool useTun = settings?.UseTunMode == true;
+        if (useTun)
+        {
+            inbounds.Add(new JsonObject
+            {
+                ["tag"] = "tun-in",
+                ["protocol"] = "dokodemo-door",
+                ["listen"] = "127.0.0.1",
+                ["port"] = socksPort,
+                ["settings"] = new JsonObject
+                {
+                    ["network"] = "tcp,udp",
+                    ["followRedirect"] = true
+                },
+                ["sniffing"] = new JsonObject
+                {
+                    ["enabled"] = true,
+                    ["destOverride"] = new JsonArray("http", "tls")
+                },
+                ["streamSettings"] = new JsonObject
+                {
+                    ["sockopt"] = new JsonObject
+                    {
+                        ["tstack"] = new JsonObject
+                        {
+                            ["interface"] = "wintun",
+                            ["autoRoute"] = false
+                        }
+                    }
+                }
+            });
+            inbounds.Add(new JsonObject
+            {
+                ["tag"] = "tun-http",
+                ["protocol"] = "http",
+                ["listen"] = "127.0.0.1",
+                ["port"] = httpPort,
+                ["settings"] = new JsonObject()
+            });
+        }
+        else
+        {
+            inbounds.Add(new JsonObject
+            {
+                ["tag"] = "socks-in",
+                ["listen"] = "127.0.0.1",
+                ["port"] = socksPort,
+                ["protocol"] = "socks",
+                ["settings"] = new JsonObject { ["auth"] = "noauth", ["udp"] = true },
+                ["sniffing"] = new JsonObject { ["enabled"] = true, ["destOverride"] = new JsonArray("http", "tls") }
+            });
+            inbounds.Add(new JsonObject
+            {
+                ["tag"] = "http-in",
+                ["listen"] = "127.0.0.1",
+                ["port"] = httpPort,
+                ["protocol"] = "http"
+            });
+        }
 
         var dns = BuildDnsObject(settings);
         if (dns is not null) config["dns"] = dns;

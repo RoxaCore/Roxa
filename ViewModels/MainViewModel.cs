@@ -49,6 +49,7 @@ public partial class MainViewModel : ViewModelBase
       [ObservableProperty] private string _customDnsServers = "";
       [ObservableProperty] private string _customDnsAdvancedJson = "";
       [ObservableProperty] private bool _showAdvancedDns;
+      [ObservableProperty] private bool _useTunMode;
       [ObservableProperty] private Dictionary<int, double> _columnWidths = new()
       {
           { 0, 80 },   // Type
@@ -84,6 +85,7 @@ public partial class MainViewModel : ViewModelBase
         _sortAscending = _settings.SortAscending;
         _customDnsServers = _settings.CustomDnsServers ?? "";
         _customDnsAdvancedJson = _settings.CustomDnsAdvancedJson ?? "";
+        _useTunMode = _settings.UseTunMode;
         foreach (var s in Storage.LoadSubscriptions())
             Subscriptions.Add(s);
         foreach (var server in Storage.LoadServers())
@@ -278,6 +280,19 @@ public partial class MainViewModel : ViewModelBase
     }
     partial void OnCustomDnsServersChanged(string value) { _settings.CustomDnsServers = value; SaveSettings(); }
     partial void OnCustomDnsAdvancedJsonChanged(string value) { _settings.CustomDnsAdvancedJson = value; SaveSettings(); }
+    partial void OnUseTunModeChanged(bool value)
+    {
+        if (value && !AdminHelper.IsRunningAsAdmin())
+        {
+            UseTunMode = false;
+            ShowAdminWarningHandler?.Invoke();
+            return;
+        }
+        _settings.UseTunMode = value;
+        SaveSettings();
+    }
+
+    public Action? ShowAdminWarningHandler { get; set; }
 
     [RelayCommand]
     private void OpenDnsSettings() => OpenDnsSettingsHandler?.Invoke();

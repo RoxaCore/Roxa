@@ -333,6 +333,16 @@
               </StackPanel>
             </Border>
 
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <ToggleSwitch IsChecked="{Binding UseTunMode}"/>
+                  <TextBlock Text="حالت TUN (VPN کامل سیستم)" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="این حالت نیاز به دسترسی Administrator دارد و تمام ترافیک سیستم (نه فقط برنامه‌های سازگار با پروکسی) را از طریق تانل عبور می‌دهد" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
             <TextBlock Text="Roxa 3.0 • Avalonia" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,16,0,0"/>
           </StackPanel>
         </ScrollViewer>

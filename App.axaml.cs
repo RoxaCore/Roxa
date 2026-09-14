@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using XrayClient.Core;
 using XrayClient.ViewModels;
 using XrayClient.Views;
 
@@ -11,6 +12,7 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        FailSafeCleanup();
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -21,8 +23,21 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(),
             };
+            desktop.ShutdownRequested += (_, _) => FailSafeCleanup();
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private static void FailSafeCleanup()
+    {
+        try
+        {
+            if (TunManager.IsTunAdapterActive())
+            {
+                TunManager.CleanupTunAdapter();
+            }
+        }
+        catch { }
     }
 }

@@ -49,6 +49,39 @@ public partial class MainWindow : Window
         };
         vm.ToastHandler = message => ShowToast(message);
         vm.OpenDnsSettingsHandler = () => OpenDnsDialog();
+        vm.ShowAdminWarningHandler = () =>
+        {
+            var btnOk = new Button { Content = "ادامه", Width = 80 };
+            var btnRestart = new Button { Content = "اجرای مجدد به عنوان ادمین", Width = 160 };
+            var win = new Window
+            {
+                Title = "نیاز به دسترسی Administrator",
+                Width = 400,
+                Height = 160,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Content = new StackPanel
+                {
+                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                    Spacing = 15,
+                    Margin = new Avalonia.Thickness(20),
+                    Children =
+                    {
+                        new TextBlock { Text = "حالت TUN نیاز به دسترسی Administrator دارد.\nبرای فعال کردن، برنامه باید مجدداً با دسترسی ادمین اجرا شود.", TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                        new StackPanel
+                        {
+                            Orientation = Avalonia.Layout.Orientation.Horizontal,
+                            Spacing = 10,
+                            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                            Children = { btnOk, btnRestart }
+                        }
+                    }
+                }
+            };
+            btnOk.Click += (_, _) => win.Close();
+            btnRestart.Click += (_, _) => { Core.AdminHelper.RestartAsAdmin(); win.Close(); };
+            win.ShowDialog(this);
+        };
         vm.ConfirmDeleteHandler = async message =>
         {
             bool result = false;

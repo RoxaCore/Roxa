@@ -39,8 +39,8 @@
               Padding="16,14" 
               Margin="0,6,0,0"
               HorizontalAlignment="Stretch"
-              Background="#FFFFFF"
-              BorderBrush="#ECECEC"
+              Background="{Binding IsActiveConnection, Converter={x:Static converters:ActiveToBrushConverter.Instance}}"
+              BorderBrush="{Binding IsActiveConnection, Converter={x:Static converters:ActiveToBorderConverter.Instance}}"
               BorderThickness="1">
         
         <Border.ContextMenu>

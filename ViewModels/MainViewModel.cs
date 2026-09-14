@@ -444,7 +444,7 @@ public partial class MainViewModel : ViewModelBase
     private async Task Connect()
     {
         var server = SelectedServer;
-        if (server == null) return;
+        if (server == null || !Servers.Contains(server)) return;
         try
         {
             Status = "در حال اتصال ...";
@@ -1083,11 +1083,12 @@ public partial class MainViewModel : ViewModelBase
             {
                 Status = $"دریافت {sub.Name} ...";
                 var servers = await SubscriptionManager.FetchAsync(sub.Url);
-                foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
-                {
-                    if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
-                    Servers.Remove(o);
-                }
+          foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
+          {
+              if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
+              if (ReferenceEquals(SelectedServer, o)) SelectedServer = null;
+              Servers.Remove(o);
+          }
                 foreach (var server in servers)
                 {
                     Enrich(server);
@@ -1233,6 +1234,7 @@ public partial class MainViewModel : ViewModelBase
           foreach (var s in toRemove)
           {
               if (ReferenceEquals(SelectedServer, s) && IsConnected) Disconnect();
+              if (ReferenceEquals(SelectedServer, s)) SelectedServer = null;
               Servers.Remove(s);
           }
           SaveServers();

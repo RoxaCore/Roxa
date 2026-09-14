@@ -315,19 +315,23 @@ public partial class MainViewModel : ViewModelBase
      [RelayCommand]
      private async Task RemoveServer(ServerInfo? server)
      {
-         server ??= SelectedServer;
-         if (server == null) return;
+         var checkedServers = Servers.Where(s => s.IsChecked).ToList();
+         var targets = checkedServers.Count > 0 ? checkedServers : (server != null ? new List<ServerInfo> { server } : new List<ServerInfo>());
+         if (targets.Count == 0) return;
          if (ConfirmDeleteHandler != null)
          {
-             bool confirmed = await ConfirmDeleteHandler($"آیا از حذف «{server.Name}» متمعن هستید؟");
+             bool confirmed = await ConfirmDeleteHandler($"آیا از حذف {targets.Count} سرور متمعن هستید؟");
              if (!confirmed) return;
          }
-         if (ReferenceEquals(SelectedServer, server) && IsConnected) Disconnect();
-         Servers.Remove(server);
-         if (ReferenceEquals(SelectedServer, server)) SelectedServer = null;
+         foreach (var s in targets)
+         {
+             if (ReferenceEquals(SelectedServer, s) && IsConnected) Disconnect();
+             Servers.Remove(s);
+             if (ReferenceEquals(SelectedServer, s)) SelectedServer = null;
+         }
          SaveServers();
          RefreshGroups();
-         AppendLog($"«{server.Name}» حذف شد.");
+         AppendLog($"{targets.Count} سرور حذف شد.");
      }
 
     [RelayCommand]
@@ -571,39 +575,68 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task TestOneServer(ServerInfo? server)
     {
-        server ??= SelectedServer;
-        if (server == null || IsTesting) return;
+        var checkedServers = Servers.Where(s => s.IsChecked).ToList();
+        var targets = checkedServers.Count > 0 ? checkedServers : (server != null ? new List<ServerInfo> { server } : new List<ServerInfo>());
+        if (targets.Count == 0) return;
+        if (IsTesting) return;
         IsTesting = true;
         try
         {
-            var (ok, ms) = SelectedPingType switch
+            using var sem = new SemaphoreSlim(3);
+            var tasks = targets.Select(async s =>
             {
-                PingType.TcpPing or PingType.Ping => await LatencyTester.TcpAsync(server.Address, server.Port),
-                PingType.HttpPing => await LatencyTester.HttpAsync(server.Address, server.Port),
-                _ => await RealDelayTester.TestAsync(server)
-            };
-            server.RecordLatency(ok ? ms : -2);
-            SaveServers();
+                await sem.WaitAsync();
+                try
+                {
+                    var (ok, ms) = SelectedPingType switch
+                    {
+                        PingType.TcpPing or PingType.Ping => await LatencyTester.TcpAsync(s.Address, s.Port),
+                        PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
+                        _ => await RealDelayTester.TestAsync(s)
+                    };
+                    Post(() => s.RecordLatency(ok ? ms : -2));
+                }
+                catch { Post(() => s.RecordLatency(-2)); }
+                finally { try { sem.Release(); } catch { } }
+            });
+            await Task.WhenAll(tasks);
         }
-        finally { IsTesting = false; }
+        finally { IsTesting = false; SaveServers(); }
     }
 
     [RelayCommand]
     private async Task TestOneSpeed(ServerInfo? server)
     {
-        server ??= SelectedServer;
-        if (server == null || IsTesting) return;
+        var checkedServers = Servers.Where(s => s.IsChecked).ToList();
+        var targets = checkedServers.Count > 0 ? checkedServers : (server != null ? new List<ServerInfo> { server } : new List<ServerInfo>());
+        if (targets.Count == 0 || IsTesting) return;
         _testCts = new CancellationTokenSource();
         IsTesting = true;
-        Status = $"تست سرعت: {server.Name} ...";
-        try
+        Status = $"تست سرعت {targets.Count} سرور ...";
+        foreach (var s in targets) s.RecordSpeed(-1);
+        using var sem = new SemaphoreSlim(3);
+        var tasks = targets.Select(async s =>
         {
-            var (ok, mbps) = await SpeedTester.TestAsync(server, _testCts.Token);
-            server.RecordSpeed(ok ? mbps : -2);
-            SaveServers();
-            Status = ok ? $"سرعت {server.Name}: {mbps:F1} Mb/s" : "تست سرعت ناموفق بود";
-        }
-        finally { IsTesting = false; }
+            if (_testCts.Token.IsCancellationRequested) return;
+            await sem.WaitAsync(_testCts.Token);
+            try
+            {
+                if (_testCts.Token.IsCancellationRequested) return;
+                Post(() => Status = $"تست سرعت: {s.Name} ...");
+                var (ok, mbps) = await SpeedTester.TestAsync(s, _testCts.Token);
+                Post(() => s.RecordSpeed(ok ? mbps : -2));
+            }
+            catch { Post(() => s.RecordSpeed(-2)); }
+            finally { try { sem.Release(); } catch { } }
+        });
+        try { await Task.WhenAll(tasks); }
+        catch (OperationCanceledException) { }
+        foreach (var s in targets)
+            if (s.DownloadMbps == -1) s.RecordSpeed(-2);
+        int okCount = targets.Count(s => s.DownloadMbps >= 0);
+        IsTesting = false;
+        Status = $"سرعت تمام شد: {okCount} از {targets.Count} موفق";
+        SaveServers();
     }
 
     // ---------- انتخاب چندتایی ----------
@@ -937,18 +970,36 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task TestOneRealDelay(ServerInfo? server)
     {
-        server ??= SelectedServer;
-        if (server == null || IsTesting) return;
+        var checkedServers = Servers.Where(s => s.IsChecked).ToList();
+        var targets = checkedServers.Count > 0 ? checkedServers : (server != null ? new List<ServerInfo> { server } : new List<ServerInfo>());
+        if (targets.Count == 0 || IsTesting) return;
+        _testCts = new CancellationTokenSource();
         IsTesting = true;
-         Status = $"تست پینگ واقعی: {server.Name} ...";
-        try
+        Status = $"تست پینگ واقعی {targets.Count} سرور ...";
+        foreach (var s in targets) s.LatencyMs = -1;
+        using var sem = new SemaphoreSlim(3);
+        var tasks = targets.Select(async s =>
         {
-            var (ok, ms) = await RealDelayTester.TestAsync(server, _testCts.Token);
-            server.RecordLatency(ok ? ms : -2);
-            SaveServers();
-            Status = ok ? $"پینگ واقعی {server.Name}: {ms} ms" : "ناموفق بود";
-        }
-        finally { IsTesting = false; }
+            if (_testCts.Token.IsCancellationRequested) return;
+            await sem.WaitAsync(_testCts.Token);
+            try
+            {
+                if (_testCts.Token.IsCancellationRequested) return;
+                Post(() => Status = $"پینگ واقعی: {s.Name} ...");
+                var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
+                Post(() => s.LatencyMs = ok ? ms : -2);
+            }
+            catch { Post(() => s.LatencyMs = -2); }
+            finally { try { sem.Release(); } catch { } }
+        });
+        try { await Task.WhenAll(tasks); }
+        catch (OperationCanceledException) { }
+        foreach (var s in targets)
+            if (s.LatencyMs == -1) s.LatencyMs = -2;
+        int okCount = targets.Count(s => s.LatencyMs >= 0);
+        IsTesting = false;
+        Status = $"پینگ واقعی تمام شد: {okCount} از {targets.Count} موفق";
+        SaveServers();
     }
 
     // ---------- سابسکریپشن ----------

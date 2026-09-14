@@ -265,6 +265,7 @@ public partial class MainViewModel : ViewModelBase
         string input = (ServerLink ?? "").Trim();
         if (input.Length == 0) return;
         int added = 0;
+        int duplicates = 0;
         foreach (var line in input.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
             if (!UrlParser.IsProtocolLink(line)) { AppendLog($"پرش: لینک معتبر نیست."); continue; }
@@ -273,14 +274,20 @@ public partial class MainViewModel : ViewModelBase
                 var server = UrlParser.Parse(line);
                 Enrich(server);
                 if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal)))
-                { AppendLog($"«{server.Name}» تکراری است."); continue; }
+                {
+                    AppendLog($"«{server.Name}» تکراری است.");
+                    Status = $"سرور «{server.Name}» قبلا اضافه شده است";
+                    duplicates++;
+                    continue;
+                }
                 Servers.Add(server);
                 added++;
                 AppendLog($"«{server.Name}» اضافه شد.");
             }
             catch (FormatException ex) { AppendLog($"خطا: {ex.Message}"); }
         }
-        if (added > 0) { SaveServers(); SelectedServer = Servers.LastOrDefault(); }
+        if (added > 0) { SaveServers(); SelectedServer = Servers.LastOrDefault(); Status = $"{added} سرور اضافه شد"; }
+        else if (duplicates > 0) { Status = $"{duplicates} سرور تکراری بود"; }
         ServerLink = "";
         RefreshGroups();
     }

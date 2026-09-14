@@ -21,6 +21,7 @@
 
   <Window.Resources>
     <converters:BoolNegateConverter x:Key="Not"/>
+    <converters:BoolToBrushConverter x:Key="ActiveBrush"/>
     
     <!-- رنگ‌های تیل -->
     <SolidColorBrush x:Key="PrimaryBrush">#0E7C6B</SolidColorBrush>
@@ -36,8 +37,8 @@
       <Border CornerRadius="8" 
               Padding="16" 
               Margin="0,8,0,0"
-              Background="{StaticResource CardBackground}"
-              BorderBrush="{StaticResource BorderLight}"
+              Background="{Binding IsActiveConnection, Converter={StaticResource ActiveBrush}, ConverterParameter='#E1F0EC,#FFFFFF'}"
+              BorderBrush="{Binding IsActiveConnection, Converter={StaticResource ActiveBrush}, ConverterParameter='#0E7C6B,#E0E0E0'}"
               BorderThickness="1">
         <Border.Effect>
           <DropShadowEffect BlurRadius="4" OffsetY="2" Opacity="0.08" Color="#000000"/>

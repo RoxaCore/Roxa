@@ -62,6 +62,7 @@ public partial class MainViewModel : ViewModelBase
       public string[] SortOptions { get; } = { "بدون مرتب", "تأخیر (کم)", "سرعت (بیش)", "نام" };
 
     public string HomeServerName => SelectedServer?.Name ?? "سروری انتخاب نشده";
+    public string HomeAddress => SelectedServer != null ? $"{SelectedServer.Address}:{SelectedServer.Port}" : "";
     public string HomeLatency => SelectedServer?.LatencyDisplay ?? "";
     public string HomeSpeed => SelectedServer?.SpeedDisplay ?? "";
     public string PortText => IsConnected ? $"HTTP {HttpPort} · SOCKS {SocksPort}" : "";
@@ -101,6 +102,7 @@ public partial class MainViewModel : ViewModelBase
         foreach (var s in Servers)
             s.IsSelected = ReferenceEquals(s, value);
         OnPropertyChanged(nameof(HomeServerName));
+        OnPropertyChanged(nameof(HomeAddress));
         OnPropertyChanged(nameof(HomeLatency));
         OnPropertyChanged(nameof(HomeSpeed));
         ConnectCommand.NotifyCanExecuteChanged();
@@ -368,6 +370,7 @@ public partial class MainViewModel : ViewModelBase
             Enrich(server);
             SaveServers();
             OnPropertyChanged(nameof(HomeServerName));
+            OnPropertyChanged(nameof(HomeAddress));
             AppendLog($"«{server.Name}» ویرایش شد.");
         }
         else
@@ -808,6 +811,40 @@ public partial class MainViewModel : ViewModelBase
          int okCount = targets.Count(s => s.DownloadMbps >= 0);
          IsTesting = false;
          Status = $"سرعت گروه تمام شد ({okCount} موفق)";
+         SaveServers();
+     }
+
+     [RelayCommand]
+     private async Task UpdateGroupServers(ServerGroup? group)
+     {
+         var targets = group?.Servers.ToList() ?? new List<ServerInfo>();
+         if (targets.Count == 0 || IsTesting) return;
+         _testCts = new CancellationTokenSource();
+         IsTesting = true;
+         Status = $"بروزرسانی گروه «{group!.Title}» ({targets.Count} سرور) ...";
+         foreach (var s in targets) { s.LatencyMs = -1; s.RecordSpeed(-1); }
+         using var sem = new SemaphoreSlim(3);
+         var tasks = targets.Select(async s =>
+         {
+             if (_testCts.Token.IsCancellationRequested) return;
+             await sem.WaitAsync(_testCts.Token);
+             try
+             {
+                 if (_testCts.Token.IsCancellationRequested) return;
+                 Post(() => Status = $"بروزرسانی: {s.Name} ...");
+                 var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
+                 Post(() => s.LatencyMs = ok ? ms : -2);
+             }
+             catch { Post(() => s.LatencyMs = -2); }
+             finally { try { sem.Release(); } catch { } }
+         });
+         try { await Task.WhenAll(tasks); }
+         catch (OperationCanceledException) { }
+         foreach (var s in targets)
+             if (s.LatencyMs == -1) s.LatencyMs = -2;
+         int okCount = targets.Count(s => s.LatencyMs >= 0);
+         IsTesting = false;
+         Status = $"بروزرسانی گروه تمام شد ({okCount} موفق)";
          SaveServers();
      }
 

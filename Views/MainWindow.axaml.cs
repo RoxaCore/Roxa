@@ -15,6 +15,9 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "roxa-icon.ico");
+        if (System.IO.File.Exists(iconPath))
+            Icon = new WindowIcon(iconPath);
         Opened += OnOpened;
         Closing += (_, _) =>
         {

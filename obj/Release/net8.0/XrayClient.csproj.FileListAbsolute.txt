@@ -89,3 +89,4 @@ D:\ai project freebuff\hiku\XrayClient\obj\Release\net8.0\XrayClient.pdb
 D:\ai project freebuff\hiku\XrayClient\obj\Release\net8.0\XrayClient.genruntimeconfig.cache
 D:\ai project freebuff\hiku\XrayClient\obj\Release\net8.0\ref\XrayClient.dll
 D:\ai project freebuff\hiku\XrayClient\bin\Release\net8.0\Avalonia.Controls.DataGrid.dll
+D:\ai project freebuff\hiku\XrayClient\bin\Release\net8.0\Assets\roxa-icon.ico

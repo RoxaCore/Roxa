@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Project Overview
-XrayClient is a desktop VPN/proxy client built with Avalonia UI 12.1.2 targeting .NET 8. The UI is in Persian (Farsi) with RTL layout.
+XrayClient (branded as Roxa) is a desktop VPN/proxy client built with Avalonia UI 12.1.2 targeting .NET 8. The UI is in Persian (Farsi) with RTL layout.
 
 ## Build & Run
 ```powershell

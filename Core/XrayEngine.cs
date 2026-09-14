@@ -43,7 +43,7 @@ public sealed class XrayEngine : IDisposable
         Directory.CreateDirectory(EngineDir);
         Log("Downloading Xray-core engine ...");
         using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(180) };
-        http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "XrayClient/2.0");
+        http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Roxa/2.0");
 
         string latestJson = await http.GetStringAsync("https://api.github.com/repos/XTLS/Xray-core/releases/latest", ct);
         using var doc = JsonDocument.Parse(latestJson);

@@ -3,7 +3,7 @@ using XrayClient.Models;
 
 namespace XrayClient.Core;
 
-/// <summary>ذخیره‌سازی JSON در پوشه AppData/XrayClient.</summary>
+/// <summary>ذخیره‌سازی JSON در پوشه AppData/Roxa.</summary>
 public static class Storage
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
@@ -12,7 +12,7 @@ public static class Storage
     {
         get
         {
-            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "XrayClient");
+            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Roxa");
             Directory.CreateDirectory(dir);
             return dir;
         }

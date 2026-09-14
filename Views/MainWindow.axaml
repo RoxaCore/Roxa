@@ -175,7 +175,33 @@
             <StackPanel Spacing="12">
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <TextBox Text="{Binding ServerLink}" PlaceholderText="لینک سرور (vmess://, vless://, ...)" Width="400" Padding="12,10" BorderThickness="1" BorderBrush="#E0E0E0" CornerRadius="10" Background="#FFFFFF" FontSize="13"/>
-                <Button Content="+" Command="{Binding AddLinkCommand}" Padding="16,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="16" FontWeight="Bold"/>
+                <Button Padding="16,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="16" FontWeight="Bold">
+                  <Button.ContextMenu>
+                    <ContextMenu>
+                      <MenuItem Header="افزودن با لینک" Command="{Binding AddLinkCommand}">
+                        <MenuItem.Icon><TextBlock Text="🔗" FontSize="14"/></MenuItem.Icon>
+                      </MenuItem>
+                      <Separator/>
+                      <MenuItem Header="افزودن VMess" Command="{Binding AddManualServerCommand}" CommandParameter="VMess">
+                        <MenuItem.Icon><TextBlock Text="🟢" FontSize="14"/></MenuItem.Icon>
+                      </MenuItem>
+                      <MenuItem Header="افزودن VLESS" Command="{Binding AddManualServerCommand}" CommandParameter="VLESS">
+                        <MenuItem.Icon><TextBlock Text="🔵" FontSize="14"/></MenuItem.Icon>
+                      </MenuItem>
+                      <MenuItem Header="افزودن Shadowsocks" Command="{Binding AddManualServerCommand}" CommandParameter="Shadowsocks">
+                        <MenuItem.Icon><TextBlock Text="🟠" FontSize="14"/></MenuItem.Icon>
+                      </MenuItem>
+                      <MenuItem Header="افزودن Trojan" Command="{Binding AddManualServerCommand}" CommandParameter="Trojan">
+                        <MenuItem.Icon><TextBlock Text="🔴" FontSize="14"/></MenuItem.Icon>
+                      </MenuItem>
+                      <Separator/>
+                      <MenuItem Header="وارد کردن از کلیپبورد" Command="{Binding ImportFromClipboardCommand}">
+                        <MenuItem.Icon><TextBlock Text="📋" FontSize="14"/></MenuItem.Icon>
+                      </MenuItem>
+                    </ContextMenu>
+                  </Button.ContextMenu>
+                  +
+                </Button>
               </StackPanel>
               
               <!-- Action Buttons -->

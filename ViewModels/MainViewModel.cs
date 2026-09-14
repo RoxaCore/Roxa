@@ -312,6 +312,64 @@ public partial class MainViewModel : ViewModelBase
         RefreshGroups();
     }
 
+    [RelayCommand]
+    private async Task AddManualServer(string? protocol)
+    {
+        var server = new ServerInfo();
+        if (Enum.TryParse<ProxyProtocol>(protocol, out var p))
+            server.Protocol = p;
+        server.Name = $"سرور جدید ({protocol})";
+
+        if (EditServerHandler != null && await EditServerHandler(server))
+        {
+            Enrich(server);
+            Servers.Add(server);
+            SaveServers();
+            SelectedServer = server;
+            RefreshGroups();
+            AppendLog($"«{server.Name}» اضافه شد.");
+            Status = $"سرور «{server.Name}» اضافه شد";
+            ToastHandler?.Invoke($"سرور «{server.Name}» اضافه شد");
+        }
+    }
+
+    [RelayCommand]
+    private async Task ImportFromClipboard()
+    {
+        if (Clipboard == null) { Status = "دسترسی به کلیپبورد ممکن نیست"; return; }
+        var text = await Clipboard.TryGetTextAsync();
+        if (string.IsNullOrWhiteSpace(text)) { Status = "کلیپبورد خالی است"; return; }
+
+        int added = 0;
+        int duplicates = 0;
+        foreach (var line in text.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (!UrlParser.IsProtocolLink(line)) continue;
+            try
+            {
+                var server = UrlParser.Parse(line);
+                Enrich(server);
+                if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal)))
+                {
+                    duplicates++;
+                    continue;
+                }
+                Servers.Add(server);
+                added++;
+            }
+            catch { }
+        }
+        if (added > 0)
+        {
+            SaveServers();
+            RefreshGroups();
+            Status = $"{added} سرور از کلیپبورد اضافه شد";
+            ToastHandler?.Invoke($"{added} سرور اضافه شد");
+        }
+        else if (duplicates > 0) { Status = $"{duplicates} سرور تکراری بود"; }
+        else { Status = "لینک معتبری در کلیپبورد نبود"; }
+    }
+
      [RelayCommand]
      private async Task RemoveServer(ServerInfo? server)
      {

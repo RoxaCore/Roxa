@@ -52,6 +52,12 @@ public partial class ServerGroup : ObservableObject
 
     partial void OnGroupSortFieldChanged(string value) => SortGroupServers();
 
+    public void UpdateTitle()
+    {
+        OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(CountText));
+    }
+
     public void SortGroupServers()
     {
         try

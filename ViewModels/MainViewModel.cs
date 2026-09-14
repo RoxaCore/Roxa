@@ -192,6 +192,18 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    private void UpdateGroupContent(ServerGroup group)
+    {
+        var servers = Servers.Where(s =>
+            string.IsNullOrEmpty(s.SubscriptionName) ? string.IsNullOrEmpty(group.Key) :
+            s.SubscriptionName == group.Key).ToList();
+        SortServers(servers);
+        group.Servers.Clear();
+        foreach (var s in servers)
+            group.Servers.Add(s);
+        group.UpdateTitle();
+    }
+
     private void SortServers(List<ServerInfo> servers)
     {
         try
@@ -1056,11 +1068,32 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = $"دریافت {sub.Name} ...";
-            var servers = await SubscriptionManager.FetchAsync(sub.Url);
-            MergeServers(sub.Name, servers);
+            var fetched = await SubscriptionManager.FetchAsync(sub.Url);
+            string? activeId = SelectedServer?.Id;
+            foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
+            {
+                if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
+                Servers.Remove(o);
+            }
+            int added = 0;
+            foreach (var server in fetched)
+            {
+                Enrich(server);
+                server.SubscriptionName = sub.Name;
+                if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal))) continue;
+                Servers.Add(server);
+                added++;
+            }
+            SaveServers();
+            sub.LastUpdated = DateTime.Now;
+            sub.ServerCount = fetched.Count;
+            SaveSubs();
+            SelectedServer = Servers.FirstOrDefault(s => s.Id == activeId) ?? SelectedServer;
+            foreach (var g in Groups)
+                UpdateGroupContent(g);
             _settings.LastSubscriptionUpdate = DateTime.Now;
             SaveSettings();
-            Status = $"«{sub.Name}» به‌روز شد ({servers.Count} سرور)";
+            Status = $"«{sub.Name}» به‌روز شد ({added} سرور جدید)";
         }
         catch (Exception ex) { Status = "خطا در به‌روزرسانی"; AppendLog($"خطا: {ex.Message}"); }
     }

@@ -3,7 +3,6 @@
              x:Class="XrayClient.App"
              xmlns:local="using:XrayClient"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
         <local:ViewLocator />
@@ -12,4 +11,8 @@
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
+
+    <Application.Resources>
+        <FontFamily x:Key="Vazirmatn">avares://XrayClient/Assets/Fonts/Vazirmatn-Regular.ttf#Vazirmatn</FontFamily>
+    </Application.Resources>
 </Application>

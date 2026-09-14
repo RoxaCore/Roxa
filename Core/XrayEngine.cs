@@ -163,6 +163,7 @@ public sealed class XrayEngine : IDisposable
             _proxyActive = true;
         }
         Log($"Connected. HTTP 127.0.0.1:{HttpPort}  SOCKS 127.0.0.1:{SocksPort}");
+        CleanupTempConfig(configPath);
     }
 
     private static int FindFreePort()
@@ -210,14 +211,17 @@ public sealed class XrayEngine : IDisposable
 
     private void OnExited()
     {
-        if (_proxyActive)
+        lock (_lock)
         {
-            _proxyActive = false;
-            try { SystemProxy.Clear(); } catch { }
+            if (_proxyActive)
+            {
+                _proxyActive = false;
+                try { SystemProxy.Clear(); } catch { }
+            }
+            CurrentServer = null;
+            HttpPort = 0;
+            SocksPort = 0;
         }
-        CurrentServer = null;
-        HttpPort = 0;
-        SocksPort = 0;
         Log("Engine stopped.");
         Stopped?.Invoke();
     }
@@ -227,5 +231,10 @@ public sealed class XrayEngine : IDisposable
         Stop();
         Output = null;
         Stopped = null;
+    }
+
+    private void CleanupTempConfig(string configPath)
+    {
+        try { if (File.Exists(configPath)) File.Delete(configPath); } catch { }
     }
 }

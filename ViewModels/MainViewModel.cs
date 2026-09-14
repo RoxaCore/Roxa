@@ -141,7 +141,11 @@ public partial class MainViewModel : ViewModelBase
     }
 
     private void AppendLog(string message)
-        => LogText += $"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}";
+    {
+        LogText += $"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}";
+        if (LogText.Length > 50000)
+            LogText = LogText.Substring(LogText.Length - 30000);
+    }
 
     private static void Enrich(ServerInfo s) => s.CountryCode = GeoFlags.DetectCountry(s.Name, s.Address);
     private void SaveServers() => Storage.SaveServers(Servers.ToList());
@@ -424,10 +428,10 @@ public partial class MainViewModel : ViewModelBase
         if (server == null) return;
         try
         {
-            IsConnected = true;
-            RefreshConnectionFlags();
             Status = "در حال اتصال ...";
             await _engine.StartAsync(server, SetSystemProxy);
+            IsConnected = true;
+            RefreshConnectionFlags();
             Status = $"متصل به {server.Name}";
             _settings.ActiveServerId = server.Id;
             SaveSettings();
@@ -1078,7 +1082,8 @@ public partial class MainViewModel : ViewModelBase
      [RelayCommand]
      private void StopTest()
      {
-         _testCts.Cancel();
+         _testCts?.Cancel();
+         _testCts?.Dispose();
          _testCts = new CancellationTokenSource();
          IsTesting = false;
           Status = "تست متوقف شد";

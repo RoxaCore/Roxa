@@ -114,8 +114,10 @@
     <Border Grid.Row="0" Padding="0" Background="#FFFFFF" BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
       <Grid ColumnDefinitions="Auto,*,Auto" Margin="24,14,24,14">
         <!-- Logo -->
-        <Image Grid.Column="0" Source="avares://XrayClient/Assets/roxa-icon.png" Width="28" Height="28" Margin="14,0,8,0" VerticalAlignment="Center"/>
-        <TextBlock Grid.Column="0" Text="Roxa" FontSize="16" FontWeight="Bold" Foreground="#1A1A1A" VerticalAlignment="Center"/>
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <Image Source="avares://XrayClient/Assets/roxa-icon.png" Width="30" Height="30"/>
+          <TextBlock Text="Roxa" FontSize="18" FontWeight="Bold" Foreground="#0B2420" VerticalAlignment="Center" Margin="0,0,4,0"/>
+        </StackPanel>
 
         <!-- Server Status (center) -->
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center">

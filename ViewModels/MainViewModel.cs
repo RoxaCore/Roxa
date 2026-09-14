@@ -21,6 +21,7 @@ public partial class MainViewModel : ViewModelBase
      public Func<ServerInfo, Task<bool>>? EditServerHandler { get; set; }
      public Func<string, string, Task>? ShowQrHandler { get; set; }
      public Func<string, Task<bool>>? ConfirmDeleteHandler { get; set; }
+     public Action<string>? ToastHandler { get; set; }
 
     [ObservableProperty] private ObservableCollection<ServerInfo> _servers = new();
     [ObservableProperty] private ObservableCollection<SubscriptionInfo> _subscriptions = new();
@@ -277,6 +278,7 @@ public partial class MainViewModel : ViewModelBase
                 {
                     AppendLog($"«{server.Name}» تکراری است.");
                     Status = $"سرور «{server.Name}» قبلا اضافه شده است";
+                    ToastHandler?.Invoke($"سرور «{server.Name}» قبلا اضافه شده است");
                     duplicates++;
                     continue;
                 }

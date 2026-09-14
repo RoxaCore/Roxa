@@ -134,8 +134,9 @@
     </DataTemplate>
   </Window.Resources>
 
-  <DockPanel Background="#F8F9FA">
-    <!-- Top Bar -->
+  <Grid Background="#F8F9FA">
+    <DockPanel>
+      <!-- Top Bar -->
     <Border DockPanel.Dock="Top" Padding="0" Background="#FFFFFF" BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1">
       <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" Margin="20,12">
         <!-- Logo & Title -->
@@ -223,8 +224,6 @@
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <TextBox Text="{Binding ServerLink}" PlaceholderText="لینک سرور (vmess://, vless://, ...)" Width="400" Padding="10,8" BorderThickness="1" BorderBrush="{StaticResource BorderLight}" CornerRadius="6"/>
                 <Button Content="افزودن" Command="{Binding AddLinkCommand}" Padding="16,8" CornerRadius="6" Background="{StaticResource SuccessBrush}" Foreground="White"/>
-                <CheckBox Content="انتخاب همه" IsChecked="{Binding SelectAllChecked, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding SelectedCountText}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}"/>
               </StackPanel>
               
               <!-- Action Buttons -->
@@ -348,4 +347,11 @@
       </TabItem>
     </TabControl>
   </DockPanel>
+
+  <!-- Toast Notification -->
+  <Border x:Name="ToastBorder" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" ZIndex="999"
+          Background="#122A25" CornerRadius="10" Padding="20,12" MaxWidth="400">
+    <TextBlock x:Name="ToastText" Text="" FontSize="13" Foreground="White" TextWrapping="Wrap" TextAlignment="Center"/>
+  </Border>
+  </Grid>
 </Window>

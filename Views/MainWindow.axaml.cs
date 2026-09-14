@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
+using Avalonia.Threading;
 using XrayClient.Models;
 using XrayClient.ViewModels;
 
@@ -22,6 +23,13 @@ public partial class MainWindow : Window
         };
     }
 
+    public void ShowToast(string message, int durationMs = 3000)
+    {
+        ToastText.Text = message;
+        ToastBorder.IsVisible = true;
+        DispatcherTimer.RunOnce(() => { ToastBorder.IsVisible = false; }, TimeSpan.FromMilliseconds(durationMs));
+    }
+
     private async void OnOpened(object? sender, EventArgs e)
     {
         if (DataContext is not MainViewModel vm) return;
@@ -36,6 +44,7 @@ public partial class MainWindow : Window
             var dlg = new QrShareWindow(name, link, TopLevel.GetTopLevel(this)?.Clipboard);
             await dlg.ShowDialog(this);
         };
+        vm.ToastHandler = message => ShowToast(message);
         vm.ConfirmDeleteHandler = async message =>
         {
             bool result = false;

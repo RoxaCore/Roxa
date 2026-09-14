@@ -60,7 +60,7 @@
               
               <!-- Test Section -->
               <MenuItem Header="تست Ping" Command="{Binding Owner.TestOneServerCommand}" CommandParameter="{Binding}"/>
-              <MenuItem Header="تست RealDelay" Command="{Binding Owner.TestOneRealDelayCommand}" CommandParameter="{Binding}"/>
+              <MenuItem Header="تست پینگ واقعی" Command="{Binding Owner.TestOneRealDelayCommand}" CommandParameter="{Binding}"/>
               <MenuItem Header="تست سرعت" Command="{Binding Owner.TestOneSpeedCommand}" CommandParameter="{Binding}"/>
               <Separator/>
               
@@ -230,7 +230,7 @@
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <Button Content="پینگ" Command="{Binding TestAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="6" Background="{StaticResource PrimaryBrush}" Foreground="White"/>
                 <Button Content="توقف" Command="{Binding StopTestCommand}" IsVisible="{Binding IsTesting}" Padding="12,8" CornerRadius="6" Background="{StaticResource ErrorBrush}" Foreground="White"/>
-                <Button Content="RealDelay" Command="{Binding TestRealDelayAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="6"/>
+                <Button Content="پینگ واقعی" Command="{Binding TestRealDelayAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="6"/>
                 <Button Content="سرعت" Command="{Binding TestSpeedCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="6"/>
                 <Button Content="حذف تکراری" Command="{Binding RemoveDuplicatesCommand}" Padding="12,8" CornerRadius="6"/>
               </StackPanel>
@@ -251,7 +251,7 @@
                         <ComboBox Grid.Column="3" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding GroupSortField, Mode=TwoWay}" Width="120" Padding="6,4" FontSize="11" VerticalAlignment="Center" Margin="8,0" HorizontalAlignment="Left"/>
                         <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="6">
                           <Button Content="پینگ" ToolTip.Tip="پینگ گروه" Padding="8,4" Command="{Binding Owner.TestGroupCommand}" CommandParameter="{Binding}" CornerRadius="4" Background="{StaticResource PrimaryBrush}" Foreground="White"/>
-                          <Button Content="RealDelay" ToolTip.Tip="RealDelay" Padding="8,4" Command="{Binding Owner.TestGroupRealDelayCommand}" CommandParameter="{Binding}" CornerRadius="4"/>
+                          <Button Content="پینگ واقعی" ToolTip.Tip="پینگ واقعی" Padding="8,4" Command="{Binding Owner.TestGroupRealDelayCommand}" CommandParameter="{Binding}" CornerRadius="4"/>
                           <Button Content="سرعت" ToolTip.Tip="سرعت" Padding="8,4" Command="{Binding Owner.TestGroupSpeedCommand}" CommandParameter="{Binding}" CornerRadius="4"/>
                           <Button Content="بروزرسانی" ToolTip.Tip="بروزرسانی سابسکریپشن" Padding="8,4" IsVisible="{Binding IsSubscription}" Command="{Binding Owner.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding Subscription}" CornerRadius="4" Background="{StaticResource WarningBrush}" Foreground="White"/>
                           <Button Content="حذف ساب" ToolTip.Tip="حذف" Padding="8,4" IsVisible="{Binding IsSubscription}" Command="{Binding Owner.RemoveSubscriptionCommand}" CommandParameter="{Binding Subscription}" CornerRadius="4" Background="{StaticResource ErrorBrush}" Foreground="White"/>

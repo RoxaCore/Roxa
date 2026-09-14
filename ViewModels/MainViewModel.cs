@@ -746,7 +746,7 @@ public partial class MainViewModel : ViewModelBase
          if (targets.Count == 0 || IsTesting) return;
          _testCts = new CancellationTokenSource();
          IsTesting = true;
-         Status = $"تست RealDelay گروه «{group!.Title}» ({targets.Count} سرور) ...";
+          Status = $"تست پینگ واقعی گروه «{group!.Title}» ({targets.Count} سرور) ...";
          foreach (var s in targets) s.LatencyMs = -1;
          using var sem = new SemaphoreSlim(3);
          var tasks = targets.Select(async s =>
@@ -770,7 +770,7 @@ public partial class MainViewModel : ViewModelBase
          catch (OperationCanceledException) { }
          int okCount = targets.Count(t => t.LatencyMs >= 0);
          IsTesting = false;
-         Status = $"RealDelay گروه تمام شد ({okCount} موفق)";
+          Status = $"پینگ واقعی گروه تمام شد ({okCount} موفق)";
          SaveServers();
      }
 
@@ -811,7 +811,7 @@ public partial class MainViewModel : ViewModelBase
          SaveServers();
      }
 
-     // ---------- تب RealDelay ----------
+     // ---------- تب پینگ واقعی ----------
      [RelayCommand]
      private async Task TestRealDelayAll()
      {
@@ -821,7 +821,7 @@ public partial class MainViewModel : ViewModelBase
          if (targets.Count == 0) { Status = "سروری نیست"; return; }
          _testCts = new CancellationTokenSource();
          IsTesting = true;
-         Status = $"تست RealDelay {targets.Count} سرور (کند ولی دقیق) ...";
+         Status = $"تست پینگ واقعی {targets.Count} سرور (کند ولی دقیق) ...";
          foreach (var s in targets) s.LatencyMs = -1;
         using var sem = new SemaphoreSlim(3);
         var tasks = targets.Select(async s =>
@@ -846,7 +846,7 @@ public partial class MainViewModel : ViewModelBase
             if (s.LatencyMs == -1) s.RecordLatency(-2);
         int okCount = targets.Count(t => t.LatencyMs >= 0);
         IsTesting = false;
-        Status = $"RealDelay تمام شد ({okCount} موفق)";
+        Status = $"پینگ واقعی تمام شد ({okCount} موفق)";
         SaveServers();
     }
 
@@ -857,7 +857,7 @@ public partial class MainViewModel : ViewModelBase
         if (targets.Count == 0 || IsTesting) return;
         _testCts = new CancellationTokenSource();
         IsTesting = true;
-        Status = $"تست RealDelay {targets.Count} سرور منتخب ...";
+         Status = $"تست پینگ واقعی {targets.Count} سرور منتخب ...";
         foreach (var s in targets) s.LatencyMs = -1;
         using var sem = new SemaphoreSlim(3);
         var tasks = targets.Select(async s =>
@@ -881,7 +881,7 @@ public partial class MainViewModel : ViewModelBase
         foreach (var s in targets)
             if (s.LatencyMs == -1) s.RecordLatency(-2);
         IsTesting = false;
-        Status = $"RealDelay منتخب‌ها تمام شد ({targets.Count(t => t.LatencyMs >= 0)} موفق)";
+        Status = $"پینگ واقعی منتخب‌ها تمام شد ({targets.Count(t => t.LatencyMs >= 0)} موفق)";
         SaveServers();
     }
 
@@ -891,13 +891,13 @@ public partial class MainViewModel : ViewModelBase
         server ??= SelectedServer;
         if (server == null || IsTesting) return;
         IsTesting = true;
-        Status = $"تست RealDelay: {server.Name} ...";
+         Status = $"تست پینگ واقعی: {server.Name} ...";
         try
         {
             var (ok, ms) = await RealDelayTester.TestAsync(server, _testCts.Token);
             server.RecordLatency(ok ? ms : -2);
             SaveServers();
-            Status = ok ? $"RealDelay {server.Name}: {ms} ms" : "ناموفق بود";
+            Status = ok ? $"پینگ واقعی {server.Name}: {ms} ms" : "ناموفق بود";
         }
         finally { IsTesting = false; }
     }

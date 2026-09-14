@@ -131,45 +131,46 @@
   <Grid RowDefinitions="Auto,*" Background="#F8F9FA">
     <!-- Top Bar -->
     <Border Grid.Row="0" Padding="0,0,0,12" Background="#FFFFFF" BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1">
-      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="20,12">
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="20,12">
+        <!-- Logo & Title -->
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-          <Border Background="{StaticResource PrimaryBrush}" CornerRadius="8" Width="36" Height="36">
+          <Border Background="{StaticResource PrimaryBrush}" CornerRadius="8" Width="38" Height="38">
             <TextBlock Text="⚡" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
           </Border>
-          <StackPanel Spacing="0">
-            <TextBlock Text="XrayClient" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-            <TextBlock Text="{Binding Status}" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+          <StackPanel Spacing="1">
+            <TextBlock Text="XrayClient" FontSize="17" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+            <TextBlock Text="آماده" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
           </StackPanel>
         </StackPanel>
-        <Border Grid.Column="1" Width="1" Background="{StaticResource BorderLight}" Margin="16,4"/>
-        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-          <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessBrush}" IsVisible="{Binding IsConnected}" VerticalAlignment="Center"/>
-          <Ellipse Width="10" Height="10" Fill="{StaticResource TextSecondary}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" VerticalAlignment="Center"/>
-          <StackPanel Spacing="0">
-            <TextBlock Text="سرور فعال" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
-            <TextBlock Text="{Binding HomeServerName}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" MaxWidth="280" TextTrimming="CharacterEllipsis"/>
+
+        <!-- Active Server -->
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Center">
+          <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessBrush}" IsVisible="{Binding IsConnected}"/>
+          <Ellipse Width="10" Height="10" Fill="{StaticResource TextSecondary}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"/>
+          <StackPanel Spacing="1">
+            <TextBlock Text="{Binding Status}" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
+            <TextBlock Text="{Binding HomeServerName}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" MaxWidth="300" TextTrimming="CharacterEllipsis"/>
           </StackPanel>
         </StackPanel>
-        <Border Grid.Column="3" Background="#F5F5F5" CornerRadius="6" Padding="12,6" VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="آدرس:" FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
-            <TextBlock Text="{Binding HomeAddress}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" FlowDirection="LeftToRight" VerticalAlignment="Center"/>
-          </StackPanel>
+
+        <!-- IP Address -->
+        <Border Grid.Column="2" Background="#F0F4F3" CornerRadius="8" Padding="14,7" VerticalAlignment="Center">
+          <TextBlock Text="{Binding HomeAddress}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" FlowDirection="LeftToRight"/>
         </Border>
-        <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-          <Button Command="{Binding ConnectCommand}" Padding="14,8" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" Background="{StaticResource SuccessBrush}" Foreground="White" CornerRadius="6">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock Text="▶" FontSize="10" VerticalAlignment="Center"/>
-              <TextBlock Text="اتصال" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
-            </StackPanel>
-          </Button>
-          <Button Command="{Binding DisconnectCommand}" Padding="14,8" IsVisible="{Binding IsConnected}" Background="{StaticResource ErrorBrush}" Foreground="White" CornerRadius="6">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock Text="✕" FontSize="10" VerticalAlignment="Center"/>
-              <TextBlock Text="قطع" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
-            </StackPanel>
-          </Button>
-        </StackPanel>
+
+        <!-- Connect/Disconnect -->
+        <Button Grid.Column="3" Command="{Binding ConnectCommand}" Padding="16,10" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" Background="{StaticResource SuccessBrush}" Foreground="White" CornerRadius="8" VerticalAlignment="Center" Margin="12,0,0,0">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="▶" FontSize="11" VerticalAlignment="Center"/>
+            <TextBlock Text="اتصال" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+        <Button Grid.Column="3" Command="{Binding DisconnectCommand}" Padding="16,10" IsVisible="{Binding IsConnected}" Background="{StaticResource ErrorBrush}" Foreground="White" CornerRadius="8" VerticalAlignment="Center" Margin="12,0,0,0">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="✕" FontSize="11" VerticalAlignment="Center"/>
+            <TextBlock Text="قطع" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
       </Grid>
     </Border>
 

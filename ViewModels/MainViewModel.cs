@@ -662,13 +662,7 @@ public partial class MainViewModel : ViewModelBase
                 await engine.StartMultiAsync(configJson, ct);
                 AppendLog($"Smart connect: single Xray process started on {portMap.Count} ports");
 
-                // تست موازی با early exit
-                ServerInfo? bestCandidate = null;
-                int bestMs = int.MaxValue;
-                int earlyExitThreshold = 150;
-                var tcs = new TaskCompletionSource();
-                int completed = 0;
-
+                // تست موازی همه کاندیدها
                 var testTasks = portMap.Select(async kvp =>
                 {
                     int port = kvp.Key;
@@ -687,18 +681,6 @@ public partial class MainViewModel : ViewModelBase
                         {
                             int ms = (int)sw.ElapsedMilliseconds;
                             Post(() => { server.RecordLatency(ms); AutoSortAfterTest("latency"); });
-
-                            lock (portMap)
-                            {
-                                if (ms < bestMs)
-                                {
-                                    bestMs = ms;
-                                    bestCandidate = server;
-                                }
-                                // Early Exit
-                                if (ms < earlyExitThreshold && !tcs.Task.IsCompleted)
-                                    tcs.TrySetResult();
-                            }
                         }
                         else
                         {
@@ -709,18 +691,10 @@ public partial class MainViewModel : ViewModelBase
                     {
                         Post(() => server.RecordLatency(-2));
                     }
-
-                    if (Interlocked.Increment(ref completed) >= portMap.Count && !tcs.Task.IsCompleted)
-                        tcs.TrySetResult();
                 });
 
-                // منتظر early exit یا اتمام همه
-                var waitTask = tcs.Task;
-                var delayTask = Task.Delay(TimeSpan.FromSeconds(8), ct);
-                await Task.WhenAny(waitTask, delayTask);
-
-                if (bestCandidate != null)
-                    AppendLog($"Smart connect: best = {bestCandidate.Name} ({bestMs}ms)");
+                try { await Task.WhenAll(testTasks); }
+                catch (OperationCanceledException) { }
             }
             finally
             {

@@ -599,6 +599,61 @@ public partial class MainViewModel : ViewModelBase
 
     // ---------- تست ----------
 
+    [RelayCommand]
+    private async Task SmartConnect()
+    {
+        if (IsTesting) return;
+        if (Servers.Count == 0) { Status = "سروری نیست"; ToastHandler?.Invoke("سروری برای اتصال وجود ندارد"); return; }
+        if (IsConnected) Disconnect();
+
+        _testCts = new CancellationTokenSource();
+        IsTesting = true;
+        Status = "اتصال هوشمند: در حال تست پینگ واقعی ...";
+        ToastHandler?.Invoke("در حال پیدا کردن بهترین سرور ...");
+        foreach (var s in Servers) s.LatencyMs = -1;
+
+        using var sem = new SemaphoreSlim(3);
+        var tasks = Servers.ToList().Select(async s =>
+        {
+            if (_testCts.Token.IsCancellationRequested) return;
+            await sem.WaitAsync(_testCts.Token);
+            try
+            {
+                if (_testCts.Token.IsCancellationRequested) return;
+                var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
+                Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+            }
+            catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+            finally { try { sem.Release(); } catch { } }
+        });
+
+        try { await Task.WhenAll(tasks); }
+        catch (OperationCanceledException) { }
+
+        foreach (var s in Servers)
+            if (s.LatencyMs == -1) s.RecordLatency(-2);
+
+        var best = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).FirstOrDefault();
+
+        IsTesting = false;
+
+        if (best == null)
+        {
+            Status = "اتصال هوشمند: هیچ سروری پاسخ نداد";
+            ToastHandler?.Invoke("هیچ سروری پاسخ نداد");
+            AppendLog("Smart connect failed: no server responded");
+            return;
+        }
+
+        Status = $"اتصال هوشمند: بهترین سرور → {best.Name} ({best.LatencyDisplay})";
+        ToastHandler?.Invoke($"اتصال به {best.Name} ({best.LatencyDisplay})");
+        AppendLog($"Smart connect: {best.Name} ({best.LatencyDisplay})");
+
+        SelectedServer = best;
+        RefreshConnectionFlags();
+        await Connect();
+    }
+
      [RelayCommand]
      private async Task TestAll()
      {

@@ -193,6 +193,8 @@
                   </Button.Flyout>
                   +
                 </Button>
+                <Button Content="⚡ اتصال هوشمند" Command="{Binding SmartConnectCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" Background="#7C3AED" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
+                <Button Content=" توقف ..." Command="{Binding StopTestCommand}" IsVisible="{Binding IsTesting}" Padding="14,10" CornerRadius="10" Background="#E53E3E" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
               </StackPanel>
               
               <!-- Action Buttons -->

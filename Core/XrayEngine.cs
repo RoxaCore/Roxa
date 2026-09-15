@@ -218,14 +218,23 @@ public sealed class XrayEngine : IDisposable
             try { SystemProxy.Clear(); }
             catch (Exception ex) { Log($"Clear proxy failed: {ex.Message}"); }
         }
-        if (TunManager.IsTunAdapterActive())
-        {
-            TunManager.CleanupTunAdapter();
-            Log("TUN adapter cleaned up on stop.");
-        }
         CurrentServer = null;
         HttpPort = 0;
         SocksPort = 0;
+    }
+
+    public void StopAndCleanupTun()
+    {
+        Stop();
+        try
+        {
+            if (TunManager.IsTunAdapterActive())
+            {
+                TunManager.CleanupTunAdapter();
+                Log("TUN adapter cleaned up.");
+            }
+        }
+        catch (Exception ex) { Log($"TUN cleanup failed: {ex.Message}"); }
     }
 
     private void OnExited()

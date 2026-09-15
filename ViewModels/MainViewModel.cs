@@ -569,7 +569,10 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void Disconnect()
     {
-        _engine.Stop();
+        if (UseTunMode)
+            _engine.StopAndCleanupTun();
+        else
+            _engine.Stop();
         IsConnected = false;
         RefreshConnectionFlags();
         AppendLog("اتصال قطع شد.");

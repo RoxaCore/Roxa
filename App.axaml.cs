@@ -23,7 +23,15 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(),
             };
-            desktop.ShutdownRequested += (_, _) => FailSafeCleanup();
+            desktop.ShutdownRequested += (_, _) =>
+            {
+                try
+                {
+                    if (AdminHelper.IsRunningAsAdmin() && TunManager.IsTunAdapterActive())
+                        TunManager.CleanupTunAdapter();
+                }
+                catch { }
+            };
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -33,7 +41,7 @@ public partial class App : Application
     {
         try
         {
-            if (TunManager.IsTunAdapterActive())
+            if (AdminHelper.IsRunningAsAdmin() && TunManager.IsTunAdapterActive())
             {
                 TunManager.CleanupTunAdapter();
             }

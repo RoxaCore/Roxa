@@ -194,11 +194,65 @@ public sealed class XrayEngine : IDisposable
         CleanupTempConfig(configPath);
     }
 
-    private static int FindFreePort()
+    public static int FindFreePort()
     {
         using var listener = new TcpListener(System.Net.IPAddress.Loopback, 0);
         listener.Start();
         return ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+    }
+
+    public async Task StartWithConfigAsync(string configJson, int httpPort, CancellationToken ct = default)
+    {
+        Stop();
+        if (!File.Exists(EnginePath))
+        {
+            Log("Engine not found, downloading ...");
+            await EnsureEngineAsync(false, ct);
+        }
+
+        string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-test-{Guid.NewGuid():N}.json");
+        await File.WriteAllTextAsync(configPath, configJson, ct);
+
+        var psi = new ProcessStartInfo(EnginePath)
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+        psi.ArgumentList.Add("run");
+        psi.ArgumentList.Add("-c");
+        psi.ArgumentList.Add(configPath);
+
+        Process process;
+        lock (_lock)
+        {
+            _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
+            process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+            process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+            process.Exited += (_, _) => OnExited();
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+        }
+
+        HttpPort = httpPort;
+
+        bool ready = false;
+        for (int i = 0; i < 30 && !ct.IsCancellationRequested; i++)
+        {
+            await Task.Delay(300, ct);
+            lock (_lock)
+            {
+                if (_process == null || _process.HasExited)
+                    throw new InvalidOperationException("Xray test engine exited unexpectedly.");
+            }
+            if (TryConnect(HttpPort)) { ready = true; break; }
+        }
+        if (!ready) throw new InvalidOperationException("Xray test port did not come up.");
+
+        CleanupTempConfig(configPath);
+        Log("Test Xray engine started.");
     }
 
     private static bool TryConnect(int port)

@@ -655,55 +655,56 @@ public partial class MainViewModel : ViewModelBase
 
             AppendLog($"Smart connect: {candidates.Count} candidates selected (best: {candidates[0].LatencyDisplay})");
 
-            // --- مرحله ۲: Xray واحد + تست واقعی موازی ---
+            // --- مرحله ۲: تست واقعی یکی یکی ---
             Status = $"اتصال هوشمند: تست واقعی {candidates.Count} کاندید ...";
+            AppendLog($"Smart connect: testing {candidates.Count} candidates one by one");
 
-            var (configJson, portMap) = XrayConfigBuilder.BuildMultiServerConfig(candidates);
-            var engine = new XrayEngine();
-
-            try
+            foreach (var candidate in candidates)
             {
-                await engine.StartMultiAsync(configJson, portMap, ct);
-                AppendLog($"Smart connect: single Xray process started on {portMap.Count} ports");
+                if (ct.IsCancellationRequested) break;
 
-                // تست موازی همه کاندیدها
-                var testTasks = portMap.Select(async kvp =>
+                try
                 {
-                    int port = kvp.Key;
-                    ServerInfo server = kvp.Value;
+                    AppendLog($"Smart connect: testing {candidate.Name} ...");
 
+                    var testEngine = new XrayEngine();
                     try
                     {
-                        using var handler = new HttpClientHandler { Proxy = new System.Net.WebProxy($"http://127.0.0.1:{port}"), UseProxy = true };
-                        using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(4) };
+                        int socks = XrayEngine.FindFreePort();
+                        int http = XrayEngine.FindFreePort();
+                        string cfg = XrayConfigBuilder.Build(candidate, socks, http);
+                        await testEngine.StartWithConfigAsync(cfg, http, ct);
+
+                        using var handler = new HttpClientHandler { Proxy = new System.Net.WebProxy($"http://127.0.0.1:{http}"), UseProxy = true };
+                        using var http2 = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
 
                         var sw = Stopwatch.StartNew();
-                        using var resp = await http.GetAsync("https://www.google.com/generate_204", ct);
+                        using var resp = await http2.GetAsync("http://www.gstatic.com/generate_204", ct);
                         sw.Stop();
 
                         if (resp.IsSuccessStatusCode)
                         {
                             int ms = (int)sw.ElapsedMilliseconds;
-                            Post(() => { server.RecordLatency(ms); AutoSortAfterTest("latency"); });
+                            AppendLog($"Smart connect: {candidate.Name} → {ms}ms");
+                            Post(() => { candidate.RecordLatency(ms); AutoSortAfterTest("latency"); });
                         }
                         else
                         {
-                            Post(() => { server.RecordLatency(-2); AutoSortAfterTest("latency"); });
+                            AppendLog($"Smart connect: {candidate.Name} → failed (status {resp.StatusCode})");
+                            Post(() => { candidate.RecordLatency(-2); AutoSortAfterTest("latency"); });
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        Post(() => { server.RecordLatency(-2); AutoSortAfterTest("latency"); });
+                        AppendLog($"Smart connect: {candidate.Name} → error: {ex.Message}");
+                        Post(() => { candidate.RecordLatency(-2); AutoSortAfterTest("latency"); });
                     }
-                });
-
-                try { await Task.WhenAll(testTasks); }
-                catch (OperationCanceledException) { }
-            }
-            finally
-            {
-                engine.Stop();
-                engine.Dispose();
+                    finally
+                    {
+                        try { testEngine.Stop(); testEngine.Dispose(); } catch { }
+                    }
+                }
+                catch (OperationCanceledException) { break; }
             }
 
             // --- انتخاب نهایی ---

@@ -91,6 +91,18 @@ public partial class ServerInfo : ObservableObject
     public string Flag => Core.GeoFlags.FlagEmoji(CountryCode);
 
     [JsonIgnore]
+    public string StatusColor
+    {
+        get
+        {
+            if (IsActiveConnection) return "#22C55E";
+            if (LatencyMs == -1) return "#EF4444";
+            if (LatencyMs == -2) return "#F59E0B";
+            return "#22C55E";
+        }
+    }
+
+    [JsonIgnore]
     public string ProtocolDisplay => Protocol switch
     {
         ProxyProtocol.VMess => "VMess",
@@ -114,7 +126,7 @@ public partial class ServerInfo : ObservableObject
     [JsonIgnore]
     public string LastTestedDisplay => LastTested == DateTime.MinValue ? "" : LastTested.ToString("HH:mm dd/MM");
 
-    partial void OnLatencyMsChanged(int value) => OnPropertyChanged(nameof(LatencyDisplay));
+    partial void OnLatencyMsChanged(int value) { OnPropertyChanged(nameof(LatencyDisplay)); OnPropertyChanged(nameof(StatusColor)); }
     partial void OnDownloadMbpsChanged(double value) => OnPropertyChanged(nameof(SpeedDisplay));
     partial void OnCountryCodeChanged(string value)
     {
@@ -122,6 +134,7 @@ public partial class ServerInfo : ObservableObject
     }
 
     partial void OnIsCheckedChanged(bool value) => Owner?.UpdateSelectedCount();
+    partial void OnIsActiveConnectionChanged(bool value) => OnPropertyChanged(nameof(StatusColor));
 
     public void RecordLatency(int ms)
     {

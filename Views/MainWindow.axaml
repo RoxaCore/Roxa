@@ -62,8 +62,7 @@
 
         <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto" Margin="0">
           <!-- Status Dot -->
-          <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,12,0" Fill="#22C55E" IsVisible="{Binding IsActiveConnection}"/>
-          <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,12,0" Fill="#CCCCCC" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}"/>
+          <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,12,0" Fill="{Binding StatusColor}"/>
 
           <!-- Server Name & Details -->
           <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">

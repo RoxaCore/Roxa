@@ -85,7 +85,16 @@ public partial class MainViewModel : ViewModelBase
         _sortAscending = _settings.SortAscending;
         _customDnsServers = _settings.CustomDnsServers ?? "";
         _customDnsAdvancedJson = _settings.CustomDnsAdvancedJson ?? "";
-        _useTunMode = _settings.UseTunMode;
+        if (_settings.UseTunMode && !Core.AdminHelper.IsRunningAsAdmin())
+        {
+            _settings.UseTunMode = false;
+            Core.Storage.SaveSettings(_settings);
+            _useTunMode = false;
+        }
+        else
+        {
+            _useTunMode = _settings.UseTunMode;
+        }
         foreach (var s in Storage.LoadSubscriptions())
             Subscriptions.Add(s);
         foreach (var server in Storage.LoadServers())

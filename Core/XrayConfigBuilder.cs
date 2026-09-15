@@ -43,38 +43,35 @@ public static class XrayConfigBuilder
             inbounds.Add(new JsonObject
             {
                 ["tag"] = "tun-in",
-                ["protocol"] = "dokodemo-door",
-                ["listen"] = "127.0.0.1",
-                ["port"] = socksPort,
+                ["protocol"] = "tun",
                 ["settings"] = new JsonObject
                 {
-                    ["network"] = "tcp,udp",
-                    ["followRedirect"] = true
+                    ["address"] = new JsonArray("172.19.0.1/30", "fdfe:dcba:9876::1/126"),
+                    ["mtu"] = 1420,
+                    ["autoRoute"] = false,
+                    ["stack"] = "system"
                 },
                 ["sniffing"] = new JsonObject
                 {
                     ["enabled"] = true,
                     ["destOverride"] = new JsonArray("http", "tls")
-                },
-                ["streamSettings"] = new JsonObject
-                {
-                    ["sockopt"] = new JsonObject
-                    {
-                        ["tstack"] = new JsonObject
-                        {
-                            ["interface"] = "wintun",
-                            ["autoRoute"] = false
-                        }
-                    }
                 }
             });
             inbounds.Add(new JsonObject
             {
-                ["tag"] = "tun-http",
-                ["protocol"] = "http",
+                ["tag"] = "socks-in",
+                ["listen"] = "127.0.0.1",
+                ["port"] = socksPort,
+                ["protocol"] = "socks",
+                ["settings"] = new JsonObject { ["auth"] = "noauth", ["udp"] = true },
+                ["sniffing"] = new JsonObject { ["enabled"] = true, ["destOverride"] = new JsonArray("http", "tls") }
+            });
+            inbounds.Add(new JsonObject
+            {
+                ["tag"] = "http-in",
                 ["listen"] = "127.0.0.1",
                 ["port"] = httpPort,
-                ["settings"] = new JsonObject()
+                ["protocol"] = "http"
             });
         }
         else

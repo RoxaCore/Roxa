@@ -116,14 +116,27 @@ public sealed class XrayEngine : IDisposable
         if (useTun)
         {
             if (!AdminHelper.IsRunningAsAdmin())
-                throw new InvalidOperationException("TUN mode requires Administrator privileges. Run as Administrator.");
-            if (!TunManager.IsWintunAvailable())
+            {
+                Log("TUN mode requires Administrator. Falling back to proxy mode.");
+                useTun = false;
+            }
+            else if (!TunManager.IsWintunAvailable())
             {
                 bool ok = await TunManager.EnsureWintunDownloadedAsync();
-                if (!ok) throw new InvalidOperationException("wintun.dll not found and could not be downloaded.");
+                if (!ok)
+                {
+                    Log("wintun.dll not available. Falling back to proxy mode.");
+                    useTun = false;
+                }
+                else if (!TunManager.IsTunAdapterActive())
+                {
+                    TunManager.CreateTunAdapter();
+                }
             }
-            if (!TunManager.IsTunAdapterActive())
+            else if (!TunManager.IsTunAdapterActive())
+            {
                 TunManager.CreateTunAdapter();
+            }
         }
 
         SocksPort = FindFreePort();

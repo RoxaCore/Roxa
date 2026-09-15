@@ -268,13 +268,17 @@ public partial class MainViewModel : ViewModelBase
     {
         foreach (var g in Groups)
         {
-            List<ServerInfo> sorted;
+            var success = g.Servers.Where(s => metric == "latency" ? s.LatencyMs >= 0 : s.DownloadMbps >= 0).ToList();
+            var failed = g.Servers.Where(s => metric == "latency" ? s.LatencyMs < 0 : s.DownloadMbps < 0).ToList();
+
             if (metric == "latency")
-                sorted = g.Servers.OrderBy(s => s.LatencyMs < 0 ? int.MaxValue : s.LatencyMs).ToList();
+                success = success.OrderBy(s => s.LatencyMs).ToList();
             else
-                sorted = g.Servers.OrderByDescending(s => s.DownloadMbps < 0 ? 0 : s.DownloadMbps).ToList();
+                success = success.OrderByDescending(s => s.DownloadMbps).ToList();
+
             g.Servers.Clear();
-            foreach (var s in sorted) g.Servers.Add(s);
+            foreach (var s in success) g.Servers.Add(s);
+            foreach (var s in failed) g.Servers.Add(s);
         }
     }
 

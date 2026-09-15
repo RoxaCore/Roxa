@@ -624,7 +624,7 @@ public partial class MainViewModel : ViewModelBase
             ToastHandler?.Invoke("در حال پیدا کردن بهترین سرور ...");
             AppendLog("Smart connect: stage 1 - fast TCP ping on all servers");
 
-            foreach (var s in Servers) s.LatencyMs = -1;
+            foreach (var s in Servers) { s.LatencyMs = -1; s.DownloadMbps = -1; }
 
             using var sem1 = new SemaphoreSlim(20);
             var pingTasks = Servers.ToList().Select(async s =>

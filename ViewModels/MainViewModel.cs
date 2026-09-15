@@ -44,6 +44,7 @@ public partial class MainViewModel : ViewModelBase
      [ObservableProperty] private PingType _selectedPingType = PingType.Ping;
      public PingType[] PingTypeOptions { get; } = (PingType[])Enum.GetValues(typeof(PingType));
      [ObservableProperty] private bool _isTesting;
+     [ObservableProperty] private bool _isSmartConnecting;
       [ObservableProperty] private string _selectedSubscriptionName = "";
       [ObservableProperty] private string _sortField = "بدون مرتب";
       [ObservableProperty] private int _selectedCount;
@@ -616,6 +617,7 @@ public partial class MainViewModel : ViewModelBase
         _testCts = new CancellationTokenSource();
         var ct = _testCts.Token;
         IsTesting = true;
+        IsSmartConnecting = true;
 
         try
         {
@@ -647,6 +649,7 @@ public partial class MainViewModel : ViewModelBase
             if (candidates.Count == 0)
             {
                 IsTesting = false;
+                IsSmartConnecting = false;
                 Status = "اتصال هوشمند: هیچ سروری پاسخ نداد";
                 ToastHandler?.Invoke("هیچ سروری پاسخ نداد");
                 AppendLog("Smart connect: no server responded to ping");
@@ -711,6 +714,7 @@ public partial class MainViewModel : ViewModelBase
             var finalBest = candidates.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).FirstOrDefault();
 
             IsTesting = false;
+            IsSmartConnecting = false;
 
             if (finalBest == null)
             {
@@ -743,11 +747,13 @@ public partial class MainViewModel : ViewModelBase
         catch (OperationCanceledException)
         {
             IsTesting = false;
+            IsSmartConnecting = false;
             Status = "اتصال هوشمند لغو شد";
         }
         catch (Exception ex)
         {
             IsTesting = false;
+            IsSmartConnecting = false;
             Status = $"خطا: {ex.Message}";
             AppendLog($"Smart connect error: {ex.Message}");
         }

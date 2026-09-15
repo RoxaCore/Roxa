@@ -719,6 +719,18 @@ public partial class MainViewModel : ViewModelBase
             ToastHandler?.Invoke($"اتصال به {finalBest.Name} ({finalBest.LatencyDisplay})");
             AppendLog($"Smart connect: connecting to {finalBest.Name} ({finalBest.LatencyDisplay})");
 
+            // انتقال به اول لیست
+            foreach (var g in Groups)
+            {
+                int idx = g.Servers.IndexOf(finalBest);
+                if (idx > 0)
+                {
+                    g.Servers.RemoveAt(idx);
+                    g.Servers.Insert(0, finalBest);
+                    break;
+                }
+            }
+
             SelectedServer = finalBest;
             RefreshConnectionFlags();
             await Connect();

@@ -927,8 +927,8 @@ public partial class MainViewModel : ViewModelBase
                     Disconnect();
                     SelectedServer = bestCandidate;
                     RefreshConnectionFlags();
-                    AutoSortAfterTest("latency");
                     await Connect();
+                    AutoSortAfterTest("latency");
                 }
                 else
                 {

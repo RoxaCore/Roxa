@@ -45,6 +45,8 @@ public partial class MainViewModel : ViewModelBase
      public PingType[] PingTypeOptions { get; } = (PingType[])Enum.GetValues(typeof(PingType));
      [ObservableProperty] private bool _isTesting;
      [ObservableProperty] private bool _isSmartConnecting;
+
+     public bool ShowSmartConnectButton => !IsSmartConnecting && !IsConnected;
       [ObservableProperty] private string _selectedSubscriptionName = "";
       [ObservableProperty] private string _sortField = "بدون مرتب";
       [ObservableProperty] private int _selectedCount;
@@ -133,8 +135,11 @@ public partial class MainViewModel : ViewModelBase
     {
         Status = value ? $"متصل به {SelectedServer?.Name ?? ""}" : "آماده";
         OnPropertyChanged(nameof(PortText));
+        OnPropertyChanged(nameof(ShowSmartConnectButton));
         RefreshConnectionFlags();
     }
+
+    partial void OnIsSmartConnectingChanged(bool value) => OnPropertyChanged(nameof(ShowSmartConnectButton));
 
     partial void OnSetSystemProxyChanged(bool value) { _settings.SetSystemProxy = value; SaveSettings(); }
     partial void OnAutoConnectChanged(bool value) { _settings.AutoConnect = value; SaveSettings(); }

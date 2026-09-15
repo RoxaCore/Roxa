@@ -688,12 +688,12 @@ public partial class MainViewModel : ViewModelBase
                         }
                         else
                         {
-                            Post(() => server.RecordLatency(-2));
+                            Post(() => { server.RecordLatency(-2); AutoSortAfterTest("latency"); });
                         }
                     }
                     catch
                     {
-                        Post(() => server.RecordLatency(-2));
+                        Post(() => { server.RecordLatency(-2); AutoSortAfterTest("latency"); });
                     }
                 });
 

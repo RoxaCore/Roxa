@@ -13,6 +13,7 @@ public sealed class XrayEngine : IDisposable
 {
     private Process? _process;
     private bool _proxyActive;
+    private string? _tempConfigPath;
     private readonly object _lock = new();
 
     public event Action<string>? Output;
@@ -234,6 +235,8 @@ public sealed class XrayEngine : IDisposable
         CurrentServer = null;
         HttpPort = 0;
         SocksPort = 0;
+        CleanupTempConfig(_tempConfigPath);
+        _tempConfigPath = null;
     }
 
     public void StopAndCleanupTun()
@@ -300,8 +303,8 @@ public sealed class XrayEngine : IDisposable
         }
         if (!allReady) throw new InvalidOperationException("Multi-test ports did not come up.");
 
+        _tempConfigPath = configPath;
         Log("Multi-test Xray engine started.");
-        CleanupTempConfig(configPath);
     }
 
     private void OnExited()
@@ -328,8 +331,8 @@ public sealed class XrayEngine : IDisposable
         Stopped = null;
     }
 
-    private void CleanupTempConfig(string configPath)
+    private void CleanupTempConfig(string? configPath)
     {
-        try { if (File.Exists(configPath)) File.Delete(configPath); } catch { }
+        try { if (configPath != null && File.Exists(configPath)) File.Delete(configPath); } catch { }
     }
 }

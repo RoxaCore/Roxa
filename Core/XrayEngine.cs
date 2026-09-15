@@ -250,6 +250,53 @@ public sealed class XrayEngine : IDisposable
         catch (Exception ex) { Log($"TUN cleanup failed: {ex.Message}"); }
     }
 
+    public async Task StartMultiAsync(string configJson, CancellationToken ct = default)
+    {
+        Stop();
+        if (!File.Exists(EnginePath))
+        {
+            Log("Engine not found, downloading ...");
+            await EnsureEngineAsync(false, ct);
+        }
+
+        string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-multi-{Guid.NewGuid():N}.json");
+        await File.WriteAllTextAsync(configPath, configJson, ct);
+
+        var psi = new ProcessStartInfo(EnginePath)
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+        psi.ArgumentList.Add("run");
+        psi.ArgumentList.Add("-c");
+        psi.ArgumentList.Add(configPath);
+
+        Process process;
+        lock (_lock)
+        {
+            _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
+            process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+            process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+            process.Exited += (_, _) => OnExited();
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+        }
+
+        // Wait for process to be ready
+        await Task.Delay(500, ct);
+        lock (_lock)
+        {
+            if (_process == null || _process.HasExited)
+                throw new InvalidOperationException("Xray multi-test engine exited unexpectedly.");
+        }
+
+        Log("Multi-test Xray engine started.");
+        CleanupTempConfig(configPath);
+    }
+
     private void OnExited()
     {
         lock (_lock)

@@ -1,5 +1,8 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -607,51 +610,156 @@ public partial class MainViewModel : ViewModelBase
         if (IsConnected) Disconnect();
 
         _testCts = new CancellationTokenSource();
+        var ct = _testCts.Token;
         IsTesting = true;
-        Status = "اتصال هوشمند: در حال تست پینگ واقعی ...";
-        ToastHandler?.Invoke("در حال پیدا کردن بهترین سرور ...");
-        foreach (var s in Servers) s.LatencyMs = -1;
 
-        using var sem = new SemaphoreSlim(3);
-        var tasks = Servers.ToList().Select(async s =>
+        try
         {
-            if (_testCts.Token.IsCancellationRequested) return;
-            await sem.WaitAsync(_testCts.Token);
+            // --- مرحله ۱: پینگ سریع TCP روی همه سرورها ---
+            Status = "اتصال هوشمند: پینگ سریع ...";
+            ToastHandler?.Invoke("در حال پیدا کردن بهترین سرور ...");
+            AppendLog("Smart connect: stage 1 - fast TCP ping on all servers");
+
+            foreach (var s in Servers) s.LatencyMs = -1;
+
+            using var sem1 = new SemaphoreSlim(20);
+            var pingTasks = Servers.ToList().Select(async s =>
+            {
+                if (ct.IsCancellationRequested) return;
+                await sem1.WaitAsync(ct);
+                try
+                {
+                    var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 3000);
+                    Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                }
+                catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+                finally { try { sem1.Release(); } catch { } }
+            });
+            try { await Task.WhenAll(pingTasks); }
+            catch (OperationCanceledException) { }
+
+            // --- انتخاب ۸ کاندید برتر ---
+            var candidates = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).Take(8).ToList();
+            if (candidates.Count == 0)
+            {
+                IsTesting = false;
+                Status = "اتصال هوشمند: هیچ سروری پاسخ نداد";
+                ToastHandler?.Invoke("هیچ سروری پاسخ نداد");
+                AppendLog("Smart connect: no server responded to ping");
+                return;
+            }
+
+            AppendLog($"Smart connect: {candidates.Count} candidates selected (best: {candidates[0].LatencyDisplay})");
+
+            // --- مرحله ۲: Xray واحد + تست واقعی موازی ---
+            Status = $"اتصال هوشمند: تست واقعی {candidates.Count} کاندید ...";
+
+            var (configJson, portMap) = XrayConfigBuilder.BuildMultiServerConfig(candidates);
+            var engine = new XrayEngine();
+
             try
             {
-                if (_testCts.Token.IsCancellationRequested) return;
-                var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                await engine.StartMultiAsync(configJson, ct);
+                AppendLog($"Smart connect: single Xray process started on {portMap.Count} ports");
+
+                // تست موازی با early exit
+                ServerInfo? bestCandidate = null;
+                int bestMs = int.MaxValue;
+                int earlyExitThreshold = 150;
+                var tcs = new TaskCompletionSource();
+                int completed = 0;
+
+                var testTasks = portMap.Select(async kvp =>
+                {
+                    int port = kvp.Key;
+                    ServerInfo server = kvp.Value;
+
+                    try
+                    {
+                        using var handler = new HttpClientHandler { Proxy = new System.Net.WebProxy($"http://127.0.0.1:{port}"), UseProxy = true };
+                        using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(4) };
+
+                        var sw = Stopwatch.StartNew();
+                        using var resp = await http.GetAsync("https://www.google.com/generate_204", ct);
+                        sw.Stop();
+
+                        if (resp.IsSuccessStatusCode)
+                        {
+                            int ms = (int)sw.ElapsedMilliseconds;
+                            Post(() => { server.RecordLatency(ms); AutoSortAfterTest("latency"); });
+
+                            lock (portMap)
+                            {
+                                if (ms < bestMs)
+                                {
+                                    bestMs = ms;
+                                    bestCandidate = server;
+                                }
+                                // Early Exit
+                                if (ms < earlyExitThreshold && !tcs.Task.IsCompleted)
+                                    tcs.TrySetResult();
+                            }
+                        }
+                        else
+                        {
+                            Post(() => server.RecordLatency(-2));
+                        }
+                    }
+                    catch
+                    {
+                        Post(() => server.RecordLatency(-2));
+                    }
+
+                    if (Interlocked.Increment(ref completed) >= portMap.Count && !tcs.Task.IsCompleted)
+                        tcs.TrySetResult();
+                });
+
+                // منتظر early exit یا اتمام همه
+                var waitTask = tcs.Task;
+                var delayTask = Task.Delay(TimeSpan.FromSeconds(8), ct);
+                await Task.WhenAny(waitTask, delayTask);
+
+                if (bestCandidate != null)
+                    AppendLog($"Smart connect: best = {bestCandidate.Name} ({bestMs}ms)");
             }
-            catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
-            finally { try { sem.Release(); } catch { } }
-        });
+            finally
+            {
+                engine.Stop();
+                engine.Dispose();
+            }
 
-        try { await Task.WhenAll(tasks); }
-        catch (OperationCanceledException) { }
+            // --- انتخاب نهایی ---
+            var finalBest = candidates.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).FirstOrDefault();
 
-        foreach (var s in Servers)
-            if (s.LatencyMs == -1) s.RecordLatency(-2);
+            IsTesting = false;
 
-        var best = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).FirstOrDefault();
+            if (finalBest == null)
+            {
+                Status = "اتصال هوشمند: تست واقعی ناموفق";
+                ToastHandler?.Invoke("تست واقعی ناموفق بود");
+                AppendLog("Smart connect: real delay test failed for all candidates");
+                return;
+            }
 
-        IsTesting = false;
+            Status = $"اتصال هوشمند: بهترین سرور → {finalBest.Name} ({finalBest.LatencyDisplay})";
+            ToastHandler?.Invoke($"اتصال به {finalBest.Name} ({finalBest.LatencyDisplay})");
+            AppendLog($"Smart connect: connecting to {finalBest.Name} ({finalBest.LatencyDisplay})");
 
-        if (best == null)
-        {
-            Status = "اتصال هوشمند: هیچ سروری پاسخ نداد";
-            ToastHandler?.Invoke("هیچ سروری پاسخ نداد");
-            AppendLog("Smart connect failed: no server responded");
-            return;
+            SelectedServer = finalBest;
+            RefreshConnectionFlags();
+            await Connect();
         }
-
-        Status = $"اتصال هوشمند: بهترین سرور → {best.Name} ({best.LatencyDisplay})";
-        ToastHandler?.Invoke($"اتصال به {best.Name} ({best.LatencyDisplay})");
-        AppendLog($"Smart connect: {best.Name} ({best.LatencyDisplay})");
-
-        SelectedServer = best;
-        RefreshConnectionFlags();
-        await Connect();
+        catch (OperationCanceledException)
+        {
+            IsTesting = false;
+            Status = "اتصال هوشمند لغو شد";
+        }
+        catch (Exception ex)
+        {
+            IsTesting = false;
+            Status = $"خطا: {ex.Message}";
+            AppendLog($"Smart connect error: {ex.Message}");
+        }
     }
 
      [RelayCommand]

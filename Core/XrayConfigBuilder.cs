@@ -309,4 +309,65 @@ public static class XrayConfigBuilder
             arr.Add(item);
         return arr;
     }
+
+    public static (string Json, Dictionary<int, ServerInfo> PortMap) BuildMultiServerConfig(List<ServerInfo> servers)
+    {
+        var portMap = new Dictionary<int, ServerInfo>();
+        var inbounds = new JsonArray();
+        var outbounds = new JsonArray();
+
+        int basePort = 20000;
+
+        for (int i = 0; i < servers.Count; i++)
+        {
+            int port = basePort + i;
+            portMap[port] = servers[i];
+
+            inbounds.Add(new JsonObject
+            {
+                ["tag"] = $"http-{i}",
+                ["protocol"] = "http",
+                ["listen"] = "127.0.0.1",
+                ["port"] = port,
+                ["settings"] = new JsonObject()
+            });
+
+            var outbound = BuildOutbound(servers[i]);
+            outbound["tag"] = $"proxy-{i}";
+            outbounds.Add(outbound);
+
+            inbounds[^1]["routing"] = $"proxy-{i}";
+        }
+
+        var routingRules = new JsonArray();
+        for (int i = 0; i < servers.Count; i++)
+        {
+            routingRules.Add(new JsonObject
+            {
+                ["type"] = "field",
+                ["inboundTag"] = $"http-{i}",
+                ["outboundTag"] = $"proxy-{i}"
+            });
+        }
+
+        var config = new JsonObject
+        {
+            ["log"] = new JsonObject { ["loglevel"] = "none" },
+            ["inbounds"] = inbounds,
+            ["outbounds"] = outbounds,
+            ["routing"] = new JsonObject
+            {
+                ["domainStrategy"] = "AsIs",
+                ["rules"] = routingRules
+            }
+        };
+
+        string json = config.ToJsonString(new JsonSerializerOptions
+        {
+            WriteIndented = false,
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+        });
+
+        return (json, portMap);
+    }
 }

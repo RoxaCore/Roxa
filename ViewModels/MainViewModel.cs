@@ -639,7 +639,7 @@ public partial class MainViewModel : ViewModelBase
             catch (OperationCanceledException) { }
 
             // --- انتخاب ۸ کاندید برتر ---
-            var candidates = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).Take(8).ToList();
+            var candidates = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).Take(12).ToList();
             if (candidates.Count == 0)
             {
                 IsTesting = false;

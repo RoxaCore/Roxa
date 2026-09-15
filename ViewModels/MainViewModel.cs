@@ -45,6 +45,7 @@ public partial class MainViewModel : ViewModelBase
      public PingType[] PingTypeOptions { get; } = (PingType[])Enum.GetValues(typeof(PingType));
       [ObservableProperty] private bool _isTesting;
       [ObservableProperty] private bool _isSmartConnecting;
+      [ObservableProperty] private bool _isFindingBetter;
 
       // --- وضعیت جستجوی تدریجی ---
       private List<ServerInfo> _searchPool = new();
@@ -809,7 +810,7 @@ public partial class MainViewModel : ViewModelBase
         _testCts = new CancellationTokenSource();
         var ct = _testCts.Token;
         IsTesting = true;
-        IsSmartConnecting = true;
+        IsFindingBetter = true;
 
         try
         {
@@ -839,7 +840,7 @@ public partial class MainViewModel : ViewModelBase
             if (survivors.Count == 0)
             {
                 IsTesting = false;
-                IsSmartConnecting = false;
+                IsFindingBetter = false;
                 Status = "یافتن سرور بهتر: هیچ کاندیدی پاسخ نداد";
                 AppendLog("Find better: no survivors from TCP ping");
                 return;
@@ -951,7 +952,7 @@ public partial class MainViewModel : ViewModelBase
         finally
         {
             IsTesting = false;
-            IsSmartConnecting = false;
+            IsFindingBetter = false;
         }
     }
 

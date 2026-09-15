@@ -204,12 +204,12 @@
                     <TextBlock Text="در حال پیدا کردن بهترین سرور ..." VerticalAlignment="Center"/>
                   </StackPanel>
                 </Button>
-                <Button Command="{Binding FindBetterServerCommand}" IsVisible="{Binding IsConnected}" IsEnabled="{Binding IsSmartConnecting, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold">
+                <Button Command="{Binding FindBetterServerCommand}" IsVisible="{Binding IsConnected}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold">
                   <StackPanel Orientation="Horizontal" Spacing="6">
-                    <TextBlock Text="🔍" VerticalAlignment="Center" IsVisible="{Binding IsSmartConnecting, Converter={StaticResource Not}}"/>
-                    <TextBlock Text="◉" VerticalAlignment="Center" FontSize="16" IsVisible="{Binding IsSmartConnecting}"/>
-                    <TextBlock Text="یافتن سرور بهتر" VerticalAlignment="Center" IsVisible="{Binding IsSmartConnecting, Converter={StaticResource Not}}"/>
-                    <TextBlock Text="در حال جستجوی سرور بهتر ..." VerticalAlignment="Center" IsVisible="{Binding IsSmartConnecting}"/>
+                    <TextBlock Text="🔍" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}"/>
+                    <TextBlock Text="◉" VerticalAlignment="Center" FontSize="16" IsVisible="{Binding IsFindingBetter}"/>
+                    <TextBlock Text="یافتن سرور بهتر" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}"/>
+                    <TextBlock Text="در حال جستجوی سرور بهتر ..." VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter}"/>
                   </StackPanel>
                 </Button>
               </StackPanel>

@@ -206,14 +206,14 @@
                 </Button>
                 <Button IsVisible="{Binding IsSmartConnecting}" Padding="14,10" CornerRadius="10" Background="#7C3AED" Foreground="White" FontSize="13" FontWeight="SemiBold" IsEnabled="False">
                   <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Path Stroke="White" StrokeThickness="2" StrokeLineCap="Round" Data="M 2 14 A 7 7 0 0 1 14 2" RenderTransformOrigin="0.5,0.5">
-                      <Path.RenderTransform>
+                    <TextBlock Text="◉" VerticalAlignment="Center" FontSize="16" RenderTransformOrigin="0.5,0.5">
+                      <TextBlock.RenderTransform>
                         <RotateTransform Angle="0"/>
-                      </Path.RenderTransform>
-                      <Path.Styles>
-                        <Style Selector="Path">
+                      </TextBlock.RenderTransform>
+                      <TextBlock.Styles>
+                        <Style Selector="TextBlock">
                           <Style.Animations>
-                            <Animation Duration="0:0:1" IterationCount="Infinite">
+                            <Animation Duration="0:0:1" IterationCount="Infinite" Easing="Linear">
                               <KeyFrame Cue="0%">
                                 <Setter Property="RenderTransform">
                                   <RotateTransform Angle="0"/>
@@ -227,8 +227,8 @@
                             </Animation>
                           </Style.Animations>
                         </Style>
-                      </Path.Styles>
-                    </Path>
+                      </TextBlock.Styles>
+                    </TextBlock>
                     <TextBlock Text="در حال پیدا کردن بهترین سرور ..." VerticalAlignment="Center"/>
                   </StackPanel>
                 </Button>

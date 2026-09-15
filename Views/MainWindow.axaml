@@ -198,7 +198,7 @@
                     <TextBlock Text="اتصال هوشمند" VerticalAlignment="Center"/>
                   </StackPanel>
                 </Button>
-                <Button Command="{Binding SmartConnectCommand}" IsVisible="{Binding IsConnected}" Padding="14,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold">
+                <Button Command="{Binding FindBetterServerCommand}" IsVisible="{Binding IsConnected}" Padding="14,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold">
                   <StackPanel Orientation="Horizontal" Spacing="6">
                     <TextBlock Text="🔍" VerticalAlignment="Center"/>
                     <TextBlock Text="یافتن سرور بهتر" VerticalAlignment="Center"/>

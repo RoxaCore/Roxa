@@ -43,8 +43,14 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private int _autoUpdateIntervalHours = 12;
      [ObservableProperty] private PingType _selectedPingType = PingType.Ping;
      public PingType[] PingTypeOptions { get; } = (PingType[])Enum.GetValues(typeof(PingType));
-     [ObservableProperty] private bool _isTesting;
-     [ObservableProperty] private bool _isSmartConnecting;
+      [ObservableProperty] private bool _isTesting;
+      [ObservableProperty] private bool _isSmartConnecting;
+
+      // --- وضعیت جستجوی تدریجی ---
+      private List<ServerInfo> _searchPool = new();
+      private DateTime _lastSearchTime = DateTime.MinValue;
+      private const int SearchBatchSize = 5;
+      private static readonly TimeSpan SearchExpiry = TimeSpan.FromMinutes(15);
 
      public bool ShowSmartConnectButton => !IsSmartConnecting && !IsConnected;
       [ObservableProperty] private string _selectedSubscriptionName = "";
@@ -649,8 +655,15 @@ public partial class MainViewModel : ViewModelBase
             try { await Task.WhenAll(pingTasks); }
             catch (OperationCanceledException) { }
 
-            // --- انتخاب ۸ کاندید برتر ---
+            // --- انتخاب ۱۲ کاندید برتر ---
             var candidates = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).Take(12).ToList();
+
+            // ذخیره مابقی سرورها برای جستجوی تدریجی
+            var candidateIds = new HashSet<string>(candidates.Select(c => c.Id));
+            _searchPool = Servers.Where(s => !candidateIds.Contains(s.Id)).ToList();
+            _lastSearchTime = DateTime.Now;
+            AppendLog($"Search pool: {_searchPool.Count} untested servers saved for incremental search");
+
             if (candidates.Count == 0)
             {
                 IsTesting = false;
@@ -761,6 +774,184 @@ public partial class MainViewModel : ViewModelBase
             IsSmartConnecting = false;
             Status = $"خطا: {ex.Message}";
             AppendLog($"Smart connect error: {ex.Message}");
+        }
+    }
+
+    // ---------- یافتن سرور بهتر ----------
+    [RelayCommand]
+    private async Task FindBetterServer()
+    {
+        if (IsTesting) return;
+        if (!IsConnected || SelectedServer == null) return;
+
+        // بررسی انقضا: اگه ۱۵ دقیقه گذشته، از اول شروع کن
+        if (_searchPool.Count == 0 || (DateTime.Now - _lastSearchTime) > SearchExpiry)
+        {
+            AppendLog("Search pool expired or empty. Rebuilding from all servers...");
+            _searchPool = Servers.Where(s => s.Id != SelectedServer.Id).ToList();
+            // shuffle for variety
+            var rng = new Random();
+            _searchPool = _searchPool.OrderBy(_ => rng.Next()).ToList();
+        }
+
+        // برداشتن batch بعدی
+        var batch = _searchPool.Take(SearchBatchSize).ToList();
+        _searchPool.RemoveRange(0, Math.Min(SearchBatchSize, _searchPool.Count));
+        _lastSearchTime = DateTime.Now;
+
+        if (batch.Count == 0)
+        {
+            ToastHandler?.Invoke("همه سرورها قبلاً بررسی شدند");
+            AppendLog("Find better: no more servers to test");
+            return;
+        }
+
+        _testCts = new CancellationTokenSource();
+        var ct = _testCts.Token;
+        IsTesting = true;
+        IsSmartConnecting = true;
+
+        try
+        {
+            Status = $"یافتن سرور بهتر: تست {batch.Count} سرور ...";
+            AppendLog($"Find better: testing batch of {batch.Count} ({_searchPool.Count} remaining in pool)");
+            ToastHandler?.Invoke($"بررسی {batch.Count} سرور جدید ...");
+
+            // --- مرحله ۱: TCP ping سریع روی batch ---
+            using var sem = new SemaphoreSlim(10);
+            var pingTasks = batch.Select(async s =>
+            {
+                if (ct.IsCancellationRequested) return;
+                await sem.WaitAsync(ct);
+                try
+                {
+                    var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 3000);
+                    Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                }
+                catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+                finally { try { sem.Release(); } catch { } }
+            });
+            try { await Task.WhenAll(pingTasks); }
+            catch (OperationCanceledException) { }
+
+            // فیلتر: فقط سرورهایی که TCP موفق داشتن
+            var survivors = batch.Where(s => s.LatencyMs > 0).ToList();
+            if (survivors.Count == 0)
+            {
+                IsTesting = false;
+                IsSmartConnecting = false;
+                Status = "یافتن سرور بهتر: هیچ کاندیدی پاسخ نداد";
+                AppendLog("Find better: no survivors from TCP ping");
+                return;
+            }
+
+            AppendLog($"Find better: {survivors.Count} survivors, starting real delay test");
+
+            // --- مرحله ۲: تست واقعی ---
+            ServerInfo? bestCandidate = null;
+            foreach (var candidate in survivors)
+            {
+                if (ct.IsCancellationRequested) break;
+
+                try
+                {
+                    AppendLog($"Find better: testing {candidate.Name} ...");
+
+                    var testEngine = new XrayEngine();
+                    try
+                    {
+                        int socks = XrayEngine.FindFreePort();
+                        int http = XrayEngine.FindFreePort();
+                        string cfg = XrayConfigBuilder.Build(candidate, socks, http);
+                        await testEngine.StartWithConfigAsync(cfg, http, ct);
+
+                        using var handler = new HttpClientHandler { Proxy = new System.Net.WebProxy($"http://127.0.0.1:{http}"), UseProxy = true };
+                        using var http2 = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
+
+                        var sw = Stopwatch.StartNew();
+                        using var resp = await http2.GetAsync("http://www.gstatic.com/generate_204", ct);
+                        sw.Stop();
+
+                        if (resp.IsSuccessStatusCode)
+                        {
+                            int ms = (int)sw.ElapsedMilliseconds;
+                            AppendLog($"Find better: {candidate.Name} → {ms}ms");
+                            Post(() => { candidate.RecordLatency(ms); AutoSortAfterTest("latency"); });
+
+                            if (bestCandidate == null || ms < bestCandidate.LatencyMs)
+                                bestCandidate = candidate;
+                        }
+                        else
+                        {
+                            Post(() => { candidate.RecordLatency(-2); AutoSortAfterTest("latency"); });
+                        }
+                    }
+                    catch
+                    {
+                        Post(() => { candidate.RecordLatency(-2); AutoSortAfterTest("latency"); });
+                    }
+                    finally
+                    {
+                        try { testEngine.Stop(); testEngine.Dispose(); } catch { }
+                    }
+                }
+                catch (OperationCanceledException) { break; }
+            }
+
+            // --- مقایسه با سرور فعلی ---
+            if (bestCandidate != null && bestCandidate.LatencyMs > 0)
+            {
+                int currentMs = SelectedServer.LatencyMs > 0 ? SelectedServer.LatencyMs : 999;
+
+                if (bestCandidate.LatencyMs < currentMs)
+                {
+                    // سرور بهتر پیدا شد → سوییچ
+                    AppendLog($"Find better: switching from {SelectedServer.Name} ({currentMs}ms) → {bestCandidate.Name} ({bestCandidate.LatencyMs}ms)");
+                    ToastHandler?.Invoke($"سوییچ به {bestCandidate.Name} ({bestCandidate.LatencyMs}ms)");
+
+                    // انتقال به اول لیست
+                    foreach (var g in Groups)
+                    {
+                        int idx = g.Servers.IndexOf(bestCandidate);
+                        if (idx > 0)
+                        {
+                            g.Servers.RemoveAt(idx);
+                            g.Servers.Insert(0, bestCandidate);
+                            break;
+                        }
+                    }
+
+                    Disconnect();
+                    SelectedServer = bestCandidate;
+                    RefreshConnectionFlags();
+                    await Connect();
+                }
+                else
+                {
+                    AppendLog($"Find better: current server ({currentMs}ms) is still best. Best candidate: {bestCandidate.Name} ({bestCandidate.LatencyMs}ms)");
+                    ToastHandler?.Invoke($"سرور فعلی هنوز بهترینه ({currentMs}ms)");
+                    Status = $"یافتن سرور بهتر: سرور فعلی بهترینه ({currentMs}ms)";
+                }
+            }
+            else
+            {
+                Status = "یافتن سرور بهتر: تست واقعی ناموفق";
+                AppendLog("Find better: all real delay tests failed");
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Status = "یافتن سرور بهتر لغو شد";
+        }
+        catch (Exception ex)
+        {
+            Status = $"خطا: {ex.Message}";
+            AppendLog($"Find better error: {ex.Message}");
+        }
+        finally
+        {
+            IsTesting = false;
+            IsSmartConnecting = false;
         }
     }
 

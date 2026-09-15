@@ -112,7 +112,7 @@ public partial class MainViewModel : ViewModelBase
 
         _engine.Output += line => Post(() => AppendLog(line));
         _engine.Stopped += () => Post(() => IsConnected = false);
-        AppendLog($"سلام! {Servers.Count} سرور و {Subscriptions.Count} سابسکریپشن بارگذاری شد.");
+        AppendLog($"سلام! {Servers.Count} سرور و {Subscriptions.Count} اشتراک بارگذاری شد.");
     }
 
     partial void OnSelectedServerChanged(ServerInfo? value)
@@ -1275,7 +1275,7 @@ public partial class MainViewModel : ViewModelBase
         SaveServers();
     }
 
-    // ---------- سابسکریپشن ----------
+    // ---------- اشتراک ----------
 
     private static string GuessSubName(string url)
     {
@@ -1347,7 +1347,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task UpdateSubscriptions()
     {
-        if (Subscriptions.Count == 0) { AppendLog("سابسکریپشنی نیست."); return; }
+        if (Subscriptions.Count == 0) { AppendLog("اشتراکی نیست."); return; }
         string? activeId = SelectedServer?.Id;
         int total = 0;
         foreach (var sub in Subscriptions.ToList())
@@ -1430,7 +1430,7 @@ public partial class MainViewModel : ViewModelBase
          if (sub == null) return;
          if (ConfirmDeleteHandler != null)
          {
-             bool confirmed = await ConfirmDeleteHandler($"آیا از حذف سابسکریپشن «{sub.Name}» و تمام سرورهایش متمعن هستید؟");
+             bool confirmed = await ConfirmDeleteHandler($"آیا از حذف اشتراک «{sub.Name}» و تمام سرورهایش متمعن هستید؟");
              if (!confirmed) return;
          }
          Subscriptions.Remove(sub);
@@ -1471,7 +1471,7 @@ public partial class MainViewModel : ViewModelBase
         if (urls.Count == 0) { AppendLog("سروری نیست."); return; }
         string b64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(string.Join("\n", urls)));
         _ = CopyTextAsync(b64);
-         AppendLog("سابسکریپشن base64 کپی شد.");
+         AppendLog("اشتراک base64 کپی شد.");
      }
 
      [RelayCommand]

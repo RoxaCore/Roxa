@@ -254,7 +254,7 @@
       </TabItem>
 
       <!-- Subscriptions Tab -->
-      <TabItem Header="سابسکریپشن" Padding="16">
+      <TabItem Header="اشتراک" Padding="16">
         <DockPanel>
           <StackPanel DockPanel.Dock="Top" Spacing="12" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" Spacing="8">
@@ -313,8 +313,8 @@
             
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
-                <TextBlock Text="سابسکریپشن" FontWeight="Bold" FontSize="13"/>
-                <TextBlock Text="بروزرسانی از طریق تب سابسکریپشن انجام می‌شود" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                <TextBlock Text="اشتراک" FontWeight="Bold" FontSize="13"/>
+                <TextBlock Text="بروزرسانی از طریق تب اشتراک انجام می‌شود" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
               </StackPanel>
             </Border>
 

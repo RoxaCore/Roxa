@@ -663,7 +663,7 @@ public partial class MainViewModel : ViewModelBase
 
             try
             {
-                await engine.StartMultiAsync(configJson, ct);
+                await engine.StartMultiAsync(configJson, portMap, ct);
                 AppendLog($"Smart connect: single Xray process started on {portMap.Count} ports");
 
                 // تست موازی همه کاندیدها

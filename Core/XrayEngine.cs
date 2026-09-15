@@ -250,7 +250,7 @@ public sealed class XrayEngine : IDisposable
         catch (Exception ex) { Log($"TUN cleanup failed: {ex.Message}"); }
     }
 
-    public async Task StartMultiAsync(string configJson, CancellationToken ct = default)
+    public async Task StartMultiAsync(string configJson, Dictionary<int, ServerInfo> portMap, CancellationToken ct = default)
     {
         Stop();
         if (!File.Exists(EnginePath))
@@ -285,13 +285,20 @@ public sealed class XrayEngine : IDisposable
             process.BeginErrorReadLine();
         }
 
-        // Wait for process to be ready
-        await Task.Delay(500, ct);
-        lock (_lock)
+        // Wait for ports to be ready
+        bool allReady = false;
+        for (int i = 0; i < 30 && !ct.IsCancellationRequested; i++)
         {
-            if (_process == null || _process.HasExited)
-                throw new InvalidOperationException("Xray multi-test engine exited unexpectedly.");
+            await Task.Delay(300, ct);
+            lock (_lock)
+            {
+                if (_process == null || _process.HasExited)
+                    throw new InvalidOperationException("Xray multi-test engine exited unexpectedly.");
+            }
+            allReady = portMap.Keys.All(p => TryConnect(p));
+            if (allReady) break;
         }
+        if (!allReady) throw new InvalidOperationException("Multi-test ports did not come up.");
 
         Log("Multi-test Xray engine started.");
         CleanupTempConfig(configPath);

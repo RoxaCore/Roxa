@@ -335,8 +335,6 @@ public static class XrayConfigBuilder
             var outbound = BuildOutbound(servers[i]);
             outbound["tag"] = $"proxy-{i}";
             outbounds.Add(outbound);
-
-            inbounds[^1]["routing"] = $"proxy-{i}";
         }
 
         var routingRules = new JsonArray();

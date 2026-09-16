@@ -198,24 +198,24 @@
                     <TextBlock Text="اتصال هوشمند" VerticalAlignment="Center"/>
                   </StackPanel>
                 </Button>
-                <Button IsVisible="{Binding IsSmartConnecting}" IsEnabled="False" Padding="0" CornerRadius="10" Background="Transparent" BorderThickness="0">
+                <Button IsVisible="{Binding IsSmartConnecting}" IsEnabled="False" Padding="14,10" CornerRadius="10" Background="#7C3AED" Foreground="White" FontSize="13" FontWeight="SemiBold">
                   <Grid>
-                    <Border Background="#5B21B6" CornerRadius="10" HorizontalAlignment="Stretch"/>
-                    <Border Background="#7C3AED" CornerRadius="10" HorizontalAlignment="Left" Width="300" RenderTransformOrigin="0,0.5">
+                    <Border Background="#5B21B6" CornerRadius="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <Border Background="#7C3AED" CornerRadius="10" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
                       <Border.RenderTransform>
                         <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
                       </Border.RenderTransform>
                     </Border>
                     <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10">
                       <TextBlock Text="◉" VerticalAlignment="Center" FontSize="16" Foreground="White"/>
-                      <TextBlock Text="{Binding SearchProgressText}" VerticalAlignment="Center" Foreground="White"/>
+                      <TextBlock Text="{Binding SearchProgressText}" VerticalAlignment="Center" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
                     </StackPanel>
                   </Grid>
                 </Button>
-                <Button Command="{Binding FindBetterServerCommand}" IsVisible="{Binding IsConnected}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}" Padding="0" CornerRadius="10" Background="Transparent" BorderThickness="0">
+                <Button Command="{Binding FindBetterServerCommand}" IsVisible="{Binding IsConnected}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold">
                   <Grid>
-                    <Border Background="#065F46" CornerRadius="10" HorizontalAlignment="Stretch"/>
-                    <Border Background="#0E7C6B" CornerRadius="10" HorizontalAlignment="Left" Width="300" RenderTransformOrigin="0,0.5">
+                    <Border Background="#065F46" CornerRadius="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <Border Background="#0E7C6B" CornerRadius="10" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
                       <Border.RenderTransform>
                         <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
                       </Border.RenderTransform>
@@ -223,8 +223,8 @@
                     <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10">
                       <TextBlock Text="🔍" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}"/>
                       <TextBlock Text="◉" VerticalAlignment="Center" FontSize="16" IsVisible="{Binding IsFindingBetter}" Foreground="White"/>
-                      <TextBlock Text="یافتن سرور بهتر" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}" Foreground="White"/>
-                      <TextBlock Text="{Binding SearchProgressText}" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter}" Foreground="White"/>
+                      <TextBlock Text="یافتن سرور بهتر" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
+                      <TextBlock Text="{Binding SearchProgressText}" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter}" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
                     </StackPanel>
                   </Grid>
                 </Button>

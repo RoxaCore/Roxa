@@ -19,6 +19,7 @@ public class AppSettings
     public HashSet<string> CollapsedGroups { get; set; } = new();
     public string SortField { get; set; } = "بدون مرتب";
     public bool SortAscending { get; set; } = true;
+    public bool GlobalSort { get; set; }
     public Dictionary<string, string> GroupSortFields { get; set; } = new();
     public string CustomDnsServers { get; set; } = "";
     public string? CustomDnsAdvancedJson { get; set; }

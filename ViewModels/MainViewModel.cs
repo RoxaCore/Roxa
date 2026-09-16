@@ -74,6 +74,7 @@ public partial class MainViewModel : ViewModelBase
      public bool ShowSmartConnectButton => !IsSmartConnecting && !IsConnected;
       [ObservableProperty] private string _selectedSubscriptionName = "";
       [ObservableProperty] private string _sortField = "بدون مرتب";
+      [ObservableProperty] private bool _globalSort;
       [ObservableProperty] private int _selectedCount;
       [ObservableProperty] private bool _selectAllChecked;
       [ObservableProperty] private bool _sortAscending = true;
@@ -114,6 +115,7 @@ public partial class MainViewModel : ViewModelBase
         AutoUpdateIntervalHours = _settings.AutoUpdateIntervalHours <= 0 ? 12 : _settings.AutoUpdateIntervalHours;
         _sortField = _settings.SortField;
         _sortAscending = _settings.SortAscending;
+        _globalSort = _settings.GlobalSort;
         _customDnsServers = _settings.CustomDnsServers ?? "";
         _customDnsAdvancedJson = _settings.CustomDnsAdvancedJson ?? "";
         if (_settings.UseTunMode && !Core.AdminHelper.IsRunningAsAdmin())
@@ -299,27 +301,65 @@ public partial class MainViewModel : ViewModelBase
 
     private void AutoSortAfterTest(string metric)
     {
-        foreach (var g in Groups)
+        if (GlobalSort)
         {
-            var connected = g.Servers.FirstOrDefault(s => s.IsActiveConnection);
-            var success = g.Servers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs >= 0 : s.DownloadMbps >= 0)).ToList();
-            var failed = g.Servers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs < 0 : s.DownloadMbps < 0)).ToList();
+            // مرتب‌سازی سراسری: همه سرورها از همه گروه‌ها
+            var allServers = Groups.SelectMany(g => g.Servers).ToList();
+            var connected = allServers.FirstOrDefault(s => s.IsActiveConnection);
+            var success = allServers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs >= 0 : s.DownloadMbps >= 0)).ToList();
+            var failed = allServers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs < 0 : s.DownloadMbps < 0)).ToList();
 
             if (metric == "latency")
                 success = success.OrderBy(s => s.LatencyMs).ToList();
             else
                 success = success.OrderByDescending(s => s.DownloadMbps).ToList();
 
-            g.Servers.Clear();
-            if (connected != null) g.Servers.Add(connected);
-            foreach (var s in success) g.Servers.Add(s);
-            foreach (var s in failed) g.Servers.Add(s);
+            var sorted = new List<ServerInfo>();
+            if (connected != null) sorted.Add(connected);
+            sorted.AddRange(success);
+            sorted.AddRange(failed);
+
+            // بازتوزیع به گروه‌ها بر اساس ترتیب سراسری
+            var grouped = sorted.GroupBy(s => s.SubscriptionName ?? "");
+            foreach (var g in Groups)
+            {
+                var groupServers = grouped.FirstOrDefault(gr => gr.Key == (g.Key == "" ? "" : g.Key));
+                g.Servers.Clear();
+                if (groupServers != null)
+                    foreach (var s in groupServers) g.Servers.Add(s);
+            }
+        }
+        else
+        {
+            // مرتب‌سازی داخل هر گروه (حالت قبلی)
+            foreach (var g in Groups)
+            {
+                var connected = g.Servers.FirstOrDefault(s => s.IsActiveConnection);
+                var success = g.Servers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs >= 0 : s.DownloadMbps >= 0)).ToList();
+                var failed = g.Servers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs < 0 : s.DownloadMbps < 0)).ToList();
+
+                if (metric == "latency")
+                    success = success.OrderBy(s => s.LatencyMs).ToList();
+                else
+                    success = success.OrderByDescending(s => s.DownloadMbps).ToList();
+
+                g.Servers.Clear();
+                if (connected != null) g.Servers.Add(connected);
+                foreach (var s in success) g.Servers.Add(s);
+                foreach (var s in failed) g.Servers.Add(s);
+            }
         }
     }
 
     partial void OnSortFieldChanged(string value)
     {
         _settings.SortField = value;
+        SaveSettings();
+        RefreshGroups();
+    }
+    partial void OnGlobalSortChanged(bool value)
+    {
+        _settings.GlobalSort = value;
         SaveSettings();
         RefreshGroups();
     }

@@ -371,6 +371,10 @@
                   <TextBlock Text="نوع پینگ:" VerticalAlignment="Center"/>
                   <ComboBox ItemsSource="{Binding PingTypeOptions}" SelectedItem="{Binding SelectedPingType}" Width="160"/>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <CheckBox IsChecked="{Binding GlobalSort}" VerticalAlignment="Center"/>
+                  <TextBlock Text="مرتب‌سازی سراسری (بعد از تست، بهترین سرور از همه گروه‌ها بالا میاد)" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                </StackPanel>
               </StackPanel>
             </Border>
 

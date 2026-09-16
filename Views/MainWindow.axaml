@@ -16,6 +16,12 @@
         FontFamily="{StaticResource Vazirmatn}"
         Background="#F8F9FA">
 
+  <Window.Styles>
+    <Style Selector="Button:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource AncestorType=Button}}"/>
+    </Style>
+  </Window.Styles>
+
   <Design.DataContext>
     <vm:MainViewModel />
   </Design.DataContext>
@@ -198,9 +204,8 @@
                     <TextBlock Text="اتصال هوشمند" VerticalAlignment="Center"/>
                   </StackPanel>
                 </Button>
-                <Button IsVisible="{Binding IsSmartConnecting}" IsEnabled="False" Padding="14,10" CornerRadius="10" Background="#7C3AED" Foreground="White" FontSize="13" FontWeight="SemiBold">
+                <Button IsVisible="{Binding IsSmartConnecting}" IsEnabled="False" Padding="14,10" CornerRadius="10" Background="#5B21B6" Foreground="White" FontSize="13" FontWeight="SemiBold">
                   <Grid>
-                    <Border Background="#5B21B6" CornerRadius="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                     <Border Background="#7C3AED" CornerRadius="10" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
                       <Border.RenderTransform>
                         <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
@@ -212,9 +217,8 @@
                     </StackPanel>
                   </Grid>
                 </Button>
-                <Button Command="{Binding FindBetterServerCommand}" IsVisible="{Binding IsConnected}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold">
+                <Button Command="{Binding FindBetterServerCommand}" IsVisible="{Binding IsConnected}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" Background="#065F46" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderThickness="0">
                   <Grid>
-                    <Border Background="#065F46" CornerRadius="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                     <Border Background="#0E7C6B" CornerRadius="10" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
                       <Border.RenderTransform>
                         <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>

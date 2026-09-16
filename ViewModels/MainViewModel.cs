@@ -197,11 +197,44 @@ public partial class MainViewModel : ViewModelBase
         else Dispatcher.UIThread.Post(action);
     }
 
+    private readonly object _logLock = new();
+    private readonly List<string> _logBuffer = new();
+    private DateTime _lastLogFlush = DateTime.MinValue;
+
     private void AppendLog(string message)
     {
-        LogText += $"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}";
-        if (LogText.Length > 50000)
-            LogText = LogText.Substring(LogText.Length - 30000);
+        var line = $"[{DateTime.Now:HH:mm:ss}] {message}";
+        lock (_logLock)
+        {
+            _logBuffer.Add(line);
+            if ((DateTime.Now - _lastLogFlush).TotalMilliseconds < 500) return;
+            _lastLogFlush = DateTime.Now;
+            var batch = string.Join(Environment.NewLine, _logBuffer);
+            _logBuffer.Clear();
+            Post(() =>
+            {
+                LogText += batch + Environment.NewLine;
+                if (LogText.Length > 50000)
+                    LogText = LogText.Substring(LogText.Length - 30000);
+            });
+        }
+    }
+
+    private void FlushLog()
+    {
+        lock (_logLock)
+        {
+            if (_logBuffer.Count == 0) return;
+            var batch = string.Join(Environment.NewLine, _logBuffer);
+            _logBuffer.Clear();
+            _lastLogFlush = DateTime.Now;
+            Post(() =>
+            {
+                LogText += batch + Environment.NewLine;
+                if (LogText.Length > 50000)
+                    LogText = LogText.Substring(LogText.Length - 30000);
+            });
+        }
     }
 
     private static void Enrich(ServerInfo s) => s.CountryCode = GeoFlags.DetectCountry(s.Name, s.Address);
@@ -873,6 +906,7 @@ public partial class MainViewModel : ViewModelBase
             Status = $"خطا: {ex.Message}";
             AppendLog($"Smart connect error: {ex.Message}");
         }
+        finally { FlushLog(); }
     }
 
     // ---------- یافتن سرور بهتر ----------
@@ -1053,6 +1087,7 @@ public partial class MainViewModel : ViewModelBase
         {
             IsTesting = false;
             IsFindingBetter = false;
+            FlushLog();
         }
     }
 

@@ -792,7 +792,9 @@ public partial class MainViewModel : ViewModelBase
             try { await Task.WhenAll(pingTasks); }
             catch (OperationCanceledException) { }
 
-            Post(() => AutoSortAfterTest("latency"));
+            // صبر تا همه Post() ها اجرا بشن
+            await Dispatcher.UIThread.InvokeAsync(() => { });
+            AutoSortAfterTest("latency");
 
             // --- انتخاب ۱۲ کاندید برتر ---
             var candidates = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).Take(12).ToList();
@@ -980,7 +982,8 @@ public partial class MainViewModel : ViewModelBase
             try { await Task.WhenAll(pingTasks); }
             catch (OperationCanceledException) { }
 
-            Post(() => AutoSortAfterTest("latency"));
+            await Dispatcher.UIThread.InvokeAsync(() => { });
+            AutoSortAfterTest("latency");
 
             // فیلتر: فقط سرورهایی که TCP موفق داشتن
             var survivors = batch.Where(s => s.LatencyMs > 0).ToList();

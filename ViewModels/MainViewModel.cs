@@ -49,6 +49,7 @@ public partial class MainViewModel : ViewModelBase
       [ObservableProperty] private int _searchTestedCount;
       [ObservableProperty] private int _searchTotalCount;
 
+      public double SearchProgressPercent => SearchTotalCount > 0 ? (double)SearchTestedCount / SearchTotalCount : 0;
       public string SearchProgressText => SearchTotalCount > 0
           ? $"در حال جستجو ... {SearchTestedCount} از {SearchTotalCount} سرور"
           : "در حال جستجو ...";
@@ -153,6 +154,8 @@ public partial class MainViewModel : ViewModelBase
     }
 
     partial void OnIsSmartConnectingChanged(bool value) => OnPropertyChanged(nameof(ShowSmartConnectButton));
+    partial void OnSearchTestedCountChanged(int value) { OnPropertyChanged(nameof(SearchProgressPercent)); OnPropertyChanged(nameof(SearchProgressText)); }
+    partial void OnSearchTotalCountChanged(int value) { OnPropertyChanged(nameof(SearchProgressPercent)); OnPropertyChanged(nameof(SearchProgressText)); }
 
     partial void OnSetSystemProxyChanged(bool value) { _settings.SetSystemProxy = value; SaveSettings(); }
     partial void OnAutoConnectChanged(bool value) { _settings.AutoConnect = value; SaveSettings(); }
@@ -660,6 +663,12 @@ public partial class MainViewModel : ViewModelBase
 
         try
         {
+            int totalServers = Servers.Count;
+            int tested = 0;
+            SearchTestedCount = 0;
+            SearchTotalCount = totalServers;
+            OnPropertyChanged(nameof(SearchProgressText));
+
             // --- مرحله ۱: پینگ سریع TCP روی همه سرورها ---
             Status = "اتصال هوشمند: پینگ سریع ...";
             ToastHandler?.Invoke("در حال پیدا کردن بهترین سرور ...");
@@ -678,7 +687,12 @@ public partial class MainViewModel : ViewModelBase
                     Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
                 }
                 catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
-                finally { try { sem1.Release(); } catch { } }
+                finally
+                {
+                    try { sem1.Release(); } catch { }
+                    tested++;
+                    Post(() => { SearchTestedCount = tested; OnPropertyChanged(nameof(SearchProgressText)); });
+                }
             });
             try { await Task.WhenAll(pingTasks); }
             catch (OperationCanceledException) { }
@@ -691,6 +705,10 @@ public partial class MainViewModel : ViewModelBase
             _searchPool = Servers.Where(s => !candidateIds.Contains(s.Id)).ToList();
             _lastSearchTime = DateTime.Now;
             AppendLog($"Search pool: {_searchPool.Count} untested servers saved for incremental search");
+
+            // آپدیت تعداد کل برای فاز تست واقعی
+            SearchTotalCount = Servers.Count + candidates.Count;
+            OnPropertyChanged(nameof(SearchProgressText));
 
             if (candidates.Count == 0)
             {
@@ -715,6 +733,8 @@ public partial class MainViewModel : ViewModelBase
                 try
                 {
                     AppendLog($"Smart connect: testing {candidate.Name} ...");
+                    tested++;
+                    Post(() => { SearchTestedCount = tested; OnPropertyChanged(nameof(SearchProgressText)); });
 
                     var testEngine = new XrayEngine();
                     try

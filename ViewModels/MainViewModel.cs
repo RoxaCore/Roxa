@@ -46,6 +46,12 @@ public partial class MainViewModel : ViewModelBase
       [ObservableProperty] private bool _isTesting;
       [ObservableProperty] private bool _isSmartConnecting;
       [ObservableProperty] private bool _isFindingBetter;
+      [ObservableProperty] private int _searchTestedCount;
+      [ObservableProperty] private int _searchTotalCount;
+
+      public string SearchProgressText => SearchTotalCount > 0
+          ? $"در حال جستجو ... {SearchTestedCount} از {SearchTotalCount} سرور"
+          : "در حال جستجو ...";
 
       // --- وضعیت جستجوی تدریجی ---
       private List<ServerInfo> _searchPool = new();
@@ -823,6 +829,12 @@ public partial class MainViewModel : ViewModelBase
 
         try
         {
+            int totalTests = batch.Count * 2;
+            int tested = 0;
+            SearchTestedCount = 0;
+            SearchTotalCount = totalTests;
+            OnPropertyChanged(nameof(SearchProgressText));
+
             Status = $"یافتن سرور بهتر: تست {batch.Count} سرور ...";
             AppendLog($"Find better: testing batch of {batch.Count} ({_searchPool.Count} remaining in pool)");
             ToastHandler?.Invoke($"بررسی {batch.Count} سرور جدید ...");
@@ -839,7 +851,12 @@ public partial class MainViewModel : ViewModelBase
                     Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
                 }
                 catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
-                finally { try { sem.Release(); } catch { } }
+                finally
+                {
+                    try { sem.Release(); } catch { }
+                    tested++;
+                    Post(() => { SearchTestedCount = tested; OnPropertyChanged(nameof(SearchProgressText)); });
+                }
             });
             try { await Task.WhenAll(pingTasks); }
             catch (OperationCanceledException) { }
@@ -866,6 +883,8 @@ public partial class MainViewModel : ViewModelBase
                 try
                 {
                     AppendLog($"Find better: testing {candidate.Name} ...");
+                    tested++;
+                    Post(() => { SearchTestedCount = tested; OnPropertyChanged(nameof(SearchProgressText)); });
 
                     var testEngine = new XrayEngine();
                     try

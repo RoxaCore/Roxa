@@ -209,7 +209,7 @@
                     <TextBlock Text="🔍" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}"/>
                     <TextBlock Text="◉" VerticalAlignment="Center" FontSize="16" IsVisible="{Binding IsFindingBetter}"/>
                     <TextBlock Text="یافتن سرور بهتر" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}"/>
-                    <TextBlock Text="در حال جستجوی سرور بهتر ..." VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter}"/>
+                    <TextBlock Text="{Binding SearchProgressText}" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter}"/>
                   </StackPanel>
                 </Button>
               </StackPanel>

@@ -53,6 +53,17 @@ public partial class MainViewModel : ViewModelBase
       public string SearchProgressText => SearchTotalCount > 0
           ? $"در حال جستجو ... {SearchTestedCount} از {SearchTotalCount} سرور"
           : "در حال جستجو ...";
+      public string LastUpdateDisplay
+      {
+          get
+          {
+              if (_settings.LastSubscriptionUpdate == DateTime.MinValue) return "آخرین بروزرسانی: هرگز";
+              var elapsed = DateTime.Now - _settings.LastSubscriptionUpdate;
+              if (elapsed.TotalHours < 1) return $"آخرین بروزرسانی: {(int)elapsed.TotalMinutes} دقیقه پیش";
+              if (elapsed.TotalDays < 1) return $"آخرین بروزرسانی: {(int)elapsed.TotalHours} ساعت پیش";
+              return $"آخرین بروزرسانی: {(int)elapsed.TotalDays} روز پیش";
+          }
+      }
 
       // --- وضعیت جستجوی تدریجی ---
       private List<ServerInfo> _searchPool = new();
@@ -159,7 +170,7 @@ public partial class MainViewModel : ViewModelBase
 
     partial void OnSetSystemProxyChanged(bool value) { _settings.SetSystemProxy = value; SaveSettings(); }
     partial void OnAutoConnectChanged(bool value) { _settings.AutoConnect = value; SaveSettings(); }
-    partial void OnAutoUpdateSubsChanged(bool value) { _settings.AutoUpdateSubs = value; SaveSettings(); }
+    partial void OnAutoUpdateSubsChanged(bool value) { _settings.AutoUpdateSubs = value; SaveSettings(); OnPropertyChanged(nameof(LastUpdateDisplay)); }
     partial void OnAutoUpdateIntervalHoursChanged(int value)
     {
         _settings.AutoUpdateIntervalHours = Math.Clamp(value, 1, 168);
@@ -1647,6 +1658,7 @@ public partial class MainViewModel : ViewModelBase
         SaveServers();
         _settings.LastSubscriptionUpdate = DateTime.Now;
         SaveSettings();
+        Post(() => OnPropertyChanged(nameof(LastUpdateDisplay)));
         SelectedServer = Servers.FirstOrDefault(s => s.Id == activeId) ?? Servers.FirstOrDefault();
         Status = $"به‌روز شد ({total} سرور، {Servers.Count} یکتا — دستی‌ها حفظ شدند)";
         RefreshGroups();
@@ -1686,6 +1698,7 @@ public partial class MainViewModel : ViewModelBase
                 UpdateGroupContent(g);
             _settings.LastSubscriptionUpdate = DateTime.Now;
             SaveSettings();
+            Post(() => OnPropertyChanged(nameof(LastUpdateDisplay)));
             Status = $"«{sub.Name}» به‌روز شد ({added} سرور جدید)";
         }
         catch (Exception ex) { Status = "خطا در به‌روزرسانی"; AppendLog($"خطا: {ex.Message}"); }

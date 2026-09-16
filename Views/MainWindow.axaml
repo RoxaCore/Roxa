@@ -350,8 +350,17 @@
             
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
-                <TextBlock Text="اشتراک" FontWeight="Bold" FontSize="13"/>
-                <TextBlock Text="بروزرسانی از طریق تب اشتراک انجام می‌شود" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                <TextBlock Text="بروزرسانی خودکار اشتراک" FontWeight="Bold" FontSize="13"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <CheckBox IsChecked="{Binding AutoUpdateSubs}" VerticalAlignment="Center"/>
+                  <TextBlock Text="بروزرسانی خودکار اشتراک‌ها" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding AutoUpdateSubs}">
+                  <TextBlock Text="هر" VerticalAlignment="Center"/>
+                  <NumericUpDown Value="{Binding AutoUpdateIntervalHours}" Minimum="1" Maximum="168" Width="80" FormatString="0"/>
+                  <TextBlock Text="ساعت بروزرسانی شود" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding LastUpdateDisplay}" FontSize="11" Foreground="{StaticResource TextSecondary}" IsVisible="{Binding AutoUpdateSubs}"/>
               </StackPanel>
             </Border>
 

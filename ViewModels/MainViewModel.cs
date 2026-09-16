@@ -281,8 +281,9 @@ public partial class MainViewModel : ViewModelBase
     {
         foreach (var g in Groups)
         {
-            var success = g.Servers.Where(s => metric == "latency" ? s.LatencyMs >= 0 : s.DownloadMbps >= 0).ToList();
-            var failed = g.Servers.Where(s => metric == "latency" ? s.LatencyMs < 0 : s.DownloadMbps < 0).ToList();
+            var connected = g.Servers.FirstOrDefault(s => s.IsActiveConnection);
+            var success = g.Servers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs >= 0 : s.DownloadMbps >= 0)).ToList();
+            var failed = g.Servers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs < 0 : s.DownloadMbps < 0)).ToList();
 
             if (metric == "latency")
                 success = success.OrderBy(s => s.LatencyMs).ToList();
@@ -290,6 +291,7 @@ public partial class MainViewModel : ViewModelBase
                 success = success.OrderByDescending(s => s.DownloadMbps).ToList();
 
             g.Servers.Clear();
+            if (connected != null) g.Servers.Add(connected);
             foreach (var s in success) g.Servers.Add(s);
             foreach (var s in failed) g.Servers.Add(s);
         }

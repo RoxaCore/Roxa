@@ -1377,32 +1377,36 @@ public partial class MainViewModel : ViewModelBase
          if (targets.Count == 0 || IsTesting) return;
          _testCts = new CancellationTokenSource();
          IsTesting = true;
-         Status = $"بروزرسانی گروه «{group!.Title}» ({targets.Count} سرور) ...";
-         foreach (var s in targets) { s.LatencyMs = -1; s.RecordSpeed(-1); }
-         using var sem = new SemaphoreSlim(3);
-         var tasks = targets.Select(async s =>
+         try
          {
-             if (_testCts.Token.IsCancellationRequested) return;
-             await sem.WaitAsync(_testCts.Token);
-             try
+             Status = $"بروزرسانی گروه «{group!.Title}» ({targets.Count} سرور) ...";
+             foreach (var s in targets) { s.LatencyMs = -1; s.RecordSpeed(-1); }
+             using var sem = new SemaphoreSlim(3);
+             var tasks = targets.Select(async s =>
              {
                  if (_testCts.Token.IsCancellationRequested) return;
-                 Post(() => Status = $"بروزرسانی: {s.Name} ...");
-                 var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                 Post(() => { s.LatencyMs = ok ? ms : -2; AutoSortAfterTest("latency"); });
-             }
-             catch { Post(() => { s.LatencyMs = -2; AutoSortAfterTest("latency"); }); }
-             finally { try { sem.Release(); } catch { } }
-         });
-         try { await Task.WhenAll(tasks); }
-         catch (OperationCanceledException) { }
-         foreach (var s in targets)
-             if (s.LatencyMs == -1) s.LatencyMs = -2;
-         int okCount = targets.Count(s => s.LatencyMs >= 0);
-          IsTesting = false;
-          Status = $"بروزرسانی گروه تمام شد ({okCount} موفق)";
-          AutoSortAfterTest("latency");
-          SaveServers();
+                 await sem.WaitAsync(_testCts.Token);
+                 try
+                 {
+                     if (_testCts.Token.IsCancellationRequested) return;
+                     Post(() => Status = $"بروزرسانی: {s.Name} ...");
+                     var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
+                     Post(() => { s.LatencyMs = ok ? ms : -2; AutoSortAfterTest("latency"); });
+                 }
+                 catch { Post(() => { s.LatencyMs = -2; AutoSortAfterTest("latency"); }); }
+                 finally { try { sem.Release(); } catch { } }
+             });
+             try { await Task.WhenAll(tasks); }
+             catch (OperationCanceledException) { }
+             foreach (var s in targets)
+                 if (s.LatencyMs == -1) s.LatencyMs = -2;
+             int okCount = targets.Count(s => s.LatencyMs >= 0);
+             Status = $"بروزرسانی گروه تمام شد ({okCount} موفق)";
+             AutoSortAfterTest("latency");
+             SaveServers();
+         }
+         catch (Exception ex) { Status = $"خطا: {ex.Message}"; }
+         finally { IsTesting = false; }
      }
 
      // ---------- تب پینگ واقعی ----------

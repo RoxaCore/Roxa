@@ -128,8 +128,8 @@ public static class XrayConfigBuilder
             var servers = new JsonArray();
             foreach (var part in settings.CustomDnsServers.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
-                if (System.Net.IPAddress.TryParse(part, out _))
-                    servers.Add(part);
+                if (string.IsNullOrWhiteSpace(part)) continue;
+                servers.Add(part);
             }
             if (servers.Count > 0)
                 return new JsonObject { ["servers"] = servers };
@@ -164,6 +164,12 @@ public static class XrayConfigBuilder
                 };
                 break;
             case ProxyProtocol.VLESS:
+                var vlessUser = new JsonObject
+                {
+                    ["id"] = s.UserId,
+                    ["encryption"] = string.IsNullOrEmpty(s.Encryption) ? "none" : s.Encryption
+                };
+                if (!string.IsNullOrEmpty(s.Flow)) vlessUser["flow"] = s.Flow;
                 outbound["protocol"] = "vless";
                 outbound["settings"] = new JsonObject
                 {
@@ -171,12 +177,7 @@ public static class XrayConfigBuilder
                     {
                         ["address"] = s.Address,
                         ["port"] = s.Port,
-                        ["users"] = new JsonArray(new JsonObject
-                        {
-                            ["id"] = s.UserId,
-                            ["encryption"] = string.IsNullOrEmpty(s.Encryption) ? "none" : s.Encryption,
-                            ["flow"] = s.Flow ?? ""
-                        })
+                        ["users"] = new JsonArray(vlessUser)
                     })
                 };
                 break;
@@ -300,16 +301,19 @@ public static class XrayConfigBuilder
                 break;
         }
 
-        // TLS Fragment - bypass DPI
-        stream["sockopt"] = new JsonObject
+        // TLS Fragment - bypass DPI (only for TLS/Reality connections)
+        if (s.Security is "tls" or "reality")
         {
-            ["fragment"] = new JsonObject
+            stream["sockopt"] = new JsonObject
             {
-                ["packets"] = "1-1",
-                ["length"] = "100-200",
-                ["interval"] = "50-100"
-            }
-        };
+                ["fragment"] = new JsonObject
+                {
+                    ["packets"] = "1-1",
+                    ["length"] = "100-200",
+                    ["interval"] = "50-100"
+                }
+            };
+        }
 
         return stream;
     }

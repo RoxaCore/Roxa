@@ -86,8 +86,14 @@ public sealed class XrayEngine : IDisposable
 
         string zipPath = Path.Combine(Path.GetTempPath(), "xray-core-download.zip");
         await File.WriteAllBytesAsync(zipPath, data, ct);
-        ZipFile.ExtractToDirectory(zipPath, EngineDir, overwriteFiles: true);
-        File.Delete(zipPath);
+        try
+        {
+            ZipFile.ExtractToDirectory(zipPath, EngineDir, overwriteFiles: true);
+        }
+        finally
+        {
+            try { File.Delete(zipPath); } catch { }
+        }
         if (!IsWindows)
         {
             try
@@ -146,52 +152,58 @@ public sealed class XrayEngine : IDisposable
         string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-config-{Guid.NewGuid():N}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
 
-        var psi = new ProcessStartInfo(EnginePath)
+        try
         {
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
-        };
-        psi.ArgumentList.Add("run");
-        psi.ArgumentList.Add("-c");
-        psi.ArgumentList.Add(configPath);
+            var psi = new ProcessStartInfo(EnginePath)
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            psi.ArgumentList.Add("run");
+            psi.ArgumentList.Add("-c");
+            psi.ArgumentList.Add(configPath);
 
-        Process process;
-        lock (_lock)
-        {
-            _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
-            process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-            process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-            process.Exited += (_, _) => OnExited();
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-        }
-
-        CurrentServer = server;
-        Log($"Connecting to {server.Name} {(useTun ? "[TUN Mode]" : "")} ...");
-
-        bool ready = false;
-        for (int i = 0; i < 60 && !ct.IsCancellationRequested; i++)
-        {
-            await Task.Delay(200, ct);
+            Process process;
             lock (_lock)
             {
-                if (_process == null || _process.HasExited)
-                    throw new InvalidOperationException("Xray engine exited unexpectedly.");
+                _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
+                process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+                process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+                process.Exited += (_, _) => OnExited();
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
             }
-            if (TryConnect(HttpPort)) { ready = true; break; }
-        }
-        if (!ready) throw new InvalidOperationException("Proxy port did not come up.");
 
-        if (!useTun && setSystemProxy && IsWindows)
-        {
-            SystemProxy.Set($"127.0.0.1:{HttpPort}");
-            _proxyActive = true;
+            CurrentServer = server;
+            Log($"Connecting to {server.Name} {(useTun ? "[TUN Mode]" : "")} ...");
+
+            bool ready = false;
+            for (int i = 0; i < 60 && !ct.IsCancellationRequested; i++)
+            {
+                await Task.Delay(200, ct);
+                lock (_lock)
+                {
+                    if (_process == null || _process.HasExited)
+                        throw new InvalidOperationException("Xray engine exited unexpectedly.");
+                }
+                if (TryConnect(HttpPort)) { ready = true; break; }
+            }
+            if (!ready) throw new InvalidOperationException("Proxy port did not come up.");
+
+            if (!useTun && setSystemProxy && IsWindows)
+            {
+                SystemProxy.Set($"127.0.0.1:{HttpPort}");
+                _proxyActive = true;
+            }
+            Log($"Connected. HTTP 127.0.0.1:{HttpPort}  SOCKS 127.0.0.1:{SocksPort} {(useTun ? "[TUN]" : "")}");
         }
-        Log($"Connected. HTTP 127.0.0.1:{HttpPort}  SOCKS 127.0.0.1:{SocksPort} {(useTun ? "[TUN]" : "")}");
-        CleanupTempConfig(configPath);
+        finally
+        {
+            CleanupTempConfig(configPath);
+        }
     }
 
     public static int FindFreePort()
@@ -213,46 +225,52 @@ public sealed class XrayEngine : IDisposable
         string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-test-{Guid.NewGuid():N}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
 
-        var psi = new ProcessStartInfo(EnginePath)
+        try
         {
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
-        };
-        psi.ArgumentList.Add("run");
-        psi.ArgumentList.Add("-c");
-        psi.ArgumentList.Add(configPath);
+            var psi = new ProcessStartInfo(EnginePath)
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            psi.ArgumentList.Add("run");
+            psi.ArgumentList.Add("-c");
+            psi.ArgumentList.Add(configPath);
 
-        Process process;
-        lock (_lock)
-        {
-            _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
-            process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-            process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-            process.Exited += (_, _) => OnExited();
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-        }
-
-        HttpPort = httpPort;
-
-        bool ready = false;
-        for (int i = 0; i < 30 && !ct.IsCancellationRequested; i++)
-        {
-            await Task.Delay(300, ct);
+            Process process;
             lock (_lock)
             {
-                if (_process == null || _process.HasExited)
-                    throw new InvalidOperationException("Xray test engine exited unexpectedly.");
+                _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
+                process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+                process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+                process.Exited += (_, _) => OnExited();
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
             }
-            if (TryConnect(HttpPort)) { ready = true; break; }
-        }
-        if (!ready) throw new InvalidOperationException("Xray test port did not come up.");
 
-        CleanupTempConfig(configPath);
-        Log("Test Xray engine started.");
+            HttpPort = httpPort;
+
+            bool ready = false;
+            for (int i = 0; i < 30 && !ct.IsCancellationRequested; i++)
+            {
+                await Task.Delay(300, ct);
+                lock (_lock)
+                {
+                    if (_process == null || _process.HasExited)
+                        throw new InvalidOperationException("Xray test engine exited unexpectedly.");
+                }
+                if (TryConnect(HttpPort)) { ready = true; break; }
+            }
+            if (!ready) throw new InvalidOperationException("Xray test port did not come up.");
+
+            Log("Test Xray engine started.");
+        }
+        finally
+        {
+            CleanupTempConfig(configPath);
+        }
     }
 
     private static bool TryConnect(int port)
@@ -319,46 +337,54 @@ public sealed class XrayEngine : IDisposable
         string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-multi-{Guid.NewGuid():N}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
 
-        var psi = new ProcessStartInfo(EnginePath)
+        try
         {
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
-        };
-        psi.ArgumentList.Add("run");
-        psi.ArgumentList.Add("-c");
-        psi.ArgumentList.Add(configPath);
+            var psi = new ProcessStartInfo(EnginePath)
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            psi.ArgumentList.Add("run");
+            psi.ArgumentList.Add("-c");
+            psi.ArgumentList.Add(configPath);
 
-        Process process;
-        lock (_lock)
-        {
-            _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
-            process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-            process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-            process.Exited += (_, _) => OnExited();
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-        }
-
-        // Wait for ports to be ready
-        bool allReady = false;
-        for (int i = 0; i < 30 && !ct.IsCancellationRequested; i++)
-        {
-            await Task.Delay(300, ct);
+            Process process;
             lock (_lock)
             {
-                if (_process == null || _process.HasExited)
-                    throw new InvalidOperationException("Xray multi-test engine exited unexpectedly.");
+                _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
+                process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+                process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+                process.Exited += (_, _) => OnExited();
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
             }
-            allReady = portMap.Keys.All(p => TryConnect(p));
-            if (allReady) break;
-        }
-        if (!allReady) throw new InvalidOperationException("Multi-test ports did not come up.");
 
-        _tempConfigPath = configPath;
-        Log("Multi-test Xray engine started.");
+            // Wait for ports to be ready
+            bool allReady = false;
+            for (int i = 0; i < 30 && !ct.IsCancellationRequested; i++)
+            {
+                await Task.Delay(300, ct);
+                lock (_lock)
+                {
+                    if (_process == null || _process.HasExited)
+                        throw new InvalidOperationException("Xray multi-test engine exited unexpectedly.");
+                }
+                allReady = portMap.Keys.All(p => TryConnect(p));
+                if (allReady) break;
+            }
+            if (!allReady) throw new InvalidOperationException("Multi-test ports did not come up.");
+
+            _tempConfigPath = configPath;
+            Log("Multi-test Xray engine started.");
+        }
+        catch
+        {
+            CleanupTempConfig(configPath);
+            throw;
+        }
     }
 
     private void OnExited()

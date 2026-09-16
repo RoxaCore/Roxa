@@ -225,6 +225,16 @@ public partial class MainViewModel : ViewModelBase
         foreach (var s in Servers)
             s.Owner = this;
         RefreshConnectionFlags();
+
+        // تب «همه سرورها» — اولین تب، بدون دسته‌بندی
+        bool allExp = expanded.TryGetValue("__all__", out bool ae) ? ae : true;
+        var allGroup = new ServerGroup(this, "__all__", "📋 همه سرورها", null, allExp);
+        var allServers = Servers.ToList();
+        SortServers(allServers);
+        foreach (var s in allServers)
+            allGroup.Servers.Add(s);
+        Groups.Add(allGroup);
+
         foreach (var sub in Subscriptions)
         {
             bool isExp = expanded.TryGetValue(sub.Name, out bool e) ? e : !_settings.CollapsedGroups.Contains(sub.Name);

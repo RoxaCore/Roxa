@@ -27,6 +27,8 @@ public partial class ServerGroup : ObservableObject
 
     public bool IsSubscription => Subscription != null;
     public bool IsNotSubscription => !IsSubscription;
+    public bool IsAllGroup => Key == "__all__";
+    public bool ShowManageButtons => !IsAllGroup;
     public string CountText => $"{Servers.Count} سرور";
 
     public ServerGroup(MainViewModel owner, string key, string title, SubscriptionInfo? subscription, bool expanded)

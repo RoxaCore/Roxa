@@ -1671,6 +1671,7 @@ public partial class MainViewModel : ViewModelBase
             foreach (var server in fetched)
             {
                 Enrich(server);
+                server.Owner = this;
                 server.SubscriptionName = sub.Name;
                 if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal))) continue;
                 Servers.Add(server);

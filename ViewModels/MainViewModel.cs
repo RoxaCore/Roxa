@@ -701,7 +701,7 @@ public partial class MainViewModel : ViewModelBase
                     if (resp.IsSuccessStatusCode)
                     {
                         int ms = (int)sw.ElapsedMilliseconds;
-                        Post(() => { server.RecordLatency(ms); AutoSortAfterTest("latency"); });
+                        Post(() => server.RecordLatency(ms));
                     }
                 }
                 catch { }
@@ -779,9 +779,9 @@ public partial class MainViewModel : ViewModelBase
                 try
                 {
                     var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 3000);
-                    Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                    Post(() => s.RecordLatency(ok ? ms : -2));
                 }
-                catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+                catch { Post(() => s.RecordLatency(-2)); }
                 finally
                 {
                     try { sem1.Release(); } catch { }
@@ -791,6 +791,8 @@ public partial class MainViewModel : ViewModelBase
             });
             try { await Task.WhenAll(pingTasks); }
             catch (OperationCanceledException) { }
+
+            Post(() => AutoSortAfterTest("latency"));
 
             // --- انتخاب ۱۲ کاندید برتر ---
             var candidates = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).Take(12).ToList();
@@ -850,18 +852,18 @@ public partial class MainViewModel : ViewModelBase
                         {
                             int ms = (int)sw.ElapsedMilliseconds;
                             AppendLog($"Smart connect: {candidate.Name} → {ms}ms");
-                            Post(() => { candidate.RecordLatency(ms); AutoSortAfterTest("latency"); });
+                            Post(() => candidate.RecordLatency(ms));
                         }
                         else
                         {
                             AppendLog($"Smart connect: {candidate.Name} → failed (status {resp.StatusCode})");
-                            Post(() => { candidate.RecordLatency(-2); AutoSortAfterTest("latency"); });
+                            Post(() => candidate.RecordLatency(-2));
                         }
                     }
                     catch (Exception ex)
                     {
                         AppendLog($"Smart connect: {candidate.Name} → error: {ex.Message}");
-                        Post(() => { candidate.RecordLatency(-2); AutoSortAfterTest("latency"); });
+                        Post(() => candidate.RecordLatency(-2));
                     }
                     finally
                     {
@@ -965,9 +967,9 @@ public partial class MainViewModel : ViewModelBase
                 try
                 {
                     var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 3000);
-                    Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                    Post(() => s.RecordLatency(ok ? ms : -2));
                 }
-                catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+                catch { Post(() => s.RecordLatency(-2)); }
                 finally
                 {
                     try { sem.Release(); } catch { }
@@ -977,6 +979,8 @@ public partial class MainViewModel : ViewModelBase
             });
             try { await Task.WhenAll(pingTasks); }
             catch (OperationCanceledException) { }
+
+            Post(() => AutoSortAfterTest("latency"));
 
             // فیلتر: فقط سرورهایی که TCP موفق داشتن
             var survivors = batch.Where(s => s.LatencyMs > 0).ToList();
@@ -1022,19 +1026,19 @@ public partial class MainViewModel : ViewModelBase
                         {
                             int ms = (int)sw.ElapsedMilliseconds;
                             AppendLog($"Find better: {candidate.Name} → {ms}ms");
-                            Post(() => { candidate.RecordLatency(ms); AutoSortAfterTest("latency"); });
+                            Post(() => candidate.RecordLatency(ms));
 
                             if (bestCandidate == null || ms < bestCandidate.LatencyMs)
                                 bestCandidate = candidate;
                         }
                         else
                         {
-                            Post(() => { candidate.RecordLatency(-2); AutoSortAfterTest("latency"); });
+                            Post(() => candidate.RecordLatency(-2));
                         }
                     }
                     catch
                     {
-                        Post(() => { candidate.RecordLatency(-2); AutoSortAfterTest("latency"); });
+                        Post(() => candidate.RecordLatency(-2));
                     }
                     finally
                     {
@@ -1118,9 +1122,9 @@ public partial class MainViewModel : ViewModelBase
                          _ => await RealDelayTester.TestAsync(s, _testCts.Token)
                      };
                      if (!_testCts.Token.IsCancellationRequested)
-                         Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                         Post(() => s.RecordLatency(ok ? ms : -2));
                  }
-                 catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+                 catch { Post(() => s.RecordLatency(-2)); }
                  finally { sem.Release(); }
              });
              try { await Task.WhenAll(tasks); }
@@ -1146,25 +1150,25 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = true;
          try
          {
-             Status = $"تست سرعت {targets.Count} سرور (از طریق پروکسی) ...";
-             foreach (var s in targets) s.RecordSpeed(-1);
-             using var sem = new SemaphoreSlim(3);
-             var tasks = targets.Select(async s =>
-             {
-                 if (_testCts.Token.IsCancellationRequested) return;
-                 await sem.WaitAsync(_testCts.Token);
-                 try
-                 {
-                     if (_testCts.Token.IsCancellationRequested) return;
-                     Post(() => Status = $"تست سرعت: {s.Name} ...");
-                     var (ok, mbps) = await SpeedTester.TestAsync(s, _testCts.Token);
-                     Post(() => { s.RecordSpeed(ok ? mbps : -2); AutoSortAfterTest("speed"); });
-                 }
-                 catch { Post(() => { s.RecordSpeed(-2); AutoSortAfterTest("speed"); }); }
-                 finally { try { sem.Release(); } catch { } }
-             });
-             try { await Task.WhenAll(tasks); }
-             catch (OperationCanceledException) { }
+              Status = $"تست سرعت {targets.Count} سرور (از طریق پروکسی) ...";
+              foreach (var s in targets) s.RecordSpeed(-1);
+              using var sem = new SemaphoreSlim(3);
+              var tasks = targets.Select(async s =>
+              {
+                  if (_testCts.Token.IsCancellationRequested) return;
+                  await sem.WaitAsync(_testCts.Token);
+                  try
+                  {
+                      if (_testCts.Token.IsCancellationRequested) return;
+                      Post(() => Status = $"تست سرعت: {s.Name} ...");
+                      var (ok, mbps) = await SpeedTester.TestAsync(s, _testCts.Token);
+                      Post(() => s.RecordSpeed(ok ? mbps : -2));
+                  }
+                  catch { Post(() => s.RecordSpeed(-2)); }
+                  finally { try { sem.Release(); } catch { } }
+              });
+              try { await Task.WhenAll(tasks); }
+              catch (OperationCanceledException) { }
              foreach (var s in targets)
                  if (s.DownloadMbps == -1) s.RecordSpeed(-2);
              int okCount = targets.Count(s => s.DownloadMbps >= 0);
@@ -1221,23 +1225,23 @@ public partial class MainViewModel : ViewModelBase
         {
             Status = $"تست سرعت {targets.Count} سرور ...";
             foreach (var s in targets) s.RecordSpeed(-1);
-            using var sem = new SemaphoreSlim(3);
-            var tasks = targets.Select(async s =>
-            {
-                if (_testCts.Token.IsCancellationRequested) return;
-                await sem.WaitAsync(_testCts.Token);
-                try
-                {
-                    if (_testCts.Token.IsCancellationRequested) return;
-                    Post(() => Status = $"تست سرعت: {s.Name} ...");
-                    var (ok, mbps) = await SpeedTester.TestAsync(s, _testCts.Token);
-                    Post(() => s.RecordSpeed(ok ? mbps : -2));
-                }
-                catch { Post(() => s.RecordSpeed(-2)); }
-                finally { try { sem.Release(); } catch { } }
-            });
-            try { await Task.WhenAll(tasks); }
-            catch (OperationCanceledException) { }
+              using var sem = new SemaphoreSlim(3);
+              var tasks = targets.Select(async s =>
+              {
+                  if (_testCts.Token.IsCancellationRequested) return;
+                  await sem.WaitAsync(_testCts.Token);
+                  try
+                  {
+                      if (_testCts.Token.IsCancellationRequested) return;
+                      Post(() => Status = $"تست سرعت: {s.Name} ...");
+                      var (ok, mbps) = await SpeedTester.TestAsync(s, _testCts.Token);
+                      Post(() => s.RecordSpeed(ok ? mbps : -2));
+                  }
+                  catch { Post(() => s.RecordSpeed(-2)); }
+                  finally { try { sem.Release(); } catch { } }
+              });
+              try { await Task.WhenAll(tasks); }
+              catch (OperationCanceledException) { }
             foreach (var s in targets)
                 if (s.DownloadMbps == -1) s.RecordSpeed(-2);
             int okCount = targets.Count(s => s.DownloadMbps >= 0);
@@ -1292,9 +1296,9 @@ public partial class MainViewModel : ViewModelBase
                         PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
                         _ => await RealDelayTester.TestAsync(s)
                     };
-                    Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                    Post(() => s.RecordLatency(ok ? ms : -2));
                 }
-                catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+                catch { Post(() => s.RecordLatency(-2)); }
                 finally { sem.Release(); }
             });
             await Task.WhenAll(tasks);
@@ -1322,9 +1326,9 @@ public partial class MainViewModel : ViewModelBase
                 try
                 {
                     var (ok, mbps) = await SpeedTester.TestAsync(s);
-                    Post(() => { s.RecordSpeed(ok ? mbps : -2); AutoSortAfterTest("speed"); });
+                    Post(() => s.RecordSpeed(ok ? mbps : -2));
                 }
-                catch { Post(() => { s.RecordSpeed(-2); AutoSortAfterTest("speed"); }); }
+                catch { Post(() => s.RecordSpeed(-2)); }
                 finally { sem.Release(); }
             });
             await Task.WhenAll(tasks);
@@ -1390,9 +1394,9 @@ public partial class MainViewModel : ViewModelBase
                          _ => await RealDelayTester.TestAsync(s, _testCts.Token)
                      };
                      if (!_testCts.Token.IsCancellationRequested)
-                         Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                         Post(() => s.RecordLatency(ok ? ms : -2));
                  }
-                 catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+                 catch { Post(() => s.RecordLatency(-2)); }
                  finally { sem.Release(); }
              });
              try { await Task.WhenAll(tasks); }
@@ -1427,9 +1431,9 @@ public partial class MainViewModel : ViewModelBase
                      if (_testCts.Token.IsCancellationRequested) return;
                      var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
                      if (!_testCts.Token.IsCancellationRequested)
-                         Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                         Post(() => s.RecordLatency(ok ? ms : -2));
                  }
-                 catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+                 catch { Post(() => s.RecordLatency(-2)); }
                  finally { sem.Release(); }
              });
              try { await Task.WhenAll(tasks); }
@@ -1452,25 +1456,25 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = true;
          try
          {
-             Status = $"تست سرعت گروه «{group!.Title}» ({targets.Count} سرور) ...";
-             foreach (var s in targets) s.RecordSpeed(-1);
-             using var sem = new SemaphoreSlim(3);
-             var tasks = targets.Select(async s =>
-             {
-                 if (_testCts.Token.IsCancellationRequested) return;
-                 await sem.WaitAsync(_testCts.Token);
-                 try
-                 {
-                     if (_testCts.Token.IsCancellationRequested) return;
-                     Post(() => Status = $"تست سرعت: {s.Name} ...");
-                     var (ok, mbps) = await SpeedTester.TestAsync(s, _testCts.Token);
-                     Post(() => { s.RecordSpeed(ok ? mbps : -2); AutoSortAfterTest("speed"); });
-                 }
-                 catch { Post(() => { s.RecordSpeed(-2); AutoSortAfterTest("speed"); }); }
-                 finally { try { sem.Release(); } catch { } }
-             });
-             try { await Task.WhenAll(tasks); }
-             catch (OperationCanceledException) { }
+              Status = $"تست سرعت گروه «{group!.Title}» ({targets.Count} سرور) ...";
+              foreach (var s in targets) s.RecordSpeed(-1);
+              using var sem = new SemaphoreSlim(3);
+              var tasks = targets.Select(async s =>
+              {
+                  if (_testCts.Token.IsCancellationRequested) return;
+                  await sem.WaitAsync(_testCts.Token);
+                  try
+                  {
+                      if (_testCts.Token.IsCancellationRequested) return;
+                      Post(() => Status = $"تست سرعت: {s.Name} ...");
+                      var (ok, mbps) = await SpeedTester.TestAsync(s, _testCts.Token);
+                      Post(() => s.RecordSpeed(ok ? mbps : -2));
+                  }
+                  catch { Post(() => s.RecordSpeed(-2)); }
+                  finally { try { sem.Release(); } catch { } }
+              });
+              try { await Task.WhenAll(tasks); }
+              catch (OperationCanceledException) { }
              foreach (var s in targets)
                  if (s.DownloadMbps == -1) s.RecordSpeed(-2);
              int okCount = targets.Count(s => s.DownloadMbps >= 0);
@@ -1503,9 +1507,9 @@ public partial class MainViewModel : ViewModelBase
                      if (_testCts.Token.IsCancellationRequested) return;
                      Post(() => Status = $"بروزرسانی: {s.Name} ...");
                      var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                     Post(() => { s.LatencyMs = ok ? ms : -2; AutoSortAfterTest("latency"); });
+                     Post(() => s.LatencyMs = ok ? ms : -2);
                  }
-                 catch { Post(() => { s.LatencyMs = -2; AutoSortAfterTest("latency"); }); }
+                 catch { Post(() => s.LatencyMs = -2); }
                  finally { try { sem.Release(); } catch { } }
              });
              try { await Task.WhenAll(tasks); }
@@ -1545,9 +1549,9 @@ public partial class MainViewModel : ViewModelBase
                 {
                     if (_testCts.Token.IsCancellationRequested) return;
                     var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                    Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                    Post(() => s.RecordLatency(ok ? ms : -2));
                 }
-                catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+                catch { Post(() => s.RecordLatency(-2)); }
                 finally { try { sem.Release(); } catch { } }
             });
             try { await Task.WhenAll(tasks); }
@@ -1583,9 +1587,9 @@ public partial class MainViewModel : ViewModelBase
                 {
                     if (_testCts.Token.IsCancellationRequested) return;
                     var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                    Post(() => { s.RecordLatency(ok ? ms : -2); AutoSortAfterTest("latency"); });
+                    Post(() => s.RecordLatency(ok ? ms : -2));
                 }
-                catch { Post(() => { s.RecordLatency(-2); AutoSortAfterTest("latency"); }); }
+                catch { Post(() => s.RecordLatency(-2)); }
                 finally { try { sem.Release(); } catch { } }
             });
             try { await Task.WhenAll(tasks); }

@@ -299,6 +299,18 @@ public static class XrayConfigBuilder
                 stream["security"] = "none";
                 break;
         }
+
+        // TLS Fragment - bypass DPI
+        stream["sockopt"] = new JsonObject
+        {
+            ["fragment"] = new JsonObject
+            {
+                ["packets"] = "1-1",
+                ["length"] = "100-200",
+                ["interval"] = "50-100"
+            }
+        };
+
         return stream;
     }
 

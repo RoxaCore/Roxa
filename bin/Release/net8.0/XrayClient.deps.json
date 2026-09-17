@@ -18,6 +18,11 @@
         },
         "runtime": {
           "XrayClient.dll": {}
+        },
+        "resources": {
+          "en/XrayClient.resources.dll": {
+            "locale": "en"
+          }
         }
       },
       "Avalonia/12.1.2": {

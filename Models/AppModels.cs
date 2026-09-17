@@ -24,4 +24,5 @@ public class AppSettings
     public string CustomDnsServers { get; set; } = "";
     public string? CustomDnsAdvancedJson { get; set; }
     public bool UseTunMode { get; set; }
+    public string Language { get; set; } = "fa";
 }

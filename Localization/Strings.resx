@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- Tabs -->
+  <data name="Tab_Servers" xml:space="preserve"><value>سرورها</value></data>
+  <data name="Tab_Subscription" xml:space="preserve"><value>اشتراک</value></data>
+  <data name="Tab_Log" xml:space="preserve"><value>لاگ</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>⚙ تنظیمات</value></data>
+  <!-- Buttons -->
+  <data name="Btn_Connect" xml:space="preserve"><value>▶ اتصال</value></data>
+  <data name="Btn_Disconnect" xml:space="preserve"><value>قطع اتصال</value></data>
+  <data name="Btn_SmartConnect" xml:space="preserve"><value>اتصال هوشمند</value></data>
+  <data name="Btn_FindBetter" xml:space="preserve"><value>یافتن سرور بهتر</value></data>
+  <data name="Btn_Ping" xml:space="preserve"><value>پینگ</value></data>
+  <data name="Btn_PingAll" xml:space="preserve"><value>🔄 پینگ همه</value></data>
+  <data name="Btn_Real" xml:space="preserve"><value>واقعی</value></data>
+  <data name="Btn_Speed" xml:space="preserve"><value>سرعت</value></data>
+  <data name="Btn_SpeedAll" xml:space="preserve"><value>🚀 سرعت</value></data>
+  <data name="Btn_Stop" xml:space="preserve"><value>توقف</value></data>
+  <data name="Btn_UpdateAll" xml:space="preserve"><value>بروزرسانی همه</value></data>
+  <data name="Btn_Update" xml:space="preserve"><value>بروزرسانی</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>+ افزودن</value></data>
+  <data name="Btn_RemoveSub" xml:space="preserve"><value>حذف ساب</value></data>
+  <data name="Btn_RemoveAll" xml:space="preserve"><value>حذف همه</value></data>
+  <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ حذف تکراری</value></data>
+  <data name="Btn_Export" xml:space="preserve"><value>📦 صادرات</value></data>
+  <data name="Btn_Import" xml:space="preserve"><value>📋 واردات</value></data>
+  <!-- Placeholders -->
+  <data name="Ph_ServerLink" xml:space="preserve"><value>لینک سرور (vmess://, vless://, ...)</value></data>
+  <data name="Ph_SubName" xml:space="preserve"><value>نام</value></data>
+  <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
+  <!-- Sort -->
+  <data name="Sort_None" xml:space="preserve"><value>بدون مرتب</value></data>
+  <data name="Sort_Latency" xml:space="preserve"><value>تأخیر (کم)</value></data>
+  <data name="Sort_Speed" xml:space="preserve"><value>سرعت (بیش)</value></data>
+  <data name="Sort_Name" xml:space="preserve"><value>نام</value></data>
+  <!-- Status -->
+  <data name="Status_Ready" xml:space="preserve"><value>آماده</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>متصل</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>قطع شد</value></data>
+  <!-- Context Menu -->
+  <data name="Ctx_Connect" xml:space="preserve"><value>اتصال</value></data>
+  <data name="Ctx_Disconnect" xml:space="preserve"><value>قطع اتصال</value></data>
+  <data name="Ctx_Edit" xml:space="preserve"><value>ویرایش سرور</value></data>
+  <data name="Ctx_Clone" xml:space="preserve"><value>کپی سرور</value></data>
+  <data name="Ctx_Share" xml:space="preserve"><value>اشتراک‌گذاری</value></data>
+  <data name="Ctx_TestPing" xml:space="preserve"><value>تست Ping</value></data>
+  <data name="Ctx_TestReal" xml:space="preserve"><value>تست پینگ واقعی</value></data>
+  <data name="Ctx_TestSpeed" xml:space="preserve"><value>تست سرعت</value></data>
+  <data name="Ctx_Delete" xml:space="preserve"><value>حذف سرور</value></data>
+  <!-- Add Menu -->
+  <data name="Add_Link" xml:space="preserve"><value>🔗 افزودن با لینک</value></data>
+  <data name="Add_VMess" xml:space="preserve"><value>🟢 افزودن VMess</value></data>
+  <data name="Add_VLESS" xml:space="preserve"><value>🔵 افزودن VLESS</value></data>
+  <data name="Add_SS" xml:space="preserve"><value>🟠 افزودن Shadowsocks</value></data>
+  <data name="Add_Trojan" xml:space="preserve"><value>🔴 افزودن Trojan</value></data>
+  <data name="Add_Clipboard" xml:space="preserve"><value>📋 وارد کردن از کلیپبورد</value></data>
+  <!-- Settings -->
+  <data name="Set_Proxy" xml:space="preserve"><value>تنظیم پراکسی سیستم</value></data>
+  <data name="Set_AutoConnect" xml:space="preserve"><value>اتصال خودکار</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>بروزرسانی خودکار اشتراک‌ها</value></data>
+  <data name="Set_Interval" xml:space="preserve"><value>هر {0} ساعت بروزرسانی شود</value></data>
+  <data name="Set_Language" xml:space="preserve"><value>زبان برنامه</value></data>
+  <data name="Set_Connection" xml:space="preserve"><value>اتصال</value></data>
+  <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>بروزرسانی خودکار اشتراک</value></data>
+  <!-- Filter -->
+  <data name="Filter_All" xml:space="preserve"><value>همه</value></data>
+  <data name="Filter_Errors" xml:space="preserve"><value>فقط خطا</value></data>
+  <data name="Filter_Connection" xml:space="preserve"><value>فقط اتصال</value></data>
+  <data name="Filter_Label" xml:space="preserve"><value>فیلتر:</value></data>
+  <!-- Log Messages -->
+  <data name="Log_ServersLoaded" xml:space="preserve"><value>سلام! {0} سرور و {1} اشتراک بارگذاری شد.</value></data>
+  <data name="Log_Connected" xml:space="preserve"><value>اتصال برقرار شد. HTTP 127.0.0.1:{0}</value></data>
+  <data name="Log_Disconnected" xml:space="preserve"><value>اتصال قطع شد.</value></data>
+  <data name="Log_ServerAdded" xml:space="preserve"><value>«{0}» اضافه شد.</value></data>
+  <data name="Log_ServerDup" xml:space="preserve"><value>«{0}» تکراری است.</value></data>
+  <data name="Log_SubAdded" xml:space="preserve"><value>«{0}» اضافه شد ({1} سرور)</value></data>
+  <data name="Log_Merged" xml:space="preserve"><value>ادغام «{0}»: {1} سرور جدید، مجموع {2}.</value></data>
+  <data name="Log_NoSub" xml:space="preserve"><value>اشتراکی نیست.</value></data>
+  <data name="Log_Updated" xml:space="preserve"><value>به‌روز شد ({0} سرور، {1} یکتا — دستی‌ها حفظ شدند)</value></data>
+  <data name="Log_SmartStage1" xml:space="preserve"><value>Smart connect: stage 1 - fast TCP ping on all servers</value></data>
+  <data name="Log_SmartCandidates" xml:space="preserve"><value>Smart connect: {0} candidates selected</value></data>
+  <data name="Log_SmartStage2" xml:space="preserve"><value>Smart connect: testing {0} candidates one by one</value></data>
+  <data name="Log_SmartTesting" xml:space="preserve"><value>Smart connect: testing {0} ...</value></data>
+  <data name="Log_SmartResult" xml:space="preserve"><value>Smart connect: {0} → {1}ms</value></data>
+  <data name="Log_SmartFailed" xml:space="preserve"><value>Smart connect: {0} → failed</value></data>
+  <data name="Log_SmartConnect" xml:space="preserve"><value>Smart connect: connecting to {0}</value></data>
+  <data name="Log_SmartError" xml:space="preserve"><value>Smart connect error: {0}</value></data>
+  <data name="Log_NoPing" xml:space="preserve"><value>Smart connect: no server responded to ping</value></data>
+  <data name="Log_FindBetter" xml:space="preserve"><value>Find better: testing batch of {0} ({1} remaining)</value></data>
+  <data name="Log_FindSwitch" xml:space="preserve"><value>Find better: switching from {0} ({1}ms) → {2} ({3}ms)</value></data>
+  <data name="Log_FindBest" xml:space="preserve"><value>Find better: current server is still best</value></data>
+  <data name="Log_Sorted" xml:space="preserve"><value>مرتب شد بر اساس {0}.</value></data>
+  <data name="Log_Error" xml:space="preserve"><value>خطا: {0}</value></data>
+  <data name="Log_InvalidLink" xml:space="preserve"><value>پرش: لینک معتبر نیست.</value></data>
+  <data name="Log_ServersDeleted" xml:space="preserve"><value>{0} سرور حذف شد.</value></data>
+  <data name="Log_SubRemoved" xml:space="preserve"><value>«{0}» با سرورهایش حذف شد.</value></data>
+  <data name="Log_DupesRemoved" xml:space="preserve"><value>{0} سرور تکراری حذف شد.</value></data>
+  <data name="Log_Copied" xml:space="preserve"><value>لینک «{0}» کپی شد.</value></data>
+  <data name="Log_Exported" xml:space="preserve"><value>صادر شد: {0}</value></data>
+  <data name="Log_LinksCopied" xml:space="preserve"><value>{0} لینک کپی شد.</value></data>
+  <data name="Log_SubCopied" xml:space="preserve"><value>اشتراک base64 کپی شد.</value></data>
+  <data name="Log_TestStopped" xml:space="preserve"><value>تست متوقف شد</value></data>
+  <data name="Log_SubUpdated" xml:space="preserve"><value>«{0}»: {1} سرور.</value></data>
+  <!-- All Servers Tab -->
+  <data name="AllServers_Title" xml:space="preserve"><value>📋 همه سرورها</value></data>
+  <!-- Headers -->
+  <data name="Header_Name" xml:space="preserve"><value>نام</value></data>
+  <data name="Header_Ping" xml:space="preserve"><value>پینگ</value></data>
+  <data name="Header_Speed" xml:space="preserve"><value>سرعت</value></data>
+  <data name="Header_Status" xml:space="preserve"><value>وضعیت</value></data>
+  <data name="Header_Country" xml:space="preserve"><value>کشور</value></data>
+  <data name="Header_Protocol" xml:space="preserve"><value>پروتکل</value></data>
+  <data name="Header_Address" xml:space="preserve"><value>آدرس</value></data>
+  <data name="Header_Port" xml:space="preserve"><value>پورت</value></data>
+  <data name="Header_Sub" xml:space="preserve"><value>اشتراک</value></data>
+  <data name="ServerCount" xml:space="preserve"><value>تعداد سرورها: {0}</value></data>
+</root>

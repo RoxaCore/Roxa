@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <!-- Tabs -->
+  <data name="Tab_Servers" xml:space="preserve"><value>Servers</value></data>
+  <data name="Tab_Subscription" xml:space="preserve"><value>Subscription</value></data>
+  <data name="Tab_Log" xml:space="preserve"><value>Log</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>⚙ Settings</value></data>
+  <!-- Buttons -->
+  <data name="Btn_Connect" xml:space="preserve"><value>▶ Connect</value></data>
+  <data name="Btn_Disconnect" xml:space="preserve"><value>Disconnect</value></data>
+  <data name="Btn_SmartConnect" xml:space="preserve"><value>Smart Connect</value></data>
+  <data name="Btn_FindBetter" xml:space="preserve"><value>Find Better Server</value></data>
+  <data name="Btn_Ping" xml:space="preserve"><value>Ping</value></data>
+  <data name="Btn_PingAll" xml:space="preserve"><value>🔄 Ping All</value></data>
+  <data name="Btn_Real" xml:space="preserve"><value>Real</value></data>
+  <data name="Btn_Speed" xml:space="preserve"><value>Speed</value></data>
+  <data name="Btn_SpeedAll" xml:space="preserve"><value>🚀 Speed</value></data>
+  <data name="Btn_Stop" xml:space="preserve"><value>Stop</value></data>
+  <data name="Btn_UpdateAll" xml:space="preserve"><value>Update All</value></data>
+  <data name="Btn_Update" xml:space="preserve"><value>Update</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>+ Add</value></data>
+  <data name="Btn_RemoveSub" xml:space="preserve"><value>Remove Sub</value></data>
+  <data name="Btn_RemoveAll" xml:space="preserve"><value>Remove All</value></data>
+  <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ Remove Dupes</value></data>
+  <data name="Btn_Export" xml:space="preserve"><value>📦 Export</value></data>
+  <data name="Btn_Import" xml:space="preserve"><value>📋 Import</value></data>
+  <!-- Placeholders -->
+  <data name="Ph_ServerLink" xml:space="preserve"><value>Server link (vmess://, vless://, ...)</value></data>
+  <data name="Ph_SubName" xml:space="preserve"><value>Name</value></data>
+  <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
+  <!-- Sort -->
+  <data name="Sort_None" xml:space="preserve"><value>No Sort</value></data>
+  <data name="Sort_Latency" xml:space="preserve"><value>Latency (low)</value></data>
+  <data name="Sort_Speed" xml:space="preserve"><value>Speed (high)</value></data>
+  <data name="Sort_Name" xml:space="preserve"><value>Name</value></data>
+  <!-- Status -->
+  <data name="Status_Ready" xml:space="preserve"><value>Ready</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>Connected</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>Disconnected</value></data>
+  <!-- Context Menu -->
+  <data name="Ctx_Connect" xml:space="preserve"><value>Connect</value></data>
+  <data name="Ctx_Disconnect" xml:space="preserve"><value>Disconnect</value></data>
+  <data name="Ctx_Edit" xml:space="preserve"><value>Edit Server</value></data>
+  <data name="Ctx_Clone" xml:space="preserve"><value>Clone Server</value></data>
+  <data name="Ctx_Share" xml:space="preserve"><value>Share</value></data>
+  <data name="Ctx_TestPing" xml:space="preserve"><value>Test Ping</value></data>
+  <data name="Ctx_TestReal" xml:space="preserve"><value>Test Real Delay</value></data>
+  <data name="Ctx_TestSpeed" xml:space="preserve"><value>Test Speed</value></data>
+  <data name="Ctx_Delete" xml:space="preserve"><value>Delete Server</value></data>
+  <!-- Add Menu -->
+  <data name="Add_Link" xml:space="preserve"><value>🔗 Add with Link</value></data>
+  <data name="Add_VMess" xml:space="preserve"><value>🟢 Add VMess</value></data>
+  <data name="Add_VLESS" xml:space="preserve"><value>🔵 Add VLESS</value></data>
+  <data name="Add_SS" xml:space="preserve"><value>🟠 Add Shadowsocks</value></data>
+  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Add Trojan</value></data>
+  <data name="Add_Clipboard" xml:space="preserve"><value>📋 Import from Clipboard</value></data>
+  <!-- Settings -->
+  <data name="Set_Proxy" xml:space="preserve"><value>Set System Proxy</value></data>
+  <data name="Set_AutoConnect" xml:space="preserve"><value>Auto Connect</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>Auto Update Subscriptions</value></data>
+  <data name="Set_Interval" xml:space="preserve"><value>Update every {0} hours</value></data>
+  <data name="Set_Language" xml:space="preserve"><value>App Language</value></data>
+  <data name="Set_Connection" xml:space="preserve"><value>Connection</value></data>
+  <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>Auto Update Subscription</value></data>
+  <!-- Filter -->
+  <data name="Filter_All" xml:space="preserve"><value>All</value></data>
+  <data name="Filter_Errors" xml:space="preserve"><value>Errors Only</value></data>
+  <data name="Filter_Connection" xml:space="preserve"><value>Connection Only</value></data>
+  <data name="Filter_Label" xml:space="preserve"><value>Filter:</value></data>
+  <!-- Log Messages -->
+  <data name="Log_ServersLoaded" xml:space="preserve"><value>Hello! {0} servers and {1} subscriptions loaded.</value></data>
+  <data name="Log_Connected" xml:space="preserve"><value>Connected. HTTP 127.0.0.1:{0}</value></data>
+  <data name="Log_Disconnected" xml:space="preserve"><value>Disconnected.</value></data>
+  <data name="Log_ServerAdded" xml:space="preserve"><value>"{0}" added.</value></data>
+  <data name="Log_ServerDup" xml:space="preserve"><value>"{0}" is duplicate.</value></data>
+  <data name="Log_SubAdded" xml:space="preserve"><value>"{0}" added ({1} servers)</value></data>
+  <data name="Log_Merged" xml:space="preserve"><value>Merged "{0}": {1} new servers, total {2}.</value></data>
+  <data name="Log_NoSub" xml:space="preserve"><value>No subscriptions.</value></data>
+  <data name="Log_Updated" xml:space="preserve"><value>Updated ({0} servers, {1} unique — manual servers preserved)</value></data>
+  <data name="Log_SmartStage1" xml:space="preserve"><value>Smart connect: stage 1 - fast TCP ping on all servers</value></data>
+  <data name="Log_SmartCandidates" xml:space="preserve"><value>Smart connect: {0} candidates selected</value></data>
+  <data name="Log_SmartStage2" xml:space="preserve"><value>Smart connect: testing {0} candidates one by one</value></data>
+  <data name="Log_SmartTesting" xml:space="preserve"><value>Smart connect: testing {0} ...</value></data>
+  <data name="Log_SmartResult" xml:space="preserve"><value>Smart connect: {0} → {1}ms</value></data>
+  <data name="Log_SmartFailed" xml:space="preserve"><value>Smart connect: {0} → failed</value></data>
+  <data name="Log_SmartConnect" xml:space="preserve"><value>Smart connect: connecting to {0}</value></data>
+  <data name="Log_SmartError" xml:space="preserve"><value>Smart connect error: {0}</value></data>
+  <data name="Log_NoPing" xml:space="preserve"><value>Smart connect: no server responded to ping</value></data>
+  <data name="Log_FindBetter" xml:space="preserve"><value>Find better: testing batch of {0} ({1} remaining)</value></data>
+  <data name="Log_FindSwitch" xml:space="preserve"><value>Find better: switching from {0} ({1}ms) → {2} ({3}ms)</value></data>
+  <data name="Log_FindBest" xml:space="preserve"><value>Find better: current server is still best</value></data>
+  <data name="Log_Sorted" xml:space="preserve"><value>Sorted by {0}.</value></data>
+  <data name="Log_Error" xml:space="preserve"><value>Error: {0}</value></data>
+  <data name="Log_InvalidLink" xml:space="preserve"><value>Skip: invalid link.</value></data>
+  <data name="Log_ServersDeleted" xml:space="preserve"><value>{0} servers deleted.</value></data>
+  <data name="Log_SubRemoved" xml:space="preserve"><value>"{0}" removed with its servers.</value></data>
+  <data name="Log_DupesRemoved" xml:space="preserve"><value>{0} duplicate servers removed.</value></data>
+  <data name="Log_Copied" xml:space="preserve"><value>Link "{0}" copied.</value></data>
+  <data name="Log_Exported" xml:space="preserve"><value>Exported: {0}</value></data>
+  <data name="Log_LinksCopied" xml:space="preserve"><value>{0} links copied.</value></data>
+  <data name="Log_SubCopied" xml:space="preserve"><value>Base64 subscription copied.</value></data>
+  <data name="Log_TestStopped" xml:space="preserve"><value>Test stopped</value></data>
+  <data name="Log_SubUpdated" xml:space="preserve"><value>"{0}": {1} servers.</value></data>
+  <!-- All Servers Tab -->
+  <data name="AllServers_Title" xml:space="preserve"><value>📋 All Servers</value></data>
+  <!-- Headers -->
+  <data name="Header_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Header_Ping" xml:space="preserve"><value>Ping</value></data>
+  <data name="Header_Speed" xml:space="preserve"><value>Speed</value></data>
+  <data name="Header_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Header_Country" xml:space="preserve"><value>Country</value></data>
+  <data name="Header_Protocol" xml:space="preserve"><value>Protocol</value></data>
+  <data name="Header_Address" xml:space="preserve"><value>Address</value></data>
+  <data name="Header_Port" xml:space="preserve"><value>Port</value></data>
+  <data name="Header_Sub" xml:space="preserve"><value>Subscription</value></data>
+  <data name="ServerCount" xml:space="preserve"><value>{0} servers</value></data>
+</root>

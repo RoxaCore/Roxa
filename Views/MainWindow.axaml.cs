@@ -127,6 +127,17 @@ public partial class MainWindow : Window
         await vm.OnStartedAsync();
     }
 
+    private void SubscriptionCard_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (sender is Border border && border.Tag is string groupKey && DataContext is MainViewModel vm)
+        {
+            MainTabControl.SelectedItem = ServersTab;
+            var group = vm.Groups.FirstOrDefault(g => g.Key == groupKey);
+            if (group != null && !group.IsExpanded)
+                group.IsExpanded = true;
+        }
+    }
+
     private void SetupResizeHandles()
     {
         var header = this.FindControl<Grid>("TableHeader");

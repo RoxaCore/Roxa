@@ -90,3 +90,9 @@ D:\ai project freebuff\hiku\XrayClient\obj\Release\net8.0\XrayClient.genruntimec
 D:\ai project freebuff\hiku\XrayClient\obj\Release\net8.0\ref\XrayClient.dll
 D:\ai project freebuff\hiku\XrayClient\bin\Release\net8.0\Avalonia.Controls.DataGrid.dll
 D:\ai project freebuff\hiku\XrayClient\bin\Release\net8.0\Assets\roxa-icon.ico
+D:\ai project freebuff\hiku\XrayClient\obj\Release\net8.0\XrayClient.Localization.Strings.resources
+D:\ai project freebuff\hiku\XrayClient\obj\Release\net8.0\XrayClient.Localization.Strings.en.resources
+D:\ai project freebuff\hiku\XrayClient\obj\Release\net8.0\XrayClient.csproj.GenerateResource.cache
+D:\ai project freebuff\hiku\XrayClient\bin\Release\net8.0\en\XrayClient.resources.dll
+D:\ai project freebuff\hiku\XrayClient\obj\Release\net8.0\en\XrayClient.resources.cs
+D:\ai project freebuff\hiku\XrayClient\obj\Release\net8.0\en\XrayClient.resources.dll

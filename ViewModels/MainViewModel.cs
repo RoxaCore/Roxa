@@ -34,7 +34,6 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private string _serverLink = "";
     [ObservableProperty] private string _subUrl = "";
     [ObservableProperty] private string _subName = "";
-    [ObservableProperty] private string _logText = "";
     [ObservableProperty] private string _status = "آماده";
     [ObservableProperty] private bool _isConnected;
     [ObservableProperty] private bool _setSystemProxy = true;
@@ -98,6 +97,20 @@ public partial class MainViewModel : ViewModelBase
 
       public string[] SortOptions { get; } = { "بدون مرتب", "تأخیر (کم)", "سرعت (بیش)", "نام" };
 
+    public string[] LanguageOptions { get; } = ["فارسی", "English"];
+    private static readonly (string name, string code)[] _languages = [("فارسی", "fa"), ("English", "en")];
+    [ObservableProperty] private string _selectedLanguage = "فارسی";
+    partial void OnSelectedLanguageChanged(string value)
+    {
+        var match = _languages.FirstOrDefault(l => l.name == value);
+        if (match.code != null)
+        {
+            Localization.TranslationManager.Instance.SetCulture(match.code);
+            _settings.Language = match.code;
+            SaveSettings();
+        }
+    }
+
     public string HomeServerName => SelectedServer?.Name ?? "سروری انتخاب نشده";
     public string HomeAddress => SelectedServer != null ? $"{SelectedServer.Address}:{SelectedServer.Port}" : "";
     public string HomeLatency => SelectedServer?.LatencyDisplay ?? "";
@@ -127,6 +140,9 @@ public partial class MainViewModel : ViewModelBase
         else
         {
             _useTunMode = _settings.UseTunMode;
+        var savedLang = _languages.FirstOrDefault(l => l.code == _settings.Language);
+        _selectedLanguage = savedLang.name ?? "فارسی";
+        Localization.TranslationManager.Instance.SetCulture(_settings.Language ?? "fa");
         }
         foreach (var s in Storage.LoadSubscriptions())
             Subscriptions.Add(s);
@@ -198,8 +214,14 @@ public partial class MainViewModel : ViewModelBase
     }
 
     private readonly object _logLock = new();
-    private readonly List<string> _logBuffer = new();
+    private readonly List<string> _allLogLines = new();
+    private readonly List<string> _visibleLines = new();
     private DateTime _lastLogFlush = DateTime.MinValue;
+    private readonly List<string> _logBuffer = new();
+    [ObservableProperty] private string _logFilter = "همه";
+    [ObservableProperty] private string _filteredLogText = "";
+    public string[] LogFilters { get; } = ["همه", "فقط خطا", "فقط اتصال"];
+    private const int MaxVisibleLines = 20;
 
     private void AppendLog(string message)
     {
@@ -207,16 +229,8 @@ public partial class MainViewModel : ViewModelBase
         lock (_logLock)
         {
             _logBuffer.Add(line);
-            if ((DateTime.Now - _lastLogFlush).TotalMilliseconds < 500) return;
-            _lastLogFlush = DateTime.Now;
-            var batch = string.Join(Environment.NewLine, _logBuffer);
-            _logBuffer.Clear();
-            Post(() =>
-            {
-                LogText += batch + Environment.NewLine;
-                if (LogText.Length > 50000)
-                    LogText = LogText.Substring(LogText.Length - 30000);
-            });
+            if ((DateTime.Now - _lastLogFlush).TotalMilliseconds < 1000) return;
+            FlushLogUnsafe();
         }
     }
 
@@ -225,16 +239,40 @@ public partial class MainViewModel : ViewModelBase
         lock (_logLock)
         {
             if (_logBuffer.Count == 0) return;
-            var batch = string.Join(Environment.NewLine, _logBuffer);
-            _logBuffer.Clear();
-            _lastLogFlush = DateTime.Now;
-            Post(() =>
-            {
-                LogText += batch + Environment.NewLine;
-                if (LogText.Length > 50000)
-                    LogText = LogText.Substring(LogText.Length - 30000);
-            });
+            FlushLogUnsafe();
         }
+    }
+
+    private void FlushLogUnsafe()
+    {
+        _allLogLines.AddRange(_logBuffer);
+        _logBuffer.Clear();
+        _lastLogFlush = DateTime.Now;
+        if (_allLogLines.Count > 200)
+            _allLogLines.RemoveRange(0, _allLogLines.Count - 200);
+        RebuildVisibleLines();
+        Post(() => { FilteredLogText = string.Join(Environment.NewLine, _visibleLines); });
+    }
+
+    partial void OnLogFilterChanged(string value) { lock (_logLock) { RebuildVisibleLines(); } FilteredLogText = string.Join(Environment.NewLine, _visibleLines); }
+
+    private void RebuildVisibleLines()
+    {
+        _visibleLines.Clear();
+        int start = Math.Max(0, _allLogLines.Count - 100);
+        for (int i = start; i < _allLogLines.Count; i++)
+        {
+            var l = _allLogLines[i];
+            bool show = LogFilter switch
+            {
+                "فقط خطا" => l.Contains("خطا") || l.Contains("error", StringComparison.OrdinalIgnoreCase),
+                "فقط اتصال" => l.Contains("اتصال") || l.Contains("متصل") || l.Contains("قطع") || l.Contains("connect", StringComparison.OrdinalIgnoreCase),
+                _ => true
+            };
+            if (show) _visibleLines.Add(l);
+        }
+        while (_visibleLines.Count > MaxVisibleLines)
+            _visibleLines.RemoveAt(0);
     }
 
     private static void Enrich(ServerInfo s) => s.CountryCode = GeoFlags.DetectCountry(s.Name, s.Address);
@@ -1664,7 +1702,7 @@ public partial class MainViewModel : ViewModelBase
     private async Task AddSubscription()
     {
         string url = (SubUrl ?? "").Trim();
-        if (url.Length == 0) return;
+        if (url.Length == 0) { ToastHandler?.Invoke("لینک را وارد کنید"); return; }
         string name = string.IsNullOrWhiteSpace(SubName) ? GuessSubName(url) : SubName.Trim();
         if (Subscriptions.Any(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase)))
         { AppendLog($"«{name}» تکراری است."); return; }
@@ -1681,7 +1719,7 @@ public partial class MainViewModel : ViewModelBase
             SelectedSubscriptionName = name;
             Status = $"«{name}» اضافه شد ({servers.Count} سرور)";
         }
-        catch (Exception ex) { Status = "خطا در دریافت"; AppendLog($"خطا: {ex.Message}"); }
+        catch (Exception ex) { Status = "خطا در دریافت"; AppendLog($"خطا: {ex.Message}"); ToastHandler?.Invoke($"خطا: {ex.Message}"); }
     }
 
     private void MergeServers(string subName, List<ServerInfo> fetched)

@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using XrayClient.Core;
+using XrayClient.Localization;
 using XrayClient.Models;
 
 namespace XrayClient.ViewModels;
@@ -34,7 +35,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private string _serverLink = "";
     [ObservableProperty] private string _subUrl = "";
     [ObservableProperty] private string _subName = "";
-    [ObservableProperty] private string _status = "آماده";
+    [ObservableProperty] private string _status = TranslationManager.Instance["Status_Ready"];
     [ObservableProperty] private bool _isConnected;
     [ObservableProperty] private bool _setSystemProxy = true;
     [ObservableProperty] private bool _autoConnect;
@@ -72,7 +73,7 @@ public partial class MainViewModel : ViewModelBase
 
      public bool ShowSmartConnectButton => !IsSmartConnecting && !IsConnected;
       [ObservableProperty] private string _selectedSubscriptionName = "";
-      [ObservableProperty] private string _sortField = "بدون مرتب";
+      [ObservableProperty] private string _sortField = TranslationManager.Instance["Sort_None"];
       [ObservableProperty] private bool _globalSort;
       [ObservableProperty] private int _selectedCount;
       [ObservableProperty] private bool _selectAllChecked;
@@ -95,7 +96,7 @@ public partial class MainViewModel : ViewModelBase
            { 9, 90 }    // Speed
        };
 
-      public string[] SortOptions { get; } = { "بدون مرتب", "تأخیر (کم)", "سرعت (بیش)", "نام" };
+      public string[] SortOptions { get; } = { TranslationManager.Instance["Sort_None"], TranslationManager.Instance["Sort_Latency"], TranslationManager.Instance["Sort_Speed"], TranslationManager.Instance["Sort_Name"] };
 
     public string[] LanguageOptions { get; } = ["فارسی", "English"];
     private static readonly (string name, string code)[] _languages = [("فارسی", "fa"), ("English", "en")];
@@ -158,7 +159,7 @@ public partial class MainViewModel : ViewModelBase
 
         _engine.Output += line => Post(() => AppendLog(line));
         _engine.Stopped += () => Post(() => IsConnected = false);
-        AppendLog($"سلام! {Servers.Count} سرور و {Subscriptions.Count} اشتراک بارگذاری شد.");
+        AppendLog(string.Format(TranslationManager.Instance["Log_ServersLoaded"], Servers.Count, Subscriptions.Count));
     }
 
     partial void OnSelectedServerChanged(ServerInfo? value)
@@ -176,7 +177,7 @@ public partial class MainViewModel : ViewModelBase
 
     partial void OnIsConnectedChanged(bool value)
     {
-        Status = value ? $"متصل به {SelectedServer?.Name ?? ""}" : "آماده";
+        Status = value ? $"{TranslationManager.Instance["Status_Connected"]} به {SelectedServer?.Name ?? ""}" : TranslationManager.Instance["Status_Ready"];
         OnPropertyChanged(nameof(PortText));
         OnPropertyChanged(nameof(ShowSmartConnectButton));
         RefreshConnectionFlags();
@@ -218,9 +219,9 @@ public partial class MainViewModel : ViewModelBase
     private readonly List<string> _visibleLines = new();
     private DateTime _lastLogFlush = DateTime.MinValue;
     private readonly List<string> _logBuffer = new();
-    [ObservableProperty] private string _logFilter = "همه";
+    [ObservableProperty] private string _logFilter = TranslationManager.Instance["Filter_All"];
     [ObservableProperty] private string _filteredLogText = "";
-    public string[] LogFilters { get; } = ["همه", "فقط خطا", "فقط اتصال"];
+    public string[] LogFilters { get; } = [TranslationManager.Instance["Filter_All"], TranslationManager.Instance["Filter_Errors"], TranslationManager.Instance["Filter_Connection"]];
     private const int MaxVisibleLines = 20;
 
     private void AppendLog(string message)
@@ -265,8 +266,8 @@ public partial class MainViewModel : ViewModelBase
             var l = _allLogLines[i];
             bool show = LogFilter switch
             {
-                "فقط خطا" => l.Contains("خطا") || l.Contains("error", StringComparison.OrdinalIgnoreCase),
-                "فقط اتصال" => l.Contains("اتصال") || l.Contains("متصل") || l.Contains("قطع") || l.Contains("connect", StringComparison.OrdinalIgnoreCase),
+                var f when f == TranslationManager.Instance["Filter_Errors"] => l.Contains("خطا") || l.Contains("error", StringComparison.OrdinalIgnoreCase),
+                var f when f == TranslationManager.Instance["Filter_Connection"] => l.Contains("اتصال") || l.Contains("متصل") || l.Contains("قطع") || l.Contains("connect", StringComparison.OrdinalIgnoreCase),
                 _ => true
             };
             if (show) _visibleLines.Add(l);
@@ -299,7 +300,7 @@ public partial class MainViewModel : ViewModelBase
 
         // تب «همه سرورها» — اولین تب، بدون دسته‌بندی
         bool allExp = expanded.TryGetValue("__all__", out bool ae) ? ae : true;
-        var allGroup = new ServerGroup(this, "__all__", "📋 همه سرورها", null, allExp);
+        var allGroup = new ServerGroup(this, "__all__", TranslationManager.Instance["AllServers_Title"], null, allExp);
         var allServers = Servers.ToList();
         SortServers(allServers);
         foreach (var s in allServers)
@@ -348,25 +349,25 @@ public partial class MainViewModel : ViewModelBase
 
             switch (SortField)
             {
-                case "تأخیر (کم)":
+                case var sf when sf == TranslationManager.Instance["Sort_Latency"]:
                     sorted = servers
                         .OrderBy(s => s.LatencyMs < 0 ? int.MaxValue : s.LatencyMs)
                         .ToList();
                     break;
 
-                case "سرعت (بیش)":
+                case var sf when sf == TranslationManager.Instance["Sort_Speed"]:
                     sorted = servers
                         .OrderByDescending(s => s.DownloadMbps < 0 ? 0 : s.DownloadMbps)
                         .ToList();
                     break;
 
-                case "نام":
+                case var sf when sf == TranslationManager.Instance["Sort_Name"]:
                     sorted = servers
                         .OrderBy(s => s.Name)
                         .ToList();
                     break;
 
-                default: // "بدون مرتب"
+                default: // Sort_None
                     return; // بدون تغییر
             }
 
@@ -499,14 +500,14 @@ public partial class MainViewModel : ViewModelBase
         int duplicates = 0;
         foreach (var line in input.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
-            if (!UrlParser.IsProtocolLink(line)) { AppendLog($"پرش: لینک معتبر نیست."); continue; }
+            if (!UrlParser.IsProtocolLink(line)) { AppendLog(TranslationManager.Instance["Log_InvalidLink"]); continue; }
             try
             {
                 var server = UrlParser.Parse(line);
                 Enrich(server);
                 if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal)))
                 {
-                    AppendLog($"«{server.Name}» تکراری است.");
+                    AppendLog(string.Format(TranslationManager.Instance["Log_ServerDup"], server.Name));
                     Status = $"سرور «{server.Name}» قبلا اضافه شده است";
                     ToastHandler?.Invoke($"سرور «{server.Name}» قبلا اضافه شده است");
                     duplicates++;
@@ -514,9 +515,9 @@ public partial class MainViewModel : ViewModelBase
                 }
                 Servers.Add(server);
                 added++;
-                AppendLog($"«{server.Name}» اضافه شد.");
+                AppendLog(string.Format(TranslationManager.Instance["Log_ServerAdded"], server.Name));
             }
-            catch (FormatException ex) { AppendLog($"خطا: {ex.Message}"); }
+            catch (FormatException ex) { AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message)); }
         }
         if (added > 0) { SaveServers(); SelectedServer = Servers.LastOrDefault(); Status = $"{added} سرور اضافه شد"; }
         else if (duplicates > 0) { Status = $"{duplicates} سرور تکراری بود"; }
@@ -539,7 +540,7 @@ public partial class MainViewModel : ViewModelBase
             SaveServers();
             SelectedServer = server;
             RefreshGroups();
-            AppendLog($"«{server.Name}» اضافه شد.");
+            AppendLog(string.Format(TranslationManager.Instance["Log_ServerAdded"], server.Name));
             Status = $"سرور «{server.Name}» اضافه شد";
             ToastHandler?.Invoke($"سرور «{server.Name}» اضافه شد");
         }
@@ -601,8 +602,8 @@ public partial class MainViewModel : ViewModelBase
          }
          SaveServers();
          RefreshGroups();
-         AppendLog($"{targets.Count} سرور حذف شد.");
-     }
+          AppendLog(string.Format(TranslationManager.Instance["Log_ServersDeleted"], targets.Count));
+      }
 
     [RelayCommand]
     private void CloneServer(ServerInfo? server)
@@ -615,7 +616,7 @@ public partial class MainViewModel : ViewModelBase
         Servers.Add(clone);
         SaveServers();
         RefreshGroups();
-        AppendLog($"«{clone.Name}» کپی شد.");
+        AppendLog(string.Format(TranslationManager.Instance["Log_Copied"], clone.Name));
     }
 
     [RelayCommand]
@@ -635,7 +636,7 @@ public partial class MainViewModel : ViewModelBase
         }
         SaveServers();
         RefreshGroups();
-        AppendLog($"{dupes.Count} سرور تکراری حذف شد.");
+        AppendLog(string.Format(TranslationManager.Instance["Log_DupesRemoved"], dupes.Count));
     }
 
     [RelayCommand]
@@ -676,8 +677,8 @@ public partial class MainViewModel : ViewModelBase
         string link = UrlBuilder.Build(server);
         server.Link = link;
         await CopyTextAsync(link);
-        Status = "لینک کپی شد";
-        AppendLog($"لینک «{server.Name}» کپی شد.");
+        Status = TranslationManager.Instance["Status_Ready"];
+        AppendLog(string.Format(TranslationManager.Instance["Log_Copied"], server.Name));
         if (ShowQrHandler != null)
             await ShowQrHandler(server.Name, link);
     }
@@ -688,7 +689,7 @@ public partial class MainViewModel : ViewModelBase
         server ??= SelectedServer;
         if (server == null) return;
         await CopyTextAsync(UrlBuilder.Build(server));
-        AppendLog($"لینک «{server.Name}» کپی شد.");
+        AppendLog(string.Format(TranslationManager.Instance["Log_Copied"], server.Name));
     }
 
     [RelayCommand]
@@ -705,7 +706,7 @@ public partial class MainViewModel : ViewModelBase
         foreach (var s in ordered)
             Servers.Add(s);
         RefreshGroups();
-        AppendLog($"مرتب شد بر اساس {SortField}.");
+        AppendLog(string.Format(TranslationManager.Instance["Log_Sorted"], SortField));
     }
 
     // ---------- اتصال ----------
@@ -724,7 +725,7 @@ public partial class MainViewModel : ViewModelBase
             Status = $"متصل به {server.Name}";
             _settings.ActiveServerId = server.Id;
             SaveSettings();
-            AppendLog($"اتصال برقرار شد. HTTP 127.0.0.1:{_engine.HttpPort}");
+            AppendLog(string.Format(TranslationManager.Instance["Log_Connected"], _engine.HttpPort));
 
             // آپدیت پینگ واقعی بعد از اتصال
             _ = Task.Run(async () =>
@@ -750,7 +751,7 @@ public partial class MainViewModel : ViewModelBase
             IsConnected = false;
             RefreshConnectionFlags();
             Status = "خطا در اتصال";
-            AppendLog($"خطا: {ex.Message}");
+            AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
         }
         finally { ConnectCommand.NotifyCanExecuteChanged(); }
     }
@@ -766,7 +767,7 @@ public partial class MainViewModel : ViewModelBase
             _engine.Stop();
         IsConnected = false;
         RefreshConnectionFlags();
-        AppendLog("اتصال قطع شد.");
+        AppendLog(TranslationManager.Instance["Log_Disconnected"]);
         ConnectCommand.NotifyCanExecuteChanged();
     }
 
@@ -1396,7 +1397,7 @@ public partial class MainViewModel : ViewModelBase
          if (SelectedServer != null && doomed.Contains(SelectedServer)) SelectedServer = null;
          SaveServers();
          RefreshGroups();
-         AppendLog($"{doomed.Count} سرور منتخب حذف شد.");
+          AppendLog(string.Format(TranslationManager.Instance["Log_ServersDeleted"], doomed.Count));
      }
 
     [RelayCommand]
@@ -1705,7 +1706,7 @@ public partial class MainViewModel : ViewModelBase
         if (url.Length == 0) { ToastHandler?.Invoke("لینک را وارد کنید"); return; }
         string name = string.IsNullOrWhiteSpace(SubName) ? GuessSubName(url) : SubName.Trim();
         if (Subscriptions.Any(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase)))
-        { AppendLog($"«{name}» تکراری است."); return; }
+        { AppendLog(string.Format(TranslationManager.Instance["Log_ServerDup"], name)); return; }
         try
         {
             Status = $"دریافت {name} ...";
@@ -1749,13 +1750,13 @@ public partial class MainViewModel : ViewModelBase
         }
         SelectedServer = Servers.FirstOrDefault(s => s.Id == activeId) ?? SelectedServer;
         RefreshGroups();
-        AppendLog($"ادغام «{subName}»: {added} سرور جدید، مجموع {Servers.Count}.");
+        AppendLog(string.Format(TranslationManager.Instance["Log_Merged"], subName, added, Servers.Count));
     }
 
     [RelayCommand]
     private async Task UpdateSubscriptions()
     {
-        if (Subscriptions.Count == 0) { AppendLog("اشتراکی نیست."); return; }
+        if (Subscriptions.Count == 0) { AppendLog(TranslationManager.Instance["Log_NoSub"]); return; }
         string? activeId = SelectedServer?.Id;
         int total = 0;
         foreach (var sub in Subscriptions.ToList())
@@ -1780,7 +1781,7 @@ public partial class MainViewModel : ViewModelBase
                 sub.LastUpdated = DateTime.Now;
                 sub.ServerCount = servers.Count;
                 total += servers.Count;
-                AppendLog($"«{sub.Name}»: {servers.Count} سرور.");
+                AppendLog(string.Format(TranslationManager.Instance["Log_SubUpdated"], sub.Name, servers.Count));
             }
             catch (Exception ex) { AppendLog($"خطا در {sub.Name}: {ex.Message}"); }
         }
@@ -1790,7 +1791,7 @@ public partial class MainViewModel : ViewModelBase
         SaveSettings();
         Post(() => OnPropertyChanged(nameof(LastUpdateDisplay)));
         SelectedServer = Servers.FirstOrDefault(s => s.Id == activeId) ?? Servers.FirstOrDefault();
-        Status = $"به‌روز شد ({total} سرور، {Servers.Count} یکتا — دستی‌ها حفظ شدند)";
+        Status = string.Format(TranslationManager.Instance["Log_Updated"], total, Servers.Count);
         RefreshGroups();
     }
 
@@ -1831,7 +1832,7 @@ public partial class MainViewModel : ViewModelBase
             Post(() => OnPropertyChanged(nameof(LastUpdateDisplay)));
             Status = $"«{sub.Name}» به‌روز شد ({added} سرور جدید)";
         }
-        catch (Exception ex) { Status = "خطا در به‌روزرسانی"; AppendLog($"خطا: {ex.Message}"); }
+        catch (Exception ex) { Status = "خطا در به‌روزرسانی"; AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message)); }
     }
 
      [RelayCommand]
@@ -1855,7 +1856,7 @@ public partial class MainViewModel : ViewModelBase
          if (SelectedSubscriptionName == sub.Name)
              SelectedSubscriptionName = Subscriptions.Count > 0 ? Subscriptions[0].Name : "";
          RefreshGroups();
-         AppendLog($"«{sub.Name}» با سرورهایش حذف شد.");
+         AppendLog(string.Format(TranslationManager.Instance["Log_SubRemoved"], sub.Name));
      }
 
     [RelayCommand]
@@ -1863,7 +1864,7 @@ public partial class MainViewModel : ViewModelBase
     {
         string path = Path.Combine(Storage.DataDir, "servers_export.json");
         File.WriteAllText(path, JsonSerializer.Serialize(Servers.ToList(), new JsonSerializerOptions { WriteIndented = true }));
-        AppendLog($"صادر شد: {path}");
+        AppendLog(string.Format(TranslationManager.Instance["Log_Exported"], path));
     }
 
     [RelayCommand]
@@ -1872,7 +1873,7 @@ public partial class MainViewModel : ViewModelBase
         var urls = Servers.Where(s => !string.IsNullOrEmpty(s.Link)).Select(s => UrlBuilder.Build(s)).ToList();
         if (urls.Count == 0) { AppendLog("سروری نیست."); return; }
         _ = CopyTextAsync(string.Join(Environment.NewLine, urls));
-        AppendLog($"{urls.Count} لینک کپی شد.");
+        AppendLog(string.Format(TranslationManager.Instance["Log_LinksCopied"], urls.Count));
     }
 
     [RelayCommand]
@@ -1882,7 +1883,7 @@ public partial class MainViewModel : ViewModelBase
         if (urls.Count == 0) { AppendLog("سروری نیست."); return; }
         string b64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(string.Join("\n", urls)));
         _ = CopyTextAsync(b64);
-         AppendLog("اشتراک base64 کپی شد.");
+         AppendLog(TranslationManager.Instance["Log_SubCopied"]);
      }
 
      [RelayCommand]
@@ -1892,8 +1893,8 @@ public partial class MainViewModel : ViewModelBase
          oldCts?.Cancel();
          oldCts?.Dispose();
          IsTesting = false;
-          Status = "تست متوقف شد";
-          AppendLog("تست متوقف شد");
+          Status = TranslationManager.Instance["Log_TestStopped"];
+          AppendLog(TranslationManager.Instance["Log_TestStopped"]);
       }
 
       [RelayCommand]

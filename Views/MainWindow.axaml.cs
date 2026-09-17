@@ -48,6 +48,12 @@ public partial class MainWindow : Window
             await dlg.ShowDialog(this);
         };
         vm.ToastHandler = message => ShowToast(message);
+        vm.RestartRequested += () =>
+        {
+            var exe = Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "";
+            System.Diagnostics.Process.Start(exe);
+            Close();
+        };
         vm.OpenDnsSettingsHandler = () => OpenDnsDialog();
         vm.ShowAdminWarningHandler = () =>
         {

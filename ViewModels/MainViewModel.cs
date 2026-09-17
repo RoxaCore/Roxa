@@ -109,8 +109,11 @@ public partial class MainViewModel : ViewModelBase
             Localization.TranslationManager.Instance.SetCulture(match.code);
             _settings.Language = match.code;
             SaveSettings();
+            RestartRequested?.Invoke();
         }
     }
+
+    public event Action? RestartRequested;
 
     public string HomeServerName => SelectedServer?.Name ?? "سروری انتخاب نشده";
     public string HomeAddress => SelectedServer != null ? $"{SelectedServer.Address}:{SelectedServer.Port}" : "";

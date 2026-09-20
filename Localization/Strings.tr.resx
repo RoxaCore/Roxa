@@ -53,6 +53,9 @@
   <data name="Btn_Disconnect" xml:space="preserve">
     <value>❌ Bağlantıyı Kes</value>
   </data>
+  <data name="Btn_Reconnect" xml:space="preserve">
+    <value>Yeniden Bağlan</value>
+  </data>
   <data name="Btn_SmartConnect" xml:space="preserve">
     <value>🧠 Akıllı Bağlantı</value>
   </data>
@@ -552,8 +555,6 @@
   <data name="Hotkey_Info" xml:space="preserve">
     <value>Kısayollar: Ctrl+Shift+C = Bağlan | Ctrl+Shift+D = Kes | Ctrl+Shift+S = Akıllı Bağlantı | Ctrl+Shift+Q = Çıkış</value>
   </data>
-
-  <data name="Add_Link" xml:space="preserve"><value>Ekle</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>Güncellemeleri proxy üzerinden yap</value></data>
 </root>

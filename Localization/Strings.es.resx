@@ -37,6 +37,7 @@
   <data name="Tab_Settings"><value>⚙ Ajustes</value></data>
   <data name="Btn_Connect"><value>▶ Conectar</value></data>
   <data name="Btn_Disconnect"><value>Desconectar</value></data>
+  <data name="Btn_Reconnect"><value>Reconectar</value></data>
   <data name="Btn_SmartConnect"><value>Conexión Inteligente</value></data>
   <data name="Btn_FindBetter"><value>Buscar Mejor Servidor</value></data>
   <data name="Btn_Ping"><value>Ping</value></data>

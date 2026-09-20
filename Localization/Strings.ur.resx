@@ -37,6 +37,7 @@
   <data name="Tab_Settings" xml:space="preserve"><value>⚙ ترتیبات</value></data>
   <data name="Btn_Connect" xml:space="preserve"><value>▶ جڑیں</value></data>
   <data name="Btn_Disconnect" xml:space="preserve"><value>منقطع کریں</value></data>
+  <data name="Btn_Reconnect" xml:space="preserve"><value>دوبارہ جڑیں</value></data>
   <data name="Btn_SmartConnect" xml:space="preserve"><value>اسمارٹ کنکشن</value></data>
   <data name="Btn_FindBetter" xml:space="preserve"><value>بہتر سرور تلاش کریں</value></data>
   <data name="Btn_Ping" xml:space="preserve"><value>پنگ</value></data>

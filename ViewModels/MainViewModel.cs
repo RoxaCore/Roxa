@@ -119,6 +119,8 @@ public partial class MainViewModel : ViewModelBase
     public event Action? RestartRequested;
 
     public string HomeServerName => SelectedServer?.Name ?? "سروری انتخاب نشده";
+    public string HomeShortName => SelectedServer?.ShortName ?? "";
+    public string HomeFlag => SelectedServer?.Flag ?? "🌐";
     public string HomeAddress => SelectedServer != null ? $"{SelectedServer.Address}:{SelectedServer.Port}" : "";
     public string HomeLatency => SelectedServer?.LatencyDisplay ?? "";
     public string HomeSpeed => SelectedServer?.SpeedDisplay ?? "";
@@ -187,6 +189,8 @@ public partial class MainViewModel : ViewModelBase
         foreach (var s in Servers)
             s.IsSelected = ReferenceEquals(s, value);
         OnPropertyChanged(nameof(HomeServerName));
+        OnPropertyChanged(nameof(HomeShortName));
+        OnPropertyChanged(nameof(HomeFlag));
         OnPropertyChanged(nameof(HomeAddress));
         OnPropertyChanged(nameof(HomeLatency));
         OnPropertyChanged(nameof(HomeSpeed));
@@ -698,6 +702,8 @@ public partial class MainViewModel : ViewModelBase
             Enrich(server);
             SaveServers();
             OnPropertyChanged(nameof(HomeServerName));
+            OnPropertyChanged(nameof(HomeShortName));
+            OnPropertyChanged(nameof(HomeFlag));
             OnPropertyChanged(nameof(HomeAddress));
             AppendLog($"«{server.Name}» ویرایش شد.");
         }
@@ -818,6 +824,14 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task Reconnect()
+    {
+        if (SelectedServer == null) return;
+        if (IsConnected) Disconnect();
+        await Connect();
+    }
+
+    [RelayCommand]
     private async Task ConnectServer(ServerInfo? server)
     {
         if (server != null) SelectedServer = server;
@@ -827,6 +841,12 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // ---------- تست ----------
+
+    [RelayCommand]
+    private void ToggleTun() => UseTunMode = !UseTunMode;
+
+    [RelayCommand]
+    private void ToggleSystemProxy() => SetSystemProxy = !SetSystemProxy;
 
     [RelayCommand]
     private async Task SmartConnect()

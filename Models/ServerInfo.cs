@@ -108,6 +108,10 @@ public partial class ServerInfo : ObservableObject
             if (string.IsNullOrWhiteSpace(name)) return CountryCode.Length == 2 ? CountryCode : "Unknown";
 
             string shortName = RemoveCommonParts(name);
+
+            if (shortName.StartsWith(CountryCode, StringComparison.OrdinalIgnoreCase))
+                return shortName;
+
             return $"{CountryCode} {shortName}";
         }
     }
@@ -140,7 +144,11 @@ public partial class ServerInfo : ObservableObject
         int keepTo = myTokens.Length - suffixLen;
         if (keepTo <= keepFrom) return name;
 
-        return string.Join(" ", myTokens[keepFrom..keepTo]);
+        var kept = myTokens[keepFrom..keepTo]
+            .Where(t => !t.Equals(CountryCode, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+
+        return kept.Length > 0 ? string.Join(" ", kept) : name;
     }
 
     [JsonIgnore]

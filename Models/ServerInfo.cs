@@ -105,25 +105,23 @@ public partial class ServerInfo : ObservableObject
         get
         {
             string name = Name;
-            if (string.IsNullOrWhiteSpace(name)) return "🌐 Unknown";
+            if (string.IsNullOrWhiteSpace(name)) return "Unknown";
 
             var tokens = name.Split(Core.GeoFlags.SplitChars, StringSplitOptions.RemoveEmptyEntries);
             var cityParts = new List<string>();
-            string number = "";
 
             foreach (var t in tokens)
             {
                 string up = t.ToUpperInvariant();
                 if (up == CountryCode || up.Length == 2 && Core.GeoFlags.IsoCodes.Contains(up)) continue;
-                if (int.TryParse(t, out int n)) { number = $" #{n}"; continue; }
+                if (int.TryParse(t, out _)) continue;
                 if (double.TryParse(t, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out _)) continue;
                 if (t.Length <= 2) continue;
                 string cleaned = System.Text.RegularExpressions.Regex.Replace(t, @"[^a-zA-Z\u0600-\u06FF\u4E00-\u9FFF]", "");
                 if (cleaned.Length > 0) cityParts.Add(cleaned);
             }
 
-            string city = cityParts.Count > 0 ? string.Join(" ", cityParts) : name;
-            return $"{Flag} {city}{number}";
+            return cityParts.Count > 0 ? string.Join(" ", cityParts) : name;
         }
     }
 

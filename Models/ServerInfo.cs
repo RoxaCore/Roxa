@@ -109,10 +109,13 @@ public partial class ServerInfo : ObservableObject
 
             string shortName = RemoveCommonParts(name);
 
-            if (shortName.StartsWith(CountryCode, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(CountryCode) && shortName.StartsWith(CountryCode, StringComparison.OrdinalIgnoreCase))
                 return shortName;
 
-            return $"{CountryCode} {shortName}";
+            if (!string.IsNullOrEmpty(CountryCode))
+                return $"{CountryCode} {shortName}";
+
+            return shortName;
         }
     }
 
@@ -219,7 +222,7 @@ public partial class ServerInfo : ObservableObject
 
     partial void OnLatencyMsChanged(int value) { OnPropertyChanged(nameof(LatencyDisplay)); OnPropertyChanged(nameof(StatusColor)); }
     partial void OnDownloadMbpsChanged(double value) => OnPropertyChanged(nameof(SpeedDisplay));
-    partial void OnCountryCodeChanged(string value) => OnPropertyChanged(nameof(Flag));
+    partial void OnCountryCodeChanged(string value) { OnPropertyChanged(nameof(Flag)); OnPropertyChanged(nameof(ShortName)); }
     partial void OnIsCheckedChanged(bool value) => Owner?.UpdateSelectedCount();
     partial void OnIsActiveConnectionChanged(bool value) => OnPropertyChanged(nameof(StatusColor));
 

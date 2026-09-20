@@ -6,7 +6,7 @@ namespace XrayClient.Core;
 /// <summary>تشخیص کشور از روی اسم/آدرس + ایموجی پرچم.</summary>
 public static class GeoFlags
 {
-    private static readonly HashSet<string> IsoCodes = new(StringComparer.OrdinalIgnoreCase)
+    internal static readonly HashSet<string> IsoCodes = new(StringComparer.OrdinalIgnoreCase)
     {
         "AD","AE","AF","AG","AI","AL","AM","AO","AQ","AR","AS","AT","AU","AW","AX","AZ",
         "BA","BB","BD","BE","BF","BG","BH","BI","BJ","BL","BM","BN","BO","BQ","BR","BS","BT","BV","BW","BY","BZ",
@@ -22,7 +22,7 @@ public static class GeoFlags
         "VA","VC","VE","VG","VI","VN","VU","WF","WS","YE","YT","ZA","ZM","ZW"
     };
 
-    private static readonly char[] SplitChars = [' ', '·', '|', ',', '_', '-', '.', ':', '(', ')'];
+    internal static readonly char[] SplitChars = [' ', '·', '|', ',', '_', '-', '.', ':', '(', ')'];
     private static readonly Regex NonAlphaRegex = new("[^A-Za-z]", RegexOptions.Compiled);
 
     public static string DetectCountry(string name, string address)

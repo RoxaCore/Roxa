@@ -124,7 +124,7 @@ public partial class ServerInfo : ObservableObject
         var myTokens = name.Split(Core.GeoFlags.SplitChars, StringSplitOptions.RemoveEmptyEntries);
         if (myTokens.Length <= 1) return name;
 
-        var noCc = myTokens.Where(t => !t.Equals(CountryCode, StringComparison.OrdinalIgnoreCase)).ToArray();
+        var noCc = myTokens.Where(t => !IsCountryToken(t)).ToArray();
         if (noCc.Length == 0) return name;
 
         var siblings = Owner?.Servers?
@@ -151,10 +151,24 @@ public partial class ServerInfo : ObservableObject
         if (keepTo <= keepFrom) return name;
 
         var kept = myTokens[keepFrom..keepTo]
-            .Where(t => !t.Equals(CountryCode, StringComparison.OrdinalIgnoreCase))
+            .Where(t => !IsCountryToken(t))
             .ToArray();
 
         return kept.Length > 0 ? string.Join(" ", kept) : name;
+    }
+
+    private bool IsCountryToken(string token)
+    {
+        if (string.Equals(token, CountryCode, StringComparison.OrdinalIgnoreCase)) return true;
+        if (token.Length < 2) return false;
+        int i = 0;
+        while (i < token.Length)
+        {
+            int cp = char.ConvertToUtf32(token, i);
+            i += char.IsSurrogatePair(token, i) ? 2 : 1;
+            if (cp < 0x1F1E6 || cp > 0x1F1FF) return false;
+        }
+        return true;
     }
 
     [JsonIgnore]

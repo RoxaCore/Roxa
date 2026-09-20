@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Tab_Servers"><value>Servidores</value></data>
+  <data name="Tab_Subscription"><value>Suscripción</value></data>
+  <data name="Tab_Log"><value>Registro</value></data>
+  <data name="Tab_Settings"><value>⚙ Ajustes</value></data>
+  <data name="Btn_Connect"><value>▶ Conectar</value></data>
+  <data name="Btn_Disconnect"><value>Desconectar</value></data>
+  <data name="Btn_SmartConnect"><value>Conexión Inteligente</value></data>
+  <data name="Btn_FindBetter"><value>Buscar Mejor Servidor</value></data>
+  <data name="Btn_Ping"><value>Ping</value></data>
+  <data name="Btn_PingAll"><value>🔄 Ping a Todos</value></data>
+  <data name="Btn_Real"><value>Retraso Real</value></data>
+  <data name="Btn_Speed"><value>Velocidad</value></data>
+  <data name="Btn_SpeedAll"><value>🚀 Test de Velocidad</value></data>
+  <data name="Btn_Stop"><value>Detener</value></data>
+  <data name="Btn_UpdateAll"><value>Actualizar Todo</value></data>
+  <data name="Btn_Update"><value>Actualizar</value></data>
+  <data name="Btn_Add"><value>+ Añadir</value></data>
+  <data name="Btn_RemoveSub"><value>Eliminar Sub</value></data>
+  <data name="Btn_RemoveAll"><value>Eliminar Todo</value></data>
+  <data name="Btn_RemoveDupes"><value>🗑️ Eliminar Duplicados</value></data>
+  <data name="Btn_Export"><value>📦 Exportar</value></data>
+  <data name="Btn_Import"><value>📋 Importar</value></data>
+  <data name="Ph_ServerLink"><value>Enlace del servidor (vmess://, vless://, ...)</value></data>
+  <data name="Ph_SubName"><value>Nombre</value></data>
+  <data name="Ph_SubUrl"><value>https://...</value></data>
+  <data name="Sort_None"><value>Sin Orden</value></data>
+  <data name="Sort_Latency"><value>Latencia (baja)</value></data>
+  <data name="Sort_Speed"><value>Velocidad (alta)</value></data>
+  <data name="Sort_Name"><value>Nombre</value></data>
+  <data name="Status_Ready"><value>Listo</value></data>
+  <data name="Status_Connected"><value>Conectado</value></data>
+  <data name="Status_Disconnected"><value>Desconectado</value></data>
+  <data name="Ctx_Connect"><value>Conectar</value></data>
+  <data name="Ctx_Disconnect"><value>Desconectar</value></data>
+  <data name="Ctx_Edit"><value>Editar Servidor</value></data>
+  <data name="Ctx_Clone"><value>Clonar Servidor</value></data>
+  <data name="Ctx_Share"><value>Compartir</value></data>
+  <data name="Ctx_TestPing"><value>Test de Ping</value></data>
+  <data name="Ctx_TestReal"><value>Test de Retraso Real</value></data>
+  <data name="Ctx_TestSpeed"><value>Test de Velocidad</value></data>
+  <data name="Ctx_Delete"><value>Eliminar Servidor</value></data>
+  <data name="Add_VMess"><value>🟢 Añadir VMess</value></data>
+  <data name="Add_VLESS"><value>🔵 Añadir VLESS</value></data>
+  <data name="Add_SS"><value>🟠 Añadir Shadowsocks</value></data>
+  <data name="Add_Trojan"><value>🔴 Añadir Trojan</value></data>
+  <data name="Add_Clipboard"><value>📋 Importar del Portapapeles</value></data>
+  <data name="Set_Proxy"><value>Configurar Proxy del Sistema</value></data>
+  <data name="Set_AutoConnect"><value>Conexión Automática</value></data>
+  <data name="Set_AutoConnect_Desc"><value>(Conectar al servidor seleccionado al iniciar)</value></data>
+  <data name="Set_AutoUpdate"><value>Actualización Automática de Suscripciones</value></data>
+  <data name="Set_Interval"><value>Actualizar cada {0} horas</value></data>
+  <data name="Set_Language"><value>Idioma de la App</value></data>
+  <data name="Set_Connection"><value>Conexión</value></data>
+  <data name="Set_SubscriptionUpdate"><value>Actualización Automática de Suscripción</value></data>
+  <data name="Set_LeaveProxy"><value>No cambiar proxy del sistema</value></data>
+  <data name="Set_LeaveProxy_Desc"><value>El proxy del sistema no se modifica al conectar/desconectar</value></data>
+  <data name="Set_ClearProxy"><value>Limpiar proxy del sistema</value></data>
+  <data name="Set_ClearProxy_Desc"><value>El proxy del sistema se limpia al desconectar</value></data>
+  <data name="Set_Every"><value>Cada</value></data>
+  <data name="Set_Hours"><value>horas actualizar</value></data>
+  <data name="Set_Advanced"><value>Ajustes Avanzados</value></data>
+  <data name="Set_PingType"><value>Tipo de ping:</value></data>
+  <data name="Set_GlobalSort"><value>Orden global (después del test, mejor servidor de todos los grupos)</value></data>
+  <data name="Set_DNS"><value>DNS Personalizado</value></data>
+  <data name="Set_DNSBtn"><value>⚙ Ajustes DNS</value></data>
+  <data name="Set_TUN"><value>Modo TUN (VPN completa del sistema)</value></data>
+  <data name="Set_TUN_Desc"><value>Requiere acceso de Administrador. Redirige todo el tráfico del sistema a través del túnel</value></data>
+  <data name="Dlg_Continue"><value>Continuar</value></data>
+  <data name="Dlg_RestartAdmin"><value>Reiniciar como Admin</value></data>
+  <data name="Dlg_NeedsAdmin"><value>Se Requiere Acceso de Administrador</value></data>
+  <data name="Dlg_TUNAdminMsg"><value>El modo TUN requiere acceso de Administrador.</value></data>
+  <data name="Dlg_Yes"><value>Sí</value></data>
+  <data name="Dlg_No"><value>No</value></data>
+  <data name="Dlg_ConfirmDelete"><value>Confirmar Eliminación</value></data>
+  <data name="Dlg_Save"><value>Guardar</value></data>
+  <data name="Dlg_Cancel"><value>Cancelar</value></data>
+  <data name="Dlg_DNSSettings"><value>Ajustes DNS</value></data>
+  <data name="Dlg_DNSSimple"><value>DNS Simple</value></data>
+  <data name="Dlg_DNSHint"><value>IPv4/IPv6 separados por coma</value></data>
+  <data name="Dlg_DNSAdvanced"><value>DNS Avanzado (JSON)</value></data>
+  <data name="Dlg_DNSDocs"><value>Documentación: https://xtls.github.io/config/dns.html</value></data>
+  <data name="Dlg_EditServer"><value>Editar Servidor</value></data>
+  <data name="Dlg_Name"><value>Nombre</value></data>
+  <data name="Dlg_Address"><value>Dirección</value></data>
+  <data name="Dlg_Port"><value>Puerto</value></data>
+  <data name="Dlg_RebuiltLink"><value>Enlace Reconstruido</value></data>
+  <data name="Dlg_ShareQR"><value>Compartir (QR)</value></data>
+  <data name="Dlg_CopyLink"><value>Copiar Enlace</value></data>
+  <data name="Dlg_Close"><value>Cerrar</value></data>
+  <data name="SelectedCount"><value>{0} seleccionados</value></data>
+  <data name="Filter_All"><value>Todo</value></data>
+  <data name="Filter_Errors"><value>Solo Errores</value></data>
+  <data name="Filter_Connection"><value>Solo Conexión</value></data>
+  <data name="Filter_Label"><value>Filtrar:</value></data>
+  <data name="Log_ServersLoaded"><value>¡Hola! {0} servidores y {1} suscripciones cargados.</value></data>
+  <data name="Log_Connected"><value>Conectado. HTTP 127.0.0.1:{0}</value></data>
+  <data name="Log_Disconnected"><value>Desconectado.</value></data>
+  <data name="Log_ServerAdded"><value>"{0}" añadido.</value></data>
+  <data name="Log_ServerDup"><value>"{0}" es duplicado.</value></data>
+  <data name="Log_SubAdded"><value>"{0}" añadido ({1} servidores)</value></data>
+  <data name="Log_Merged"><value>Combinado "{0}": {1} servidores nuevos, total {2}.</value></data>
+  <data name="Log_NoSub"><value>Sin suscripciones.</value></data>
+  <data name="Log_Updated"><value>Actualizado ({0} servidores, {1} únicos — servidores manuales preservados)</value></data>
+  <data name="Log_SmartStage1"><value>Conexión inteligente: etapa 1 - ping TCP rápido en todos los servidores</value></data>
+  <data name="Log_SmartCandidates"><value>Conexión inteligente: {0} candidatos seleccionados</value></data>
+  <data name="Log_SmartStage2"><value>Conexión inteligente: probando {0} candidatos uno por uno</value></data>
+  <data name="Log_SmartTesting"><value>Conexión inteligente: probando {0} ...</value></data>
+  <data name="Log_SmartResult"><value>Conexión inteligente: {0} → {1}ms</value></data>
+  <data name="Log_SmartFailed"><value>Conexión inteligente: {0} → falló</value></data>
+  <data name="Log_SmartConnect"><value>Conexión inteligente: conectando a {0}</value></data>
+  <data name="Log_SmartError"><value>Error de conexión inteligente: {0}</value></data>
+  <data name="Log_NoPing"><value>Conexión inteligente: ningún servidor respondió al ping</value></data>
+  <data name="Log_FindBetter"><value>Buscar mejor: probando lote de {0} ({1} restantes)</value></data>
+  <data name="Log_FindSwitch"><value>Buscar mejor: cambiando de {0} ({1}ms) → {2} ({3}ms)</value></data>
+  <data name="Log_FindBest"><value>Buscar mejor: el servidor actual sigue siendo el mejor</value></data>
+  <data name="Log_Sorted"><value>Ordenado por {0}.</value></data>
+  <data name="Log_Error"><value>Error: {0}</value></data>
+  <data name="Log_InvalidLink"><value>Omitido: enlace no válido.</value></data>
+  <data name="Log_ServersDeleted"><value>{0} servidores eliminados.</value></data>
+  <data name="Log_SubRemoved"><value>"{0}" eliminado con sus servidores.</value></data>
+  <data name="Log_DupesRemoved"><value>{0} servidores duplicados eliminados.</value></data>
+  <data name="Log_Copied"><value>Enlace "{0}" copiado.</value></data>
+  <data name="Log_Exported"><value>Exportado: {0}</value></data>
+  <data name="Log_LinksCopied"><value>{0} enlaces copiados.</value></data>
+  <data name="Log_SubCopied"><value>Suscripción Base64 copiada.</value></data>
+  <data name="Log_TestStopped"><value>Test detenido</value></data>
+  <data name="Log_SubUpdated"><value>"{0}": {1} servidores.</value></data>
+  <data name="AllServers_Title"><value>📋 Todos los Servidores</value></data>
+  <data name="Header_Name"><value>Nombre</value></data>
+  <data name="Header_Ping"><value>Ping</value></data>
+  <data name="Header_Speed"><value>Velocidad</value></data>
+  <data name="Header_Status"><value>Estado</value></data>
+  <data name="Header_Country"><value>País</value></data>
+  <data name="Header_Protocol"><value>Protocolo</value></data>
+  <data name="Header_Address"><value>Dirección</value></data>
+  <data name="Header_Port"><value>Puerto</value></data>
+  <data name="Header_Sub"><value>Suscripción</value></data>
+  <data name="ServerCount"><value>{0} servidores</value></data>
+  <data name="Status_Failed"><value>Falló</value></data>
+  <data name="Status_Error"><value>Error</value></data>
+  <data name="Card_Ping"><value>Ping: </value></data>
+  <data name="Card_Speed"><value>Velocidad: </value></data>
+  <data name="Card_Connect"><value>Conectar</value></data>
+  <data name="Card_Disconnect"><value>Desconectar</value></data>
+  <data name="Card_Edit"><value>Editar</value></data>
+  <data name="Card_Share"><value>Compartir</value></data>
+  <data name="Card_Delete"><value>Eliminar</value></data>
+  <data name="Card_Connected"><value>Conectado</value></data>
+  <data name="Tray_Show"><value>Mostrar</value></data>
+  <data name="Tray_SmartConnect"><value>⚡ Conexión Inteligente</value></data>
+  <data name="Tray_Stop"><value>⏹ Detener</value></data>
+  <data name="Tray_FindBetter"><value>🔍 Buscar Mejor Servidor</value></data>
+  <data name="Tray_Proxy"><value>Proxy del Sistema</value></data>
+  <data name="Tray_UpdateNoProxy"><value>🔄 Actualizar sin proxy</value></data>
+  <data name="Tray_UpdateProxy"><value>🔄 Actualizar con proxy</value></data>
+  <data name="Tray_Settings"><value>⚙ Ajustes</value></data>
+  <data name="Tray_Exit"><value>Salir</value></data>
+  <data name="Tray_ConnectedTo"><value>Conectado a {0}</value></data>
+  <data name="Tray_Searching"><value>Buscando...</value></data>
+  <data name="Tray_SearchingProgress"><value>Buscando... {0} de {1} servidores</value></data>
+
+  <data name="Hotkey_Info" xml:space="preserve">
+    <value>Atajos: Ctrl+Shift+C = Conectar | Ctrl+Shift+D = Desconectar | Ctrl+Shift+S = Conexión Inteligente | Ctrl+Shift+Q = Salir</value>
+  </data>
+
+  <data name="Add_Link" xml:space="preserve"><value>Añadir</value></data>
+
+  <data name="Sub_UseProxy" xml:space="preserve"><value>Usar proxy para actualizaciones</value></data>
+</root>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Tab_Servers" xml:space="preserve"><value>سرورز</value></data>
+  <data name="Tab_Subscription" xml:space="preserve"><value>سبسکرپشن</value></data>
+  <data name="Tab_Log" xml:space="preserve"><value>لاگ</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>⚙ ترتیبات</value></data>
+  <data name="Btn_Connect" xml:space="preserve"><value>▶ جڑیں</value></data>
+  <data name="Btn_Disconnect" xml:space="preserve"><value>منقطع کریں</value></data>
+  <data name="Btn_SmartConnect" xml:space="preserve"><value>اسمارٹ کنکشن</value></data>
+  <data name="Btn_FindBetter" xml:space="preserve"><value>بہتر سرور تلاش کریں</value></data>
+  <data name="Btn_Ping" xml:space="preserve"><value>پنگ</value></data>
+  <data name="Btn_PingAll" xml:space="preserve"><value>🔄 سب کو پنگ</value></data>
+  <data name="Btn_Real" xml:space="preserve"><value>اصل تاخیر</value></data>
+  <data name="Btn_Speed" xml:space="preserve"><value>رفتار</value></data>
+  <data name="Btn_SpeedAll" xml:space="preserve"><value>🚀 رفتار ٹیسٹ</value></data>
+  <data name="Btn_Stop" xml:space="preserve"><value>روکیں</value></data>
+  <data name="Btn_UpdateAll" xml:space="preserve"><value>سب اپ ڈیٹ</value></data>
+  <data name="Btn_Update" xml:space="preserve"><value>اپ ڈیٹ</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>+ شامل کریں</value></data>
+  <data name="Btn_RemoveSub" xml:space="preserve"><value>سبسکرپشن ہٹائیں</value></data>
+  <data name="Btn_RemoveAll" xml:space="preserve"><value>سب ہٹائیں</value></data>
+  <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ نقلیں ہٹائیں</value></data>
+  <data name="Btn_Export" xml:space="preserve"><value>📦 برآمد</value></data>
+  <data name="Btn_Import" xml:space="preserve"><value>📋 درآمد</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>سرور لنک (vmess://, vless://, ...)</value></data>
+  <data name="Ph_SubName" xml:space="preserve"><value>نام</value></data>
+  <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
+  <data name="Sort_None" xml:space="preserve"><value>کوئی ترتیب نہیں</value></data>
+  <data name="Sort_Latency" xml:space="preserve"><value>تاخیر (کم)</value></data>
+  <data name="Sort_Speed" xml:space="preserve"><value>رفتار (زیادہ)</value></data>
+  <data name="Sort_Name" xml:space="preserve"><value>نام</value></data>
+  <data name="Status_Ready" xml:space="preserve"><value>تیار</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>جڑا ہوا</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>منقطع</value></data>
+  <data name="Ctx_Connect" xml:space="preserve"><value>جڑیں</value></data>
+  <data name="Ctx_Disconnect" xml:space="preserve"><value>منقطع کریں</value></data>
+  <data name="Ctx_Edit" xml:space="preserve"><value>سرور میں ترمیم</value></data>
+  <data name="Ctx_Clone" xml:space="preserve"><value>سرور کاپی</value></data>
+  <data name="Ctx_Share" xml:space="preserve"><value>شیئر</value></data>
+  <data name="Ctx_TestPing" xml:space="preserve"><value>پنگ ٹیسٹ</value></data>
+  <data name="Ctx_TestReal" xml:space="preserve"><value>اصل تاخیر ٹیسٹ</value></data>
+  <data name="Ctx_TestSpeed" xml:space="preserve"><value>رفتار ٹیسٹ</value></data>
+  <data name="Ctx_Delete" xml:space="preserve"><value>سرور حذف</value></data>
+  <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess شامل کریں</value></data>
+  <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS شامل کریں</value></data>
+  <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks شامل کریں</value></data>
+  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Trojan شامل کریں</value></data>
+  <data name="Add_Clipboard" xml:space="preserve"><value>📋 کلپ بورڈ سے درآمد</value></data>
+  <data name="Set_Proxy" xml:space="preserve"><value>سسٹم پراکسی سیٹ کریں</value></data>
+  <data name="Set_AutoConnect" xml:space="preserve"><value>خودکار جڑیں</value></data>
+  <data name="Set_AutoConnect_Desc" xml:space="preserve"><value>(شروع میں منتخب سرور سے جڑیں)</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>خودکار سبسکرپشن اپ ڈیٹ</value></data>
+  <data name="Set_Interval" xml:space="preserve"><value>ہر {0} گھنٹے میں اپ ڈیٹ</value></data>
+  <data name="Set_Language" xml:space="preserve"><value>ایپ زبان</value></data>
+  <data name="Set_Connection" xml:space="preserve"><value>کنکشن</value></data>
+  <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>خودکار سبسکرپشن اپ ڈیٹ</value></data>
+  <data name="Set_LeaveProxy" xml:space="preserve"><value>سسٹم پراکسی نہ بدلیں</value></data>
+  <data name="Set_LeaveProxy_Desc" xml:space="preserve"><value>جڑنے/کٹنے پر سسٹم پراکسی نہیں بدلتا</value></data>
+  <data name="Set_ClearProxy" xml:space="preserve"><value>سسٹم پراکسی صاف کریں</value></data>
+  <data name="Set_ClearProxy_Desc" xml:space="preserve"><value>کٹنے پر سسٹم پراکسی صاف ہو جاتا ہے</value></data>
+  <data name="Set_Every" xml:space="preserve"><value>ہر</value></data>
+  <data name="Set_Hours" xml:space="preserve"><value>گھنٹے میں اپ ڈیٹ</value></data>
+  <data name="Set_Advanced" xml:space="preserve"><value>جدید ترتیبات</value></data>
+  <data name="Set_PingType" xml:space="preserve"><value>پنگ کی قسم:</value></data>
+  <data name="Set_GlobalSort" xml:space="preserve"><value>عالمی ترتیب</value></data>
+  <data name="Set_DNS" xml:space="preserve"><value>مخصوص DNS</value></data>
+  <data name="Set_DNSBtn" xml:space="preserve"><value>⚙ DNS ترتیبات</value></data>
+  <data name="Set_TUN" xml:space="preserve"><value>TUN موڈ (مکمل VPN)</value></data>
+  <data name="Set_TUN_Desc" xml:space="preserve"><value>ایڈمنسٹریٹر کی اجازت درکار ہے۔</value></data>
+  <data name="Dlg_Continue" xml:space="preserve"><value>جاری</value></data>
+  <data name="Dlg_RestartAdmin" xml:space="preserve"><value>ایڈمن کے ساتھ دوبارہ شروع</value></data>
+  <data name="Dlg_NeedsAdmin" xml:space="preserve"><value>ایڈمنسٹریٹر کی اجازت درکار</value></data>
+  <data name="Dlg_TUNAdminMsg" xml:space="preserve"><value>TUN موڈ کو ایڈمنسٹریٹر کی اجازت درکار ہے۔</value></data>
+  <data name="Dlg_Yes" xml:space="preserve"><value>ہاں</value></data>
+  <data name="Dlg_No" xml:space="preserve"><value>نہیں</value></data>
+  <data name="Dlg_ConfirmDelete" xml:space="preserve"><value>حذف کی تصدیق</value></data>
+  <data name="Dlg_Save" xml:space="preserve"><value>محفوظ</value></data>
+  <data name="Dlg_Cancel" xml:space="preserve"><value>منسوخ</value></data>
+  <data name="Dlg_DNSSettings" xml:space="preserve"><value>DNS ترتیبات</value></data>
+  <data name="Dlg_DNSSimple" xml:space="preserve"><value>سادہ DNS</value></data>
+  <data name="Dlg_DNSHint" xml:space="preserve"><value>IPv4/IPv6 کوما سے الگ</value></data>
+  <data name="Dlg_DNSAdvanced" xml:space="preserve"><value>جدید DNS (JSON)</value></data>
+  <data name="Dlg_DNSDocs" xml:space="preserve"><value>دستاویزات</value></data>
+  <data name="Dlg_EditServer" xml:space="preserve"><value>سرور میں ترمیم</value></data>
+  <data name="Dlg_Name" xml:space="preserve"><value>نام</value></data>
+  <data name="Dlg_Address" xml:space="preserve"><value>پتہ</value></data>
+  <data name="Dlg_Port" xml:space="preserve"><value>پورٹ</value></data>
+  <data name="Dlg_RebuiltLink" xml:space="preserve"><value>تیار شدہ لنک</value></data>
+  <data name="Dlg_ShareQR" xml:space="preserve"><value>شیئر (QR)</value></data>
+  <data name="Dlg_CopyLink" xml:space="preserve"><value>لنک کاپی</value></data>
+  <data name="Dlg_Close" xml:space="preserve"><value>بند</value></data>
+  <data name="SelectedCount" xml:space="preserve"><value>{0} منتخب</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>سب</value></data>
+  <data name="Filter_Errors" xml:space="preserve"><value>صرف خرابیاں</value></data>
+  <data name="Filter_Connection" xml:space="preserve"><value>صرف کنکشن</value></data>
+  <data name="Filter_Label" xml:space="preserve"><value>فلٹر:</value></data>
+  <data name="Log_ServersLoaded" xml:space="preserve"><value>{0} سرورز اور {1} سبسکرپشن لوڈ ہوئے۔</value></data>
+  <data name="Log_Connected" xml:space="preserve"><value>جڑ گیا۔ HTTP 127.0.0.1:{0}</value></data>
+  <data name="Log_Disconnected" xml:space="preserve"><value>کٹ گیا۔</value></data>
+  <data name="Log_ServerAdded" xml:space="preserve"><value>"{0}" شامل ہو گیا۔</value></data>
+  <data name="Log_ServerDup" xml:space="preserve"><value>"{0}" نقلی ہے۔</value></data>
+  <data name="Log_SubAdded" xml:space="preserve"><value>"{0}" شامل ہو گیا ({1} سرور)</value></data>
+  <data name="Log_Merged" xml:space="preserve"><value>"{0}" کا ادغام: {1} نئے سرور، کل {2}۔</value></data>
+  <data name="Log_NoSub" xml:space="preserve"><value>کوئی سبسکرپشن نہیں۔</value></data>
+  <data name="Log_Updated" xml:space="preserve"><value>اپ ڈیٹ ہو گیا ({0} سرور، {1} منفرد)</value></data>
+  <data name="Log_SmartStage1" xml:space="preserve"><value>اسمارٹ کنکشن: مرحلہ ۱</value></data>
+  <data name="Log_SmartCandidates" xml:space="preserve"><value>اسمارٹ کنکشن: {0} امیدوار منتخب</value></data>
+  <data name="Log_SmartStage2" xml:space="preserve"><value>اسمارٹ کنکشن: {0} امیدواروں کا ٹیسٹ</value></data>
+  <data name="Log_SmartTesting" xml:space="preserve"><value>اسمارٹ کنکشن: {0} ٹیسٹ ہو رہا ہے</value></data>
+  <data name="Log_SmartResult" xml:space="preserve"><value>اسمارٹ کنکشن: {0} → {1}ms</value></data>
+  <data name="Log_SmartFailed" xml:space="preserve"><value>اسمارٹ کنکشن: {0} → ناکام</value></data>
+  <data name="Log_SmartConnect" xml:space="preserve"><value>اسمارٹ کنکشن: {0} سے جڑ رہا ہے</value></data>
+  <data name="Log_SmartError" xml:space="preserve"><value>اسمارٹ کنکشن خرابی: {0}</value></data>
+  <data name="Log_NoPing" xml:space="preserve"><value>اسمارٹ کنکشن: کوئی سرور جواب نہ دیا</value></data>
+  <data name="Log_FindBetter" xml:space="preserve"><value>بہتر تلاش: بیچ {0} ٹیسٹ ({1} باقی)</value></data>
+  <data name="Log_FindSwitch" xml:space="preserve"><value>بہتر تلاش: {0} ({1}ms) سے {2} ({3}ms) پر سوئچ</value></data>
+  <data name="Log_FindBest" xml:space="preserve"><value>بہتر تلاش: موجودہ سرور ابھی بھی بہترین ہے</value></data>
+  <data name="Log_Sorted" xml:space="preserve"><value>{0} کے مطابق ترتیب دی گئی۔</value></data>
+  <data name="Log_Error" xml:space="preserve"><value>خرابی: {0}</value></data>
+  <data name="Log_InvalidLink" xml:space="preserve"><value>چھوڑا: نامعتبر لنک۔</value></data>
+  <data name="Log_ServersDeleted" xml:space="preserve"><value>{0} سرور حذف ہوئے۔</value></data>
+  <data name="Log_SubRemoved" xml:space="preserve"><value>"{0}" اس کے سرورز کے ساتھ حذف ہو گیا۔</value></data>
+  <data name="Log_DupesRemoved" xml:space="preserve"><value>{0} نقلی سرور حذف ہوئے۔</value></data>
+  <data name="Log_Copied" xml:space="preserve"><value>لنک "{0}" کاپی ہو گیا۔</value></data>
+  <data name="Log_Exported" xml:space="preserve"><value>برآمد: {0}</value></data>
+  <data name="Log_LinksCopied" xml:space="preserve"><value>{0} لنک کاپی ہوئے۔</value></data>
+  <data name="Log_SubCopied" xml:space="preserve"><value>Base64 سبسکرپشن کاپی ہو گئی۔</value></data>
+  <data name="Log_TestStopped" xml:space="preserve"><value>ٹیسٹ رک گیا</value></data>
+  <data name="Log_SubUpdated" xml:space="preserve"><value>"{0}": {1} سرور۔</value></data>
+  <data name="AllServers_Title" xml:space="preserve"><value>📋 سب سرورز</value></data>
+  <data name="Header_Name" xml:space="preserve"><value>نام</value></data>
+  <data name="Header_Ping" xml:space="preserve"><value>پنگ</value></data>
+  <data name="Header_Speed" xml:space="preserve"><value>رفتار</value></data>
+  <data name="Header_Status" xml:space="preserve"><value>حالت</value></data>
+  <data name="Header_Country" xml:space="preserve"><value>ملک</value></data>
+  <data name="Header_Protocol" xml:space="preserve"><value>پروٹوکال</value></data>
+  <data name="Header_Address" xml:space="preserve"><value>پتہ</value></data>
+  <data name="Header_Port" xml:space="preserve"><value>پورٹ</value></data>
+  <data name="Header_Sub" xml:space="preserve"><value>سبسکرپشن</value></data>
+  <data name="ServerCount" xml:space="preserve"><value>{0} سرورز</value></data>
+  <data name="Status_Failed" xml:space="preserve"><value>ناکام</value></data>
+  <data name="Status_Error" xml:space="preserve"><value>خرابی</value></data>
+  <data name="Card_Ping" xml:space="preserve"><value>پنگ:</value></data>
+  <data name="Card_Speed" xml:space="preserve"><value>رفتار:</value></data>
+  <data name="Card_Connect" xml:space="preserve"><value>جڑیں</value></data>
+  <data name="Card_Disconnect" xml:space="preserve"><value>کٹیں</value></data>
+  <data name="Card_Edit" xml:space="preserve"><value>ترمیم</value></data>
+  <data name="Card_Share" xml:space="preserve"><value>شیئر</value></data>
+  <data name="Card_Delete" xml:space="preserve"><value>حذف</value></data>
+  <data name="Card_Connected" xml:space="preserve"><value>جڑا ہوا</value></data>
+  <data name="Tray_Show" xml:space="preserve"><value>دکھائیں</value></data>
+  <data name="Tray_SmartConnect" xml:space="preserve"><value>⚡ اسمارٹ کنکشن</value></data>
+  <data name="Tray_Stop" xml:space="preserve"><value>⏹ روکیں</value></data>
+  <data name="Tray_FindBetter" xml:space="preserve"><value>🔍 بہتر سرور تلاش</value></data>
+  <data name="Tray_Proxy" xml:space="preserve"><value>سسٹم پراکسی</value></data>
+  <data name="Tray_UpdateNoProxy" xml:space="preserve"><value>🔄 پراکسی کے بغیر اپ ڈیٹ</value></data>
+  <data name="Tray_UpdateProxy" xml:space="preserve"><value>🔄 پراکسی کے ساتھ اپ ڈیٹ</value></data>
+  <data name="Tray_Settings" xml:space="preserve"><value>⚙ ترتیبات</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>خروج</value></data>
+  <data name="Tray_ConnectedTo" xml:space="preserve"><value>جڑا ہوا: {0}</value></data>
+  <data name="Tray_Searching" xml:space="preserve"><value>تلاش ہو رہی ہے...</value></data>
+  <data name="Tray_SearchingProgress" xml:space="preserve"><value>تلاش ہو رہی ہے... {0} / {1} سرور</value></data>
+
+  <data name="Hotkey_Info" xml:space="preserve">
+    <value>شورٹ کاٹس: Ctrl+Shift+C = جڑنا | Ctrl+Shift+D = توڑنا | Ctrl+Shift+S = اسمارٹ جڑنا | Ctrl+Shift+Q = باہر جانا</value>
+  </data>
+
+  <data name="Add_Link" xml:space="preserve"><value>شامل کریں</value></data>
+
+  <data name="Sub_UseProxy" xml:space="preserve"><value>اپڈیٹ کے لیے پراکسی استعمال کریں</value></data>
+</root>

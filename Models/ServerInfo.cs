@@ -3,21 +3,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace XrayClient.Models;
 
-public enum ProxyProtocol
-{
-    VMess,
-    VLESS,
-    Shadowsocks,
-    Trojan
-}
+public enum ProxyProtocol { VMess, VLESS, Shadowsocks, Trojan }
 
-/// <summary>
-/// مدل یک سرور پروکسی. فیلدهای اتصال سریالایز می‌شوند؛
-/// وضعیت تست (پینگ/سرعت/تاریخچه) فقط runtime است.
-/// قرارداد LatencyMs: ‎-1‎ تست‌نشده، ‎-2‎ ناموفق. قرارداد DownloadMbps: ‎-1‎ تست‌نشده، ‎-2‎ ناموفق.
-/// </summary>
 public partial class ServerInfo : ObservableObject
 {
+    private static readonly string[] Units = ["B", "KB", "MB", "GB", "TB"];
+
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
     public string Name { get; set; } = "";
     public string Link { get; set; } = "";
@@ -46,49 +37,67 @@ public partial class ServerInfo : ObservableObject
     public string SubscriptionName { get; set; } = "";
     public DateTime LastTested { get; set; } = DateTime.MinValue;
 
-    [ObservableProperty]
-    private int _latencyMs = -1;
+    [ObservableProperty] private long _subDataLimit;
+    [ObservableProperty] private long _subUsedTraffic;
+    [ObservableProperty] private DateTime _subExpireDate = DateTime.MinValue;
 
-    [ObservableProperty]
-    private double _downloadMbps = -1;
+    public string SubTrafficDisplay
+    {
+        get
+        {
+            if (SubDataLimit <= 0) return "";
+            return $"{FormatBytes(SubUsedTraffic)} / {FormatBytes(SubDataLimit)}";
+        }
+    }
 
-    [ObservableProperty]
-    private string _countryCode = "";
+    public string SubExpireDisplay
+    {
+        get
+        {
+            if (SubExpireDate == DateTime.MinValue) return "";
+            if (SubExpireDate < DateTime.Now) return "!";
+            var remaining = SubExpireDate - DateTime.Now;
+            if (remaining.TotalDays < 1) return $"{(int)remaining.TotalHours}h";
+            if (remaining.TotalDays < 30) return $"{(int)remaining.TotalDays}d";
+            return SubExpireDate.ToString("yy/MM/dd");
+        }
+    }
 
-    [ObservableProperty]
-    [property: JsonIgnore]
-    private bool _isSelected;
+    private static string FormatBytes(long bytes)
+    {
+        if (bytes <= 0) return "0 B";
+        double val = bytes;
+        int unit = 0;
+        while (val >= 1024 && unit < Units.Length - 1) { val /= 1024; unit++; }
+        return $"{val:F1}{Units[unit]}";
+    }
 
-    [ObservableProperty]
-    [property: JsonIgnore]
-    private bool _isActiveConnection;
+    [ObservableProperty] private int _latencyMs = -1;
+    [ObservableProperty] private double _downloadMbps = -1;
+    [ObservableProperty] private string _countryCode = "";
+    [ObservableProperty] [property: JsonIgnore] private bool _isSelected;
+    [ObservableProperty] [property: JsonIgnore] private bool _isActiveConnection;
+    [ObservableProperty] [property: JsonIgnore] private bool _isChecked;
 
-    [ObservableProperty]
-    [property: JsonIgnore]
-    private bool _isChecked;
-
-    /// <summary>پل به ViewModel برای کامندهای ردیف و منوی راست‌کلیک. سریالایز نمی‌شود.</summary>
-    [JsonIgnore]
-    public ViewModels.MainViewModel? Owner { get; set; }
+    [JsonIgnore] public ViewModels.MainViewModel? Owner { get; set; }
 
     [JsonIgnore]
     public string LatencyDisplay => LatencyMs switch
     {
         -1 => "—",
-        -2 => "ناموفق",
+        -2 => Localization.TranslationManager.Instance["Status_Failed"],
         _ => $"{LatencyMs} ms"
     };
 
     [JsonIgnore]
     public string SpeedDisplay => DownloadMbps switch
     {
-        < -1.5 => "خطا",
+        < -1.5 => Localization.TranslationManager.Instance["Status_Error"],
         < -0.5 => "—",
         _ => $"{DownloadMbps:F1} Mb/s"
     };
 
-    [JsonIgnore]
-    public string Flag => Core.GeoFlags.FlagEmoji(CountryCode);
+    [JsonIgnore] public string Flag => Core.GeoFlags.FlagEmoji(CountryCode);
 
     [JsonIgnore]
     public string StatusColor
@@ -103,6 +112,35 @@ public partial class ServerInfo : ObservableObject
     }
 
     [JsonIgnore]
+    public bool IsHighlighted
+    {
+        get => _isHighlighted;
+        set
+        {
+            if (_isHighlighted == value) return;
+            _isHighlighted = value;
+            OnPropertyChanged();
+            if (value)
+            {
+                _highlightTimer?.Stop();
+                _highlightTimer?.Dispose();
+                _highlightTimer = new System.Timers.Timer(5000) { AutoReset = false };
+                _highlightTimer.Elapsed += OnHighlightElapsed;
+                _highlightTimer.Start();
+            }
+        }
+    }
+    private bool _isHighlighted;
+    private System.Timers.Timer? _highlightTimer;
+
+    private void OnHighlightElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        IsHighlighted = false;
+        _highlightTimer?.Dispose();
+        _highlightTimer = null;
+    }
+
+    [JsonIgnore]
     public string ProtocolDisplay => Protocol switch
     {
         ProxyProtocol.VMess => "VMess",
@@ -112,27 +150,18 @@ public partial class ServerInfo : ObservableObject
         _ => Protocol.ToString()
     };
 
-    [JsonIgnore]
-    public string Summary => $"{Name} ({ProtocolDisplay}) {Address}:{Port}";
-
-    [JsonIgnore]
-    public List<int> LatencyHistory { get; } = new();
+    [JsonIgnore] public List<int> LatencyHistory { get; } = new();
 
     [JsonIgnore]
     public string HistoryDisplay => LatencyHistory.Count == 0
         ? ""
         : string.Join(" ← ", LatencyHistory.TakeLast(5).Reverse());
 
-    [JsonIgnore]
-    public string LastTestedDisplay => LastTested == DateTime.MinValue ? "" : LastTested.ToString("HH:mm dd/MM");
+    [JsonIgnore] public string LastTestedDisplay => LastTested == DateTime.MinValue ? "" : LastTested.ToString("HH:mm dd/MM");
 
     partial void OnLatencyMsChanged(int value) { OnPropertyChanged(nameof(LatencyDisplay)); OnPropertyChanged(nameof(StatusColor)); }
     partial void OnDownloadMbpsChanged(double value) => OnPropertyChanged(nameof(SpeedDisplay));
-    partial void OnCountryCodeChanged(string value)
-    {
-        OnPropertyChanged(nameof(Flag));
-    }
-
+    partial void OnCountryCodeChanged(string value) => OnPropertyChanged(nameof(Flag));
     partial void OnIsCheckedChanged(bool value) => Owner?.UpdateSelectedCount();
     partial void OnIsActiveConnectionChanged(bool value) => OnPropertyChanged(nameof(StatusColor));
 
@@ -184,4 +213,19 @@ public partial class ServerInfo : ObservableObject
         AllowInsecure = AllowInsecure,
         SubscriptionName = ""
     };
+
+    public static int CompareByPriority(ServerInfo a, ServerInfo b)
+    {
+        int ra = a.LatencyMs < 0 ? int.MaxValue : a.LatencyMs;
+        int rb = b.LatencyMs < 0 ? int.MaxValue : b.LatencyMs;
+        int c = ra.CompareTo(rb);
+        if (c != 0) return c;
+
+        double sa = a.DownloadMbps < 0 ? -1 : a.DownloadMbps;
+        double sb = b.DownloadMbps < 0 ? -1 : b.DownloadMbps;
+        c = sb.CompareTo(sa);
+        if (c != 0) return c;
+
+        return string.Compare(a.Name, b.Name, StringComparison.Ordinal);
+    }
 }

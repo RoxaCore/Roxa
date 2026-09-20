@@ -20,6 +20,9 @@
           "XrayClient.dll": {}
         },
         "resources": {
+          "ar/XrayClient.resources.dll": {
+            "locale": "ar"
+          },
           "en/XrayClient.resources.dll": {
             "locale": "en"
           }

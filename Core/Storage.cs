@@ -8,19 +8,18 @@ public static class Storage
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
 
-    public static string DataDir
+    private static readonly string _dataDir;
+    static Storage()
     {
-        get
-        {
-            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Roxa");
-            Directory.CreateDirectory(dir);
-            return dir;
-        }
+        _dataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Roxa");
+        Directory.CreateDirectory(_dataDir);
     }
 
-    private static string ServersFile => Path.Combine(DataDir, "servers.json");
-    private static string SubscriptionsFile => Path.Combine(DataDir, "subscriptions.json");
-    private static string SettingsFile => Path.Combine(DataDir, "settings.json");
+    public static string DataDir => _dataDir;
+
+    private static string ServersFile => Path.Combine(_dataDir, "servers.json");
+    private static string SubscriptionsFile => Path.Combine(_dataDir, "subscriptions.json");
+    private static string SettingsFile => Path.Combine(_dataDir, "settings.json");
 
     public static List<ServerInfo> LoadServers()
     {

@@ -6,10 +6,13 @@ namespace XrayClient.Core;
 public static class TunManager
 {
     private const string AdapterName = "RoxaTun";
-    private const string TUN_GUID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
 
-    public static string WintunDirectory => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "engine");
-    public static string WintunPath => Path.Combine(WintunDirectory, RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "wintun-arm64.dll" : "wintun-x64.dll");
+    private static readonly string _wintunDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "engine");
+    private static readonly string _wintunPath = Path.Combine(_wintunDirectory, RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "wintun-arm64.dll" : "wintun-x64.dll");
+    private static readonly string _logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+
+    public static string WintunDirectory => _wintunDirectory;
+    public static string WintunPath => _wintunPath;
 
     public static bool IsWintunAvailable()
     {
@@ -78,9 +81,9 @@ public static class TunManager
             var proc = Process.Start(psi);
             if (proc != null)
             {
-                proc.WaitForExit(5000);
                 string output = proc.StandardOutput.ReadToEnd();
                 string error = proc.StandardError.ReadToEnd();
+                proc.WaitForExit(5000);
 
                 if (proc.ExitCode == 0)
                 {
@@ -167,9 +170,8 @@ public static class TunManager
     {
         try
         {
-            string logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
-            Directory.CreateDirectory(logDir);
-            string logFile = Path.Combine(logDir, "tun.log");
+            Directory.CreateDirectory(_logDir);
+            string logFile = Path.Combine(_logDir, "tun.log");
             File.AppendAllText(logFile, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}{Environment.NewLine}");
         }
         catch { }

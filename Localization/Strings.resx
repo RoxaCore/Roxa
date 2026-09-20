@@ -51,7 +51,7 @@
   <data name="Btn_FindBetter" xml:space="preserve"><value>یافتن سرور بهتر</value></data>
   <data name="Btn_Ping" xml:space="preserve"><value>پینگ</value></data>
   <data name="Btn_PingAll" xml:space="preserve"><value>🔄 پینگ همه</value></data>
-  <data name="Btn_Real" xml:space="preserve"><value>واقعی</value></data>
+  <data name="Btn_Real" xml:space="preserve"><value>تأخیر واقعی</value></data>
   <data name="Btn_Speed" xml:space="preserve"><value>سرعت</value></data>
   <data name="Btn_SpeedAll" xml:space="preserve"><value>🚀 سرعت</value></data>
   <data name="Btn_Stop" xml:space="preserve"><value>توقف</value></data>
@@ -83,11 +83,10 @@
   <data name="Ctx_Clone" xml:space="preserve"><value>کپی سرور</value></data>
   <data name="Ctx_Share" xml:space="preserve"><value>اشتراک‌گذاری</value></data>
   <data name="Ctx_TestPing" xml:space="preserve"><value>تست Ping</value></data>
-  <data name="Ctx_TestReal" xml:space="preserve"><value>تست پینگ واقعی</value></data>
+  <data name="Ctx_TestReal" xml:space="preserve"><value>تأخیر واقعی</value></data>
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>تست سرعت</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>حذف سرور</value></data>
   <!-- Add Menu -->
-  <data name="Add_Link" xml:space="preserve"><value>🔗 افزودن با لینک</value></data>
   <data name="Add_VMess" xml:space="preserve"><value>🟢 افزودن VMess</value></data>
   <data name="Add_VLESS" xml:space="preserve"><value>🔵 افزودن VLESS</value></data>
   <data name="Add_SS" xml:space="preserve"><value>🟠 افزودن Shadowsocks</value></data>
@@ -96,11 +95,49 @@
   <!-- Settings -->
   <data name="Set_Proxy" xml:space="preserve"><value>تنظیم پراکسی سیستم</value></data>
   <data name="Set_AutoConnect" xml:space="preserve"><value>اتصال خودکار</value></data>
+  <data name="Set_AutoConnect_Desc" xml:space="preserve"><value>(اتصال به سرور انتخاب‌شده هنگام شروع برنامه)</value></data>
   <data name="Set_AutoUpdate" xml:space="preserve"><value>بروزرسانی خودکار اشتراک‌ها</value></data>
   <data name="Set_Interval" xml:space="preserve"><value>هر {0} ساعت بروزرسانی شود</value></data>
   <data name="Set_Language" xml:space="preserve"><value>زبان برنامه</value></data>
   <data name="Set_Connection" xml:space="preserve"><value>اتصال</value></data>
   <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>بروزرسانی خودکار اشتراک</value></data>
+  <data name="Set_LeaveProxy" xml:space="preserve"><value>تغییر ندادن پروکسی سیستم</value></data>
+  <data name="Set_LeaveProxy_Desc" xml:space="preserve"><value>هنگام اتصال یا قطع اتصال، پروکسی سیستم تغییر نمی‌کند</value></data>
+  <data name="Set_ClearProxy" xml:space="preserve"><value>پاک کردن پروکسی سیستم</value></data>
+  <data name="Set_ClearProxy_Desc" xml:space="preserve"><value>هنگام قطع اتصال، پروکسی سیستم پاک می‌شود</value></data>
+  <data name="Set_Every" xml:space="preserve"><value>هر</value></data>
+  <data name="Set_Hours" xml:space="preserve"><value>ساعت بروزرسانی شود</value></data>
+  <data name="Set_Advanced" xml:space="preserve"><value>تنظیمات پیشرفته</value></data>
+  <data name="Set_PingType" xml:space="preserve"><value>نوع پینگ:</value></data>
+  <data name="Set_GlobalSort" xml:space="preserve"><value>مرتب‌سازی سراسری (بعد از تست، بهترین سرور از همه گروه‌ها بالا میاد)</value></data>
+  <data name="Set_DNS" xml:space="preserve"><value>DNS سفارشی</value></data>
+  <data name="Set_DNSBtn" xml:space="preserve"><value>⚙  تنظیمات DNS</value></data>
+  <data name="Set_TUN" xml:space="preserve"><value>حالت TUN (VPN کامل سیستم)</value></data>
+  <data name="Set_TUN_Desc" xml:space="preserve"><value>این حالت نیاز به دسترسی Administrator دارد و تمام ترافیک سیستم (نه فقط برنامه‌های سازگار با پروکسی) را از طریق تانل عبور می‌دهد</value></data>
+  <!-- Dialogs -->
+  <data name="Dlg_Continue" xml:space="preserve"><value>ادامه</value></data>
+  <data name="Dlg_RestartAdmin" xml:space="preserve"><value>اجرای مجدد به عنوان ادمین</value></data>
+  <data name="Dlg_NeedsAdmin" xml:space="preserve"><value>نیاز به دسترسی Administrator</value></data>
+  <data name="Dlg_TUNAdminMsg" xml:space="preserve"><value>حالت TUN نیاز به دسترسی Administrator دارد.&#10;برای فعال کردن، برنامه باید مجدداً با دسترسی ادمین اجرا شود.</value></data>
+  <data name="Dlg_Yes" xml:space="preserve"><value>بله</value></data>
+  <data name="Dlg_No" xml:space="preserve"><value>خیر</value></data>
+  <data name="Dlg_ConfirmDelete" xml:space="preserve"><value>تأیید حذف</value></data>
+  <data name="Dlg_Save" xml:space="preserve"><value>ذخیره</value></data>
+  <data name="Dlg_Cancel" xml:space="preserve"><value>لغو</value></data>
+  <data name="Dlg_DNSSettings" xml:space="preserve"><value>تنظیمات DNS</value></data>
+  <data name="Dlg_DNSSimple" xml:space="preserve"><value>DNS ساده</value></data>
+  <data name="Dlg_DNSHint" xml:space="preserve"><value>IPv4/IPv6 با کاما جدا شده</value></data>
+  <data name="Dlg_DNSAdvanced" xml:space="preserve"><value>DNS پیشرفته (JSON)</value></data>
+  <data name="Dlg_DNSDocs" xml:space="preserve"><value>مستندات: https://xtls.github.io/config/dns.html</value></data>
+  <data name="Dlg_EditServer" xml:space="preserve"><value>ویرایش سرور</value></data>
+  <data name="Dlg_Name" xml:space="preserve"><value>نام</value></data>
+  <data name="Dlg_Address" xml:space="preserve"><value>آدرس</value></data>
+  <data name="Dlg_Port" xml:space="preserve"><value>پورت</value></data>
+  <data name="Dlg_RebuiltLink" xml:space="preserve"><value>لینک بازسازی‌شده</value></data>
+  <data name="Dlg_ShareQR" xml:space="preserve"><value>اشتراک‌گذاری (QR)</value></data>
+  <data name="Dlg_CopyLink" xml:space="preserve"><value>کپی لینک</value></data>
+  <data name="Dlg_Close" xml:space="preserve"><value>بستن</value></data>
+  <data name="SelectedCount" xml:space="preserve"><value>{0} انتخاب شده</value></data>
   <!-- Filter -->
   <data name="Filter_All" xml:space="preserve"><value>همه</value></data>
   <data name="Filter_Errors" xml:space="preserve"><value>فقط خطا</value></data>
@@ -116,18 +153,18 @@
   <data name="Log_Merged" xml:space="preserve"><value>ادغام «{0}»: {1} سرور جدید، مجموع {2}.</value></data>
   <data name="Log_NoSub" xml:space="preserve"><value>اشتراکی نیست.</value></data>
   <data name="Log_Updated" xml:space="preserve"><value>به‌روز شد ({0} سرور، {1} یکتا — دستی‌ها حفظ شدند)</value></data>
-  <data name="Log_SmartStage1" xml:space="preserve"><value>Smart connect: stage 1 - fast TCP ping on all servers</value></data>
-  <data name="Log_SmartCandidates" xml:space="preserve"><value>Smart connect: {0} candidates selected</value></data>
-  <data name="Log_SmartStage2" xml:space="preserve"><value>Smart connect: testing {0} candidates one by one</value></data>
-  <data name="Log_SmartTesting" xml:space="preserve"><value>Smart connect: testing {0} ...</value></data>
-  <data name="Log_SmartResult" xml:space="preserve"><value>Smart connect: {0} → {1}ms</value></data>
-  <data name="Log_SmartFailed" xml:space="preserve"><value>Smart connect: {0} → failed</value></data>
-  <data name="Log_SmartConnect" xml:space="preserve"><value>Smart connect: connecting to {0}</value></data>
-  <data name="Log_SmartError" xml:space="preserve"><value>Smart connect error: {0}</value></data>
-  <data name="Log_NoPing" xml:space="preserve"><value>Smart connect: no server responded to ping</value></data>
-  <data name="Log_FindBetter" xml:space="preserve"><value>Find better: testing batch of {0} ({1} remaining)</value></data>
-  <data name="Log_FindSwitch" xml:space="preserve"><value>Find better: switching from {0} ({1}ms) → {2} ({3}ms)</value></data>
-  <data name="Log_FindBest" xml:space="preserve"><value>Find better: current server is still best</value></data>
+  <data name="Log_SmartStage1" xml:space="preserve"><value>اتصال هوشمند: مرحله ۱ - پینگ سریع TCP روی همه سرورها</value></data>
+  <data name="Log_SmartCandidates" xml:space="preserve"><value>اتصال هوشمند: {0} کاندید انتخاب شد</value></data>
+  <data name="Log_SmartStage2" xml:space="preserve"><value>اتصال هوشمند: تست واقعی {0} کاندید یکی یکی</value></data>
+  <data name="Log_SmartTesting" xml:space="preserve"><value>اتصال هوشمند: تست {0} ...</value></data>
+  <data name="Log_SmartResult" xml:space="preserve"><value>اتصال هوشمند: {0} → {1}ms</value></data>
+  <data name="Log_SmartFailed" xml:space="preserve"><value>اتصال هوشمند: {0} → ناموفق</value></data>
+  <data name="Log_SmartConnect" xml:space="preserve"><value>اتصال هوشمند: اتصال به {0}</value></data>
+  <data name="Log_SmartError" xml:space="preserve"><value>خطای اتصال هوشمند: {0}</value></data>
+  <data name="Log_NoPing" xml:space="preserve"><value>اتصال هوشمند: هیچ سروری پاسخ نداد</value></data>
+  <data name="Log_FindBetter" xml:space="preserve"><value>جستجوی سرور بهتر: تست دسته {0} ({1} باقی‌مانده)</value></data>
+  <data name="Log_FindSwitch" xml:space="preserve"><value>جستجوی سرور بهتر: سوییچ از {0} ({1}ms) → {2} ({3}ms)</value></data>
+  <data name="Log_FindBest" xml:space="preserve"><value>جستجوی سرور بهتر: سرور فعلی هنوز بهترینه</value></data>
   <data name="Log_Sorted" xml:space="preserve"><value>مرتب شد بر اساس {0}.</value></data>
   <data name="Log_Error" xml:space="preserve"><value>خطا: {0}</value></data>
   <data name="Log_InvalidLink" xml:space="preserve"><value>پرش: لینک معتبر نیست.</value></data>
@@ -153,4 +190,37 @@
   <data name="Header_Port" xml:space="preserve"><value>پورت</value></data>
   <data name="Header_Sub" xml:space="preserve"><value>اشتراک</value></data>
   <data name="ServerCount" xml:space="preserve"><value>تعداد سرورها: {0}</value></data>
+  <!-- Display -->
+  <data name="Status_Failed" xml:space="preserve"><value>ناموفق</value></data>
+  <data name="Status_Error" xml:space="preserve"><value>خطا</value></data>
+  <!-- Server Card -->
+  <data name="Card_Ping" xml:space="preserve"><value>پینگ: </value></data>
+  <data name="Card_Speed" xml:space="preserve"><value>سرعت: </value></data>
+  <data name="Card_Connect" xml:space="preserve"><value>اتصال</value></data>
+  <data name="Card_Disconnect" xml:space="preserve"><value>قطع</value></data>
+  <data name="Card_Edit" xml:space="preserve"><value>ویرایش</value></data>
+  <data name="Card_Share" xml:space="preserve"><value>اشتراک</value></data>
+  <data name="Card_Delete" xml:space="preserve"><value>حذف</value></data>
+  <data name="Card_Connected" xml:space="preserve"><value>متصل</value></data>
+  <!-- System Tray -->
+  <data name="Tray_Show" xml:space="preserve"><value>نمایش</value></data>
+  <data name="Tray_SmartConnect" xml:space="preserve"><value>⚡ اتصال هوشمند</value></data>
+  <data name="Tray_Stop" xml:space="preserve"><value>⏹ توقف</value></data>
+  <data name="Tray_FindBetter" xml:space="preserve"><value>🔍 جستجو سرور بهتر</value></data>
+  <data name="Tray_Proxy" xml:space="preserve"><value>پراکسی سیستم</value></data>
+  <data name="Tray_UpdateNoProxy" xml:space="preserve"><value>🔄 بروزرسانی لیست سرورها بدون پراکسی</value></data>
+  <data name="Tray_UpdateProxy" xml:space="preserve"><value>🔄 بروزرسانی لیست سرورها با پراکسی</value></data>
+  <data name="Tray_Settings" xml:space="preserve"><value>⚙ تنظیمات</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>خروج</value></data>
+  <data name="Tray_ConnectedTo" xml:space="preserve"><value>متصل به {0}</value></data>
+  <data name="Tray_Searching" xml:space="preserve"><value>در حال جستجو ...</value></data>
+  <data name="Tray_SearchingProgress" xml:space="preserve"><value>در حال جستجو ... {0} از {1} سرور</value></data>
+
+  <data name="Hotkey_Info" xml:space="preserve">
+    <value>شورتکات‌ها: Ctrl+Shift+C = اتصال | Ctrl+Shift+D = قطع | Ctrl+Shift+S = اتصال هوشمند | Ctrl+Shift+Q = خروج</value>
+  </data>
+
+  <data name="Add_Link" xml:space="preserve"><value>افزودن</value></data>
+
+  <data name="Sub_UseProxy" xml:space="preserve"><value>بروزرسانی اشتراک از طریق پراکسی</value></data>
 </root>

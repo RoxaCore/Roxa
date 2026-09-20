@@ -14,6 +14,7 @@ public sealed class XrayEngine : IDisposable
     private Process? _process;
     private bool _proxyActive;
     private string? _tempConfigPath;
+    private AppSettings? _settings;
     private readonly object _lock = new();
 
     public event Action<string>? Output;
@@ -113,6 +114,7 @@ public sealed class XrayEngine : IDisposable
     public async Task StartAsync(ServerInfo server, bool setSystemProxy, AppSettings? settings = null, CancellationToken ct = default)
     {
         Stop();
+        _settings = settings;
         if (!File.Exists(EnginePath))
         {
             Log("Engine not found, downloading ...");
@@ -193,7 +195,7 @@ public sealed class XrayEngine : IDisposable
             }
             if (!ready) throw new InvalidOperationException("Proxy port did not come up.");
 
-            if (!useTun && setSystemProxy && IsWindows)
+            if (!useTun && setSystemProxy && IsWindows && settings?.LeaveSystemProxyAsIs != true)
             {
                 SystemProxy.Set($"127.0.0.1:{HttpPort}");
                 _proxyActive = true;
@@ -301,8 +303,11 @@ public sealed class XrayEngine : IDisposable
         if (_proxyActive)
         {
             _proxyActive = false;
-            try { SystemProxy.Clear(); }
-            catch (Exception ex) { Log($"Clear proxy failed: {ex.Message}"); }
+            if (_settings?.LeaveSystemProxyAsIs != true && _settings?.ClearProxyOnDisconnect == true)
+            {
+                try { SystemProxy.Clear(); }
+                catch (Exception ex) { Log($"Clear proxy failed: {ex.Message}"); }
+            }
         }
         CurrentServer = null;
         HttpPort = 0;

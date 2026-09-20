@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <!-- Tabs -->
+  <data name="Tab_Servers" xml:space="preserve"><value>الخوادم</value></data>
+  <data name="Tab_Subscription" xml:space="preserve"><value>الاشتراكات</value></data>
+  <data name="Tab_Log" xml:space="preserve"><value>السجل</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>⚙ الإعدادات</value></data>
+  <!-- Buttons -->
+  <data name="Btn_Connect" xml:space="preserve"><value>▶ اتصال</value></data>
+  <data name="Btn_Disconnect" xml:space="preserve"><value>قطع الاتصال</value></data>
+  <data name="Btn_SmartConnect" xml:space="preserve"><value>اتصال ذكي</value></data>
+  <data name="Btn_FindBetter" xml:space="preserve"><value>البحث عن خادم أفضل</value></data>
+  <data name="Btn_Ping" xml:space="preserve"><value>بينج</value></data>
+  <data name="Btn_PingAll" xml:space="preserve"><value>🔄 بينج الكل</value></data>
+  <data name="Btn_Real" xml:space="preserve"><value>تأخير حقيقي</value></data>
+  <data name="Btn_Speed" xml:space="preserve"><value>السرعة</value></data>
+  <data name="Btn_SpeedAll" xml:space="preserve"><value>🚀 السرعة</value></data>
+  <data name="Btn_Stop" xml:space="preserve"><value>إيقاف</value></data>
+  <data name="Btn_UpdateAll" xml:space="preserve"><value>تحديث الكل</value></data>
+  <data name="Btn_Update" xml:space="preserve"><value>تحديث</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>+ إضافة</value></data>
+  <data name="Btn_RemoveSub" xml:space="preserve"><value>حذف الاشتراك</value></data>
+  <data name="Btn_RemoveAll" xml:space="preserve"><value>حذف الكل</value></data>
+  <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ حذف المكررات</value></data>
+  <data name="Btn_Export" xml:space="preserve"><value>📦 تصدير</value></data>
+  <data name="Btn_Import" xml:space="preserve"><value>📋 استيراد</value></data>
+  <!-- Placeholders -->
+  <data name="Ph_ServerLink" xml:space="preserve"><value>رابط الخادم (vmess://, vless://, ...)</value></data>
+  <data name="Ph_SubName" xml:space="preserve"><value>الاسم</value></data>
+  <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
+  <!-- Sort -->
+  <data name="Sort_None" xml:space="preserve"><value>بدون ترتيب</value></data>
+  <data name="Sort_Latency" xml:space="preserve"><value>التأخير (أقل)</value></data>
+  <data name="Sort_Speed" xml:space="preserve"><value>السرعة (الأعلى)</value></data>
+  <data name="Sort_Name" xml:space="preserve"><value>الاسم</value></data>
+  <!-- Status -->
+  <data name="Status_Ready" xml:space="preserve"><value>جاهز</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>متصل</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>غير متصل</value></data>
+  <!-- Context Menu -->
+  <data name="Ctx_Connect" xml:space="preserve"><value>اتصال</value></data>
+  <data name="Ctx_Disconnect" xml:space="preserve"><value>قطع الاتصال</value></data>
+  <data name="Ctx_Edit" xml:space="preserve"><value>تعديل الخادم</value></data>
+  <data name="Ctx_Clone" xml:space="preserve"><value>نسخ الخادم</value></data>
+  <data name="Ctx_Share" xml:space="preserve"><value>مشاركة</value></data>
+  <data name="Ctx_TestPing" xml:space="preserve"><value>اختبار بينج</value></data>
+  <data name="Ctx_TestReal" xml:space="preserve"><value>تأخير حقيقي</value></data>
+  <data name="Ctx_TestSpeed" xml:space="preserve"><value>اختبار السرعة</value></data>
+  <data name="Ctx_Delete" xml:space="preserve"><value>حذف الخادم</value></data>
+  <!-- Add Menu -->
+  <data name="Add_VMess" xml:space="preserve"><value>🟢 إضافة VMess</value></data>
+  <data name="Add_VLESS" xml:space="preserve"><value>🔵 إضافة VLESS</value></data>
+  <data name="Add_SS" xml:space="preserve"><value>🟠 إضافة Shadowsocks</value></data>
+  <data name="Add_Trojan" xml:space="preserve"><value>🔴 إضافة Trojan</value></data>
+  <data name="Add_Clipboard" xml:space="preserve"><value>📋 استيراد من الحافظة</value></data>
+  <!-- Settings -->
+  <data name="Set_Proxy" xml:space="preserve"><value>تعيين بروكسي النظام</value></data>
+  <data name="Set_AutoConnect" xml:space="preserve"><value>اتصال تلقائي</value></data>
+  <data name="Set_AutoConnect_Desc" xml:space="preserve"><value>(الاتصال بالخادم المحدد عند بدء البرنامج)</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>تحديث تلقائي للاشتراكات</value></data>
+  <data name="Set_Interval" xml:space="preserve"><value>تحديث كل {0} ساعات</value></data>
+  <data name="Set_Language" xml:space="preserve"><value>لغة البرنامج</value></data>
+  <data name="Set_Connection" xml:space="preserve"><value>الاتصال</value></data>
+  <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>تحديث تلقائي للاشتراكات</value></data>
+  <data name="Set_LeaveProxy" xml:space="preserve"><value>عدم تغيير بروكسي النظام</value></data>
+  <data name="Set_LeaveProxy_Desc" xml:space="preserve"><value>لن يتم تعديل بروكسي النظام عند الاتصال أو قطع الاتصال</value></data>
+  <data name="Set_ClearProxy" xml:space="preserve"><value>مسح بروكسي النظام</value></data>
+  <data name="Set_ClearProxy_Desc" xml:space="preserve"><value>يتم مسح بروكسي النظام عند قطع الاتصال</value></data>
+  <data name="Set_Every" xml:space="preserve"><value>كل</value></data>
+  <data name="Set_Hours" xml:space="preserve"><value>ساعات، تحديث</value></data>
+  <data name="Set_Advanced" xml:space="preserve"><value>إعدادات متقدمة</value></data>
+  <data name="Set_PingType" xml:space="preserve"><value>نوع بينج:</value></data>
+  <data name="Set_GlobalSort" xml:space="preserve"><value>ترتيب عام (بعد الاختيار، يأتي أفضل خادم من جميع المجموعات أولاً)</value></data>
+  <data name="Set_DNS" xml:space="preserve"><value>DNS مخصص</value></data>
+  <data name="Set_DNSBtn" xml:space="preserve"><value>⚙  إعدادات DNS</value></data>
+  <data name="Set_TUN" xml:space="preserve"><value>وضع TUN (VPN كامل للنظام)</value></data>
+  <data name="Set_TUN_Desc" xml:space="preserve"><value>يتطلب صلاحيات المسؤول. يوجه جميع حركة مرور النظام (ليس فقط التطبيقات المتوافقة مع البروكسي) عبر النفق</value></data>
+  <!-- Dialogs -->
+  <data name="Dlg_Continue" xml:space="preserve"><value>متابعة</value></data>
+  <data name="Dlg_RestartAdmin" xml:space="preserve"><value>إعادة التشغيل كمسؤول</value></data>
+  <data name="Dlg_NeedsAdmin" xml:space="preserve"><value>يتطلب صلاحيات المسؤول</value></data>
+  <data name="Dlg_TUNAdminMsg" xml:space="preserve"><value>وضع TUN يتطلب صلاحيات المسؤول.&#10;لتفعيله، يجب إعادة تشغيل البرنامج بصلاحيات المسؤول.</value></data>
+  <data name="Dlg_Yes" xml:space="preserve"><value>نعم</value></data>
+  <data name="Dlg_No" xml:space="preserve"><value>لا</value></data>
+  <data name="Dlg_ConfirmDelete" xml:space="preserve"><value>تأكيد الحذف</value></data>
+  <data name="Dlg_Save" xml:space="preserve"><value>حفظ</value></data>
+  <data name="Dlg_Cancel" xml:space="preserve"><value>إلغاء</value></data>
+  <data name="Dlg_DNSSettings" xml:space="preserve"><value>إعدادات DNS</value></data>
+  <data name="Dlg_DNSSimple" xml:space="preserve"><value>DNS بسيط</value></data>
+  <data name="Dlg_DNSHint" xml:space="preserve"><value>IPv4/IPv6 مفصولة بفاصلة</value></data>
+  <data name="Dlg_DNSAdvanced" xml:space="preserve"><value>DNS متقدم (JSON)</value></data>
+  <data name="Dlg_DNSDocs" xml:space="preserve"><value>التوثيق: https://xtls.github.io/config/dns.html</value></data>
+  <data name="Dlg_EditServer" xml:space="preserve"><value>تعديل الخادم</value></data>
+  <data name="Dlg_Name" xml:space="preserve"><value>الاسم</value></data>
+  <data name="Dlg_Address" xml:space="preserve"><value>العنوان</value></data>
+  <data name="Dlg_Port" xml:space="preserve"><value>المنفذ</value></data>
+  <data name="Dlg_RebuiltLink" xml:space="preserve"><value>الرابط المعاد بناؤه</value></data>
+  <data name="Dlg_ShareQR" xml:space="preserve"><value>مشاركة (QR)</value></data>
+  <data name="Dlg_CopyLink" xml:space="preserve"><value>نسخ الرابط</value></data>
+  <data name="Dlg_Close" xml:space="preserve"><value>إغلاق</value></data>
+  <data name="SelectedCount" xml:space="preserve"><value>{0} محدد</value></data>
+  <!-- Filter -->
+  <data name="Filter_All" xml:space="preserve"><value>الكل</value></data>
+  <data name="Filter_Errors" xml:space="preserve"><value>الأخطاء فقط</value></data>
+  <data name="Filter_Connection" xml:space="preserve"><value>الاتصال فقط</value></data>
+  <data name="Filter_Label" xml:space="preserve"><value>تصفية:</value></data>
+  <!-- Log Messages -->
+  <data name="Log_ServersLoaded" xml:space="preserve"><value>مرحباً! تم تحميل {0} خادم و {1} اشتراك.</value></data>
+  <data name="Log_Connected" xml:space="preserve"><value>تم الاتصال. HTTP 127.0.0.1:{0}</value></data>
+  <data name="Log_Disconnected" xml:space="preserve"><value>تم قطع الاتصال.</value></data>
+  <data name="Log_ServerAdded" xml:space="preserve"><value>"{0}" تمت إضافته.</value></data>
+  <data name="Log_ServerDup" xml:space="preserve"><value>"{0}" مكرر.</value></data>
+  <data name="Log_SubAdded" xml:space="preserve"><value>"{0}" تمت إضافته ({1} خادم)</value></data>
+  <data name="Log_Merged" xml:space="preserve"><value>دمج "{0}": {1} خادم جديد، الإجمالي {2}.</value></data>
+  <data name="Log_NoSub" xml:space="preserve"><value>لا توجد اشتراكات.</value></data>
+  <data name="Log_Updated" xml:space="preserve"><value>تم التحديث ({0} خادم، {1} فريد — تم الاحتفاظ بالخوادم اليدوية)</value></data>
+  <data name="Log_SmartStage1" xml:space="preserve"><value>اتصال ذكي: المرحلة 1 - بينج TCP سريع على جميع الخوادم</value></data>
+  <data name="Log_SmartCandidates" xml:space="preserve"><value>اتصال ذكي: تم اختيار {0} مرشح</value></data>
+  <data name="Log_SmartStage2" xml:space="preserve"><value>اتصال ذكي: اختبار {0} مرشح واحداً تلو الآخر</value></data>
+  <data name="Log_SmartTesting" xml:space="preserve"><value>اتصال ذكي: اختبار {0} ...</value></data>
+  <data name="Log_SmartResult" xml:space="preserve"><value>اتصال ذكي: {0} → {1}ms</value></data>
+  <data name="Log_SmartFailed" xml:space="preserve"><value>اتصال ذكي: {0} → فشل</value></data>
+  <data name="Log_SmartConnect" xml:space="preserve"><value>اتصال ذكي: الاتصال بـ {0}</value></data>
+  <data name="Log_SmartError" xml:space="preserve"><value>خطأ في الاتصال الذكي: {0}</value></data>
+  <data name="Log_NoPing" xml:space="preserve"><value>اتصال ذكي: لم يستجب أي خادم للبينج</value></data>
+  <data name="Log_FindBetter" xml:space="preserve"><value>البحث عن الأفضل: اختبار دفعة {0} ({1} متبقي)</value></data>
+  <data name="Log_FindSwitch" xml:space="preserve"><value>البحث عن الأفضل: التبديل من {0} ({1}ms) → {2} ({3}ms)</value></data>
+  <data name="Log_FindBest" xml:space="preserve"><value>البحث عن الأفضل: الخادم الحالي لا يزال الأفضل</value></data>
+  <data name="Log_Sorted" xml:space="preserve"><value>تم الترتيب حسب {0}.</value></data>
+  <data name="Log_Error" xml:space="preserve"><value>خطأ: {0}</value></data>
+  <data name="Log_InvalidLink" xml:space="preserve"><value>تخطي: رابط غير صالح.</value></data>
+  <data name="Log_ServersDeleted" xml:space="preserve"><value>تم حذف {0} خادم.</value></data>
+  <data name="Log_SubRemoved" xml:space="preserve"><value>"{0}" تمت إزالته مع خوادمه.</value></data>
+  <data name="Log_DupesRemoved" xml:space="preserve"><value>تمت إزالة {0} خادم مكرر.</value></data>
+  <data name="Log_Copied" xml:space="preserve"><value>تم نسخ الرابط "{0}".</value></data>
+  <data name="Log_Exported" xml:space="preserve"><value>تم التصدير: {0}</value></data>
+  <data name="Log_LinksCopied" xml:space="preserve"><value>تم نسخ {0} رابط.</value></data>
+  <data name="Log_SubCopied" xml:space="preserve"><value>تم نسخ اشتراك Base64.</value></data>
+  <data name="Log_TestStopped" xml:space="preserve"><value>تم إيقاف الاختبار</value></data>
+  <data name="Log_SubUpdated" xml:space="preserve"><value>"{0}": {1} خادم.</value></data>
+  <!-- All Servers Tab -->
+  <data name="AllServers_Title" xml:space="preserve"><value>📋 جميع الخوادم</value></data>
+  <!-- Headers -->
+  <data name="Header_Name" xml:space="preserve"><value>الاسم</value></data>
+  <data name="Header_Ping" xml:space="preserve"><value>بينج</value></data>
+  <data name="Header_Speed" xml:space="preserve"><value>السرعة</value></data>
+  <data name="Header_Status" xml:space="preserve"><value>الحالة</value></data>
+  <data name="Header_Country" xml:space="preserve"><value>البلد</value></data>
+  <data name="Header_Protocol" xml:space="preserve"><value>البروتوكول</value></data>
+  <data name="Header_Address" xml:space="preserve"><value>العنوان</value></data>
+  <data name="Header_Port" xml:space="preserve"><value>المنفذ</value></data>
+  <data name="Header_Sub" xml:space="preserve"><value>الاشتراك</value></data>
+  <data name="ServerCount" xml:space="preserve"><value>{0} خادم</value></data>
+  <!-- Display -->
+  <data name="Status_Failed" xml:space="preserve"><value>فشل</value></data>
+  <data name="Status_Error" xml:space="preserve"><value>خطأ</value></data>
+  <!-- Server Card -->
+  <data name="Card_Ping" xml:space="preserve"><value>بينج: </value></data>
+  <data name="Card_Speed" xml:space="preserve"><value>السرعة: </value></data>
+  <data name="Card_Connect" xml:space="preserve"><value>اتصال</value></data>
+  <data name="Card_Disconnect" xml:space="preserve"><value>قطع</value></data>
+  <data name="Card_Edit" xml:space="preserve"><value>تعديل</value></data>
+  <data name="Card_Share" xml:space="preserve"><value>مشاركة</value></data>
+  <data name="Card_Delete" xml:space="preserve"><value>حذف</value></data>
+  <data name="Card_Connected" xml:space="preserve"><value>متصل</value></data>
+  <!-- System Tray -->
+  <data name="Tray_Show" xml:space="preserve"><value>عرض</value></data>
+  <data name="Tray_SmartConnect" xml:space="preserve"><value>⚡ اتصال ذكي</value></data>
+  <data name="Tray_Stop" xml:space="preserve"><value>⏹ إيقاف</value></data>
+  <data name="Tray_FindBetter" xml:space="preserve"><value>🔍 البحث عن خادم أفضل</value></data>
+  <data name="Tray_Proxy" xml:space="preserve"><value>بروكسي النظام</value></data>
+  <data name="Tray_UpdateNoProxy" xml:space="preserve"><value>🔄 تحديث بدون بروكسي</value></data>
+  <data name="Tray_UpdateProxy" xml:space="preserve"><value>🔄 تحديث بالبروكسي</value></data>
+  <data name="Tray_Settings" xml:space="preserve"><value>⚙ الإعدادات</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>خروج</value></data>
+  <data name="Tray_ConnectedTo" xml:space="preserve"><value>متصل بـ {0}</value></data>
+  <data name="Tray_Searching" xml:space="preserve"><value>جاري البحث...</value></data>
+  <data name="Tray_SearchingProgress" xml:space="preserve"><value>جاري البحث... {0} من {1} خادم</value></data>
+
+  <data name="Hotkey_Info" xml:space="preserve">
+    <value>اختصارات: Ctrl+Shift+C = اتصال | Ctrl+Shift+D = قطع | Ctrl+Shift+S = اتصال ذكي | Ctrl+Shift+Q = خروج</value>
+  </data>
+
+  <data name="Add_Link" xml:space="preserve"><value>إضافة</value></data>
+
+  <data name="Sub_UseProxy" xml:space="preserve"><value>استخدام بروكسي للتحديث</value></data>
+</root>

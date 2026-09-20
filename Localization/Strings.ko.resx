@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Tab_Servers" xml:space="preserve"><value>서버</value></data>
+  <data name="Tab_Subscription" xml:space="preserve"><value>구독</value></data>
+  <data name="Tab_Log" xml:space="preserve"><value>로그</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>⚙ 설정</value></data>
+  <data name="Btn_Connect" xml:space="preserve"><value>▶ 연결</value></data>
+  <data name="Btn_Disconnect" xml:space="preserve"><value>연결 해제</value></data>
+  <data name="Btn_SmartConnect" xml:space="preserve"><value>스마트 연결</value></data>
+  <data name="Btn_FindBetter" xml:space="preserve"><value>더 나은 서버 찾기</value></data>
+  <data name="Btn_Ping" xml:space="preserve"><value>핑</value></data>
+  <data name="Btn_PingAll" xml:space="preserve"><value>🔄 전체 핑</value></data>
+  <data name="Btn_Real" xml:space="preserve"><value>실제 지연</value></data>
+  <data name="Btn_Speed" xml:space="preserve"><value>속도</value></data>
+  <data name="Btn_SpeedAll" xml:space="preserve"><value>🚀 속도 테스트</value></data>
+  <data name="Btn_Stop" xml:space="preserve"><value>중지</value></data>
+  <data name="Btn_UpdateAll" xml:space="preserve"><value>전체 업데이트</value></data>
+  <data name="Btn_Update" xml:space="preserve"><value>업데이트</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>+ 추가</value></data>
+  <data name="Btn_RemoveSub" xml:space="preserve"><value>구독 삭제</value></data>
+  <data name="Btn_RemoveAll" xml:space="preserve"><value>전체 삭제</value></data>
+  <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ 중복 삭제</value></data>
+  <data name="Btn_Export" xml:space="preserve"><value>📦 내보내기</value></data>
+  <data name="Btn_Import" xml:space="preserve"><value>📋 가져오기</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>서버 링크 (vmess://, vless://, ...)</value></data>
+  <data name="Ph_SubName" xml:space="preserve"><value>이름</value></data>
+  <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
+  <data name="Sort_None" xml:space="preserve"><value>정렬 없음</value></data>
+  <data name="Sort_Latency" xml:space="preserve"><value>지연 (낮음)</value></data>
+  <data name="Sort_Speed" xml:space="preserve"><value>속도 (높음)</value></data>
+  <data name="Sort_Name" xml:space="preserve"><value>이름</value></data>
+  <data name="Status_Ready" xml:space="preserve"><value>준비</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>연결됨</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>연결 해제됨</value></data>
+  <data name="Ctx_Connect" xml:space="preserve"><value>연결</value></data>
+  <data name="Ctx_Disconnect" xml:space="preserve"><value>연결 해제</value></data>
+  <data name="Ctx_Edit" xml:space="preserve"><value>서버 편집</value></data>
+  <data name="Ctx_Clone" xml:space="preserve"><value>서버 복제</value></data>
+  <data name="Ctx_Share" xml:space="preserve"><value>공유</value></data>
+  <data name="Ctx_TestPing" xml:space="preserve"><value>핑 테스트</value></data>
+  <data name="Ctx_TestReal" xml:space="preserve"><value>실제 지연 테스트</value></data>
+  <data name="Ctx_TestSpeed" xml:space="preserve"><value>속도 테스트</value></data>
+  <data name="Ctx_Delete" xml:space="preserve"><value>서버 삭제</value></data>
+  <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess 추가</value></data>
+  <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS 추가</value></data>
+  <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks 추가</value></data>
+  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Trojan 추가</value></data>
+  <data name="Add_Clipboard" xml:space="preserve"><value>📋 클립보드에서 가져오기</value></data>
+  <data name="Set_Proxy" xml:space="preserve"><value>시스템 프록시 설정</value></data>
+  <data name="Set_AutoConnect" xml:space="preserve"><value>자동 연결</value></data>
+  <data name="Set_AutoConnect_Desc" xml:space="preserve"><value>(시작 시 선택된 서버에 자동 연결)</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>구독 자동 업데이트</value></data>
+  <data name="Set_Interval" xml:space="preserve"><value>매 {0}시간 업데이트</value></data>
+  <data name="Set_Language" xml:space="preserve"><value>앱 언어</value></data>
+  <data name="Set_Connection" xml:space="preserve"><value>연결</value></data>
+  <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>구독 자동 업데이트</value></data>
+  <data name="Set_LeaveProxy" xml:space="preserve"><value>시스템 프록시 변경 안 함</value></data>
+  <data name="Set_LeaveProxy_Desc" xml:space="preserve"><value>연결/해제 시 시스템 프록시가 변경되지 않음</value></data>
+  <data name="Set_ClearProxy" xml:space="preserve"><value>시스템 프록시 지우기</value></data>
+  <data name="Set_ClearProxy_Desc" xml:space="preserve"><value>연결 해제 시 시스템 프록시가 지워짐</value></data>
+  <data name="Set_Every" xml:space="preserve"><value>매</value></data>
+  <data name="Set_Hours" xml:space="preserve"><value>시간마다 업데이트</value></data>
+  <data name="Set_Advanced" xml:space="preserve"><value>고급 설정</value></data>
+  <data name="Set_PingType" xml:space="preserve"><value>핑 유형:</value></data>
+  <data name="Set_GlobalSort" xml:space="preserve"><value>전역 정렬 (테스트 후 모든 그룹에서 최고 서버 표시)</value></data>
+  <data name="Set_DNS" xml:space="preserve"><value>사용자 지정 DNS</value></data>
+  <data name="Set_DNSBtn" xml:space="preserve"><value>⚙ DNS 설정</value></data>
+  <data name="Set_TUN" xml:space="preserve"><value>TUN 모드 (전체 시스템 VPN)</value></data>
+  <data name="Set_TUN_Desc" xml:space="preserve"><value>관리자 권한이 필요합니다. 모든 시스템 트래픽을 터널을 통해 라우팅합니다</value></data>
+  <data name="Dlg_Continue" xml:space="preserve"><value>계속</value></data>
+  <data name="Dlg_RestartAdmin" xml:space="preserve"><value>관리자로 다시 시작</value></data>
+  <data name="Dlg_NeedsAdmin" xml:space="preserve"><value>관리자 권한 필요</value></data>
+  <data name="Dlg_TUNAdminMsg" xml:space="preserve"><value>TUN 모드는 관리자 권한이 필요합니다.</value></data>
+  <data name="Dlg_Yes" xml:space="preserve"><value>예</value></data>
+  <data name="Dlg_No" xml:space="preserve"><value>아니오</value></data>
+  <data name="Dlg_ConfirmDelete" xml:space="preserve"><value>삭제 확인</value></data>
+  <data name="Dlg_Save" xml:space="preserve"><value>저장</value></data>
+  <data name="Dlg_Cancel" xml:space="preserve"><value>취소</value></data>
+  <data name="Dlg_DNSSettings" xml:space="preserve"><value>DNS 설정</value></data>
+  <data name="Dlg_DNSSimple" xml:space="preserve"><value>간단한 DNS</value></data>
+  <data name="Dlg_DNSHint" xml:space="preserve"><value>IPv4/IPv6 쉼표로 구분</value></data>
+  <data name="Dlg_DNSAdvanced" xml:space="preserve"><value>고급 DNS (JSON)</value></data>
+  <data name="Dlg_DNSDocs" xml:space="preserve"><value>문서: https://xtls.github.io/config/dns.html</value></data>
+  <data name="Dlg_EditServer" xml:space="preserve"><value>서버 편집</value></data>
+  <data name="Dlg_Name" xml:space="preserve"><value>이름</value></data>
+  <data name="Dlg_Address" xml:space="preserve"><value>주소</value></data>
+  <data name="Dlg_Port" xml:space="preserve"><value>포트</value></data>
+  <data name="Dlg_RebuiltLink" xml:space="preserve"><value>재구성된 링크</value></data>
+  <data name="Dlg_ShareQR" xml:space="preserve"><value>공유 (QR)</value></data>
+  <data name="Dlg_CopyLink" xml:space="preserve"><value>링크 복사</value></data>
+  <data name="Dlg_Close" xml:space="preserve"><value>닫기</value></data>
+  <data name="SelectedCount" xml:space="preserve"><value>{0}개 선택됨</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>전체</value></data>
+  <data name="Filter_Errors" xml:space="preserve"><value>오류만</value></data>
+  <data name="Filter_Connection" xml:space="preserve"><value>연결만</value></data>
+  <data name="Filter_Label" xml:space="preserve"><value>필터:</value></data>
+  <data name="Log_ServersLoaded" xml:space="preserve"><value>안녕하세요! {0}개 서버와 {1}개 구독이 로드되었습니다.</value></data>
+  <data name="Log_Connected" xml:space="preserve"><value>연결됨. HTTP 127.0.0.1:{0}</value></data>
+  <data name="Log_Disconnected" xml:space="preserve"><value>연결 해제됨.</value></data>
+  <data name="Log_ServerAdded" xml:space="preserve"><value>"{0}" 추가됨.</value></data>
+  <data name="Log_ServerDup" xml:space="preserve"><value>"{0}"는 중복입니다.</value></data>
+  <data name="Log_SubAdded" xml:space="preserve"><value>"{0}" 추가됨 ({1}개 서버)</value></data>
+  <data name="Log_Merged" xml:space="preserve"><value>"{0}" 병합: {1}개 새 서버, 총 {2}개.</value></data>
+  <data name="Log_NoSub" xml:space="preserve"><value>구독 없음.</value></data>
+  <data name="Log_Updated" xml:space="preserve"><value>업데이트됨 ({0}개 서버, {1}개 고유 — 수동 서버 보존됨)</value></data>
+  <data name="Log_SmartStage1" xml:space="preserve"><value>스마트 연결: 단계 1 - 모든 서버에 빠른 TCP 핑</value></data>
+  <data name="Log_SmartCandidates" xml:space="preserve"><value>스마트 연결: {0}개 후보 선택됨</value></data>
+  <data name="Log_SmartStage2" xml:space="preserve"><value>스마트 연결: {0}개 후보를 하나씩 테스트</value></data>
+  <data name="Log_SmartTesting" xml:space="preserve"><value>스마트 연결: {0} 테스트 중 ...</value></data>
+  <data name="Log_SmartResult" xml:space="preserve"><value>스마트 연결: {0} → {1}ms</value></data>
+  <data name="Log_SmartFailed" xml:space="preserve"><value>스마트 연결: {0} → 실패</value></data>
+  <data name="Log_SmartConnect" xml:space="preserve"><value>스마트 연결: {0}에 연결 중</value></data>
+  <data name="Log_SmartError" xml:space="preserve"><value>스마트 연결 오류: {0}</value></data>
+  <data name="Log_NoPing" xml:space="preserve"><value>스마트 연결: 응답한 서버 없음</value></data>
+  <data name="Log_FindBetter" xml:space="preserve"><value>더 나은 찾기: 배치 {0} 테스트 ({1}개 남음)</value></data>
+  <data name="Log_FindSwitch" xml:space="preserve"><value>더 나은 찾기: {0} ({1}ms) → {2} ({3}ms)로 전환</value></data>
+  <data name="Log_FindBest" xml:space="preserve"><value>더 나은 찾기: 현재 서버가 여전히 최고</value></data>
+  <data name="Log_Sorted" xml:space="preserve"><value>{0}로 정렬됨.</value></data>
+  <data name="Log_Error" xml:space="preserve"><value>오류: {0}</value></data>
+  <data name="Log_InvalidLink" xml:space="preserve"><value>건너뜀: 유효하지 않은 링크.</value></data>
+  <data name="Log_ServersDeleted" xml:space="preserve"><value>{0}개 서버 삭제됨.</value></data>
+  <data name="Log_SubRemoved" xml:space="preserve"><value>"{0}" 및 서버 삭제됨.</value></data>
+  <data name="Log_DupesRemoved" xml:space="preserve"><value>{0}개 중복 서버 삭제됨.</value></data>
+  <data name="Log_Copied" xml:space="preserve"><value>링크 "{0}" 복사됨.</value></data>
+  <data name="Log_Exported" xml:space="preserve"><value>내보내기: {0}</value></data>
+  <data name="Log_LinksCopied" xml:space="preserve"><value>{0}개 링크 복사됨.</value></data>
+  <data name="Log_SubCopied" xml:space="preserve"><value>Base64 구독 복사됨.</value></data>
+  <data name="Log_TestStopped" xml:space="preserve"><value>테스트 중지됨</value></data>
+  <data name="Log_SubUpdated" xml:space="preserve"><value>"{0}": {1}개 서버.</value></data>
+  <data name="AllServers_Title" xml:space="preserve"><value>📋 전체 서버</value></data>
+  <data name="Header_Name" xml:space="preserve"><value>이름</value></data>
+  <data name="Header_Ping" xml:space="preserve"><value>핑</value></data>
+  <data name="Header_Speed" xml:space="preserve"><value>속도</value></data>
+  <data name="Header_Status" xml:space="preserve"><value>상태</value></data>
+  <data name="Header_Country" xml:space="preserve"><value>국가</value></data>
+  <data name="Header_Protocol" xml:space="preserve"><value>프로토콜</value></data>
+  <data name="Header_Address" xml:space="preserve"><value>주소</value></data>
+  <data name="Header_Port" xml:space="preserve"><value>포트</value></data>
+  <data name="Header_Sub" xml:space="preserve"><value>구독</value></data>
+  <data name="ServerCount" xml:space="preserve"><value>{0}개 서버</value></data>
+  <data name="Status_Failed" xml:space="preserve"><value>실패</value></data>
+  <data name="Status_Error" xml:space="preserve"><value>오류</value></data>
+  <data name="Card_Ping" xml:space="preserve"><value>핑: </value></data>
+  <data name="Card_Speed" xml:space="preserve"><value>속도: </value></data>
+  <data name="Card_Connect" xml:space="preserve"><value>연결</value></data>
+  <data name="Card_Disconnect" xml:space="preserve"><value>해제</value></data>
+  <data name="Card_Edit" xml:space="preserve"><value>편집</value></data>
+  <data name="Card_Share" xml:space="preserve"><value>공유</value></data>
+  <data name="Card_Delete" xml:space="preserve"><value>삭제</value></data>
+  <data name="Card_Connected" xml:space="preserve"><value>연결됨</value></data>
+  <data name="Tray_Show" xml:space="preserve"><value>표시</value></data>
+  <data name="Tray_SmartConnect" xml:space="preserve"><value>⚡ 스마트 연결</value></data>
+  <data name="Tray_Stop" xml:space="preserve"><value>⏹ 중지</value></data>
+  <data name="Tray_FindBetter" xml:space="preserve"><value>🔍 더 나은 서버 찾기</value></data>
+  <data name="Tray_Proxy" xml:space="preserve"><value>시스템 프록시</value></data>
+  <data name="Tray_UpdateNoProxy" xml:space="preserve"><value>🔄 프록시 없이 업데이트</value></data>
+  <data name="Tray_UpdateProxy" xml:space="preserve"><value>🔄 프록시로 업데이트</value></data>
+  <data name="Tray_Settings" xml:space="preserve"><value>⚙ 설정</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>종료</value></data>
+  <data name="Tray_ConnectedTo" xml:space="preserve"><value>연결됨: {0}</value></data>
+  <data name="Tray_Searching" xml:space="preserve"><value>검색 중...</value></data>
+  <data name="Tray_SearchingProgress" xml:space="preserve"><value>검색 중... {0} / {1}개 서버</value></data>
+
+  <data name="Hotkey_Info" xml:space="preserve">
+    <value>단축키: Ctrl+Shift+C = 연결 | Ctrl+Shift+D = 연결 해제 | Ctrl+Shift+S = 스마트 연결 | Ctrl+Shift+Q = 종료</value>
+  </data>
+
+  <data name="Add_Link" xml:space="preserve"><value>추가</value></data>
+
+  <data name="Sub_UseProxy" xml:space="preserve"><value>프록시로 업데이트</value></data>
+</root>

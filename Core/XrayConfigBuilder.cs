@@ -115,7 +115,6 @@ public static class XrayConfigBuilder
                 var parsed = JsonNode.Parse(settings.CustomDnsAdvancedJson);
                 if (parsed is JsonObject obj)
                 {
-                    _ = obj.ToJsonString();
                     return obj;
                 }
             }

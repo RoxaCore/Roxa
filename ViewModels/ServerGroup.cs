@@ -1,11 +1,11 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
+using XrayClient.Localization;
 using XrayClient.Models;
 
 namespace XrayClient.ViewModels;
 
-/// <summary>یک گروه تاشو در لیست سرورها: یا یک سابسکریپشن یا سرورهای دستی.</summary>
 public partial class ServerGroup : ObservableObject
 {
     public string Key { get; }
@@ -14,7 +14,22 @@ public partial class ServerGroup : ObservableObject
     public MainViewModel Owner { get; }
     public ObservableCollection<ServerInfo> Servers { get; } = new();
 
-    public string[] SortOptions { get; } = { "بدون مرتب", "تأخیر (کم)", "سرعت (بیش)", "نام" };
+    public static string[] SortOptionKeys { get; } = { "none", "latency", "speed", "name" };
+
+    private static readonly Dictionary<string, string> SortLabelToKey = new()
+    {
+        ["Sort_None"] = "none",
+        ["Sort_Latency"] = "latency",
+        ["Sort_Speed"] = "speed",
+        ["Sort_Name"] = "name"
+    };
+
+    public string[] SortOptions => [
+        TranslationManager.Instance["Sort_None"],
+        TranslationManager.Instance["Sort_Latency"],
+        TranslationManager.Instance["Sort_Speed"],
+        TranslationManager.Instance["Sort_Name"]
+    ];
 
     [ObservableProperty]
     private bool _isExpanded = true;
@@ -23,13 +38,12 @@ public partial class ServerGroup : ObservableObject
     private bool _allServersChecked;
 
     [ObservableProperty]
-    private string _groupSortField = "بدون مرتب";
+    private string _groupSortField = "";
 
     public bool IsSubscription => Subscription != null;
-    public bool IsNotSubscription => !IsSubscription;
     public bool IsAllGroup => Key == "__all__";
-    public bool ShowManageButtons => !IsAllGroup;
-    public string CountText => $"{Servers.Count} سرور";
+    public bool IsManualGroup => !IsSubscription && !IsAllGroup;
+    public string CountText => string.Format(TranslationManager.Instance["ServerCount"], Servers.Count);
 
     public ServerGroup(MainViewModel owner, string key, string title, SubscriptionInfo? subscription, bool expanded)
     {
@@ -38,6 +52,7 @@ public partial class ServerGroup : ObservableObject
         Title = title;
         Subscription = subscription;
         _isExpanded = expanded;
+        _groupSortField = TranslationManager.Instance["Sort_None"];
         Servers.CollectionChanged += OnServersChanged;
     }
 
@@ -64,30 +79,32 @@ public partial class ServerGroup : ObservableObject
     {
         try
         {
-            List<ServerInfo> sorted;
-
-            switch (GroupSortField)
+            string? key = null;
+            foreach (var kv in SortLabelToKey)
             {
-                case "تأخیر (کم)":
-                    sorted = Servers
-                        .OrderBy(s => s.LatencyMs < 0 ? int.MaxValue : s.LatencyMs)
-                        .ToList();
+                if (TranslationManager.Instance[kv.Key] == GroupSortField)
+                {
+                    key = kv.Value;
                     break;
+                }
+            }
 
-                case "سرعت (بیش)":
-                    sorted = Servers
-                        .OrderByDescending(s => s.DownloadMbps < 0 ? 0 : s.DownloadMbps)
-                        .ToList();
+            List<ServerInfo> sorted;
+            switch (key)
+            {
+                case "latency":
+                    sorted = Servers.OrderBy(s => s.LatencyMs < 0 ? int.MaxValue : s.LatencyMs).ToList();
                     break;
-
-                case "نام":
-                    sorted = Servers
-                        .OrderBy(s => s.Name)
-                        .ToList();
+                case "speed":
+                    sorted = Servers.OrderByDescending(s => s.DownloadMbps < 0 ? -1 : s.DownloadMbps).ToList();
                     break;
-
+                case "name":
+                    sorted = Servers.OrderBy(s => s.Name).ToList();
+                    break;
                 default:
-                    return;
+                    sorted = Servers.ToList();
+                    sorted.Sort(ServerInfo.CompareByPriority);
+                    break;
             }
 
             Servers.Clear();
@@ -96,7 +113,6 @@ public partial class ServerGroup : ObservableObject
         }
         catch
         {
-            // اگر خطا بود، سرورها حفظ شوند
         }
     }
 }

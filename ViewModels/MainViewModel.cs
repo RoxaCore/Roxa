@@ -39,6 +39,8 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private bool _isConnected;
     [ObservableProperty] private bool _setSystemProxy = true;
     [ObservableProperty] private bool _autoConnect;
+    [ObservableProperty] private bool _leaveSystemProxyAsIs;
+    [ObservableProperty] private bool _clearProxyOnDisconnect = true;
     [ObservableProperty] private bool _autoUpdateSubs;
     [ObservableProperty] private int _autoUpdateIntervalHours = 12;
      [ObservableProperty] private PingType _selectedPingType = PingType.Ping;
@@ -51,8 +53,8 @@ public partial class MainViewModel : ViewModelBase
 
       public double SearchProgressPercent => SearchTotalCount > 0 ? (double)SearchTestedCount / SearchTotalCount : 0;
       public string SearchProgressText => SearchTotalCount > 0
-          ? $"در حال جستجو ... {SearchTestedCount} از {SearchTotalCount} سرور"
-          : "در حال جستجو ...";
+          ? string.Format(TranslationManager.Instance["Tray_SearchingProgress"], SearchTestedCount, SearchTotalCount)
+          : TranslationManager.Instance["Tray_Searching"];
       public string LastUpdateDisplay
       {
           get
@@ -80,8 +82,9 @@ public partial class MainViewModel : ViewModelBase
       [ObservableProperty] private bool _sortAscending = true;
       [ObservableProperty] private string _customDnsServers = "";
       [ObservableProperty] private string _customDnsAdvancedJson = "";
-      [ObservableProperty] private bool _showAdvancedDns;
-      [ObservableProperty] private bool _useTunMode;
+    [ObservableProperty] private bool _showAdvancedDns;
+    [ObservableProperty] private bool _useTunMode;
+    [ObservableProperty] private bool _useProxyForSubscriptions;
       [ObservableProperty] private Dictionary<int, double> _columnWidths = new()
       {
           { 0, 80 },   // Type
@@ -96,10 +99,10 @@ public partial class MainViewModel : ViewModelBase
            { 9, 90 }    // Speed
        };
 
-      public string[] SortOptions { get; } = { TranslationManager.Instance["Sort_None"], TranslationManager.Instance["Sort_Latency"], TranslationManager.Instance["Sort_Speed"], TranslationManager.Instance["Sort_Name"] };
+      public string[] SortOptions => [TranslationManager.Instance["Sort_None"], TranslationManager.Instance["Sort_Latency"], TranslationManager.Instance["Sort_Speed"], TranslationManager.Instance["Sort_Name"]];
 
-    public string[] LanguageOptions { get; } = ["فارسی", "English"];
-    private static readonly (string name, string code)[] _languages = [("فارسی", "fa"), ("English", "en")];
+    public string[] LanguageOptions { get; } = ["فارسی", "English", "中文", "Русский", "Türkçe", "اردو", "Español", "Français", "한국어", "Deutsch", "日本語", "Português", "हिन्दी"];
+    private static readonly (string name, string code)[] _languages = [("فارسی", "fa"), ("English", "en"), ("العربية", "ar"), ("中文", "zh"), ("Русский", "ru"), ("Türkçe", "tr"), ("اردو", "ur"), ("Español", "es"), ("Français", "fr"), ("한국어", "ko"), ("Deutsch", "de"), ("日本語", "ja"), ("Português", "pt-br"), ("हिन्दी", "hi")];
     [ObservableProperty] private string _selectedLanguage = "فارسی";
     partial void OnSelectedLanguageChanged(string value)
     {
@@ -135,6 +138,9 @@ public partial class MainViewModel : ViewModelBase
         _globalSort = _settings.GlobalSort;
         _customDnsServers = _settings.CustomDnsServers ?? "";
         _customDnsAdvancedJson = _settings.CustomDnsAdvancedJson ?? "";
+        _leaveSystemProxyAsIs = _settings.LeaveSystemProxyAsIs;
+        _clearProxyOnDisconnect = _settings.ClearProxyOnDisconnect;
+        _useProxyForSubscriptions = _settings.UseProxyForSubscriptions;
         if (_settings.UseTunMode && !Core.AdminHelper.IsRunningAsAdmin())
         {
             _settings.UseTunMode = false;
@@ -154,6 +160,15 @@ public partial class MainViewModel : ViewModelBase
         {
             Enrich(server);
             Servers.Add(server);
+        }
+        foreach (var sub in Subscriptions)
+        {
+            foreach (var s in Servers.Where(s => s.SubscriptionName == sub.Name))
+            {
+                s.SubDataLimit = sub.DataLimit;
+                s.SubUsedTraffic = sub.UsedTraffic;
+                s.SubExpireDate = sub.ExpireDate;
+            }
         }
         if (!string.IsNullOrEmpty(_settings.ActiveServerId))
             SelectedServer = Servers.FirstOrDefault(s => s.Id == _settings.ActiveServerId);
@@ -190,9 +205,27 @@ public partial class MainViewModel : ViewModelBase
     partial void OnSearchTestedCountChanged(int value) { OnPropertyChanged(nameof(SearchProgressPercent)); OnPropertyChanged(nameof(SearchProgressText)); }
     partial void OnSearchTotalCountChanged(int value) { OnPropertyChanged(nameof(SearchProgressPercent)); OnPropertyChanged(nameof(SearchProgressText)); }
 
-    partial void OnSetSystemProxyChanged(bool value) { _settings.SetSystemProxy = value; SaveSettings(); }
-    partial void OnAutoConnectChanged(bool value) { _settings.AutoConnect = value; SaveSettings(); }
-    partial void OnAutoUpdateSubsChanged(bool value) { _settings.AutoUpdateSubs = value; SaveSettings(); OnPropertyChanged(nameof(LastUpdateDisplay)); }
+    partial void OnSetSystemProxyChanged(bool value)
+    {
+        if (value) LeaveSystemProxyAsIs = false;
+        _settings.SetSystemProxy = value;
+        SaveSettings();
+        if (IsConnected && !(_settings.UseTunMode) && !LeaveSystemProxyAsIs)
+        {
+            if (value)
+                Core.SystemProxy.Set($"127.0.0.1:{_engine.HttpPort}");
+            else
+                Core.SystemProxy.Clear();
+        }
+    }
+
+    partial void OnLeaveSystemProxyAsIsChanged(bool value)
+    {
+        if (value) SetSystemProxy = false;
+        _settings.LeaveSystemProxyAsIs = value;
+        SaveSettings();
+    }
+    partial void OnClearProxyOnDisconnectChanged(bool value) { _settings.ClearProxyOnDisconnect = value; SaveSettings(); }
     partial void OnAutoUpdateIntervalHoursChanged(int value)
     {
         _settings.AutoUpdateIntervalHours = Math.Clamp(value, 1, 168);
@@ -207,8 +240,16 @@ public partial class MainViewModel : ViewModelBase
             if (since.TotalHours >= AutoUpdateIntervalHours)
                 await UpdateSubscriptions();
         }
-        if (AutoConnect && SelectedServer != null && !IsConnected)
-            await Connect();
+        if (AutoConnect && !IsConnected)
+        {
+            if (SelectedServer != null)
+                await Connect();
+            else
+            {
+                AppendLog("اتصال خودکار: سروری انتخاب نشده است.");
+                ToastHandler?.Invoke("اتصال خودکار: ابتدا یک سرور انتخاب کنید");
+            }
+        }
     }
 
     private static void Post(Action action)
@@ -348,39 +389,32 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
-            List<ServerInfo> sorted;
+            var connected = servers.FirstOrDefault(s => s.IsActiveConnection);
+            var rest = servers.Where(s => s != connected).ToList();
 
+            List<ServerInfo> sorted;
             switch (SortField)
             {
                 case var sf when sf == TranslationManager.Instance["Sort_Latency"]:
-                    sorted = servers
-                        .OrderBy(s => s.LatencyMs < 0 ? int.MaxValue : s.LatencyMs)
-                        .ToList();
+                    sorted = rest.OrderBy(s => s.LatencyMs < 0 ? int.MaxValue : s.LatencyMs).ToList();
                     break;
-
                 case var sf when sf == TranslationManager.Instance["Sort_Speed"]:
-                    sorted = servers
-                        .OrderByDescending(s => s.DownloadMbps < 0 ? 0 : s.DownloadMbps)
-                        .ToList();
+                    sorted = rest.OrderByDescending(s => s.DownloadMbps < 0 ? -1 : s.DownloadMbps).ToList();
                     break;
-
                 case var sf when sf == TranslationManager.Instance["Sort_Name"]:
-                    sorted = servers
-                        .OrderBy(s => s.Name)
-                        .ToList();
+                    sorted = rest.OrderBy(s => s.Name).ToList();
                     break;
-
-                default: // Sort_None
-                    return; // بدون تغییر
+                default:
+                    sorted = rest.OrderBy(s => 0).ThenBy(s => s.Name).ToList();
+                    break;
             }
 
             servers.Clear();
-            foreach (var s in sorted)
-                servers.Add(s);
+            if (connected != null) servers.Add(connected);
+            foreach (var s in sorted) servers.Add(s);
         }
         catch
         {
-            // اگر خطا بود، سرورها حفظ شوند
         }
     }
 
@@ -388,50 +422,45 @@ public partial class MainViewModel : ViewModelBase
     {
         if (GlobalSort)
         {
-            // مرتب‌سازی سراسری: همه سرورها از همه گروه‌ها
-            var allServers = Groups.SelectMany(g => g.Servers).ToList();
+            var allServers = Servers.ToList();
             var connected = allServers.FirstOrDefault(s => s.IsActiveConnection);
-            var success = allServers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs >= 0 : s.DownloadMbps >= 0)).ToList();
-            var failed = allServers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs < 0 : s.DownloadMbps < 0)).ToList();
-
-            if (metric == "latency")
-                success = success.OrderBy(s => s.LatencyMs).ToList();
-            else
-                success = success.OrderByDescending(s => s.DownloadMbps).ToList();
+            var rest = allServers.Where(s => s != connected).ToList();
+            rest.Sort(ServerInfo.CompareByPriority);
 
             var sorted = new List<ServerInfo>();
             if (connected != null) sorted.Add(connected);
-            sorted.AddRange(success);
-            sorted.AddRange(failed);
+            sorted.AddRange(rest);
 
-            // بازتوزیع به گروه‌ها بر اساس ترتیب سراسری
-            var grouped = sorted.GroupBy(s => s.SubscriptionName ?? "");
+            var grouped = sorted.GroupBy(s => s.SubscriptionName ?? "").ToDictionary(g => g.Key, g => g.ToList());
             foreach (var g in Groups)
             {
-                var groupServers = grouped.FirstOrDefault(gr => gr.Key == (g.Key == "" ? "" : g.Key));
                 g.Servers.Clear();
-                if (groupServers != null)
+                if (g.Key == "__all__")
+                {
+                    foreach (var s in sorted) g.Servers.Add(s);
+                    continue;
+                }
+                if (grouped.TryGetValue(g.Key == "__all__" ? "" : g.Key, out var groupServers))
                     foreach (var s in groupServers) g.Servers.Add(s);
             }
         }
         else
         {
-            // مرتب‌سازی داخل هر گروه (حالت قبلی)
             foreach (var g in Groups)
             {
+                if (g.Key == "__all__")
+                {
+                    g.Servers.Clear();
+                    foreach (var s in Servers) g.Servers.Add(s);
+                    continue;
+                }
                 var connected = g.Servers.FirstOrDefault(s => s.IsActiveConnection);
-                var success = g.Servers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs >= 0 : s.DownloadMbps >= 0)).ToList();
-                var failed = g.Servers.Where(s => s != connected && (metric == "latency" ? s.LatencyMs < 0 : s.DownloadMbps < 0)).ToList();
-
-                if (metric == "latency")
-                    success = success.OrderBy(s => s.LatencyMs).ToList();
-                else
-                    success = success.OrderByDescending(s => s.DownloadMbps).ToList();
+                var rest = g.Servers.Where(s => s != connected).ToList();
+                rest.Sort(ServerInfo.CompareByPriority);
 
                 g.Servers.Clear();
                 if (connected != null) g.Servers.Add(connected);
-                foreach (var s in success) g.Servers.Add(s);
-                foreach (var s in failed) g.Servers.Add(s);
+                foreach (var s in rest) g.Servers.Add(s);
             }
         }
     }
@@ -465,6 +494,12 @@ public partial class MainViewModel : ViewModelBase
             return;
         }
         _settings.UseTunMode = value;
+        SaveSettings();
+    }
+
+    partial void OnUseProxyForSubscriptionsChanged(bool value)
+    {
+        _settings.UseProxyForSubscriptions = value;
         SaveSettings();
     }
 
@@ -516,7 +551,8 @@ public partial class MainViewModel : ViewModelBase
                     duplicates++;
                     continue;
                 }
-                Servers.Add(server);
+                Servers.Insert(0, server);
+                server.IsHighlighted = true;
                 added++;
                 AppendLog(string.Format(TranslationManager.Instance["Log_ServerAdded"], server.Name));
             }
@@ -539,7 +575,8 @@ public partial class MainViewModel : ViewModelBase
         if (EditServerHandler != null && await EditServerHandler(server))
         {
             Enrich(server);
-            Servers.Add(server);
+            Servers.Insert(0, server);
+            server.IsHighlighted = true;
             SaveServers();
             SelectedServer = server;
             RefreshGroups();
@@ -570,7 +607,8 @@ public partial class MainViewModel : ViewModelBase
                     duplicates++;
                     continue;
                 }
-                Servers.Add(server);
+                Servers.Insert(0, server);
+                server.IsHighlighted = true;
                 added++;
             }
             catch { }
@@ -699,10 +737,12 @@ public partial class MainViewModel : ViewModelBase
     private void Sort(string? field)
     {
         if (!string.IsNullOrWhiteSpace(field)) SortField = field;
-        List<ServerInfo> ordered = SortField switch
+        string sortKey = SortOptions.Zip(ServerGroup.SortOptionKeys, (opt, k) => (opt, k))
+            .FirstOrDefault(x => x.opt == SortField).k ?? "none";
+        List<ServerInfo> ordered = sortKey switch
         {
-            "Name" => Servers.OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase).ToList(),
-            "Speed" => Servers.OrderByDescending(s => s.DownloadMbps).ToList(),
+            "name" => Servers.OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase).ToList(),
+            "speed" => Servers.OrderByDescending(s => s.DownloadMbps).ToList(),
             _ => Servers.OrderBy(s => s.LatencyMs < 0 ? int.MaxValue : s.LatencyMs).ToList()
         };
         Servers.Clear();
@@ -729,8 +769,9 @@ public partial class MainViewModel : ViewModelBase
             _settings.ActiveServerId = server.Id;
             SaveSettings();
             AppendLog(string.Format(TranslationManager.Instance["Log_Connected"], _engine.HttpPort));
+            NotificationHelper.ShowConnected(server.Name, server.LatencyDisplay);
 
-            // آپدیت پینگ واقعی بعد از اتصال
+            // آپدیت تأخیر واقعی بعد از اتصال
             _ = Task.Run(async () =>
             {
                 try
@@ -754,6 +795,7 @@ public partial class MainViewModel : ViewModelBase
             IsConnected = false;
             RefreshConnectionFlags();
             Status = "خطا در اتصال";
+            NotificationHelper.ShowError("Connection failed");
             AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
         }
         finally { ConnectCommand.NotifyCanExecuteChanged(); }
@@ -771,6 +813,7 @@ public partial class MainViewModel : ViewModelBase
         IsConnected = false;
         RefreshConnectionFlags();
         AppendLog(TranslationManager.Instance["Log_Disconnected"]);
+        NotificationHelper.ShowDisconnected();
         ConnectCommand.NotifyCanExecuteChanged();
     }
 
@@ -847,7 +890,9 @@ public partial class MainViewModel : ViewModelBase
             _lastSearchTime = DateTime.Now;
             AppendLog($"Search pool: {_searchPool.Count} untested servers saved for incremental search");
 
-            // آپدیت تعداد کل برای فاز تست واقعی
+            // آپدیت تعداد کل برای فاز تأخیر واقعی
+            tested = 0;
+            SearchTestedCount = 0;
             SearchTotalCount = candidates.Count;
             OnPropertyChanged(nameof(SearchProgressText));
 
@@ -863,8 +908,8 @@ public partial class MainViewModel : ViewModelBase
 
             AppendLog($"Smart connect: {candidates.Count} candidates selected (best: {candidates[0].LatencyDisplay})");
 
-            // --- مرحله ۲: تست واقعی یکی یکی ---
-            Status = $"اتصال هوشمند: تست واقعی {candidates.Count} کاندید ...";
+            // --- مرحله ۲: تأخیر واقعی یکی یکی ---
+            Status = $"اتصال هوشمند: تأخیر واقعی {candidates.Count} کاندید ...";
             AppendLog($"Smart connect: testing {candidates.Count} candidates one by one");
 
             foreach (var candidate in candidates)
@@ -925,14 +970,16 @@ public partial class MainViewModel : ViewModelBase
 
             if (finalBest == null)
             {
-                Status = "اتصال هوشمند: تست واقعی ناموفق";
-                ToastHandler?.Invoke("تست واقعی ناموفق بود");
+                Status = "اتصال هوشمند: تأخیر واقعی ناموفق";
+                ToastHandler?.Invoke("تأخیر واقعی ناموفق بود");
+                NotificationHelper.ShowError("Smart connect: real delay test failed");
                 AppendLog("Smart connect: real delay test failed for all candidates");
                 return;
             }
 
             Status = $"اتصال هوشمند: بهترین سرور → {finalBest.Name} ({finalBest.LatencyDisplay})";
             ToastHandler?.Invoke($"اتصال به {finalBest.Name} ({finalBest.LatencyDisplay})");
+            NotificationHelper.ShowSmartConnect(finalBest.Name, finalBest.LatencyDisplay);
             AppendLog($"Smart connect: connecting to {finalBest.Name} ({finalBest.LatencyDisplay})");
 
             SelectedServer = finalBest;
@@ -1040,7 +1087,7 @@ public partial class MainViewModel : ViewModelBase
 
             AppendLog($"Find better: {survivors.Count} survivors, starting real delay test");
 
-            // --- مرحله ۲: تست واقعی ---
+            // --- مرحله ۲: تأخیر واقعی ---
             ServerInfo? bestCandidate = null;
             foreach (var candidate in survivors)
             {
@@ -1119,7 +1166,7 @@ public partial class MainViewModel : ViewModelBase
             }
             else
             {
-                Status = "یافتن سرور بهتر: تست واقعی ناموفق";
+                Status = "یافتن سرور بهتر: تأخیر واقعی ناموفق";
                 AppendLog("Find better: all real delay tests failed");
             }
         }
@@ -1297,7 +1344,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // ---------- انتخاب چندتایی ----------
-    public string SelectedCountText => SelectedCount > 0 ? $"{SelectedCount} انتخاب شده" : "";
+    public string SelectedCountText => SelectedCount > 0 ? string.Format(TranslationManager.Instance["SelectedCount"], SelectedCount) : "";
     private bool HasSelection() => SelectedCount > 0;
 
     public void UpdateSelectedCount()
@@ -1464,7 +1511,7 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = true;
          try
          {
-              Status = $"تست پینگ واقعی گروه «{group!.Title}» ({targets.Count} سرور) ...";
+              Status = $"تست تأخیر واقعی گروه «{group!.Title}» ({targets.Count} سرور) ...";
              foreach (var s in targets) s.LatencyMs = -1;
              using var sem = new SemaphoreSlim(3);
              var tasks = targets.Select(async s =>
@@ -1484,7 +1531,7 @@ public partial class MainViewModel : ViewModelBase
              try { await Task.WhenAll(tasks); }
              catch (OperationCanceledException) { }
              int okCount = targets.Count(t => t.LatencyMs >= 0);
-              Status = $"پینگ واقعی گروه تمام شد ({okCount} موفق)";
+              Status = $"تأخیر واقعی گروه تمام شد ({okCount} موفق)";
              AutoSortAfterTest("latency");
              SaveServers();
          }
@@ -1570,7 +1617,7 @@ public partial class MainViewModel : ViewModelBase
          finally { IsTesting = false; }
      }
 
-     // ---------- تب پینگ واقعی ----------
+     // ---------- تب تأخیر واقعی ----------
      [RelayCommand]
      private async Task TestRealDelayAll()
      {
@@ -1583,7 +1630,7 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = true;
          try
          {
-             Status = $"تست پینگ واقعی {targets.Count} سرور (کند ولی دقیق) ...";
+             Status = $"تست تأخیر واقعی {targets.Count} سرور (کند ولی دقیق) ...";
              foreach (var s in targets) s.LatencyMs = -1;
             using var sem = new SemaphoreSlim(3);
             var tasks = targets.Select(async s =>
@@ -1604,7 +1651,7 @@ public partial class MainViewModel : ViewModelBase
             foreach (var s in targets)
                 if (s.LatencyMs == -1) s.RecordLatency(-2);
             int okCount = targets.Count(t => t.LatencyMs >= 0);
-            Status = $"پینگ واقعی تمام شد ({okCount} موفق)";
+            Status = $"تأخیر واقعی تمام شد ({okCount} موفق)";
             AutoSortAfterTest("latency");
             SaveServers();
          }
@@ -1621,7 +1668,7 @@ public partial class MainViewModel : ViewModelBase
         IsTesting = true;
         try
         {
-             Status = $"تست پینگ واقعی {targets.Count} سرور منتخب ...";
+             Status = $"تست تأخیر واقعی {targets.Count} سرور منتخب ...";
             foreach (var s in targets) s.LatencyMs = -1;
             using var sem = new SemaphoreSlim(3);
             var tasks = targets.Select(async s =>
@@ -1641,7 +1688,7 @@ public partial class MainViewModel : ViewModelBase
             catch (OperationCanceledException) { }
             foreach (var s in targets)
                 if (s.LatencyMs == -1) s.RecordLatency(-2);
-            Status = $"پینگ واقعی منتخب‌ها تمام شد ({targets.Count(t => t.LatencyMs >= 0)} موفق)";
+            Status = $"تأخیر واقعی منتخب‌ها تمام شد ({targets.Count(t => t.LatencyMs >= 0)} موفق)";
             AutoSortAfterTest("latency");
             SaveServers();
         }
@@ -1659,7 +1706,7 @@ public partial class MainViewModel : ViewModelBase
         IsTesting = true;
         try
         {
-            Status = $"تست پینگ واقعی {targets.Count} سرور ...";
+            Status = $"تست تأخیر واقعی {targets.Count} سرور ...";
             foreach (var s in targets) s.LatencyMs = -1;
             using var sem = new SemaphoreSlim(3);
             var tasks = targets.Select(async s =>
@@ -1669,7 +1716,7 @@ public partial class MainViewModel : ViewModelBase
                 try
                 {
                     if (_testCts.Token.IsCancellationRequested) return;
-                    Post(() => Status = $"پینگ واقعی: {s.Name} ...");
+                    Post(() => Status = $"تأخیر واقعی: {s.Name} ...");
                     var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
                     Post(() => s.LatencyMs = ok ? ms : -2);
                 }
@@ -1681,7 +1728,7 @@ public partial class MainViewModel : ViewModelBase
             foreach (var s in targets)
                 if (s.LatencyMs == -1) s.LatencyMs = -2;
             int okCount = targets.Count(s => s.LatencyMs >= 0);
-            Status = $"پینگ واقعی تمام شد: {okCount} از {targets.Count} موفق";
+            Status = $"تأخیر واقعی تمام شد: {okCount} از {targets.Count} موفق";
             SaveServers();
         }
         finally { IsTesting = false; }
@@ -1713,8 +1760,20 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = $"دریافت {name} ...";
-            var servers = await SubscriptionManager.FetchAsync(url);
+            var (servers, subInfo) = await SubscriptionManager.FetchWithInfoAsync(url);
+            AppendLog($"تعداد سرور دریافتی: {servers.Count}");
             var info = new SubscriptionInfo { Name = name, Url = url, LastUpdated = DateTime.Now, ServerCount = servers.Count };
+            if (subInfo != null)
+            {
+                info.DataLimit = subInfo.DataLimit;
+                info.UsedTraffic = subInfo.UsedTraffic;
+                info.ExpireDate = subInfo.ExpireDate;
+                AppendLog($"حجم: {info.UsedTraffic}/{info.DataLimit} | انقضا: {info.ExpireDate}");
+            }
+            else
+            {
+                AppendLog("اطلاعات اشتراک (حجم/انقضا) از سرور دریافت نشد");
+            }
             Subscriptions.Add(info);
             SaveSubs();
             MergeServers(name, servers);
@@ -1740,8 +1799,9 @@ public partial class MainViewModel : ViewModelBase
             Enrich(server);
             server.SubscriptionName = subName;
             if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal))) continue;
-            Servers.Add(server);
-            added++;
+                Servers.Insert(0, server);
+                server.IsHighlighted = true;
+                added++;
         }
         SaveServers();
         var sub = Subscriptions.FirstOrDefault(s => s.Name == subName);
@@ -1750,6 +1810,12 @@ public partial class MainViewModel : ViewModelBase
             sub.LastUpdated = DateTime.Now;
             sub.ServerCount = fetched.Count;
             SaveSubs();
+            foreach (var s in Servers.Where(s => s.SubscriptionName == subName))
+            {
+                s.SubDataLimit = sub.DataLimit;
+                s.SubUsedTraffic = sub.UsedTraffic;
+                s.SubExpireDate = sub.ExpireDate;
+            }
         }
         SelectedServer = Servers.FirstOrDefault(s => s.Id == activeId) ?? SelectedServer;
         RefreshGroups();
@@ -1762,27 +1828,48 @@ public partial class MainViewModel : ViewModelBase
         if (Subscriptions.Count == 0) { AppendLog(TranslationManager.Instance["Log_NoSub"]); return; }
         string? activeId = SelectedServer?.Id;
         int total = 0;
+        string? proxyAddress = UseProxyForSubscriptions && IsConnected && _engine.HttpPort > 0 ? $"127.0.0.1:{_engine.HttpPort}" : null;
         foreach (var sub in Subscriptions.ToList())
         {
             try
             {
                 Status = $"دریافت {sub.Name} ...";
-                var servers = await SubscriptionManager.FetchAsync(sub.Url);
-          foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
-          {
-              if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
-              if (ReferenceEquals(SelectedServer, o)) SelectedServer = null;
-              Servers.Remove(o);
-          }
+                var (servers, subInfo) = proxyAddress != null
+                    ? await SubscriptionManager.FetchWithInfoAndProxyAsync(sub.Url, proxyAddress)
+                    : await SubscriptionManager.FetchWithInfoAsync(sub.Url);
+                if (servers.Count == 0)
+                {
+                    AppendLog($"خطا در {sub.Name}: سروری دریافت نشد — سرورهای قبلی حفظ شد");
+                    continue;
+                }
+                foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
+                {
+                    if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
+                    if (ReferenceEquals(SelectedServer, o)) SelectedServer = null;
+                    Servers.Remove(o);
+                }
                 foreach (var server in servers)
                 {
                     Enrich(server);
+                    server.Owner = this;
                     server.SubscriptionName = sub.Name;
                     if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal))) continue;
                     Servers.Add(server);
                 }
                 sub.LastUpdated = DateTime.Now;
                 sub.ServerCount = servers.Count;
+                if (subInfo != null)
+                {
+                    sub.DataLimit = subInfo.DataLimit;
+                    sub.UsedTraffic = subInfo.UsedTraffic;
+                    sub.ExpireDate = subInfo.ExpireDate;
+                }
+                foreach (var s in Servers.Where(s => s.SubscriptionName == sub.Name))
+                {
+                    s.SubDataLimit = sub.DataLimit;
+                    s.SubUsedTraffic = sub.UsedTraffic;
+                    s.SubExpireDate = sub.ExpireDate;
+                }
                 total += servers.Count;
                 AppendLog(string.Format(TranslationManager.Instance["Log_SubUpdated"], sub.Name, servers.Count));
             }
@@ -1806,7 +1893,16 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = $"دریافت {sub.Name} ...";
-            var fetched = await SubscriptionManager.FetchAsync(sub.Url);
+            string? proxyAddress = UseProxyForSubscriptions && IsConnected && _engine.HttpPort > 0 ? $"127.0.0.1:{_engine.HttpPort}" : null;
+            var (fetched, subInfo) = proxyAddress != null
+                ? await SubscriptionManager.FetchWithInfoAndProxyAsync(sub.Url, proxyAddress)
+                : await SubscriptionManager.FetchWithInfoAsync(sub.Url);
+            if (fetched.Count == 0)
+            {
+                AppendLog($"خطا در {sub.Name}: سروری دریافت نشد — سرورهای قبلی حفظ شد");
+                Status = $"سروری از «{sub.Name}» دریافت نشد";
+                return;
+            }
             string? activeId = SelectedServer?.Id;
             foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
             {
@@ -1826,6 +1922,18 @@ public partial class MainViewModel : ViewModelBase
             SaveServers();
             sub.LastUpdated = DateTime.Now;
             sub.ServerCount = fetched.Count;
+            if (subInfo != null)
+            {
+                sub.DataLimit = subInfo.DataLimit;
+                sub.UsedTraffic = subInfo.UsedTraffic;
+                sub.ExpireDate = subInfo.ExpireDate;
+            }
+            foreach (var s in Servers.Where(s => s.SubscriptionName == sub.Name))
+            {
+                s.SubDataLimit = sub.DataLimit;
+                s.SubUsedTraffic = sub.UsedTraffic;
+                s.SubExpireDate = sub.ExpireDate;
+            }
             SaveSubs();
             SelectedServer = Servers.FirstOrDefault(s => s.Id == activeId) ?? SelectedServer;
             foreach (var g in Groups)
@@ -1934,6 +2042,100 @@ public partial class MainViewModel : ViewModelBase
       private void ToggleSortDirection()
       {
           SortAscending = !SortAscending;
+      }
+
+      // --- متدهای عمومی برای Tray Menu ---
+      public async Task TraySmartConnectAsync()
+      {
+          if (SmartConnectCommand.CanExecute(null))
+              await SmartConnect();
+      }
+
+      public void CancelSmartConnect()
+      {
+          if (IsSmartConnecting || IsFindingBetter)
+          {
+              _testCts.Cancel();
+              IsTesting = false;
+              IsSmartConnecting = false;
+              IsFindingBetter = false;
+              Status = "متوقف شد";
+          }
+      }
+
+      public void TrayToggleSystemProxy()
+      {
+          SetSystemProxy = !SetSystemProxy;
+      }
+
+      public async Task TrayUpdateSubscriptionsAsync(bool useProxy)
+      {
+          if (Subscriptions.Count == 0)
+          {
+              AppendLog(TranslationManager.Instance["Log_NoSub"]);
+              return;
+          }
+          Status = useProxy ? "بروزرسانی با پراکسی ..." : "بروزرسانی بدون پراکسی ...";
+          string? activeId = SelectedServer?.Id;
+          int total = 0;
+          string? proxyAddress = useProxy && _engine.HttpPort > 0 ? $"127.0.0.1:{_engine.HttpPort}" : null;
+
+              foreach (var sub in Subscriptions.ToList())
+              {
+                  try
+                  {
+                      Status = $"دریافت {sub.Name} ...";
+                      var (servers, subInfo) = proxyAddress != null
+                          ? await SubscriptionManager.FetchWithInfoAndProxyAsync(sub.Url, proxyAddress)
+                          : await SubscriptionManager.FetchWithInfoAsync(sub.Url);
+
+                      if (servers.Count == 0)
+                      {
+                          AppendLog($"خطا در {sub.Name}: سروری دریافت نشد — سرورهای قبلی حفظ شد");
+                          continue;
+                      }
+
+                      foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
+                      {
+                          if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
+                          if (ReferenceEquals(SelectedServer, o)) SelectedServer = null;
+                          Servers.Remove(o);
+                      }
+                      foreach (var server in servers)
+                      {
+                          Enrich(server);
+                          server.Owner = this;
+                          server.SubscriptionName = sub.Name;
+                          if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal))) continue;
+                          Servers.Add(server);
+                      }
+                  sub.LastUpdated = DateTime.Now;
+                  sub.ServerCount = servers.Count;
+                  if (subInfo != null)
+                  {
+                      sub.DataLimit = subInfo.DataLimit;
+                      sub.UsedTraffic = subInfo.UsedTraffic;
+                      sub.ExpireDate = subInfo.ExpireDate;
+                  }
+                  foreach (var s in Servers.Where(s => s.SubscriptionName == sub.Name))
+                  {
+                      s.SubDataLimit = sub.DataLimit;
+                      s.SubUsedTraffic = sub.UsedTraffic;
+                      s.SubExpireDate = sub.ExpireDate;
+                  }
+                  total += servers.Count;
+                  AppendLog(string.Format(TranslationManager.Instance["Log_SubUpdated"], sub.Name, servers.Count));
+              }
+              catch (Exception ex) { AppendLog($"خطا در {sub.Name}: {ex.Message}"); }
+          }
+          SaveSubs();
+          SaveServers();
+          _settings.LastSubscriptionUpdate = DateTime.Now;
+          SaveSettings();
+          Post(() => OnPropertyChanged(nameof(LastUpdateDisplay)));
+          SelectedServer = Servers.FirstOrDefault(s => s.Id == activeId) ?? Servers.FirstOrDefault();
+          Status = string.Format(TranslationManager.Instance["Log_Updated"], total, Servers.Count);
+          RefreshGroups();
       }
 
       public void Shutdown() => _engine.Dispose();

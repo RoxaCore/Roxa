@@ -22,15 +22,18 @@ public static class GeoFlags
         "VA","VC","VE","VG","VI","VN","VU","WF","WS","YE","YT","ZA","ZM","ZW"
     };
 
+    private static readonly char[] SplitChars = [' ', '·', '|', ',', '_', '-', '.', ':', '(', ')'];
+    private static readonly Regex NonAlphaRegex = new("[^A-Za-z]", RegexOptions.Compiled);
+
     public static string DetectCountry(string name, string address)
     {
         string combined = $"{name} {address}";
         string fromFlag = FlagToCode(combined);
         if (!string.IsNullOrEmpty(fromFlag)) return fromFlag;
 
-        foreach (string token in combined.Split(new[] { ' ', '·', '|', ',', '_', '-', '.', ':', '(', ')' }, StringSplitOptions.RemoveEmptyEntries))
+        foreach (string token in combined.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries))
         {
-            string candidate = Regex.Replace(token, "[^A-Za-z]", "").ToUpperInvariant();
+            string candidate = NonAlphaRegex.Replace(token, "").ToUpperInvariant();
             if (candidate.Length == 2 && IsoCodes.Contains(candidate)) return candidate;
         }
         return "";

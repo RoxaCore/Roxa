@@ -1,7 +1,9 @@
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Notifications;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
+using XrayClient.Core;
 using XrayClient.Models;
 using XrayClient.ViewModels;
 
@@ -11,6 +13,7 @@ public partial class MainWindow : Window
 {
     private int _resizingColumn = -1;
     private double _resizeStartX = 0;
+    private bool _forceClose = false;
 
     public MainWindow()
     {
@@ -19,11 +22,39 @@ public partial class MainWindow : Window
         if (System.IO.File.Exists(iconPath))
             Icon = new WindowIcon(iconPath);
         Opened += OnOpened;
-        Closing += (_, _) =>
+        Activated += OnActivated;
+        Closing += OnClosing;
+    }
+
+    private void OnClosing(object? sender, WindowClosingEventArgs e)
+    {
+        if (_forceClose) return;
+        e.Cancel = true;
+        Hide();
+    }
+
+    public void ForceClose()
+    {
+        _forceClose = true;
+        Close();
+    }
+
+    private async void OnActivated(object? sender, EventArgs e)
+    {
+        try
         {
-            if (DataContext is MainViewModel vm)
-                vm.Shutdown();
-        };
+            if (DataContext is not ViewModels.MainViewModel vm) return;
+            if (vm.Clipboard == null) return;
+            var asyncData = (Avalonia.Input.IAsyncDataTransfer)vm.Clipboard;
+            var text = await asyncData.TryGetTextAsync();
+            if (string.IsNullOrWhiteSpace(text)) return;
+            var trimmed = text.Trim();
+            if (!Core.UrlParser.IsProtocolLink(trimmed)) return;
+            if (vm.Servers.Any(s => string.Equals(s.Link, trimmed, StringComparison.Ordinal))) return;
+            vm.ServerLink = trimmed;
+            vm.AddLinkCommand.Execute(null);
+        }
+        catch { }
     }
 
     public void ShowToast(string message, int durationMs = 3000)
@@ -36,6 +67,7 @@ public partial class MainWindow : Window
     private async void OnOpened(object? sender, EventArgs e)
     {
         if (DataContext is not MainViewModel vm) return;
+
         vm.Clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
         vm.EditServerHandler = async server =>
         {
@@ -50,18 +82,21 @@ public partial class MainWindow : Window
         vm.ToastHandler = message => ShowToast(message);
         vm.RestartRequested += () =>
         {
+            var app = Application.Current as App;
+            app?.DisposeTray();
             var exe = Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "";
             System.Diagnostics.Process.Start(exe);
-            Close();
+            Environment.Exit(0);
         };
         vm.OpenDnsSettingsHandler = () => OpenDnsDialog();
         vm.ShowAdminWarningHandler = () =>
         {
-            var btnOk = new Button { Content = "ادامه", Width = 80 };
-            var btnRestart = new Button { Content = "اجرای مجدد به عنوان ادمین", Width = 160 };
+            var tr = Localization.TranslationManager.Instance;
+            var btnOk = new Button { Content = tr["Dlg_Continue"], Width = 80 };
+            var btnRestart = new Button { Content = tr["Dlg_RestartAdmin"], Width = 160 };
             var win = new Window
             {
-                Title = "نیاز به دسترسی Administrator",
+                Title = tr["Dlg_NeedsAdmin"],
                 Width = 400,
                 Height = 160,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
@@ -73,7 +108,7 @@ public partial class MainWindow : Window
                     Margin = new Avalonia.Thickness(20),
                     Children =
                     {
-                        new TextBlock { Text = "حالت TUN نیاز به دسترسی Administrator دارد.\nبرای فعال کردن، برنامه باید مجدداً با دسترسی ادمین اجرا شود.", TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                        new TextBlock { Text = tr["Dlg_TUNAdminMsg"], TextWrapping = Avalonia.Media.TextWrapping.Wrap },
                         new StackPanel
                         {
                             Orientation = Avalonia.Layout.Orientation.Horizontal,
@@ -91,12 +126,13 @@ public partial class MainWindow : Window
         vm.ConfirmDeleteHandler = async message =>
         {
             bool result = false;
-            var btnYes = new Button { Content = "بله", Width = 80 };
-            var btnNo = new Button { Content = "خیر", Width = 80 };
+            var tr = Localization.TranslationManager.Instance;
+            var btnYes = new Button { Content = tr["Dlg_Yes"], Width = 80 };
+            var btnNo = new Button { Content = tr["Dlg_No"], Width = 80 };
             
             var window = new Window
             {
-                Title = "تأیید حذف",
+                Title = tr["Dlg_ConfirmDelete"],
                 Width = 350,
                 Height = 150,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
@@ -215,9 +251,10 @@ public partial class MainWindow : Window
             FontSize = 12
         };
 
+        var tr = Localization.TranslationManager.Instance;
         var btnSave = new Button
         {
-            Content = "ذخیره",
+            Content = tr["Dlg_Save"],
             Padding = new Avalonia.Thickness(24, 10),
             CornerRadius = new Avalonia.CornerRadius(8),
             Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#0E7C6B")),
@@ -228,7 +265,7 @@ public partial class MainWindow : Window
 
         var btnCancel = new Button
         {
-            Content = "لغو",
+            Content = tr["Dlg_Cancel"],
             Padding = new Avalonia.Thickness(24, 10),
             CornerRadius = new Avalonia.CornerRadius(8),
             FontSize = 13
@@ -236,7 +273,7 @@ public partial class MainWindow : Window
 
         var window = new Window
         {
-            Title = "تنظیمات DNS",
+            Title = tr["Dlg_DNSSettings"],
             Width = 500,
             Height = 420,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
@@ -247,17 +284,17 @@ public partial class MainWindow : Window
                 Spacing = 12,
                 Children =
                 {
-                    new TextBlock { Text = "DNS ساده", FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 13 },
+                    new TextBlock { Text = tr["Dlg_DNSSimple"], FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 13 },
                     txtServers,
-                    new TextBlock { Text = "IPv4/IPv6 با کاما جدا شده", FontSize = 11, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#888888")) },
-                    new TextBlock { Text = "DNS پیشرفته (JSON)", FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 13 },
+                    new TextBlock { Text = tr["Dlg_DNSHint"], FontSize = 11, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#888888")) },
+                    new TextBlock { Text = tr["Dlg_DNSAdvanced"], FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 13 },
                     txtJson,
                     new TextBlock { Text = "مثال: {\"servers\": [{\"address\": \"1.1.1.1\"}]}", FontSize = 11, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#888888")) },
                     new TextBlock
                     {
                         FontSize = 11,
                         Margin = new Avalonia.Thickness(0, 4, 0, 0),
-                        Text = "مستندات: https://xtls.github.io/config/dns.html"
+                        Text = tr["Dlg_DNSDocs"]
                     },
                     new StackPanel
                     {
@@ -280,5 +317,14 @@ public partial class MainWindow : Window
         btnCancel.Click += (_, _) => window.Close();
 
         window.ShowDialog(this);
+    }
+
+    public void SwitchToSettingsTab()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (MainTabControl != null)
+                MainTabControl.SelectedIndex = 3;
+        });
     }
 }

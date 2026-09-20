@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="Tab_Servers" xml:space="preserve"><value>Serveurs</value></data>
+  <data name="Tab_Subscription" xml:space="preserve"><value>Abonnement</value></data>
+  <data name="Tab_Log" xml:space="preserve"><value>Journal</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>⚙ Paramètres</value></data>
+
+  <data name="Btn_Connect" xml:space="preserve"><value>▶ Connecter</value></data>
+  <data name="Btn_Disconnect" xml:space="preserve"><value>Déconnecter</value></data>
+  <data name="Btn_SmartConnect" xml:space="preserve"><value>Connexion Intelligente</value></data>
+  <data name="Btn_FindBetter" xml:space="preserve"><value>Trouver un Meilleur Serveur</value></data>
+  <data name="Btn_Ping" xml:space="preserve"><value>Ping</value></data>
+  <data name="Btn_PingAll" xml:space="preserve"><value>🔄 Ping Tous</value></data>
+  <data name="Btn_Real" xml:space="preserve"><value>Délai Réel</value></data>
+  <data name="Btn_Speed" xml:space="preserve"><value>Vitesse</value></data>
+  <data name="Btn_SpeedAll" xml:space="preserve"><value>🚀 Test de Vitesse</value></data>
+  <data name="Btn_Stop" xml:space="preserve"><value>Arrêter</value></data>
+  <data name="Btn_UpdateAll" xml:space="preserve"><value>Tout Mettre à Jour</value></data>
+  <data name="Btn_Update" xml:space="preserve"><value>Mettre à Jour</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>+ Ajouter</value></data>
+  <data name="Btn_RemoveSub" xml:space="preserve"><value>Supprimer Sub</value></data>
+  <data name="Btn_RemoveAll" xml:space="preserve"><value>Tout Supprimer</value></data>
+  <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ Supprimer les Doublons</value></data>
+  <data name="Btn_Export" xml:space="preserve"><value>📦 Exporter</value></data>
+  <data name="Btn_Import" xml:space="preserve"><value>📋 Importer</value></data>
+
+  <data name="Ph_ServerLink" xml:space="preserve"><value>Lien du serveur (vmess://, vless://, ...)</value></data>
+  <data name="Ph_SubName" xml:space="preserve"><value>Nom</value></data>
+  <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
+
+  <data name="Sort_None" xml:space="preserve"><value>Aucun Tri</value></data>
+  <data name="Sort_Latency" xml:space="preserve"><value>Latence (basse)</value></data>
+  <data name="Sort_Speed" xml:space="preserve"><value>Vitesse (haute)</value></data>
+  <data name="Sort_Name" xml:space="preserve"><value>Nom</value></data>
+
+  <data name="Status_Ready" xml:space="preserve"><value>Prêt</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>Connecté</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>Déconnecté</value></data>
+
+  <data name="Ctx_Connect" xml:space="preserve"><value>Connecter</value></data>
+  <data name="Ctx_Disconnect" xml:space="preserve"><value>Déconnecter</value></data>
+  <data name="Ctx_Edit" xml:space="preserve"><value>Modifier le Serveur</value></data>
+  <data name="Ctx_Clone" xml:space="preserve"><value>Cloner le Serveur</value></data>
+  <data name="Ctx_Share" xml:space="preserve"><value>Partager</value></data>
+  <data name="Ctx_TestPing" xml:space="preserve"><value>Test de Ping</value></data>
+  <data name="Ctx_TestReal" xml:space="preserve"><value>Test de Délai Réel</value></data>
+  <data name="Ctx_TestSpeed" xml:space="preserve"><value>Test de Vitesse</value></data>
+  <data name="Ctx_Delete" xml:space="preserve"><value>Supprimer le Serveur</value></data>
+
+  <data name="Add_VMess" xml:space="preserve"><value>🟢 Ajouter VMess</value></data>
+  <data name="Add_VLESS" xml:space="preserve"><value>🔵 Ajouter VLESS</value></data>
+  <data name="Add_SS" xml:space="preserve"><value>🟠 Ajouter Shadowsocks</value></data>
+  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Ajouter Trojan</value></data>
+  <data name="Add_Clipboard" xml:space="preserve"><value>📋 Importer du Presse-papiers</value></data>
+
+  <data name="Set_Proxy" xml:space="preserve"><value>Configurer le Proxy Système</value></data>
+  <data name="Set_AutoConnect" xml:space="preserve"><value>Connexion Automatique</value></data>
+  <data name="Set_AutoConnect_Desc" xml:space="preserve"><value>(Se connecter au serveur sélectionné au démarrage)</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>Mise à Jour Automatique des Abonnements</value></data>
+  <data name="Set_Interval" xml:space="preserve"><value>Mettre à jour toutes les {0} heures</value></data>
+  <data name="Set_Language" xml:space="preserve"><value>Langue de l'App</value></data>
+  <data name="Set_Connection" xml:space="preserve"><value>Connexion</value></data>
+  <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>Mise à Jour Automatique de l'Abonnement</value></data>
+  <data name="Set_LeaveProxy" xml:space="preserve"><value>Ne pas modifier le proxy système</value></data>
+  <data name="Set_LeaveProxy_Desc" xml:space="preserve"><value>Le proxy système n'est pas modifié à la connexion/déconnexion</value></data>
+  <data name="Set_ClearProxy" xml:space="preserve"><value>Effacer le proxy système</value></data>
+  <data name="Set_ClearProxy_Desc" xml:space="preserve"><value>Le proxy système est effacé à la déconnexion</value></data>
+  <data name="Set_Every" xml:space="preserve"><value>Toutes les</value></data>
+  <data name="Set_Hours" xml:space="preserve"><value>heures, mettre à jour</value></data>
+  <data name="Set_Advanced" xml:space="preserve"><value>Paramètres Avancés</value></data>
+  <data name="Set_PingType" xml:space="preserve"><value>Type de ping:</value></data>
+  <data name="Set_GlobalSort" xml:space="preserve"><value>Tri global (après le test, meilleur serveur de tous les groupes)</value></data>
+  <data name="Set_DNS" xml:space="preserve"><value>DNS Personnalisé</value></data>
+  <data name="Set_DNSBtn" xml:space="preserve"><value>⚙ Paramètres DNS</value></data>
+  <data name="Set_TUN" xml:space="preserve"><value>Mode TUN (VPN complète du système)</value></data>
+  <data name="Set_TUN_Desc" xml:space="preserve"><value>Nécessite les droits Administrateur. Redirige tout le trafic système à travers le tunnel</value></data>
+
+  <data name="Dlg_Continue" xml:space="preserve"><value>Continuer</value></data>
+  <data name="Dlg_RestartAdmin" xml:space="preserve"><value>Redémarrer en tant qu'Admin</value></data>
+  <data name="Dlg_NeedsAdmin" xml:space="preserve"><value>Droits Administrateur Requis</value></data>
+  <data name="Dlg_TUNAdminMsg" xml:space="preserve"><value>Le mode TUN nécessite les droits Administrateur.</value></data>
+  <data name="Dlg_Yes" xml:space="preserve"><value>Oui</value></data>
+  <data name="Dlg_No" xml:space="preserve"><value>Non</value></data>
+  <data name="Dlg_ConfirmDelete" xml:space="preserve"><value>Confirmer la Suppression</value></data>
+  <data name="Dlg_Save" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="Dlg_Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Dlg_DNSSettings" xml:space="preserve"><value>Paramètres DNS</value></data>
+  <data name="Dlg_DNSSimple" xml:space="preserve"><value>DNS Simple</value></data>
+  <data name="Dlg_DNSHint" xml:space="preserve"><value>IPv4/IPv6 séparés par virgule</value></data>
+  <data name="Dlg_DNSAdvanced" xml:space="preserve"><value>DNS Avancé (JSON)</value></data>
+  <data name="Dlg_DNSDocs" xml:space="preserve"><value>Documentation: https://xtls.github.io/config/dns.html</value></data>
+  <data name="Dlg_EditServer" xml:space="preserve"><value>Modifier le Serveur</value></data>
+  <data name="Dlg_Name" xml:space="preserve"><value>Nom</value></data>
+  <data name="Dlg_Address" xml:space="preserve"><value>Adresse</value></data>
+  <data name="Dlg_Port" xml:space="preserve"><value>Port</value></data>
+  <data name="Dlg_RebuiltLink" xml:space="preserve"><value>Lien Reconstruit</value></data>
+  <data name="Dlg_ShareQR" xml:space="preserve"><value>Partager (QR)</value></data>
+  <data name="Dlg_CopyLink" xml:space="preserve"><value>Copier le Lien</value></data>
+  <data name="Dlg_Close" xml:space="preserve"><value>Fermer</value></data>
+
+  <data name="SelectedCount" xml:space="preserve"><value>{0} sélectionnés</value></data>
+
+  <data name="Filter_All" xml:space="preserve"><value>Tout</value></data>
+  <data name="Filter_Errors" xml:space="preserve"><value>Erreurs Uniquement</value></data>
+  <data name="Filter_Connection" xml:space="preserve"><value>Connexion Uniquement</value></data>
+  <data name="Filter_Label" xml:space="preserve"><value>Filtrer:</value></data>
+
+  <data name="Log_ServersLoaded" xml:space="preserve"><value>Bonjour ! {0} serveurs et {1} abonnements chargés.</value></data>
+  <data name="Log_Connected" xml:space="preserve"><value>Connecté. HTTP 127.0.0.1:{0}</value></data>
+  <data name="Log_Disconnected" xml:space="preserve"><value>Déconnecté.</value></data>
+  <data name="Log_ServerAdded" xml:space="preserve"><value>"{0}" ajouté.</value></data>
+  <data name="Log_ServerDup" xml:space="preserve"><value>"{0}" est un doublon.</value></data>
+  <data name="Log_SubAdded" xml:space="preserve"><value>"{0}" ajouté ({1} serveurs)</value></data>
+  <data name="Log_Merged" xml:space="preserve"><value>Fusionné "{0}": {1} nouveaux serveurs, total {2}.</value></data>
+  <data name="Log_NoSub" xml:space="preserve"><value>Aucun abonnement.</value></data>
+  <data name="Log_Updated" xml:space="preserve"><value>Mis à jour ({0} serveurs, {1} uniques — serveurs manuels préservés)</value></data>
+  <data name="Log_SmartStage1" xml:space="preserve"><value>Connexion intelligente: étape 1 - ping TCP rapide sur tous les serveurs</value></data>
+  <data name="Log_SmartCandidates" xml:space="preserve"><value>Connexion intelligente: {0} candidats sélectionnés</value></data>
+  <data name="Log_SmartStage2" xml:space="preserve"><value>Connexion intelligente: test de {0} candidats un par un</value></data>
+  <data name="Log_SmartTesting" xml:space="preserve"><value>Connexion intelligente: test de {0} ...</value></data>
+  <data name="Log_SmartResult" xml:space="preserve"><value>Connexion intelligente: {0} → {1}ms</value></data>
+  <data name="Log_SmartFailed" xml:space="preserve"><value>Connexion intelligente: {0} → échoué</value></data>
+  <data name="Log_SmartConnect" xml:space="preserve"><value>Connexion intelligente: connexion à {0}</value></data>
+  <data name="Log_SmartError" xml:space="preserve"><value>Erreur de connexion intelligente: {0}</value></data>
+  <data name="Log_NoPing" xml:space="preserve"><value>Connexion intelligente: aucun serveur n'a répondu au ping</value></data>
+  <data name="Log_FindBetter" xml:space="preserve"><value>Meilleur: test du lot {0} ({1} restants)</value></data>
+  <data name="Log_FindSwitch" xml:space="preserve"><value>Meilleur: passage de {0} ({1}ms) → {2} ({3}ms)</value></data>
+  <data name="Log_FindBest" xml:space="preserve"><value>Meilleur: le serveur actuel est toujours le meilleur</value></data>
+  <data name="Log_Sorted" xml:space="preserve"><value>Trier par {0}.</value></data>
+  <data name="Log_Error" xml:space="preserve"><value>Erreur: {0}</value></data>
+  <data name="Log_InvalidLink" xml:space="preserve"><value>Ignoré: lien invalide.</value></data>
+  <data name="Log_ServersDeleted" xml:space="preserve"><value>{0} serveurs supprimés.</value></data>
+  <data name="Log_SubRemoved" xml:space="preserve"><value>"{0}" supprimé avec ses serveurs.</value></data>
+  <data name="Log_DupesRemoved" xml:space="preserve"><value>{0} serveurs en double supprimés.</value></data>
+  <data name="Log_Copied" xml:space="preserve"><value>Lien "{0}" copié.</value></data>
+  <data name="Log_Exported" xml:space="preserve"><value>Exporté: {0}</value></data>
+  <data name="Log_LinksCopied" xml:space="preserve"><value>{0} liens copiés.</value></data>
+  <data name="Log_SubCopied" xml:space="preserve"><value>Abonnement Base64 copié.</value></data>
+  <data name="Log_TestStopped" xml:space="preserve"><value>Test arrêté</value></data>
+  <data name="Log_SubUpdated" xml:space="preserve"><value>"{0}": {1} serveurs.</value></data>
+
+  <data name="AllServers_Title" xml:space="preserve"><value>📋 Tous les Serveurs</value></data>
+
+  <data name="Header_Name" xml:space="preserve"><value>Nom</value></data>
+  <data name="Header_Ping" xml:space="preserve"><value>Ping</value></data>
+  <data name="Header_Speed" xml:space="preserve"><value>Vitesse</value></data>
+  <data name="Header_Status" xml:space="preserve"><value>État</value></data>
+  <data name="Header_Country" xml:space="preserve"><value>Pays</value></data>
+  <data name="Header_Protocol" xml:space="preserve"><value>Protocole</value></data>
+  <data name="Header_Address" xml:space="preserve"><value>Adresse</value></data>
+  <data name="Header_Port" xml:space="preserve"><value>Port</value></data>
+  <data name="Header_Sub" xml:space="preserve"><value>Abonnement</value></data>
+
+  <data name="ServerCount" xml:space="preserve"><value>{0} serveurs</value></data>
+
+  <data name="Status_Failed" xml:space="preserve"><value>Échoué</value></data>
+  <data name="Status_Error" xml:space="preserve"><value>Erreur</value></data>
+
+  <data name="Card_Ping" xml:space="preserve"><value>Ping: </value></data>
+  <data name="Card_Speed" xml:space="preserve"><value>Vitesse: </value></data>
+  <data name="Card_Connect" xml:space="preserve"><value>Connecter</value></data>
+  <data name="Card_Disconnect" xml:space="preserve"><value>Déconnecter</value></data>
+  <data name="Card_Edit" xml:space="preserve"><value>Modifier</value></data>
+  <data name="Card_Share" xml:space="preserve"><value>Partager</value></data>
+  <data name="Card_Delete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="Card_Connected" xml:space="preserve"><value>Connecté</value></data>
+
+  <data name="Tray_Show" xml:space="preserve"><value>Afficher</value></data>
+  <data name="Tray_SmartConnect" xml:space="preserve"><value>⚡ Connexion Intelligente</value></data>
+  <data name="Tray_Stop" xml:space="preserve"><value>⏹ Arrêter</value></data>
+  <data name="Tray_FindBetter" xml:space="preserve"><value>🔍 Trouver Meilleur Serveur</value></data>
+  <data name="Tray_Proxy" xml:space="preserve"><value>Proxy Système</value></data>
+  <data name="Tray_UpdateNoProxy" xml:space="preserve"><value>🔄 Mettre à jour sans proxy</value></data>
+  <data name="Tray_UpdateProxy" xml:space="preserve"><value>🔄 Mettre à jour avec proxy</value></data>
+  <data name="Tray_Settings" xml:space="preserve"><value>⚙ Paramètres</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>Quitter</value></data>
+  <data name="Tray_ConnectedTo" xml:space="preserve"><value>Connecté à {0}</value></data>
+  <data name="Tray_Searching" xml:space="preserve"><value>Recherche...</value></data>
+  <data name="Tray_SearchingProgress" xml:space="preserve"><value>Recherche... {0} sur {1} serveurs</value></data>
+
+  <data name="Hotkey_Info" xml:space="preserve">
+    <value>Raccourcis: Ctrl+Shift+C = Connecter | Ctrl+Shift+D = Déconnecter | Ctrl+Shift+S = Connexion Intelligente | Ctrl+Shift+Q = Quitter</value>
+  </data>
+
+  <data name="Add_Link" xml:space="preserve"><value>Ajouter</value></data>
+
+  <data name="Sub_UseProxy" xml:space="preserve"><value>Utiliser un proxy pour les mises à jour</value></data>
+</root>

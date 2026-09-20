@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Tab_Servers" xml:space="preserve"><value>सर्वर</value></data>
+  <data name="Tab_Subscription" xml:space="preserve"><value>सब्सक्रिप्शन</value></data>
+  <data name="Tab_Log" xml:space="preserve"><value>लॉग</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>⚙ सेटिंग्स</value></data>
+  <data name="Btn_Connect" xml:space="preserve"><value>▶ कनेक्ट</value></data>
+  <data name="Btn_Disconnect" xml:space="preserve"><value>डिस्कनेक्ट</value></data>
+  <data name="Btn_SmartConnect" xml:space="preserve"><value>स्मार्ट कनेक्शन</value></data>
+  <data name="Btn_FindBetter" xml:space="preserve"><value>बेहतर सर्वर खोजें</value></data>
+  <data name="Btn_Ping" xml:space="preserve"><value>पिंग</value></data>
+  <data name="Btn_PingAll" xml:space="preserve"><value>🔄 सभी को पिंग</value></data>
+  <data name="Btn_Real" xml:space="preserve"><value>वास्तविक विलंबता</value></data>
+  <data name="Btn_Speed" xml:space="preserve"><value>गति</value></data>
+  <data name="Btn_SpeedAll" xml:space="preserve"><value>🚀 गति परीक्षण</value></data>
+  <data name="Btn_Stop" xml:space="preserve"><value>रोकें</value></data>
+  <data name="Btn_UpdateAll" xml:space="preserve"><value>सभी अपडेट करें</value></data>
+  <data name="Btn_Update" xml:space="preserve"><value>अपडेट करें</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>+ जोड़ें</value></data>
+  <data name="Btn_RemoveSub" xml:space="preserve"><value>सब्सक्रिप्शन हटाएं</value></data>
+  <data name="Btn_RemoveAll" xml:space="preserve"><value>सभी हटाएं</value></data>
+  <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ डुप्लिकेट हटाएं</value></data>
+  <data name="Btn_Export" xml:space="preserve"><value>📦 एक्सपोर्ट</value></data>
+  <data name="Btn_Import" xml:space="preserve"><value>📋 इम्पोर्ट</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>सर्वर लिंक (vmess://, vless://, ...)</value></data>
+  <data name="Ph_SubName" xml:space="preserve"><value>नाम</value></data>
+  <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
+  <data name="Sort_None" xml:space="preserve"><value>कोई सॉर्ट नहीं</value></data>
+  <data name="Sort_Latency" xml:space="preserve"><value>विलंबता (कम)</value></data>
+  <data name="Sort_Speed" xml:space="preserve"><value>गति (अधिक)</value></data>
+  <data name="Sort_Name" xml:space="preserve"><value>नाम</value></data>
+  <data name="Status_Ready" xml:space="preserve"><value>तैयार</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>कनेक्टेड</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>डिस्कनेक्टेड</value></data>
+  <data name="Ctx_Connect" xml:space="preserve"><value>कनेक्ट</value></data>
+  <data name="Ctx_Disconnect" xml:space="preserve"><value>डिस्कनेक्ट</value></data>
+  <data name="Ctx_Edit" xml:space="preserve"><value>सर्वर संपादित करें</value></data>
+  <data name="Ctx_Clone" xml:space="preserve"><value>सर्वर क्लोन करें</value></data>
+  <data name="Ctx_Share" xml:space="preserve"><value>शेयर</value></data>
+  <data name="Ctx_TestPing" xml:space="preserve"><value>पिंग परीक्षण</value></data>
+  <data name="Ctx_TestReal" xml:space="preserve"><value>वास्तविक विलंबता परीक्षण</value></data>
+  <data name="Ctx_TestSpeed" xml:space="preserve"><value>गति परीक्षण</value></data>
+  <data name="Ctx_Delete" xml:space="preserve"><value>सर्वर हटाएं</value></data>
+  <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess जोड़ें</value></data>
+  <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS जोड़ें</value></data>
+  <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks जोड़ें</value></data>
+  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Trojan जोड़ें</value></data>
+  <data name="Add_Clipboard" xml:space="preserve"><value>📋 क्लिपबोर्ड से इम्पोर्ट</value></data>
+  <data name="Set_Proxy" xml:space="preserve"><value>सिस्टम प्रॉक्सी सेट करें</value></data>
+  <data name="Set_AutoConnect" xml:space="preserve"><value>ऑटो कनेक्ट</value></data>
+  <data name="Set_AutoConnect_Desc" xml:space="preserve"><value>(स्टार्ट पर चयनित सर्वर से कनेक्ट करें)</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>सब्सक्रिप्शन ऑटो अपडेट करें</value></data>
+  <data name="Set_Interval" xml:space="preserve"><value>हर {0} घंटे अपडेट करें</value></data>
+  <data name="Set_Language" xml:space="preserve"><value>ऐप भाषा</value></data>
+  <data name="Set_Connection" xml:space="preserve"><value>कनेक्शन</value></data>
+  <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>सब्सक्रिप्शन ऑटो अपडेट करें</value></data>
+  <data name="Set_LeaveProxy" xml:space="preserve"><value>सिस्टम प्रॉक्सी न बदलें</value></data>
+  <data name="Set_LeaveProxy_Desc" xml:space="preserve"><value>कनेक्शन/डिस्कनेक्शन पर सिस्टम प्रॉक्सी नहीं बदलेगा</value></data>
+  <data name="Set_ClearProxy" xml:space="preserve"><value>सिस्टम प्रॉक्सी साफ करें</value></data>
+  <data name="Set_ClearProxy_Desc" xml:space="preserve"><value>डिस्कनेक्शन पर सिस्टम प्रॉक्सी साफ हो जाएगा</value></data>
+  <data name="Set_Every" xml:space="preserve"><value>हर</value></data>
+  <data name="Set_Hours" xml:space="preserve"><value>घंटे अपडेट करें</value></data>
+  <data name="Set_Advanced" xml:space="preserve"><value>उन्नत सेटिंग्स</value></data>
+  <data name="Set_PingType" xml:space="preserve"><value>पिंग प्रकार:</value></data>
+  <data name="Set_GlobalSort" xml:space="preserve"><value>वैश्विक सॉर्ट (परीक्षण के बाद सभी ग्रुप का बेस्ट सर्वर ऊपर आएगा)</value></data>
+  <data name="Set_DNS" xml:space="preserve"><value>कस्टम DNS</value></data>
+  <data name="Set_DNSBtn" xml:space="preserve"><value>⚙ DNS सेटिंग्स</value></data>
+  <data name="Set_TUN" xml:space="preserve"><value>TUN मोड (पूर्ण सिस्टम VPN)</value></data>
+  <data name="Set_TUN_Desc" xml:space="preserve"><value>एडमिन अधिकार आवश्यक। पूरे सिस्टम ट्रैफ़िक को टनल से गुज़ारेगा</value></data>
+  <data name="Dlg_Continue" xml:space="preserve"><value>जारी रखें</value></data>
+  <data name="Dlg_RestartAdmin" xml:space="preserve"><value>एडमिन के रूप में पुनरारंभ</value></data>
+  <data name="Dlg_NeedsAdmin" xml:space="preserve"><value>एडमिन अधिकार आवश्यक</value></data>
+  <data name="Dlg_TUNAdminMsg" xml:space="preserve"><value>TUN मोड के लिए एडमिन अधिकार आवश्यक है।</value></data>
+  <data name="Dlg_Yes" xml:space="preserve"><value>हाँ</value></data>
+  <data name="Dlg_No" xml:space="preserve"><value>नहीं</value></data>
+  <data name="Dlg_ConfirmDelete" xml:space="preserve"><value>हटाने की पुष्टि करें</value></data>
+  <data name="Dlg_Save" xml:space="preserve"><value>सहेजें</value></data>
+  <data name="Dlg_Cancel" xml:space="preserve"><value>रद्द करें</value></data>
+  <data name="Dlg_DNSSettings" xml:space="preserve"><value>DNS सेटिंग्स</value></data>
+  <data name="Dlg_DNSSimple" xml:space="preserve"><value>सिंपल DNS</value></data>
+  <data name="Dlg_DNSHint" xml:space="preserve"><value>IPv4/IPv6 कॉमा से अलग करें</value></data>
+  <data name="Dlg_DNSAdvanced" xml:space="preserve"><value>उन्नत DNS (JSON)</value></data>
+  <data name="Dlg_DNSDocs" xml:space="preserve"><value>डॉक्यूमेंटेशन: https://xtls.github.io/config/dns.html</value></data>
+  <data name="Dlg_EditServer" xml:space="preserve"><value>सर्वर संपादित करें</value></data>
+  <data name="Dlg_Name" xml:space="preserve"><value>नाम</value></data>
+  <data name="Dlg_Address" xml:space="preserve"><value>पता</value></data>
+  <data name="Dlg_Port" xml:space="preserve"><value>पोर्ट</value></data>
+  <data name="Dlg_RebuiltLink" xml:space="preserve"><value>पुनर्निर्मित लिंक</value></data>
+  <data name="Dlg_ShareQR" xml:space="preserve"><value>शेयर (QR)</value></data>
+  <data name="Dlg_CopyLink" xml:space="preserve"><value>लिंक कॉपी करें</value></data>
+  <data name="Dlg_Close" xml:space="preserve"><value>बंद करें</value></data>
+  <data name="SelectedCount" xml:space="preserve"><value>{0} चयनित</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>सभी</value></data>
+  <data name="Filter_Errors" xml:space="preserve"><value>केवल त्रुटियाँ</value></data>
+  <data name="Filter_Connection" xml:space="preserve"><value>केवल कनेक्शन</value></data>
+  <data name="Filter_Label" xml:space="preserve"><value>फ़िल्टर:</value></data>
+  <data name="Log_ServersLoaded" xml:space="preserve"><value>नमस्ते! {0} सर्वर और {1} सब्सक्रिप्शन लोड हुए।</value></data>
+  <data name="Log_Connected" xml:space="preserve"><value>कनेक्टेड। HTTP 127.0.0.1:{0}</value></data>
+  <data name="Log_Disconnected" xml:space="preserve"><value>डिस्कनेक्टेड।</value></data>
+  <data name="Log_ServerAdded" xml:space="preserve"><value>"{0}" जोड़ा गया।</value></data>
+  <data name="Log_ServerDup" xml:space="preserve"><value>"{0}" डुप्लिकेट है।</value></data>
+  <data name="Log_SubAdded" xml:space="preserve"><value>"{0}" जोड़ा गया ({1} सर्वर)</value></data>
+  <data name="Log_Merged" xml:space="preserve"><value>मर्ज किया "{0}": {1} नए सर्वर, कुल {2}।</value></data>
+  <data name="Log_NoSub" xml:space="preserve"><value>कोई सब्सक्रिप्शन नहीं।</value></data>
+  <data name="Log_Updated" xml:space="preserve"><value>अपडेट किया ({0} सर्वर, {1} यूनीक — मैनुअल सर्वर सुरक्षित)</value></data>
+  <data name="Log_SmartStage1" xml:space="preserve"><value>स्मार्ट कनेक्शन: चरण 1 - सभी सर्वर पर तेज़ TCP पिंग</value></data>
+  <data name="Log_SmartCandidates" xml:space="preserve"><value>स्मार्ट कनेक्शन: {0} उम्मीदवार चयनित</value></data>
+  <data name="Log_SmartStage2" xml:space="preserve"><value>स्मार्ट कनेक्शन: {0} उम्मीदवार अलग-अलग टेस्ट</value></data>
+  <data name="Log_SmartTesting" xml:space="preserve"><value>स्मार्ट कनेक्शन: {0} टेस्ट हो रहा है ...</value></data>
+  <data name="Log_SmartResult" xml:space="preserve"><value>स्मार्ट कनेक्शन: {0} → {1}ms</value></data>
+  <data name="Log_SmartFailed" xml:space="preserve"><value>स्मार्ट कनेक्शन: {0} → विफल</value></data>
+  <data name="Log_SmartConnect" xml:space="preserve"><value>स्मार्ट कनेक्शन: {0} से कनेक्ट हो रहा है</value></data>
+  <data name="Log_SmartError" xml:space="preserve"><value>स्मार्ट कनेक्शन त्रुटि: {0}</value></data>
+  <data name="Log_NoPing" xml:space="preserve"><value>स्मार्ट कनेक्शन: कोई सर्वर पिंग का जवाब नहीं दिया</value></data>
+  <data name="Log_FindBetter" xml:space="preserve"><value>बेहतर खोजें: बैच {0} टेस्ट ({1} शेष)</value></data>
+  <data name="Log_FindSwitch" xml:space="preserve"><value>बेहतर खोजें: {0} ({1}ms) से स्विच → {2} ({3}ms)</value></data>
+  <data name="Log_FindBest" xml:space="preserve"><value>बेहतर खोजें: वर्तमान सर्वर अभी भी बेस्ट है</value></data>
+  <data name="Log_Sorted" xml:space="preserve"><value>{0} से सॉर्ट किया।</value></data>
+  <data name="Log_Error" xml:space="preserve"><value>त्रुटि: {0}</value></data>
+  <data name="Log_InvalidLink" xml:space="preserve"><value>स्किप किया: अमान्य लिंक।</value></data>
+  <data name="Log_ServersDeleted" xml:space="preserve"><value>{0} सर्वर हटाए गए।</value></data>
+  <data name="Log_SubRemoved" xml:space="preserve"><value>"{0}" और उसके सर्वर हटाए गए।</value></data>
+  <data name="Log_DupesRemoved" xml:space="preserve"><value>{0} डुप्लिकेट सर्वर हटाए गए।</value></data>
+  <data name="Log_Copied" xml:space="preserve"><value>लिंक "{0}" कॉपी किया।</value></data>
+  <data name="Log_Exported" xml:space="preserve"><value>एक्सपोर्ट किया: {0}</value></data>
+  <data name="Log_LinksCopied" xml:space="preserve"><value>{0} लिंक कॉपी किए गए।</value></data>
+  <data name="Log_SubCopied" xml:space="preserve"><value>Base64 सब्सक्रिप्शन कॉपी किया।</value></data>
+  <data name="Log_TestStopped" xml:space="preserve"><value>टेस्ट रोका गया</value></data>
+  <data name="Log_SubUpdated" xml:space="preserve"><value>"{0}": {1} सर्वर।</value></data>
+  <data name="AllServers_Title" xml:space="preserve"><value>📋 सभी सर्वर</value></data>
+  <data name="Header_Name" xml:space="preserve"><value>नाम</value></data>
+  <data name="Header_Ping" xml:space="preserve"><value>पिंग</value></data>
+  <data name="Header_Speed" xml:space="preserve"><value>गति</value></data>
+  <data name="Header_Status" xml:space="preserve"><value>स्थिति</value></data>
+  <data name="Header_Country" xml:space="preserve"><value>देश</value></data>
+  <data name="Header_Protocol" xml:space="preserve"><value>प्रोटोकॉल</value></data>
+  <data name="Header_Address" xml:space="preserve"><value>पता</value></data>
+  <data name="Header_Port" xml:space="preserve"><value>पोर्ट</value></data>
+  <data name="Header_Sub" xml:space="preserve"><value>सब्सक्रिप्शन</value></data>
+  <data name="ServerCount" xml:space="preserve"><value>{0} सर्वर</value></data>
+  <data name="Status_Failed" xml:space="preserve"><value>विफल</value></data>
+  <data name="Status_Error" xml:space="preserve"><value>त्रुटि</value></data>
+  <data name="Card_Ping" xml:space="preserve"><value>पिंग: </value></data>
+  <data name="Card_Speed" xml:space="preserve"><value>गति: </value></data>
+  <data name="Card_Connect" xml:space="preserve"><value>कनेक्ट</value></data>
+  <data name="Card_Disconnect" xml:space="preserve"><value>डिस्कनेक्ट</value></data>
+  <data name="Card_Edit" xml:space="preserve"><value>संपादित करें</value></data>
+  <data name="Card_Share" xml:space="preserve"><value>शेयर</value></data>
+  <data name="Card_Delete" xml:space="preserve"><value>हटाएं</value></data>
+  <data name="Card_Connected" xml:space="preserve"><value>कनेक्टेड</value></data>
+  <data name="Tray_Show" xml:space="preserve"><value>दिखाएँ</value></data>
+  <data name="Tray_SmartConnect" xml:space="preserve"><value>⚡ स्मार्ट कनेक्शन</value></data>
+  <data name="Tray_Stop" xml:space="preserve"><value>⏹ रोकें</value></data>
+  <data name="Tray_FindBetter" xml:space="preserve"><value>🔍 बेहतर सर्वर खोजें</value></data>
+  <data name="Tray_Proxy" xml:space="preserve"><value>सिस्टम प्रॉक्सी</value></data>
+  <data name="Tray_UpdateNoProxy" xml:space="preserve"><value>🔄 बिना प्रॉक्सी अपडेट करें</value></data>
+  <data name="Tray_UpdateProxy" xml:space="preserve"><value>🔄 प्रॉक्सी के साथ अपडेट करें</value></data>
+  <data name="Tray_Settings" xml:space="preserve"><value>⚙ सेटिंग्स</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>बाहर निकलें</value></data>
+  <data name="Tray_ConnectedTo" xml:space="preserve"><value>कनेक्टेड: {0}</value></data>
+  <data name="Tray_Searching" xml:space="preserve"><value>खोज रहे हैं...</value></data>
+  <data name="Tray_SearchingProgress" xml:space="preserve"><value>खोज रहे हैं... {0} / {1} सर्वर</value></data>
+
+  <data name="Hotkey_Info" xml:space="preserve">
+    <value>शॉर्टकट: Ctrl+Shift+C = कनेक्ट | Ctrl+Shift+D = डिस्कनेक्ट | Ctrl+Shift+S = स्मार्ट कनेक्ट | Ctrl+Shift+Q = बाहर</value>
+  </data>
+
+  <data name="Add_Link" xml:space="preserve"><value>जोड़ें</value></data>
+
+  <data name="Sub_UseProxy" xml:space="preserve"><value>अपडेट के लिए प्रॉक्सी का उपयोग करें</value></data>
+</root>

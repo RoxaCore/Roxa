@@ -42,13 +42,23 @@
     <SolidColorBrush x:Key="TextSecondary">#5C6E6A</SolidColorBrush>
 
     <DataTemplate x:Key="ServerRowTemplate" DataType="models:ServerInfo">
-      <Border CornerRadius="12" 
-              Padding="16,14" 
-              Margin="0,6,0,0"
+      <Border CornerRadius="8" 
+              Padding="10,6" 
+              Margin="0,2,0,0"
               HorizontalAlignment="Stretch"
-              Background="{Binding IsActiveConnection, Converter={x:Static converters:ActiveToBrushConverter.Instance}}"
-              BorderBrush="{Binding IsActiveConnection, Converter={x:Static converters:ActiveToBorderConverter.Instance}}"
               BorderThickness="1">
+        <Border.Background>
+          <MultiBinding Converter="{x:Static converters:ServerBgConverter.Instance}">
+            <Binding Path="IsActiveConnection"/>
+            <Binding Path="IsHighlighted"/>
+          </MultiBinding>
+        </Border.Background>
+        <Border.BorderBrush>
+          <MultiBinding Converter="{x:Static converters:ServerBorderConverter.Instance}">
+            <Binding Path="IsActiveConnection"/>
+            <Binding Path="IsHighlighted"/>
+          </MultiBinding>
+        </Border.BorderBrush>
         
         <Border.ContextMenu>
           <ContextMenu Padding="4">
@@ -67,49 +77,53 @@
           </ContextMenu>
         </Border.ContextMenu>
 
-        <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto" Margin="0">
-          <!-- Status Dot -->
-          <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,12,0" Fill="{Binding StatusColor}"/>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
 
-          <!-- Server Name & Details -->
-          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A" TextTrimming="CharacterEllipsis" MaxWidth="320"/>
-              <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center" Margin="0"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock FontSize="12" Foreground="#888888">
-                <Run Text="پینگ: "/>
-                <Run Text="{Binding LatencyDisplay, Mode=OneWay}"/>
-              </TextBlock>
-              <TextBlock Text="·" FontSize="12" Foreground="#CCCCCC"/>
-              <TextBlock FontSize="12" Foreground="#888888">
-                <Run Text="سرعت: "/>
-                <Run Text="{Binding SpeedDisplay, Mode=OneWay}"/>
-              </TextBlock>
-            </StackPanel>
-          </StackPanel>
+            <!-- Status Dot -->
+            <Ellipse Grid.Column="0" Width="8" Height="8" VerticalAlignment="Center" Margin="0,0,8,0" Fill="{Binding StatusColor}"/>
 
-          <!-- Metrics (hidden, data shown in details above) -->
-          
-          <!-- Action Buttons - Outline Style -->
-          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" Margin="12,0,0,0">
-            <Button ToolTip.Tip="اتصال" Padding="8,6" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="8" BorderThickness="1" BorderBrush="#D0D0D0">
-              <TextBlock Text="▶" FontSize="12"/>
-            </Button>
-            <Button ToolTip.Tip="قطع" Padding="8,6" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="Transparent" Foreground="#E53E3E" CornerRadius="8" BorderThickness="1" BorderBrush="#D0D0D0">
-              <TextBlock Text="✕" FontSize="12"/>
-            </Button>
-            <Button ToolTip.Tip="ویرایش" Padding="8,6" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="8" BorderThickness="1" BorderBrush="#D0D0D0">
-              <TextBlock Text="✎" FontSize="12"/>
-            </Button>
-            <Button ToolTip.Tip="اشتراک" Padding="8,6" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#D97706" CornerRadius="8" BorderThickness="1" BorderBrush="#D0D0D0">
-              <TextBlock Text="📋" FontSize="11"/>
-            </Button>
-            <Button ToolTip.Tip="حذف" Padding="8,6" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#E53E3E" CornerRadius="8" BorderThickness="1" BorderBrush="#D0D0D0">
-              <TextBlock Text="🗑" FontSize="11"/>
-            </Button>
-          </StackPanel>
+            <!-- Checkbox -->
+            <CheckBox Grid.Column="1" IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+
+            <!-- Server Name + Ping/Speed on one line -->
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="13" FontWeight="SemiBold" Foreground="#1A1A1A">
+              <Run Text="{Binding Name, Mode=OneWay}"/>
+              <Run Text="  " FontSize="10" Foreground="#AAAAAA"/>
+              <Run Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" Foreground="#AAAAAA"/>
+              <Run Text=" · " FontSize="10" Foreground="#CCCCCC"/>
+              <Run Text="{Binding SpeedDisplay, Mode=OneWay}" FontSize="10" Foreground="#AAAAAA"/>
+            </TextBlock>
+
+            <!-- Action Buttons -->
+            <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" Margin="8,0,0,0">
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Padding="6,4" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="6" BorderThickness="1" BorderBrush="#D0D0D0">
+                <TextBlock Text="▶" FontSize="11"/>
+              </Button>
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Disconnect}" Padding="6,4" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="Transparent" Foreground="#E53E3E" CornerRadius="6" BorderThickness="1" BorderBrush="#E53E3E">
+                <Button.Effect>
+                  <DropShadowEffect Color="#E53E3E" BlurRadius="12" Opacity="0.6" OffsetX="0" OffsetY="0"/>
+                </Button.Effect>
+                <TextBlock Text="✕" FontSize="24"/>
+              </Button>
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Edit}" Padding="6,4" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="6" BorderThickness="1" BorderBrush="#D0D0D0">
+                <TextBlock Text="✎" FontSize="11"/>
+              </Button>
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Share}" Padding="6,4" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#D97706" CornerRadius="6" BorderThickness="1" BorderBrush="#D0D0D0">
+                <TextBlock Text="📋" FontSize="10"/>
+              </Button>
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Delete}" Padding="6,4" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#E53E3E" CornerRadius="6" BorderThickness="1" BorderBrush="#D0D0D0">
+                <TextBlock Text="🗑" FontSize="10"/>
+              </Button>
+            </StackPanel>
         </Grid>
       </Border>
     </DataTemplate>
@@ -131,7 +145,7 @@
           <Ellipse Width="8" Height="8" Fill="#22C55E" IsVisible="{Binding IsConnected}" VerticalAlignment="Center"/>
           <Ellipse Width="8" Height="8" Fill="#CCCCCC" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" VerticalAlignment="Center"/>
           <TextBlock FontSize="12" Foreground="#888888" VerticalAlignment="Center" IsVisible="{Binding IsConnected}">
-            <Run Text="متصل"/>
+            <Run Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connected}"/>
             <Run Text=" · "/>
             <Run Text="{Binding HomeLatency, Mode=OneWay}"/>
           </TextBlock>
@@ -186,8 +200,12 @@
           <Border DockPanel.Dock="Top" Padding="0,0,0,16">
             <StackPanel Spacing="12">
               <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBox Text="{Binding ServerLink, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="لینک سرور" Width="400" Padding="12,10" BorderThickness="1" BorderBrush="#E0E0E0" CornerRadius="10" Background="#FFFFFF" FontSize="13"/>
-                <Button Padding="16,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="16" FontWeight="Bold">
+                <TextBox Text="{Binding ServerLink, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ph_ServerLink}" Width="400" Padding="12,10" BorderThickness="1" BorderBrush="#E0E0E0" CornerRadius="10" Background="#FFFFFF" FontSize="13">
+                  <TextBox.KeyBindings>
+                    <KeyBinding Gesture="Enter" Command="{Binding AddLinkCommand}"/>
+                  </TextBox.KeyBindings>
+                </TextBox>
+                <Button Padding="16,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold">
                   <Button.Flyout>
                     <MenuFlyout Placement="Bottom">
                       <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Add_Link}" Command="{Binding AddLinkCommand}"/>
@@ -200,7 +218,7 @@
                       <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Add_Clipboard}" Command="{Binding ImportFromClipboardCommand}"/>
                     </MenuFlyout>
                   </Button.Flyout>
-                  +
+                  افزودن
                 </Button>
                 <Button Command="{Binding SmartConnectCommand}" IsVisible="{Binding ShowSmartConnectButton}" Padding="14,10" CornerRadius="10" Background="#7C3AED" Foreground="White" FontSize="13" FontWeight="SemiBold">
                   <StackPanel Orientation="Horizontal" Spacing="6">
@@ -267,15 +285,30 @@
                           <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
                           <TextBlock Text="{Binding CountText}" Opacity="0.5" FontSize="12" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                          <StackPanel Orientation="Vertical" Spacing="2" IsVisible="{Binding IsSubscription}" MinWidth="200">
+                            <Grid ColumnDefinitions="*" Margin="0,0,0,2">
+                              <Border CornerRadius="4" Height="8" Background="#E0E0E0" ClipToBounds="True" HorizontalAlignment="Stretch">
+                                <Border CornerRadius="4" Height="8" Background="#2FC1A6" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5">
+                                  <Border.RenderTransform>
+                                    <ScaleTransform ScaleX="{Binding Subscription.TrafficPercent}"/>
+                                  </Border.RenderTransform>
+                                </Border>
+                              </Border>
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto">
+                              <TextBlock Text="{Binding Subscription.TrafficDisplay}" FontSize="10" Foreground="#666666" VerticalAlignment="Center"/>
+                              <TextBlock Grid.Column="1" Text="{Binding Subscription.ExpireText}" FontSize="10" Foreground="#666666" VerticalAlignment="Center"/>
+                            </Grid>
+                          </StackPanel>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Ping}" Padding="8,4" Command="{Binding Owner.TestGroupCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="#F5F5F5" Foreground="#555555" FontSize="11" BorderThickness="0"/>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Real}" Padding="8,4" Command="{Binding Owner.TestGroupRealDelayCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="#F5F5F5" Foreground="#555555" FontSize="11" BorderThickness="0"/>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Speed}" Padding="8,4" Command="{Binding Owner.TestGroupSpeedCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="#F5F5F5" Foreground="#555555" FontSize="11" BorderThickness="0"/>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateAll}" Padding="8,4" IsVisible="{Binding IsAllGroup}" Command="{Binding Owner.UpdateSubscriptionsCommand}" CornerRadius="6" Background="#FFF3E0" Foreground="#E65100" FontSize="11" BorderThickness="0"/>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}" Padding="8,4" IsVisible="{Binding IsSubscription}" Command="{Binding Owner.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding Subscription}" CornerRadius="6" Background="#FFF3E0" Foreground="#E65100" FontSize="11" BorderThickness="0"/>
-                          <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}" Padding="8,4" IsVisible="{Binding IsNotSubscription}" Command="{Binding Owner.UpdateGroupServersCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="#FFF3E0" Foreground="#E65100" FontSize="11" BorderThickness="0"/>
+                          <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}" Padding="8,4" IsVisible="{Binding IsManualGroup}" Command="{Binding Owner.UpdateGroupServersCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="#FFF3E0" Foreground="#E65100" FontSize="11" BorderThickness="0"/>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveSub}" Padding="8,4" IsVisible="{Binding IsSubscription}" Command="{Binding Owner.RemoveSubscriptionCommand}" CommandParameter="{Binding Subscription}" CornerRadius="6" Background="#FFF5F5" Foreground="#E53E3E" FontSize="11" BorderThickness="0"/>
-                          <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveAll}" Padding="8,4" IsVisible="{Binding IsNotSubscription}" Command="{Binding Owner.RemoveGroupServersCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="#FFF5F5" Foreground="#E53E3E" FontSize="11" BorderThickness="0"/>
+                          <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveAll}" Padding="8,4" IsVisible="{Binding IsManualGroup}" Command="{Binding Owner.RemoveGroupServersCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="#FFF5F5" Foreground="#E53E3E" FontSize="11" BorderThickness="0"/>
                         </StackPanel>
                         <ComboBox Grid.Column="3" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding GroupSortField, Mode=TwoWay}" Width="110" Padding="4,3" FontSize="10" VerticalAlignment="Center"/>
                       </Grid>
@@ -303,11 +336,14 @@
         <DockPanel>
           <StackPanel DockPanel.Dock="Top" Spacing="12" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBox Text="{Binding SubName, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="نام" Width="150" Padding="10,8" CornerRadius="6"/>
+              <TextBox Text="{Binding SubName, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ph_SubName}" Width="150" Padding="10,8" CornerRadius="6"/>
               <TextBox Text="{Binding SubUrl, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="https://..." Width="400" Padding="10,8" CornerRadius="6"/>
               <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Add}" Command="{Binding AddSubscriptionCommand}" Padding="16,8" CornerRadius="6" Background="{StaticResource PrimaryBrush}" Foreground="White"/>
             </StackPanel>
-            <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateAll}" Command="{Binding UpdateSubscriptionsCommand}" Padding="12,8" CornerRadius="6"/>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateAll}" Command="{Binding UpdateSubscriptionsCommand}" Padding="12,8" CornerRadius="6"/>
+              <CheckBox Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Sub_UseProxy}" IsChecked="{Binding UseProxyForSubscriptions}" VerticalAlignment="Center" FontSize="12"/>
+            </StackPanel>
           </StackPanel>
           
           <ScrollViewer>
@@ -319,6 +355,17 @@
                       <StackPanel Spacing="4">
                         <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13"/>
                         <TextBlock Text="{Binding ServerCount, StringFormat='تعداد سرورها: {0}'}" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="12" IsVisible="{Binding TrafficDisplay, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                          <TextBlock Text="{Binding TrafficDisplay}" FontSize="11" Foreground="#666666"/>
+                          <TextBlock Text="{Binding ExpireText}" FontSize="11" Foreground="#666666"/>
+                        </StackPanel>
+                        <Border CornerRadius="2" Height="4" Background="#E0E0E0" ClipToBounds="True" IsVisible="{Binding TrafficDisplay, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Margin="0,2,0,0">
+                          <Border CornerRadius="2" Height="4" Background="#2FC1A6" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5">
+                            <Border.RenderTransform>
+                              <ScaleTransform ScaleX="{Binding TrafficPercent}"/>
+                            </Border.RenderTransform>
+                          </Border>
+                        </Border>
                       </StackPanel>
                       <Button Grid.Column="1" Content="🔄" Padding="8" Margin="12,0,0,0" Command="{Binding #RootWindow.DataContext.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding}"/>
                       <Button Grid.Column="2" Content="🗑️" Padding="8" Margin="8,0,0,0" Command="{Binding #RootWindow.DataContext.RemoveSubscriptionCommand}" CommandParameter="{Binding}"/>
@@ -356,13 +403,19 @@
               <StackPanel Spacing="12">
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Connection}" FontWeight="Bold" FontSize="13"/>
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                  <CheckBox IsChecked="{Binding SetSystemProxy}" VerticalAlignment="Center"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Proxy}" VerticalAlignment="Center"/>
+                  <RadioButton GroupName="ProxyMode" IsChecked="{Binding SetSystemProxy}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Proxy}" VerticalAlignment="Center" Opacity="{Binding LeaveSystemProxyAsIs, Converter={StaticResource BoolToOpacity}}"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <RadioButton GroupName="ProxyMode" IsChecked="{Binding LeaveSystemProxyAsIs}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_LeaveProxy}" VerticalAlignment="Center" Opacity="{Binding SetSystemProxy, Converter={StaticResource BoolToOpacity}}"/>
                 </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_LeaveProxy_Desc}" FontSize="11" Foreground="#888888" Margin="24,0,0,0"/>
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                  <CheckBox IsChecked="{Binding AutoConnect}" VerticalAlignment="Center"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoConnect}" VerticalAlignment="Center"/>
+                  <CheckBox IsChecked="{Binding ClearProxyOnDisconnect}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_ClearProxy}" VerticalAlignment="Center"/>
                 </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_ClearProxy_Desc}" FontSize="11" Foreground="#888888" Margin="24,0,0,0"/>
               </StackPanel>
             </Border>
             
@@ -374,32 +427,37 @@
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdate}" VerticalAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding AutoUpdateSubs}">
-                  <TextBlock Text="هر" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Every}" VerticalAlignment="Center"/>
                   <TextBox Text="{Binding AutoUpdateIntervalHours}" Width="60" Padding="6,4" HorizontalContentAlignment="Center"/>
-                  <TextBlock Text="ساعت بروزرسانی شود" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Hours}" VerticalAlignment="Center"/>
                 </StackPanel>
                 <TextBlock Text="{Binding LastUpdateDisplay}" FontSize="11" Foreground="{StaticResource TextSecondary}" IsVisible="{Binding AutoUpdateSubs}"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <CheckBox IsChecked="{Binding AutoConnect}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoConnect}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoConnect_Desc}" FontSize="11" Foreground="#888888" Margin="24,0,0,0"/>
               </StackPanel>
             </Border>
 
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
-                <TextBlock Text="تنظیمات پیشرفته" FontWeight="Bold" FontSize="13"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Advanced}" FontWeight="Bold" FontSize="13"/>
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Text="نوع پینگ:" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_PingType}" VerticalAlignment="Center"/>
                   <ComboBox ItemsSource="{Binding PingTypeOptions}" SelectedItem="{Binding SelectedPingType}" Width="160"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="8">
                   <CheckBox IsChecked="{Binding GlobalSort}" VerticalAlignment="Center"/>
-                  <TextBlock Text="مرتب‌سازی سراسری (بعد از تست، بهترین سرور از همه گروه‌ها بالا میاد)" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_GlobalSort}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                 </StackPanel>
               </StackPanel>
             </Border>
 
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
-                <TextBlock Text="DNS سفارشی" FontWeight="Bold" FontSize="13"/>
-                <Button Content="⚙  تنظیمات DNS" Padding="16,10" CornerRadius="8" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold" Command="{Binding OpenDnsSettingsCommand}"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_DNS}" FontWeight="Bold" FontSize="13"/>
+                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_DNSBtn}" Padding="16,10" CornerRadius="8" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold" Command="{Binding OpenDnsSettingsCommand}"/>
               </StackPanel>
             </Border>
 
@@ -407,9 +465,9 @@
               <StackPanel Spacing="8">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <ToggleSwitch IsChecked="{Binding UseTunMode}"/>
-                  <TextBlock Text="حالت TUN (VPN کامل سیستم)" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TUN}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
                 </StackPanel>
-                <TextBlock Text="این حالت نیاز به دسترسی Administrator دارد و تمام ترافیک سیستم (نه فقط برنامه‌های سازگار با پروکسی) را از طریق تانل عبور می‌دهد" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TUN_Desc}" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
               </StackPanel>
             </Border>
 

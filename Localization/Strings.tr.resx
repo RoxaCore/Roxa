@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Tabs -->
+  <data name="Tab_Servers" xml:space="preserve">
+    <value>🖥️ Sunucular</value>
+  </data>
+  <data name="Tab_Subscription" xml:space="preserve">
+    <value>🔗 Abonelik</value>
+  </data>
+  <data name="Tab_Log" xml:space="preserve">
+    <value>📋 Günlük</value>
+  </data>
+  <data name="Tab_Settings" xml:space="preserve">
+    <value>⚙️ Ayarlar</value>
+  </data>
+
+  <!-- Buttons -->
+  <data name="Btn_Connect" xml:space="preserve">
+    <value>🔌 Bağlan</value>
+  </data>
+  <data name="Btn_Disconnect" xml:space="preserve">
+    <value>❌ Bağlantıyı Kes</value>
+  </data>
+  <data name="Btn_SmartConnect" xml:space="preserve">
+    <value>🧠 Akıllı Bağlantı</value>
+  </data>
+  <data name="Btn_FindBetter" xml:space="preserve">
+    <value>🔍 Daha İyi Sunucu Bul</value>
+  </data>
+  <data name="Btn_Ping" xml:space="preserve">
+    <value>📶 Ping</value>
+  </data>
+  <data name="Btn_PingAll" xml:space="preserve">
+    <value>📶 Tümünü Ping</value>
+  </data>
+  <data name="Btn_Real" xml:space="preserve">
+    <value>⚡ Gerçek Gecikme</value>
+  </data>
+  <data name="Btn_Speed" xml:space="preserve">
+    <value>🚀 Hız</value>
+  </data>
+  <data name="Btn_SpeedAll" xml:space="preserve">
+    <value>🚀 Hız Testi</value>
+  </data>
+  <data name="Btn_Stop" xml:space="preserve">
+    <value>⏹️ Dur</value>
+  </data>
+  <data name="Btn_UpdateAll" xml:space="preserve">
+    <value>🔄 Tümünü Güncelle</value>
+  </data>
+  <data name="Btn_Update" xml:space="preserve">
+    <value>🔄 Güncelle</value>
+  </data>
+  <data name="Btn_Add" xml:space="preserve">
+    <value>➕ Ekle</value>
+  </data>
+  <data name="Btn_RemoveSub" xml:space="preserve">
+    <value>🗑️ Aboneliği Sil</value>
+  </data>
+  <data name="Btn_RemoveAll" xml:space="preserve">
+    <value>🗑️ Tümünü Sil</value>
+  </data>
+  <data name="Btn_RemoveDupes" xml:space="preserve">
+    <value>🧹 Tekrar Edenleri Sil</value>
+  </data>
+  <data name="Btn_Export" xml:space="preserve">
+    <value>📤 Dışa Aktar</value>
+  </data>
+  <data name="Btn_Import" xml:space="preserve">
+    <value>📥 İçe Aktar</value>
+  </data>
+
+  <!-- Placeholders -->
+  <data name="Ph_ServerLink" xml:space="preserve">
+    <value>Sunucu bağlantısı (vmess://, vless://, ...)</value>
+  </data>
+  <data name="Ph_SubName" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="Ph_SubUrl" xml:space="preserve">
+    <value>https://...</value>
+  </data>
+
+  <!-- Sort -->
+  <data name="Sort_None" xml:space="preserve">
+    <value>Sıralama Yok</value>
+  </data>
+  <data name="Sort_Latency" xml:space="preserve">
+    <value>Gecikme (düşük)</value>
+  </data>
+  <data name="Sort_Speed" xml:space="preserve">
+    <value>Hız (yüksek)</value>
+  </data>
+  <data name="Sort_Name" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+
+  <!-- Status -->
+  <data name="Status_Ready" xml:space="preserve">
+    <value>Hazır</value>
+  </data>
+  <data name="Status_Connected" xml:space="preserve">
+    <value>Bağlı</value>
+  </data>
+  <data name="Status_Disconnected" xml:space="preserve">
+    <value>Bağlantı kesildi</value>
+  </data>
+  <data name="Status_Failed" xml:space="preserve">
+    <value>Başarısız</value>
+  </data>
+  <data name="Status_Error" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+
+  <!-- Context Menu -->
+  <data name="Ctx_Connect" xml:space="preserve">
+    <value>🔌 Bağlan</value>
+  </data>
+  <data name="Ctx_Disconnect" xml:space="preserve">
+    <value>❌ Bağlantıyı Kes</value>
+  </data>
+  <data name="Ctx_Edit" xml:space="preserve">
+    <value>✏️ Sunucuyu Düzenle</value>
+  </data>
+  <data name="Ctx_Clone" xml:space="preserve">
+    <value>📋 Sunucuyu Kopyala</value>
+  </data>
+  <data name="Ctx_Share" xml:space="preserve">
+    <value>🔗 Paylaş</value>
+  </data>
+  <data name="Ctx_TestPing" xml:space="preserve">
+    <value>📶 Ping Testi</value>
+  </data>
+  <data name="Ctx_TestReal" xml:space="preserve">
+    <value>⚡ Gerçek Gecikme Testi</value>
+  </data>
+  <data name="Ctx_TestSpeed" xml:space="preserve">
+    <value>🚀 Hız Testi</value>
+  </data>
+  <data name="Ctx_Delete" xml:space="preserve">
+    <value>🗑️ Sunucuyu Sil</value>
+  </data>
+
+  <!-- Add Methods -->
+  <data name="Add_Link" xml:space="preserve">
+    <value>🔗 Bağlantı ile Ekle</value>
+  </data>
+  <data name="Add_VMess" xml:space="preserve">
+    <value>➕ VMess Ekle</value>
+  </data>
+  <data name="Add_VLESS" xml:space="preserve">
+    <value>➕ VLESS Ekle</value>
+  </data>
+  <data name="Add_SS" xml:space="preserve">
+    <value>➕ Shadowsocks Ekle</value>
+  </data>
+  <data name="Add_Trojan" xml:space="preserve">
+    <value>➕ Trojan Ekle</value>
+  </data>
+  <data name="Add_Clipboard" xml:space="preserve">
+    <value>📋 Panodan İçe Aktar</value>
+  </data>
+
+  <!-- Settings -->
+  <data name="Set_Proxy" xml:space="preserve">
+    <value>🌐 Sistem Proxy'sini Ayarla</value>
+  </data>
+  <data name="Set_AutoConnect" xml:space="preserve">
+    <value>🔌 Otomatik Bağlan</value>
+  </data>
+  <data name="Set_AutoConnect_Desc" xml:space="preserve">
+    <value>(Uygulama başlangıcında seçili sunucuya bağlan)</value>
+  </data>
+  <data name="Set_AutoUpdate" xml:space="preserve">
+    <value>🔄 Otomatik Abonelik Güncelleme</value>
+  </data>
+  <data name="Set_Interval" xml:space="preserve">
+    <value>Her {0} saatte güncelle</value>
+  </data>
+  <data name="Set_Language" xml:space="preserve">
+    <value>🌍 Uygulama Dili</value>
+  </data>
+  <data name="Set_Connection" xml:space="preserve">
+    <value>🔌 Bağlantı</value>
+  </data>
+  <data name="Set_SubscriptionUpdate" xml:space="preserve">
+    <value>🔄 Abonelik Güncelleme</value>
+  </data>
+  <data name="Set_LeaveProxy" xml:space="preserve">
+    <value>🔒 Sistem proxy'sini değiştirme</value>
+  </data>
+  <data name="Set_LeaveProxy_Desc" xml:space="preserve">
+    <value>Bağlantı kesildiğinde/sağlandığında sistem proxy'si değişmez</value>
+  </data>
+  <data name="Set_ClearProxy" xml:space="preserve">
+    <value>🧹 Sistem proxy'sini temizle</value>
+  </data>
+  <data name="Set_ClearProxy_Desc" xml:space="preserve">
+    <value>Bağlantı kesildiğinde sistem proxy'si temizlenir</value>
+  </data>
+  <data name="Set_Every" xml:space="preserve">
+    <value>Her</value>
+  </data>
+  <data name="Set_Hours" xml:space="preserve">
+    <value>saatte güncelle</value>
+  </data>
+  <data name="Set_Advanced" xml:space="preserve">
+    <value>🔧 Gelişmiş Ayarlar</value>
+  </data>
+  <data name="Set_PingType" xml:space="preserve">
+    <value>Ping türü:</value>
+  </data>
+  <data name="Set_GlobalSort" xml:space="preserve">
+    <value>📊 Genel sıralama</value>
+  </data>
+  <data name="Set_DNS" xml:space="preserve">
+    <value>🌐 Özel DNS</value>
+  </data>
+  <data name="Set_DNSBtn" xml:space="preserve">
+    <value>DNS Ayarları</value>
+  </data>
+  <data name="Set_TUN" xml:space="preserve">
+    <value>🔒 TUN modu (tam sistem VPN)</value>
+  </data>
+  <data name="Set_TUN_Desc" xml:space="preserve">
+    <value>TUN modu yönetici erişimi gerektirir...</value>
+  </data>
+
+  <!-- Dialogs -->
+  <data name="Dlg_Continue" xml:space="preserve">
+    <value>Devam Et</value>
+  </data>
+  <data name="Dlg_RestartAdmin" xml:space="preserve">
+    <value>Yönetici Olarak Yeniden Başlat</value>
+  </data>
+  <data name="Dlg_NeedsAdmin" xml:space="preserve">
+    <value>Yönetici Erişimi Gerekli</value>
+  </data>
+  <data name="Dlg_TUNAdminMsg" xml:space="preserve">
+    <value>TUN modu yönetici olarak çalıştırılmalıdır.</value>
+  </data>
+  <data name="Dlg_Yes" xml:space="preserve">
+    <value>Evet</value>
+  </data>
+  <data name="Dlg_No" xml:space="preserve">
+    <value>Hayır</value>
+  </data>
+  <data name="Dlg_ConfirmDelete" xml:space="preserve">
+    <value>Silmeyi Onayla</value>
+  </data>
+  <data name="Dlg_Save" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="Dlg_Cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="Dlg_DNSSettings" xml:space="preserve">
+    <value>DNS Ayarları</value>
+  </data>
+  <data name="Dlg_DNSSimple" xml:space="preserve">
+    <value>Basit DNS</value>
+  </data>
+  <data name="Dlg_DNSHint" xml:space="preserve">
+    <value>IPv4/IPv6 virgülle ayrılmış</value>
+  </data>
+  <data name="Dlg_DNSAdvanced" xml:space="preserve">
+    <value>Gelişmiş DNS (JSON)</value>
+  </data>
+  <data name="Dlg_DNSDocs" xml:space="preserve">
+    <value>Dökümanlar</value>
+  </data>
+  <data name="Dlg_EditServer" xml:space="preserve">
+    <value>Sunucuyu Düzenle</value>
+  </data>
+  <data name="Dlg_Name" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="Dlg_Address" xml:space="preserve">
+    <value>Adres</value>
+  </data>
+  <data name="Dlg_Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="Dlg_RebuiltLink" xml:space="preserve">
+    <value>Yeniden Oluşturulan Bağlantı</value>
+  </data>
+  <data name="Dlg_ShareQR" xml:space="preserve">
+    <value>Paylaş (QR)</value>
+  </data>
+  <data name="Dlg_CopyLink" xml:space="preserve">
+    <value>Bağlantıyı Kopyala</value>
+  </data>
+  <data name="Dlg_Close" xml:space="preserve">
+    <value>Kapat</value>
+  </data>
+
+  <!-- Selection -->
+  <data name="SelectedCount" xml:space="preserve">
+    <value>{0} seçildi</value>
+  </data>
+
+  <!-- Filters -->
+  <data name="Filter_All" xml:space="preserve">
+    <value>Tümü</value>
+  </data>
+  <data name="Filter_Errors" xml:space="preserve">
+    <value>Sadece Hatalar</value>
+  </data>
+  <data name="Filter_Connection" xml:space="preserve">
+    <value>Sadece Bağlantı</value>
+  </data>
+  <data name="Filter_Label" xml:space="preserve">
+    <value>Filtre:</value>
+  </data>
+
+  <!-- Log Messages -->
+  <data name="Log_ServersLoaded" xml:space="preserve">
+    <value>{0} sunucu yüklendi</value>
+  </data>
+  <data name="Log_Connected" xml:space="preserve">
+    <value>{0} adresine bağlandı</value>
+  </data>
+  <data name="Log_Disconnected" xml:space="preserve">
+    <value>Bağlantı kesildi</value>
+  </data>
+  <data name="Log_ServerAdded" xml:space="preserve">
+    <value>Sunucu eklendi: {0}</value>
+  </data>
+  <data name="Log_ServerDup" xml:space="preserve">
+    <value>Bu sunucu zaten mevcut: {0}</value>
+  </data>
+  <data name="Log_SubAdded" xml:space="preserve">
+    <value>Abonelik eklendi: {0}</value>
+  </data>
+  <data name="Log_Merged" xml:space="preserve">
+    <value>{0} sunucu birleştirildi</value>
+  </data>
+  <data name="Log_NoSub" xml:space="preserve">
+    <value>Bağlantı abonelik içeriyor, ancak sunucu ekleme modunda</value>
+  </data>
+  <data name="Log_Updated" xml:space="preserve">
+    <value>Abonelik güncellendi: {0}</value>
+  </data>
+  <data name="Log_SmartStage1" xml:space="preserve">
+    <value>Akıllı bağlantı: sunucular test ediliyor...</value>
+  </data>
+  <data name="Log_SmartCandidates" xml:space="preserve">
+    <value>{0} aday sunucu bulundu</value>
+  </data>
+  <data name="Log_SmartStage2" xml:space="preserve">
+    <value>Adaylar için hız testi yapılıyor...</value>
+  </data>
+  <data name="Log_SmartTesting" xml:space="preserve">
+    <value>Hız testi: {0}</value>
+  </data>
+  <data name="Log_SmartResult" xml:space="preserve">
+    <value>En iyi sunucu: {0} ({1} ms, {2} Mbps)</value>
+  </data>
+  <data name="Log_SmartFailed" xml:space="preserve">
+    <value>Akıllı bağlantı başarısız: hiçbir sunucu bulunamadı</value>
+  </data>
+  <data name="Log_SmartConnect" xml:space="preserve">
+    <value>Akıllı bağlantı seçilen sunucuya bağlanıyor: {0}</value>
+  </data>
+  <data name="Log_SmartError" xml:space="preserve">
+    <value>Akıllı bağlantı hatası: {0}</value>
+  </data>
+  <data name="Log_NoPing" xml:space="preserve">
+    <value>Ping testi yapılacak sunucu yok</value>
+  </data>
+  <data name="Log_FindBetter" xml:space="preserve">
+    <value>Daha iyi sunucu aranıyor...</value>
+  </data>
+  <data name="Log_FindSwitch" xml:space="preserve">
+    <value>Daha iyi sunucuya geçiliyor: {0}</value>
+  </data>
+  <data name="Log_FindBest" xml:space="preserve">
+    <value>Mevcut sunucu en iyisi: {0}</value>
+  </data>
+  <data name="Log_Sorted" xml:space="preserve">
+    <value>Sunucular {0} sıralamasına göre sıralandı</value>
+  </data>
+  <data name="Log_Error" xml:space="preserve">
+    <value>Hata: {0}</value>
+  </data>
+  <data name="Log_InvalidLink" xml:space="preserve">
+    <value>Geçersiz bağlantı: {0}</value>
+  </data>
+  <data name="Log_ServersDeleted" xml:space="preserve">
+    <value>{0} sunucu silindi</value>
+  </data>
+  <data name="Log_SubRemoved" xml:space="preserve">
+    <value>Abonelik silindi: {0}</value>
+  </data>
+  <data name="Log_DupesRemoved" xml:space="preserve">
+    <value>{0} tekrar eden sunucu silindi</value>
+  </data>
+  <data name="Log_Copied" xml:space="preserve">
+    <value>Panoya kopyalandı</value>
+  </data>
+  <data name="Log_Exported" xml:space="preserve">
+    <value>{0} sunucu dışa aktarıldı</value>
+  </data>
+  <data name="Log_LinksCopied" xml:space="preserve">
+    <value>{0} bağlantı panoya kopyalandı</value>
+  </data>
+  <data name="Log_SubCopied" xml:space="preserve">
+    <value>Abonelik bağlantısı panoya kopyalandı</value>
+  </data>
+  <data name="Log_TestStopped" xml:space="preserve">
+    <value>Test durduruldu</value>
+  </data>
+  <data name="Log_SubUpdated" xml:space="preserve">
+    <value>Abonelik güncellendi: {0} ({1} sunucu)</value>
+  </data>
+
+  <!-- All Servers Title -->
+  <data name="AllServers_Title" xml:space="preserve">
+    <value>Tüm Sunucular</value>
+  </data>
+
+  <!-- Headers -->
+  <data name="Header_Name" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="Header_Ping" xml:space="preserve">
+    <value>Ping</value>
+  </data>
+  <data name="Header_Speed" xml:space="preserve">
+    <value>Hız</value>
+  </data>
+  <data name="Header_Status" xml:space="preserve">
+    <value>Durum</value>
+  </data>
+  <data name="Header_Country" xml:space="preserve">
+    <value>Ülke</value>
+  </data>
+  <data name="Header_Protocol" xml:space="preserve">
+    <value>Protokol</value>
+  </data>
+  <data name="Header_Address" xml:space="preserve">
+    <value>Adres</value>
+  </data>
+  <data name="Header_Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="Header_Sub" xml:space="preserve">
+    <value>Abonelik</value>
+  </data>
+
+  <!-- Server Count -->
+  <data name="ServerCount" xml:space="preserve">
+    <value>{0} sunucu</value>
+  </data>
+
+  <!-- Card Buttons -->
+  <data name="Card_Ping" xml:space="preserve">
+    <value>📶 Ping:</value>
+  </data>
+  <data name="Card_Speed" xml:space="preserve">
+    <value>🚀 Hız:</value>
+  </data>
+  <data name="Card_Connect" xml:space="preserve">
+    <value>🔌 Bağlan</value>
+  </data>
+  <data name="Card_Disconnect" xml:space="preserve">
+    <value>❌ Kes</value>
+  </data>
+  <data name="Card_Edit" xml:space="preserve">
+    <value>✏️ Düzenle</value>
+  </data>
+  <data name="Card_Share" xml:space="preserve">
+    <value>🔗 Paylaş</value>
+  </data>
+  <data name="Card_Delete" xml:space="preserve">
+    <value>🗑️ Sil</value>
+  </data>
+  <data name="Card_Connected" xml:space="preserve">
+    <value>✅ Bağlı</value>
+  </data>
+
+  <!-- Tray -->
+  <data name="Tray_Show" xml:space="preserve">
+    <value>👁️ Göster</value>
+  </data>
+  <data name="Tray_SmartConnect" xml:space="preserve">
+    <value>🧠 Akıllı Bağlantı</value>
+  </data>
+  <data name="Tray_Stop" xml:space="preserve">
+    <value>⏹️ Dur</value>
+  </data>
+  <data name="Tray_FindBetter" xml:space="preserve">
+    <value>🔍 Daha İyi Sunucu Ara</value>
+  </data>
+  <data name="Tray_Proxy" xml:space="preserve">
+    <value>🌐 Sistem Proxy'si</value>
+  </data>
+  <data name="Tray_UpdateNoProxy" xml:space="preserve">
+    <value>🔄 Proxy'siz Güncelle</value>
+  </data>
+  <data name="Tray_UpdateProxy" xml:space="preserve">
+    <value>🔄 Proxy ile Güncelle</value>
+  </data>
+  <data name="Tray_Settings" xml:space="preserve">
+    <value>⚙️ Ayarlar</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>🚪 Çıkış</value>
+  </data>
+  <data name="Tray_ConnectedTo" xml:space="preserve">
+    <value>✅ Bağlı: {0}</value>
+  </data>
+  <data name="Tray_Searching" xml:space="preserve">
+    <value>🔍 Aranıyor...</value>
+  </data>
+  <data name="Tray_SearchingProgress" xml:space="preserve">
+    <value>🔍 Aranıyor... {0} / {1} sunucu</value>
+  </data>
+
+  <data name="Hotkey_Info" xml:space="preserve">
+    <value>Kısayollar: Ctrl+Shift+C = Bağlan | Ctrl+Shift+D = Kes | Ctrl+Shift+S = Akıllı Bağlantı | Ctrl+Shift+Q = Çıkış</value>
+  </data>
+
+  <data name="Add_Link" xml:space="preserve"><value>Ekle</value></data>
+
+  <data name="Sub_UseProxy" xml:space="preserve"><value>Güncellemeleri proxy üzerinden yap</value></data>
+</root>

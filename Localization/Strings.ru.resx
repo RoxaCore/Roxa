@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <!-- Tabs -->
+  <data name="Tab_Servers" xml:space="preserve"><value>Серверы</value></data>
+  <data name="Tab_Subscription" xml:space="preserve"><value>Подписка</value></data>
+  <data name="Tab_Log" xml:space="preserve"><value>Лог</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>⚙ Настройки</value></data>
+  <!-- Buttons -->
+  <data name="Btn_Connect" xml:space="preserve"><value>▶ Подключить</value></data>
+  <data name="Btn_Disconnect" xml:space="preserve"><value>Отключить</value></data>
+  <data name="Btn_SmartConnect" xml:space="preserve"><value>Умное подключение</value></data>
+  <data name="Btn_FindBetter" xml:space="preserve"><value>Найти лучший сервер</value></data>
+  <data name="Btn_Ping" xml:space="preserve"><value>Пинг</value></data>
+  <data name="Btn_PingAll" xml:space="preserve"><value>🔄 Пинг всех</value></data>
+  <data name="Btn_Real" xml:space="preserve"><value>Реальная задержка</value></data>
+  <data name="Btn_Speed" xml:space="preserve"><value>Скорость</value></data>
+  <data name="Btn_SpeedAll" xml:space="preserve"><value>🚀 Тест скорости</value></data>
+  <data name="Btn_Stop" xml:space="preserve"><value>Стоп</value></data>
+  <data name="Btn_UpdateAll" xml:space="preserve"><value>Обновить все</value></data>
+  <data name="Btn_Update" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>+ Добавить</value></data>
+  <data name="Btn_RemoveSub" xml:space="preserve"><value>Удалить подписку</value></data>
+  <data name="Btn_RemoveAll" xml:space="preserve"><value>Удалить все</value></data>
+  <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ Удалить дубликаты</value></data>
+  <data name="Btn_Export" xml:space="preserve"><value>📦 Экспорт</value></data>
+  <data name="Btn_Import" xml:space="preserve"><value>📋 Импорт</value></data>
+  <!-- Placeholders -->
+  <data name="Ph_ServerLink" xml:space="preserve"><value>Ссылка на сервер (vmess://, vless://, ...)</value></data>
+  <data name="Ph_SubName" xml:space="preserve"><value>Название</value></data>
+  <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
+  <!-- Sort -->
+  <data name="Sort_None" xml:space="preserve"><value>Без сортировки</value></data>
+  <data name="Sort_Latency" xml:space="preserve"><value>Задержка (мин)</value></data>
+  <data name="Sort_Speed" xml:space="preserve"><value>Скорость (макс)</value></data>
+  <data name="Sort_Name" xml:space="preserve"><value>Название</value></data>
+  <!-- Status -->
+  <data name="Status_Ready" xml:space="preserve"><value>Готов</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>Подключено</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>Отключено</value></data>
+  <!-- Context Menu -->
+  <data name="Ctx_Connect" xml:space="preserve"><value>Подключить</value></data>
+  <data name="Ctx_Disconnect" xml:space="preserve"><value>Отключить</value></data>
+  <data name="Ctx_Edit" xml:space="preserve"><value>Редактировать сервер</value></data>
+  <data name="Ctx_Clone" xml:space="preserve"><value>Копировать сервер</value></data>
+  <data name="Ctx_Share" xml:space="preserve"><value>Поделиться</value></data>
+  <data name="Ctx_TestPing" xml:space="preserve"><value>Тест Ping</value></data>
+  <data name="Ctx_TestReal" xml:space="preserve"><value>Реальная задержка</value></data>
+  <data name="Ctx_TestSpeed" xml:space="preserve"><value>Тест скорости</value></data>
+  <data name="Ctx_Delete" xml:space="preserve"><value>Удалить сервер</value></data>
+  <!-- Add Menu -->
+  <data name="Add_VMess" xml:space="preserve"><value>🟢 Добавить VMess</value></data>
+  <data name="Add_VLESS" xml:space="preserve"><value>🔵 Добавить VLESS</value></data>
+  <data name="Add_SS" xml:space="preserve"><value>🟠 Добавить Shadowsocks</value></data>
+  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Добавить Trojan</value></data>
+  <data name="Add_Clipboard" xml:space="preserve"><value>📋 Импорт из буфера обмена</value></data>
+  <!-- Settings -->
+  <data name="Set_Proxy" xml:space="preserve"><value>Установить системный прокси</value></data>
+  <data name="Set_AutoConnect" xml:space="preserve"><value>Автоподключение</value></data>
+  <data name="Set_AutoConnect_Desc" xml:space="preserve"><value>(Подключаться к выбранному серверу при запуске)</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>Автообновление подписок</value></data>
+  <data name="Set_Interval" xml:space="preserve"><value>Обновлять каждые {0} часов</value></data>
+  <data name="Set_Language" xml:space="preserve"><value>Язык программы</value></data>
+  <data name="Set_Connection" xml:space="preserve"><value>Подключение</value></data>
+  <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>Автообновление подписок</value></data>
+  <data name="Set_LeaveProxy" xml:space="preserve"><value>Не изменять системный прокси</value></data>
+  <data name="Set_LeaveProxy_Desc" xml:space="preserve"><value>Системный прокси не изменяется при подключении/отключении</value></data>
+  <data name="Set_ClearProxy" xml:space="preserve"><value>Очистить системный прокси</value></data>
+  <data name="Set_ClearProxy_Desc" xml:space="preserve"><value>Системный прокси очищается при отключении</value></data>
+  <data name="Set_Every" xml:space="preserve"><value>Каждые</value></data>
+  <data name="Set_Hours" xml:space="preserve"><value>часов обновлять</value></data>
+  <data name="Set_Advanced" xml:space="preserve"><value>Дополнительные настройки</value></data>
+  <data name="Set_PingType" xml:space="preserve"><value>Тип пинга:</value></data>
+  <data name="Set_GlobalSort" xml:space="preserve"><value>Глобальная сортировка (после теста лучший сервер из всех групп)</value></data>
+  <data name="Set_DNS" xml:space="preserve"><value>Пользовательский DNS</value></data>
+  <data name="Set_DNSBtn" xml:space="preserve"><value>⚙  Настройки DNS</value></data>
+  <data name="Set_TUN" xml:space="preserve"><value>Режим TUN (полный VPN)</value></data>
+  <data name="Set_TUN_Desc" xml:space="preserve"><value>Требует прав администратора. Направляет весь трафик (не только приложения с поддержкой прокси) через туннель</value></data>
+  <!-- Dialogs -->
+  <data name="Dlg_Continue" xml:space="preserve"><value>Продолжить</value></data>
+  <data name="Dlg_RestartAdmin" xml:space="preserve"><value>Перезапуск от администратора</value></data>
+  <data name="Dlg_NeedsAdmin" xml:space="preserve"><value>Требуются права администратора</value></data>
+  <data name="Dlg_TUNAdminMsg" xml:space="preserve"><value>Режим TUN требует прав администратора.&#10;Для включения необходимо перезапустить программу с правами администратора.</value></data>
+  <data name="Dlg_Yes" xml:space="preserve"><value>Да</value></data>
+  <data name="Dlg_No" xml:space="preserve"><value>Нет</value></data>
+  <data name="Dlg_ConfirmDelete" xml:space="preserve"><value>Подтвердить удаление</value></data>
+  <data name="Dlg_Save" xml:space="preserve"><value>Сохранить</value></data>
+  <data name="Dlg_Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Dlg_DNSSettings" xml:space="preserve"><value>Настройки DNS</value></data>
+  <data name="Dlg_DNSSimple" xml:space="preserve"><value>Простой DNS</value></data>
+  <data name="Dlg_DNSHint" xml:space="preserve"><value>IPv4/IPv6 через запятую</value></data>
+  <data name="Dlg_DNSAdvanced" xml:space="preserve"><value>Продвинутый DNS (JSON)</value></data>
+  <data name="Dlg_DNSDocs" xml:space="preserve"><value>Документация: https://xtls.github.io/config/dns.html</value></data>
+  <data name="Dlg_EditServer" xml:space="preserve"><value>Редактировать сервер</value></data>
+  <data name="Dlg_Name" xml:space="preserve"><value>Название</value></data>
+  <data name="Dlg_Address" xml:space="preserve"><value>Адрес</value></data>
+  <data name="Dlg_Port" xml:space="preserve"><value>Порт</value></data>
+  <data name="Dlg_RebuiltLink" xml:space="preserve"><value>Восстановленная ссылка</value></data>
+  <data name="Dlg_ShareQR" xml:space="preserve"><value>Поделиться (QR)</value></data>
+  <data name="Dlg_CopyLink" xml:space="preserve"><value>Копировать ссылку</value></data>
+  <data name="Dlg_Close" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="SelectedCount" xml:space="preserve"><value>Выбрано: {0}</value></data>
+  <!-- Filter -->
+  <data name="Filter_All" xml:space="preserve"><value>Все</value></data>
+  <data name="Filter_Errors" xml:space="preserve"><value>Только ошибки</value></data>
+  <data name="Filter_Connection" xml:space="preserve"><value>Только подключения</value></data>
+  <data name="Filter_Label" xml:space="preserve"><value>Фильтр:</value></data>
+  <!-- Log Messages -->
+  <data name="Log_ServersLoaded" xml:space="preserve"><value>Загружено {0} серверов и {1} подписок.</value></data>
+  <data name="Log_Connected" xml:space="preserve"><value>Подключено. HTTP 127.0.0.1:{0}</value></data>
+  <data name="Log_Disconnected" xml:space="preserve"><value>Отключено.</value></data>
+  <data name="Log_ServerAdded" xml:space="preserve"><value>"{0}" добавлен.</value></data>
+  <data name="Log_ServerDup" xml:space="preserve"><value>"{0}" дубликат.</value></data>
+  <data name="Log_SubAdded" xml:space="preserve"><value>"{0}" добавлен ({1} серверов)</value></data>
+  <data name="Log_Merged" xml:space="preserve"><value>Объединено "{0}": {1} новых серверов, всего {2}.</value></data>
+  <data name="Log_NoSub" xml:space="preserve"><value>Нет подписок.</value></data>
+  <data name="Log_Updated" xml:space="preserve"><value>Обновлено ({0} серверов, {1} уникальных — ручные серверы сохранены)</value></data>
+  <data name="Log_SmartStage1" xml:space="preserve"><value>Умное подключение: этап 1 - быстрый TCP пинг всех серверов</value></data>
+  <data name="Log_SmartCandidates" xml:space="preserve"><value>Умное подключение: выбрано {0} кандидатов</value></data>
+  <data name="Log_SmartStage2" xml:space="preserve"><value>Умное подключение: тест {0} кандидатов по очереди</value></data>
+  <data name="Log_SmartTesting" xml:space="preserve"><value>Умное подключение: тест {0} ...</value></data>
+  <data name="Log_SmartResult" xml:space="preserve"><value>Умное подключение: {0} → {1}мс</value></data>
+  <data name="Log_SmartFailed" xml:space="preserve"><value>Умное подключение: {0} → неудачно</value></data>
+  <data name="Log_SmartConnect" xml:space="preserve"><value>Умное подключение: подключение к {0}</value></data>
+  <data name="Log_SmartError" xml:space="preserve"><value>Ошибка умного подключения: {0}</value></data>
+  <data name="Log_NoPing" xml:space="preserve"><value>Умное подключение: ни один сервер не ответил</value></data>
+  <data name="Log_FindBetter" xml:space="preserve"><value>Поиск лучшего: тест пакета {0} (осталось {1})</value></data>
+  <data name="Log_FindSwitch" xml:space="preserve"><value>Поиск лучшего: переключение с {0} ({1}мс) на {2} ({3}мс)</value></data>
+  <data name="Log_FindBest" xml:space="preserve"><value>Поиск лучшего: текущий сервер всё ещё лучший</value></data>
+  <data name="Log_Sorted" xml:space="preserve"><value>Отсортировано по {0}.</value></data>
+  <data name="Log_Error" xml:space="preserve"><value>Ошибка: {0}</value></data>
+  <data name="Log_InvalidLink" xml:space="preserve"><value>Пропуск: недействительная ссылка.</value></data>
+  <data name="Log_ServersDeleted" xml:space="preserve"><value>{0} серверов удалено.</value></data>
+  <data name="Log_SubRemoved" xml:space="preserve"><value>"{0}" удалён с серверами.</value></data>
+  <data name="Log_DupesRemoved" xml:space="preserve"><value>{0} дубликатов серверов удалено.</value></data>
+  <data name="Log_Copied" xml:space="preserve"><value>Ссылка "{0}" скопирована.</value></data>
+  <data name="Log_Exported" xml:space="preserve"><value>Экспортировано: {0}</value></data>
+  <data name="Log_LinksCopied" xml:space="preserve"><value>{0} ссылок скопировано.</value></data>
+  <data name="Log_SubCopied" xml:space="preserve"><value>Base64 подписка скопирована.</value></data>
+  <data name="Log_TestStopped" xml:space="preserve"><value>Тест остановлен</value></data>
+  <data name="Log_SubUpdated" xml:space="preserve"><value>"{0}": {1} серверов.</value></data>
+  <!-- All Servers Tab -->
+  <data name="AllServers_Title" xml:space="preserve"><value>📋 Все серверы</value></data>
+  <!-- Headers -->
+  <data name="Header_Name" xml:space="preserve"><value>Название</value></data>
+  <data name="Header_Ping" xml:space="preserve"><value>Пинг</value></data>
+  <data name="Header_Speed" xml:space="preserve"><value>Скорость</value></data>
+  <data name="Header_Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Header_Country" xml:space="preserve"><value>Страна</value></data>
+  <data name="Header_Protocol" xml:space="preserve"><value>Протокол</value></data>
+  <data name="Header_Address" xml:space="preserve"><value>Адрес</value></data>
+  <data name="Header_Port" xml:space="preserve"><value>Порт</value></data>
+  <data name="Header_Sub" xml:space="preserve"><value>Подписка</value></data>
+  <data name="ServerCount" xml:space="preserve"><value>Серверов: {0}</value></data>
+  <!-- Display -->
+  <data name="Status_Failed" xml:space="preserve"><value>Ошибка</value></data>
+  <data name="Status_Error" xml:space="preserve"><value>Ошибка</value></data>
+  <!-- Server Card -->
+  <data name="Card_Ping" xml:space="preserve"><value>Пинг: </value></data>
+  <data name="Card_Speed" xml:space="preserve"><value>Скорость: </value></data>
+  <data name="Card_Connect" xml:space="preserve"><value>Подключить</value></data>
+  <data name="Card_Disconnect" xml:space="preserve"><value>Отключить</value></data>
+  <data name="Card_Edit" xml:space="preserve"><value>Редактировать</value></data>
+  <data name="Card_Share" xml:space="preserve"><value>Поделиться</value></data>
+  <data name="Card_Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Card_Connected" xml:space="preserve"><value>Подключено</value></data>
+  <!-- System Tray -->
+  <data name="Tray_Show" xml:space="preserve"><value>Показать</value></data>
+  <data name="Tray_SmartConnect" xml:space="preserve"><value>⚡ Умное подключение</value></data>
+  <data name="Tray_Stop" xml:space="preserve"><value>⏹ Стоп</value></data>
+  <data name="Tray_FindBetter" xml:space="preserve"><value>🔍 Найти лучший сервер</value></data>
+  <data name="Tray_Proxy" xml:space="preserve"><value>Системный прокси</value></data>
+  <data name="Tray_UpdateNoProxy" xml:space="preserve"><value>🔄 Обновить без прокси</value></data>
+  <data name="Tray_UpdateProxy" xml:space="preserve"><value>🔄 Обновить с прокси</value></data>
+  <data name="Tray_Settings" xml:space="preserve"><value>⚙ Настройки</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>Выход</value></data>
+  <data name="Tray_ConnectedTo" xml:space="preserve"><value>Подключено к {0}</value></data>
+  <data name="Tray_Searching" xml:space="preserve"><value>Поиск...</value></data>
+  <data name="Tray_SearchingProgress" xml:space="preserve"><value>Поиск... {0} из {1} серверов</value></data>
+
+  <data name="Hotkey_Info" xml:space="preserve">
+    <value>Горячие клавиши: Ctrl+Shift+C = Подключить | Ctrl+Shift+D = Отключить | Ctrl+Shift+S = Умное подключение | Ctrl+Shift+Q = Выход</value>
+  </data>
+
+  <data name="Add_Link" xml:space="preserve"><value>Добавить</value></data>
+
+  <data name="Sub_UseProxy" xml:space="preserve"><value>Обновление через прокси</value></data>
+</root>

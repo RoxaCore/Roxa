@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Text.Json;
 using XrayClient.Models;
 
@@ -14,13 +16,181 @@ public static class SubscriptionManager
     {
         int hash = url.IndexOf('#');
         if (hash >= 0) url = url[..hash];
-        string content = await FetchRawAsync(url, ct);
+        string content = await FetchRawAsync(url, ct: ct);
         return ParseContent(content);
+    }
+
+    public static async Task<List<ServerInfo>> FetchWithProxyAsync(string url, string proxyAddress, CancellationToken ct = default)
+    {
+        int hash = url.IndexOf('#');
+        if (hash >= 0) url = url[..hash];
+        string content = await FetchRawAsync(url, proxyAddress, ct);
+        return ParseContent(content);
+    }
+
+    private static SocketsHttpHandler CreateHandler(string? proxyAddress = null)
+    {
+        var handler = new SocketsHttpHandler
+        {
+            AutomaticDecompression = System.Net.DecompressionMethods.All,
+            ConnectCallback = async (context, cancellationToken) =>
+            {
+                var host = context.DnsEndPoint.Host;
+                var addresses = await Dns.GetHostAddressesAsync(host, cancellationToken);
+                var socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+                socket.NoDelay = true;
+                try
+                {
+                    await socket.ConnectAsync(addresses, context.DnsEndPoint.Port, cancellationToken);
+                    return new NetworkStream(socket, ownsSocket: true);
+                }
+                catch
+                {
+                    socket.Dispose();
+                    throw;
+                }
+            }
+        };
+        if (!string.IsNullOrEmpty(proxyAddress))
+            handler.Proxy = new WebProxy(proxyAddress);
+        return handler;
+    }
+
+    public static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoAsync(string url, CancellationToken ct = default)
+    {
+        int hash = url.IndexOf('#');
+        if (hash >= 0) url = url[..hash];
+        try
+        {
+            using var handler = CreateHandler();
+            using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
+            http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
+            http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
+            using var response = await http.GetAsync(url, ct);
+            string content = await response.Content.ReadAsStringAsync(ct);
+            var servers = ParseContent(content);
+            SubscriptionInfo? info = null;
+            try { info = ParseHeaders(response.Headers); } catch { }
+            return (servers, info);
+        }
+        catch
+        {
+            string content = await FetchRawAsync(url, ct: ct);
+            return (ParseContent(content), null);
+        }
+    }
+
+    public static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoAndProxyAsync(string url, string proxyAddress, CancellationToken ct = default)
+    {
+        int hash = url.IndexOf('#');
+        if (hash >= 0) url = url[..hash];
+        try
+        {
+            using var handler = CreateHandler(proxyAddress);
+            using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
+            http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
+            http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
+            using var response = await http.GetAsync(url, ct);
+            string content = await response.Content.ReadAsStringAsync(ct);
+            var servers = ParseContent(content);
+            SubscriptionInfo? info = null;
+            try { info = ParseHeaders(response.Headers); } catch { }
+            return (servers, info);
+        }
+        catch
+        {
+            string content = await FetchRawAsync(url, proxyAddress, ct);
+            return (ParseContent(content), null);
+        }
+    }
+
+    private static SubscriptionInfo? ParseHeaders(HttpResponseHeaders headers)
+    {
+        string? raw = null;
+
+        // Standard format: Subscription-Userinfo: upload=1;download=2;total=3;expire=4
+        if (headers.TryGetValues("Subscription-Userinfo", out var vals))
+            raw = string.Join(";", vals);
+
+        // Some panels return info in separate headers
+        if (string.IsNullOrEmpty(raw))
+        {
+            string? upload = null, download = null, total = null, expire = null;
+            if (headers.TryGetValues("upload", out vals)) upload = string.Join(";", vals);
+            if (headers.TryGetValues("download", out vals)) download = string.Join(";", vals);
+            if (headers.TryGetValues("total", out vals)) total = string.Join(";", vals);
+            if (headers.TryGetValues("expire", out vals)) expire = string.Join(";", vals);
+
+            // Also check Traffic-Info, Profile-Info, etc.
+            if (headers.TryGetValues("Traffic-Info", out vals)) raw = string.Join(";", vals);
+            else if (headers.TryGetValues("Profile-Info", out vals)) raw = string.Join(";", vals);
+
+            if (raw == null && (upload != null || download != null || total != null || expire != null))
+            {
+                raw = "";
+                if (upload != null) raw += $"upload={upload};";
+                if (download != null) raw += $"download={download};";
+                if (total != null) raw += $"total={total};";
+                if (expire != null) raw += $"expire={expire};";
+            }
+        }
+
+        // Last resort: check ALL headers for keywords
+        if (string.IsNullOrEmpty(raw))
+        {
+            foreach (var h in headers)
+            {
+                string key = h.Key.ToLowerInvariant();
+                string val = string.Join(";", h.Value);
+                if (key.Contains("subscription") && val.Contains("=") && val.Contains(";"))
+                {
+                    raw = val;
+                    break;
+                }
+            }
+        }
+
+        if (string.IsNullOrEmpty(raw)) return null;
+
+        var info = new SubscriptionInfo();
+        foreach (var part in raw.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var kv = part.Split('=', 2);
+            if (kv.Length != 2) continue;
+            string key = kv[0].Trim().ToLowerInvariant();
+            string val = kv[1].Trim();
+            switch (key)
+            {
+                case "upload":
+                    if (long.TryParse(val, out long up)) info.UsedTraffic += up;
+                    break;
+                case "download":
+                    if (long.TryParse(val, out long down)) info.UsedTraffic += down;
+                    break;
+                case "total":
+                    if (long.TryParse(val, out long total)) info.DataLimit = total;
+                    break;
+                case "expire":
+                    if (long.TryParse(val, out long ts) && ts > 0)
+                        info.ExpireDate = DateTimeOffset.FromUnixTimeSeconds(ts).LocalDateTime;
+                    break;
+            }
+        }
+        return info;
     }
 
     public static async Task<string> FetchRawAsync(string url, CancellationToken ct = default)
     {
-        using var handler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.All };
+        using var handler = CreateHandler();
+        using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
+        http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
+        http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
+        return await http.GetStringAsync(url, ct);
+    }
+
+    public static async Task<string> FetchRawAsync(string url, string proxyAddress, CancellationToken ct = default)
+    {
+        using var handler = CreateHandler(proxyAddress);
         using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
         http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
         http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");

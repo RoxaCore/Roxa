@@ -17,8 +17,12 @@ public partial class QrShareWindow : Window
         InitializeComponent();
         _link = link;
         _clipboard = clipboard;
+        var tr = Localization.TranslationManager.Instance;
+        Title = tr["Dlg_ShareQR"];
         this.FindControl<TextBlock>("NameText")!.Text = name;
         this.FindControl<TextBox>("LinkBox")!.Text = link;
+        this.FindControl<Button>("CopyBtn")!.Content = tr["Dlg_CopyLink"];
+        this.FindControl<Button>("CloseBtn")!.Content = tr["Dlg_Close"];
         RenderQr(link);
     }
 

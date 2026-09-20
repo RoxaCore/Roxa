@@ -31,9 +31,6 @@ public sealed class TranslationManager : INotifyPropertyChanged
 
     public static string Get(string key) => Instance[key];
 
-    public string[] AvailableCultures { get; } = ["fa", "en"];
-    public string[] AvailableCultureNames { get; } = ["فارسی", "English"];
-
     public void SetCulture(string code)
     {
         Culture = CultureInfo.GetCultureInfo(code);

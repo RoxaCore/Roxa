@@ -105,24 +105,42 @@ public partial class ServerInfo : ObservableObject
         get
         {
             string name = Name;
-            if (string.IsNullOrWhiteSpace(name)) return "Unknown";
+            if (string.IsNullOrWhiteSpace(name)) return CountryCode.Length == 2 ? CountryCode : "Unknown";
 
-            var tokens = name.Split(Core.GeoFlags.SplitChars, StringSplitOptions.RemoveEmptyEntries);
-            var cityParts = new List<string>();
-
-            foreach (var t in tokens)
-            {
-                string up = t.ToUpperInvariant();
-                if (up == CountryCode || up.Length == 2 && Core.GeoFlags.IsoCodes.Contains(up)) continue;
-                if (int.TryParse(t, out _)) continue;
-                if (double.TryParse(t, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out _)) continue;
-                if (t.Length <= 2) continue;
-                string cleaned = System.Text.RegularExpressions.Regex.Replace(t, @"[^a-zA-Z\u0600-\u06FF\u4E00-\u9FFF]", "");
-                if (cleaned.Length > 0) cityParts.Add(cleaned);
-            }
-
-            return cityParts.Count > 0 ? string.Join(" ", cityParts) : name;
+            string shortName = RemoveCommonParts(name);
+            return $"{CountryCode} {shortName}";
         }
+    }
+
+    private string RemoveCommonParts(string name)
+    {
+        var myTokens = name.Split(Core.GeoFlags.SplitChars, StringSplitOptions.RemoveEmptyEntries);
+        if (myTokens.Length <= 1) return name;
+
+        var siblings = Owner?.Servers?
+            .Where(s => s != this && s.SubscriptionName == SubscriptionName)
+            .Select(s => s.Name.Split(Core.GeoFlags.SplitChars, StringSplitOptions.RemoveEmptyEntries))
+            .ToList();
+
+        if (siblings == null || siblings.Count == 0) return string.Join(" ", myTokens);
+
+        int prefixLen = 0;
+        int maxPrefix = Math.Min(myTokens.Length, siblings.Min(s => s.Length));
+        while (prefixLen < maxPrefix && siblings.All(s => s[prefixLen].Equals(myTokens[prefixLen], StringComparison.OrdinalIgnoreCase)))
+            prefixLen++;
+
+        int suffixLen = 0;
+        int maxSuffix = Math.Min(myTokens.Length - prefixLen, siblings.Min(s => s.Length - Math.Min(prefixLen, s.Length)));
+        while (suffixLen < maxSuffix &&
+               myTokens.Length - 1 - suffixLen >= prefixLen &&
+               siblings.All(s => s.Length - 1 - suffixLen >= 0 && s[s.Length - 1 - suffixLen].Equals(myTokens[myTokens.Length - 1 - suffixLen], StringComparison.OrdinalIgnoreCase)))
+            suffixLen++;
+
+        int keepFrom = prefixLen;
+        int keepTo = myTokens.Length - suffixLen;
+        if (keepTo <= keepFrom) return name;
+
+        return string.Join(" ", myTokens[keepFrom..keepTo]);
     }
 
     [JsonIgnore]

@@ -121,12 +121,15 @@ public partial class ServerInfo : ObservableObject
         var myTokens = name.Split(Core.GeoFlags.SplitChars, StringSplitOptions.RemoveEmptyEntries);
         if (myTokens.Length <= 1) return name;
 
+        var noCc = myTokens.Where(t => !t.Equals(CountryCode, StringComparison.OrdinalIgnoreCase)).ToArray();
+        if (noCc.Length == 0) return name;
+
         var siblings = Owner?.Servers?
             .Where(s => s != this && s.SubscriptionName == SubscriptionName)
             .Select(s => s.Name.Split(Core.GeoFlags.SplitChars, StringSplitOptions.RemoveEmptyEntries))
             .ToList();
 
-        if (siblings == null || siblings.Count == 0) return string.Join(" ", myTokens);
+        if (siblings == null || siblings.Count == 0) return string.Join(" ", noCc);
 
         int prefixLen = 0;
         int maxPrefix = Math.Min(myTokens.Length, siblings.Min(s => s.Length));

@@ -46,14 +46,15 @@
       <Setter Property="BorderThickness" Value="0"/>
       <Setter Property="CornerRadius" Value="10"/>
       <Setter Property="Padding" Value="14,10"/>
+      <Setter Property="MinWidth" Value="0"/>
       <Setter Property="Template">
         <ControlTemplate>
-          <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" BorderThickness="0">
+          <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" BorderThickness="0" ClipToBounds="True">
             <ContentPresenter Content="{TemplateBinding Content}"
                               ContentTemplate="{TemplateBinding ContentTemplate}"
                               Padding="{TemplateBinding Padding}"
-                              HorizontalContentAlignment="Center"
-                              VerticalContentAlignment="Center"/>
+                              HorizontalContentAlignment="Stretch"
+                              VerticalContentAlignment="Stretch"/>
           </Border>
         </ControlTemplate>
       </Setter>
@@ -218,7 +219,7 @@
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
             <!-- Smart Connect / Find Better (unified) -->
             <Button Theme="{StaticResource SmartConnectButton}" Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}">
-              <Grid>
+              <Grid ClipToBounds="True" MinWidth="0">
                 <Border CornerRadius="10" Background="#0E7C6B" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"/>
                 <Border CornerRadius="10" Background="#5B21B6" IsVisible="{Binding IsSmartConnecting}"/>
                 <Border CornerRadius="10" Background="#065F46" IsVisible="{Binding IsConnected}"/>
@@ -241,14 +242,14 @@
                 <!-- Content: connecting -->
                 <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10" IsVisible="{Binding IsSmartConnecting}">
                   <TextBlock Text="◉" FontSize="16" Foreground="White"/>
-                  <TextBlock Text="{Binding SearchProgressText}" Foreground="White" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding SearchProgressText}" Foreground="White" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
                 <!-- Content: find better -->
                 <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10" IsVisible="{Binding IsConnected}">
                   <TextBlock Text="🔍" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}"/>
                   <TextBlock Text="◉" FontSize="16" IsVisible="{Binding IsFindingBetter}" Foreground="White"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_FindBetter}" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}" Foreground="White" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding SearchProgressText}" IsVisible="{Binding IsFindingBetter}" Foreground="White" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_FindBetter}" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}" Foreground="White" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                  <TextBlock Text="{Binding SearchProgressText}" IsVisible="{Binding IsFindingBetter}" Foreground="White" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
               </Grid>
             </Button>

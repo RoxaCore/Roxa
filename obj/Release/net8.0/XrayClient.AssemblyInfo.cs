@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("XrayClient")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+41a8eb973b7d8b829a0490dd2967debfb71f41eb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+129cf654c907ac8f9ccbc10df047a75b0666cbe7")]
 [assembly: System.Reflection.AssemblyProductAttribute("XrayClient")]
 [assembly: System.Reflection.AssemblyTitleAttribute("XrayClient")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

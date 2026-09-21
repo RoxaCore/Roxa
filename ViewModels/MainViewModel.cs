@@ -128,6 +128,12 @@ public partial class MainViewModel : ViewModelBase
     public int HttpPort => _engine.HttpPort;
     public int SocksPort => _engine.SocksPort;
 
+    [ObservableProperty] private string _liveDownSpeed = "";
+    [ObservableProperty] private string _liveUpSpeed = "";
+    private long _lastBytesIn;
+    private long _lastBytesOut;
+    private DispatcherTimer? _speedTimer;
+
     public MainViewModel()
     {
         _settings = Storage.LoadSettings();
@@ -180,6 +186,46 @@ public partial class MainViewModel : ViewModelBase
         _engine.Output += line => Post(() => AppendLog(line));
         _engine.Stopped += () => Post(() => IsConnected = false);
         AppendLog(string.Format(TranslationManager.Instance["Log_ServersLoaded"], Servers.Count, Subscriptions.Count));
+
+        _speedTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _speedTimer.Tick += (_, _) => UpdateLiveSpeed();
+        _speedTimer.Start();
+    }
+
+    private void UpdateLiveSpeed()
+    {
+        try
+        {
+            var ni = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
+                .Where(n => n.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
+                            n.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback)
+                .OrderByDescending(n => n.GetIPStatistics().BytesReceived)
+                .FirstOrDefault();
+            if (ni == null) return;
+            var stats = ni.GetIPStatistics();
+            long bytesIn = stats.BytesReceived;
+            long bytesOut = stats.BytesSent;
+
+            if (_lastBytesIn > 0)
+            {
+                long diffIn = bytesIn - _lastBytesIn;
+                long diffOut = bytesOut - _lastBytesOut;
+                LiveDownSpeed = FormatSpeed(diffIn);
+                LiveUpSpeed = FormatSpeed(diffOut);
+            }
+            _lastBytesIn = bytesIn;
+            _lastBytesOut = bytesOut;
+        }
+        catch { }
+    }
+
+    private static string FormatSpeed(long bytes)
+    {
+        if (bytes < 1024) return $"{bytes} B/s";
+        double kb = bytes / 1024.0;
+        if (kb < 1024) return $"{kb:F1} KB/s";
+        double mb = kb / 1024.0;
+        return $"{mb:F1} MB/s";
     }
 
     partial void OnSelectedServerChanged(ServerInfo? value)

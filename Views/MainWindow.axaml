@@ -200,8 +200,6 @@
             <Button Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}"
                     Padding="16,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderThickness="0">
               <Grid ClipToBounds="True">
-                <Border Background="#5B21B6" IsVisible="{Binding IsSmartConnecting}"/>
-                <Border Background="#065F46" IsVisible="{Binding IsConnected}"/>
                 <Border Background="#7C3AED" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5" IsVisible="{Binding IsSmartConnecting}">
                   <Border.RenderTransform>
                     <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>

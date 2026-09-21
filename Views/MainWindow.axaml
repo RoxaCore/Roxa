@@ -198,40 +198,40 @@
 
           <!-- Buttons (right) -->
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
-            <!-- Smart Connect (idle) -->
-            <Button Command="{Binding SmartConnectCommand}" IsVisible="{Binding IsSmartConnecting, Converter={StaticResource Not}}" Padding="14,8" CornerRadius="8" Background="#FFFFFF" Foreground="#0E7C6B" BorderThickness="1" BorderBrush="#D0D0D0" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right">
-              <StackPanel Orientation="Horizontal" Spacing="4">
-                <TextBlock Text="⚡" FontSize="12" FontWeight="Bold"/>
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}" VerticalAlignment="Center"/>
-              </StackPanel>
-            </Button>
-            <!-- Smart Connect (connecting - progress) -->
-            <Button IsVisible="{Binding IsSmartConnecting}" IsEnabled="False" Padding="14,10" CornerRadius="10" Background="#5B21B6" Foreground="White" FontSize="13" FontWeight="SemiBold">
+            <!-- Smart Connect / Find Better (unified) -->
+            <Button Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right">
               <Grid>
-                <Border Background="#7C3AED" CornerRadius="10" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
+                <!-- Background: white when idle, purple when connecting, green when connected -->
+                <Border CornerRadius="10" Background="#FFFFFF" BorderThickness="1" BorderBrush="#D0D0D0" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"/>
+                <Border CornerRadius="10" Background="#5B21B6" IsVisible="{Binding IsSmartConnecting}"/>
+                <Border CornerRadius="10" Background="#065F46" IsVisible="{Binding IsConnected}"/>
+                <!-- Progress bar -->
+                <Border Background="#7C3AED" CornerRadius="10" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5" IsVisible="{Binding IsSmartConnecting}">
                   <Border.RenderTransform>
                     <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
                   </Border.RenderTransform>
                 </Border>
-                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10">
-                  <TextBlock Text="◉" VerticalAlignment="Center" FontSize="16" Foreground="White"/>
-                  <TextBlock Text="{Binding SearchProgressText}" VerticalAlignment="Center" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
+                <Border Background="#0E7C6B" CornerRadius="10" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5" IsVisible="{Binding IsConnected}">
+                  <Border.RenderTransform>
+                    <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
+                  </Border.RenderTransform>
+                </Border>
+                <!-- Content: idle -->
+                <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}">
+                  <TextBlock Text="⚡" FontSize="12" FontWeight="Bold" Foreground="#0E7C6B"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}" VerticalAlignment="Center" Foreground="#0E7C6B"/>
                 </StackPanel>
-              </Grid>
-            </Button>
-            <!-- Find Better Server (when connected) -->
-            <Button Command="{Binding FindBetterServerCommand}" IsVisible="{Binding IsConnected}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" Background="#065F46" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderThickness="0">
-              <Grid>
-                <Border Background="#0E7C6B" CornerRadius="10" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
-                  <Border.RenderTransform>
-                    <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
-                  </Border.RenderTransform>
-                </Border>
-                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10">
-                  <TextBlock Text="🔍" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}"/>
-                  <TextBlock Text="◉" VerticalAlignment="Center" FontSize="16" IsVisible="{Binding IsFindingBetter}" Foreground="White"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_FindBetter}" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding SearchProgressText}" VerticalAlignment="Center" IsVisible="{Binding IsFindingBetter}" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
+                <!-- Content: connecting -->
+                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10" IsVisible="{Binding IsSmartConnecting}">
+                  <TextBlock Text="◉" FontSize="16" Foreground="White"/>
+                  <TextBlock Text="{Binding SearchProgressText}" Foreground="White" FontWeight="SemiBold"/>
+                </StackPanel>
+                <!-- Content: find better -->
+                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10" IsVisible="{Binding IsConnected}">
+                  <TextBlock Text="🔍" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}"/>
+                  <TextBlock Text="◉" FontSize="16" IsVisible="{Binding IsFindingBetter}" Foreground="White"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_FindBetter}" IsVisible="{Binding IsFindingBetter, Converter={StaticResource Not}}" Foreground="White" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding SearchProgressText}" IsVisible="{Binding IsFindingBetter}" Foreground="White" FontWeight="SemiBold"/>
                 </StackPanel>
               </Grid>
             </Button>

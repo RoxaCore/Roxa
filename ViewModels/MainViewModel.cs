@@ -74,6 +74,8 @@ public partial class MainViewModel : ViewModelBase
       private static readonly TimeSpan SearchExpiry = TimeSpan.FromMinutes(15);
 
      public bool ShowSmartConnectButton => !IsSmartConnecting && !IsConnected;
+
+     public IRelayCommand? SmartConnectActionCommand => IsConnected ? FindBetterServerCommand : SmartConnectCommand as IRelayCommand;
       [ObservableProperty] private string _selectedSubscriptionName = "";
       [ObservableProperty] private string _sortField = TranslationManager.Instance["Sort_None"];
       [ObservableProperty] private bool _globalSort;
@@ -259,6 +261,7 @@ public partial class MainViewModel : ViewModelBase
         Status = value ? $"{TranslationManager.Instance["Status_Connected"]} به {SelectedServer?.Name ?? ""}" : TranslationManager.Instance["Status_Ready"];
         OnPropertyChanged(nameof(PortText));
         OnPropertyChanged(nameof(ShowSmartConnectButton));
+        OnPropertyChanged(nameof(SmartConnectActionCommand));
         RefreshConnectionFlags();
         if (!value)
         {

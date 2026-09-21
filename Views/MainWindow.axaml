@@ -143,19 +143,19 @@
         <!-- Connection Status Card (Column 0 = left in RTL) -->
         <Border Grid.Column="0" Background="#F9FAFB" CornerRadius="14" Padding="20,14" MinWidth="220" BorderBrush="#E5E7EB" BorderThickness="1">
           <Grid ColumnDefinitions="Auto,*">
-            <!-- Power Button (not connected) -->
+            <!-- Power Button (not connected) - Red outline, power OFF -->
             <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
                     Command="{Binding ConnectCommand}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"
-                    Background="#F3F4F6" BorderThickness="2" BorderBrush="#D1D5DB" Foreground="#9CA3AF">
+                    Background="#FFFFFF" BorderThickness="2" BorderBrush="#E53E3E" Foreground="#E53E3E">
               <Button.Effect>
-                <DropShadowEffect Color="#000000" BlurRadius="8" Opacity="0.1" OffsetX="0" OffsetY="2"/>
+                <DropShadowEffect Color="#E53E3E" BlurRadius="10" Opacity="0.25" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
               <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
             </Button>
-            <!-- Power Button (connected) -->
+            <!-- Power Button (connected) - Green filled, power ON -->
             <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
                     Command="{Binding DisconnectCommand}" IsVisible="{Binding IsConnected}"
-                    Background="#0E7C6B" BorderThickness="0" BorderBrush="#0E7C6B" Foreground="#FFFFFF">
+                    Background="#0E7C6B" BorderThickness="0" Foreground="#FFFFFF">
               <Button.Effect>
                 <DropShadowEffect Color="#0E7C6B" BlurRadius="16" Opacity="0.4" OffsetX="0" OffsetY="0"/>
               </Button.Effect>

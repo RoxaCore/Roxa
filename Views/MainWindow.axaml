@@ -304,7 +304,12 @@
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Stop}" Command="{Binding StopTestCommand}" IsVisible="{Binding IsTesting}" Padding="12,8" CornerRadius="8" Background="#FFF5F5" Foreground="#E53E3E" FontSize="12" BorderThickness="0"/>
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Real}" Command="{Binding TestRealDelayAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SpeedAll}" Command="{Binding TestSpeedCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
-                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveDupes}" Command="{Binding RemoveDuplicatesCommand}" Padding="12,8" CornerRadius="8" Background="#FFF5F5" Foreground="#E53E3E" FontSize="12" BorderThickness="0"/>
+                <Button Command="{Binding RemoveDuplicatesCommand}" IsVisible="{Binding HasDuplicates}" Padding="12,8" CornerRadius="8" Background="#FFF5F5" Foreground="#E53E3E" FontSize="12" BorderThickness="0">
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveDupes}"/>
+                    <TextBlock Text="{Binding DuplicateCount}" FontWeight="Bold"/>
+                  </StackPanel>
+                </Button>
               </StackPanel>
             </StackPanel>
           </Border>

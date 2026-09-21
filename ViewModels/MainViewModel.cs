@@ -76,6 +76,10 @@ public partial class MainViewModel : ViewModelBase
      public bool ShowSmartConnectButton => !IsSmartConnecting && !IsConnected;
 
      public IRelayCommand? SmartConnectActionCommand => IsConnected ? FindBetterServerCommand : SmartConnectCommand as IRelayCommand;
+
+     [ObservableProperty] private int _duplicateCount;
+
+     public bool HasDuplicates => DuplicateCount > 0;
       [ObservableProperty] private string _selectedSubscriptionName = "";
       [ObservableProperty] private string _sortField = TranslationManager.Instance["Sort_None"];
       [ObservableProperty] private bool _globalSort;
@@ -274,6 +278,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     partial void OnIsSmartConnectingChanged(bool value) => OnPropertyChanged(nameof(ShowSmartConnectButton));
+    partial void OnDuplicateCountChanged(int value) => OnPropertyChanged(nameof(HasDuplicates));
     partial void OnSearchTestedCountChanged(int value) { OnPropertyChanged(nameof(SearchProgressPercent)); OnPropertyChanged(nameof(SearchProgressText)); }
     partial void OnSearchTotalCountChanged(int value) { OnPropertyChanged(nameof(SearchProgressPercent)); OnPropertyChanged(nameof(SearchProgressText)); }
 
@@ -413,6 +418,15 @@ public partial class MainViewModel : ViewModelBase
         foreach (var s in Servers)
             s.Owner = this;
         RefreshConnectionFlags();
+
+        var seen = new HashSet<string>();
+        int dupeCount = 0;
+        foreach (var s in Servers)
+        {
+            string key = $"{s.Address}:{s.Port}:{s.UserId}:{s.Password}";
+            if (!seen.Add(key)) dupeCount++;
+        }
+        DuplicateCount = dupeCount;
 
         // تب «همه سرورها» — اولین تب، بدون دسته‌بندی
         bool allExp = expanded.TryGetValue("__all__", out bool ae) ? ae : true;

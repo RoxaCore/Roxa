@@ -128,8 +128,8 @@ public partial class MainViewModel : ViewModelBase
     public int HttpPort => _engine.HttpPort;
     public int SocksPort => _engine.SocksPort;
 
-    [ObservableProperty] private string _liveDownSpeed = "";
-    [ObservableProperty] private string _liveUpSpeed = "";
+    [ObservableProperty] private string _liveDownSpeed = "0 B/s";
+    [ObservableProperty] private string _liveUpSpeed = "0 B/s";
     private long _lastBytesIn;
     private long _lastBytesOut;
     private string _lastInterfaceId = "";
@@ -262,8 +262,8 @@ public partial class MainViewModel : ViewModelBase
         RefreshConnectionFlags();
         if (!value)
         {
-            LiveDownSpeed = "";
-            LiveUpSpeed = "";
+            LiveDownSpeed = "0 B/s";
+            LiveUpSpeed = "0 B/s";
             _lastBytesIn = 0;
             _lastBytesOut = 0;
             _lastInterfaceId = "";
@@ -835,6 +835,11 @@ public partial class MainViewModel : ViewModelBase
             Status = "در حال اتصال ...";
             await _engine.StartAsync(server, SetSystemProxy, _settings);
             IsConnected = true;
+            _lastBytesIn = 0;
+            _lastBytesOut = 0;
+            _lastInterfaceId = "";
+            LiveDownSpeed = "0 B/s";
+            LiveUpSpeed = "0 B/s";
             RefreshConnectionFlags();
             Status = $"متصل به {server.Name}";
             _settings.ActiveServerId = server.Id;

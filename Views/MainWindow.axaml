@@ -147,12 +147,12 @@
             <Button Grid.Column="0" Width="44" Height="44" CornerRadius="22" VerticalAlignment="Center" Margin="0,0,12,0"
                     Command="{Binding ConnectCommand}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"
                     Background="Transparent" BorderThickness="2" BorderBrush="#0E7C6B" Foreground="#0E7C6B">
-              <TextBlock Text="⏻" FontSize="20" FontWeight="Bold"/>
+              <TextBlock Text="⊘" FontSize="20" FontWeight="Bold"/>
             </Button>
             <Button Grid.Column="0" Width="44" Height="44" CornerRadius="22" VerticalAlignment="Center" Margin="0,0,12,0"
                     Command="{Binding DisconnectCommand}" IsVisible="{Binding IsConnected}"
                     Background="Transparent" BorderThickness="2" BorderBrush="#E53E3E" Foreground="#E53E3E">
-              <TextBlock Text="⏻" FontSize="20" FontWeight="Bold"/>
+              <TextBlock Text="✕" FontSize="20" FontWeight="Bold"/>
             </Button>
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
               <!-- Status -->
@@ -169,15 +169,15 @@
               </TextBlock>
               <!-- Server Name (when connected) -->
               <TextBlock Text="{Binding HomeShortName}" FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A" MaxWidth="180" TextTrimming="CharacterEllipsis" Margin="0,0,0,4" IsVisible="{Binding IsConnected}"/>
-              <!-- Live Speed (only when connected) -->
-              <StackPanel Orientation="Horizontal" Spacing="12" IsVisible="{Binding IsConnected}">
+              <!-- Live Speed (always visible) -->
+              <StackPanel Orientation="Horizontal" Spacing="12">
                 <TextBlock FontSize="11" Foreground="#888888">
                   <Run Text="↓"/>
-                  <Run Text="{Binding LiveDownSpeed, Mode=OneWay}"/>
+                  <Run Text="{Binding LiveDownSpeed, Mode=OneWay, FallbackValue='0 B/s'}"/>
                 </TextBlock>
                 <TextBlock FontSize="11" Foreground="#888888">
                   <Run Text="↑"/>
-                  <Run Text="{Binding LiveUpSpeed, Mode=OneWay}"/>
+                  <Run Text="{Binding LiveUpSpeed, Mode=OneWay, FallbackValue='0 B/s'}"/>
                 </TextBlock>
               </StackPanel>
             </StackPanel>

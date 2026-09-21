@@ -199,10 +199,9 @@
           <!-- Buttons (right) -->
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
             <!-- Smart Connect / Find Better (unified) -->
-            <Button Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right">
+            <Button Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right" Background="Transparent" BorderThickness="0">
               <Grid>
-                <!-- Background: white when idle, purple when connecting, green when connected -->
-                <Border CornerRadius="10" Background="#FFFFFF" BorderThickness="1" BorderBrush="#D0D0D0" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"/>
+                <Border CornerRadius="10" Background="#0E7C6B" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"/>
                 <Border CornerRadius="10" Background="#5B21B6" IsVisible="{Binding IsSmartConnecting}"/>
                 <Border CornerRadius="10" Background="#065F46" IsVisible="{Binding IsConnected}"/>
                 <!-- Progress bar -->
@@ -218,8 +217,8 @@
                 </Border>
                 <!-- Content: idle -->
                 <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}">
-                  <TextBlock Text="⚡" FontSize="12" FontWeight="Bold" Foreground="#0E7C6B"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}" VerticalAlignment="Center" Foreground="#0E7C6B"/>
+                  <TextBlock Text="⚡" FontSize="12" FontWeight="Bold" Foreground="White"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}" VerticalAlignment="Center" Foreground="White"/>
                 </StackPanel>
                 <!-- Content: connecting -->
                 <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10" IsVisible="{Binding IsSmartConnecting}">

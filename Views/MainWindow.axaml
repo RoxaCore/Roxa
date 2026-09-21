@@ -146,20 +146,24 @@
             <!-- Power Button (not connected) - Red outline -->
             <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
                     Command="{Binding ConnectCommand}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"
-                    Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#E53E3E" Foreground="#E53E3E">
+                    Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#E53E3E">
               <Button.Effect>
                 <DropShadowEffect Color="#E53E3E" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
-              <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
+              <Viewbox Width="24" Height="24">
+                <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M12,2 L12,9 M7,11 A5,5 0 1,0 17,11"/>
+              </Viewbox>
             </Button>
             <!-- Power Button (connected) - Green outline -->
             <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
                     Command="{Binding DisconnectCommand}" IsVisible="{Binding IsConnected}"
-                    Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#0E7C6B" Foreground="#0E7C6B">
+                    Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#0E7C6B">
               <Button.Effect>
                 <DropShadowEffect Color="#0E7C6B" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
-              <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
+              <Viewbox Width="24" Height="24">
+                <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M12,2 L12,9 M7,11 A5,5 0 1,0 17,11"/>
+              </Viewbox>
             </Button>
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
               <!-- Status -->

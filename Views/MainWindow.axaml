@@ -143,26 +143,23 @@
         <!-- Connection Status Card (Column 0 = left in RTL) -->
         <Border Grid.Column="0" Background="#F9FAFB" CornerRadius="14" Padding="20,14" MinWidth="220" BorderBrush="#E5E7EB" BorderThickness="1">
           <Grid ColumnDefinitions="Auto,*">
-            <!-- Power Button (not connected) - Red outline, power OFF -->
+            <!-- Power Button (not connected) - Red outline -->
             <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
                     Command="{Binding ConnectCommand}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"
                     Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#E53E3E" Foreground="#E53E3E">
               <Button.Effect>
                 <DropShadowEffect Color="#E53E3E" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
-              <TextBlock Text="⏻" FontSize="22" FontWeight="Bold" RenderTransform="RotateTransform(0)"/>
+              <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
             </Button>
-            <!-- Power Button (connected) - Green outline, power ON -->
+            <!-- Power Button (connected) - Green outline -->
             <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
                     Command="{Binding DisconnectCommand}" IsVisible="{Binding IsConnected}"
                     Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#0E7C6B" Foreground="#0E7C6B">
               <Button.Effect>
                 <DropShadowEffect Color="#0E7C6B" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
-              <Panel>
-                <Ellipse Width="8" Height="8" Fill="#0E7C6B" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,3,0,0"/>
-                <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
-              </Panel>
+              <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
             </Button>
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
               <!-- Status -->

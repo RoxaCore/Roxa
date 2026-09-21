@@ -146,18 +146,18 @@
             <!-- Power Button (not connected) - Red outline, power OFF -->
             <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
                     Command="{Binding ConnectCommand}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"
-                    Background="#FFFFFF" BorderThickness="2" BorderBrush="#E53E3E" Foreground="#E53E3E">
+                    Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#E53E3E" Foreground="#E53E3E">
               <Button.Effect>
-                <DropShadowEffect Color="#E53E3E" BlurRadius="10" Opacity="0.25" OffsetX="0" OffsetY="0"/>
+                <DropShadowEffect Color="#E53E3E" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
               <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
             </Button>
-            <!-- Power Button (connected) - Green filled, power ON -->
+            <!-- Power Button (connected) - Green outline, power ON -->
             <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
                     Command="{Binding DisconnectCommand}" IsVisible="{Binding IsConnected}"
-                    Background="#0E7C6B" BorderThickness="0" Foreground="#FFFFFF">
+                    Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#0E7C6B" Foreground="#0E7C6B">
               <Button.Effect>
-                <DropShadowEffect Color="#0E7C6B" BlurRadius="16" Opacity="0.4" OffsetX="0" OffsetY="0"/>
+                <DropShadowEffect Color="#0E7C6B" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
               <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
             </Button>

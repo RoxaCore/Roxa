@@ -138,86 +138,83 @@
   <Grid RowDefinitions="Auto,*" Background="#F7F8FA">
     <!-- Top Bar -->
     <Border Grid.Row="0" Padding="0" Background="#FFFFFF" BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
-      <Grid ColumnDefinitions="*,Auto" Margin="24,14,24,14">
+      <Border Background="#F9FAFB" CornerRadius="14" Padding="16,12" Margin="24,14,24,14" BorderBrush="#E5E7EB" BorderThickness="1" MaxWidth="500">
+        <Grid ColumnDefinitions="Auto,*,Auto">
 
-        <!-- Connection Status Card (Column 0 = left in RTL) -->
-        <Border Grid.Column="0" Background="#F9FAFB" CornerRadius="14" Padding="20,14" MinWidth="220" BorderBrush="#E5E7EB" BorderThickness="1">
-          <Grid ColumnDefinitions="Auto,*">
-            <!-- Power Button (not connected) - Red outline -->
-            <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
-                    Command="{Binding ConnectCommand}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"
-                    Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#E53E3E">
-              <Button.Effect>
-                <DropShadowEffect Color="#E53E3E" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
-              </Button.Effect>
-              <Viewbox Width="24" Height="24" Stretch="Uniform">
-                <Canvas Width="24" Height="24">
-                  <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M12,3 L12,11"/>
-                  <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M8,13 A4.5,4.5 0 1,0 16,13"/>
-                </Canvas>
-              </Viewbox>
-            </Button>
-            <!-- Power Button (connected) - Green outline -->
-            <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
-                    Command="{Binding DisconnectCommand}" IsVisible="{Binding IsConnected}"
-                    Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#0E7C6B">
-              <Button.Effect>
-                <DropShadowEffect Color="#0E7C6B" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
-              </Button.Effect>
-              <Viewbox Width="24" Height="24" Stretch="Uniform">
-                <Canvas Width="24" Height="24">
-                  <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M12,3 L12,11"/>
-                  <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M8,13 A4.5,4.5 0 1,0 16,13"/>
-                </Canvas>
-              </Viewbox>
-            </Button>
-            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-              <!-- Status -->
-              <TextBlock FontSize="12" FontWeight="Medium" Margin="0,0,0,4" IsVisible="{Binding IsConnected}">
-                <TextBlock.Text>
-                  <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Connected"/>
-                </TextBlock.Text>
-                <TextBlock.Foreground>
-                  <SolidColorBrush Color="#22C55E"/>
-                </TextBlock.Foreground>
+          <!-- Power Button (not connected) - Red outline -->
+          <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
+                  Command="{Binding ConnectCommand}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"
+                  Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#E53E3E">
+            <Button.Effect>
+              <DropShadowEffect Color="#E53E3E" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
+            </Button.Effect>
+            <Viewbox Width="24" Height="24" Stretch="Uniform">
+              <Canvas Width="24" Height="24">
+                <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M12,3 L12,11"/>
+                <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M8,13 A4.5,4.5 0 1,0 16,13"/>
+              </Canvas>
+            </Viewbox>
+          </Button>
+          <!-- Power Button (connected) - Green outline -->
+          <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
+                  Command="{Binding DisconnectCommand}" IsVisible="{Binding IsConnected}"
+                  Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#0E7C6B">
+            <Button.Effect>
+              <DropShadowEffect Color="#0E7C6B" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
+            </Button.Effect>
+            <Viewbox Width="24" Height="24" Stretch="Uniform">
+              <Canvas Width="24" Height="24">
+                <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M12,3 L12,11"/>
+                <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M8,13 A4.5,4.5 0 1,0 16,13"/>
+              </Canvas>
+            </Viewbox>
+          </Button>
+
+          <!-- Status + Name + Speed (center) -->
+          <StackPanel Grid.Column="1" VerticalAlignment="Center">
+            <!-- Status -->
+            <TextBlock FontSize="12" FontWeight="Medium" Margin="0,0,0,2" IsVisible="{Binding IsConnected}" Foreground="#0E7C6B">
+              <TextBlock.Text>
+                <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Connected"/>
+              </TextBlock.Text>
+            </TextBlock>
+            <TextBlock FontSize="12" FontWeight="Medium" Margin="0,0,0,2" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" Foreground="#999999">
+              وصل نیستید
+            </TextBlock>
+            <!-- Server Name -->
+            <TextBlock Text="{Binding HomeShortName}" FontSize="13" FontWeight="SemiBold" Foreground="#1A1A1A" MaxWidth="120" TextTrimming="CharacterEllipsis" Margin="0,0,0,2" IsVisible="{Binding IsConnected}"/>
+            <!-- Live Speed -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock FontSize="10" Foreground="#888888">
+                <Run Text="↓"/>
+                <Run Text="{Binding LiveDownSpeed, Mode=OneWay, FallbackValue='0 B/s'}"/>
               </TextBlock>
-              <TextBlock FontSize="12" FontWeight="Medium" Margin="0,0,0,4" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" Foreground="#999999">
-                وصل نیستید
+              <TextBlock FontSize="10" Foreground="#888888">
+                <Run Text="↑"/>
+                <Run Text="{Binding LiveUpSpeed, Mode=OneWay, FallbackValue='0 B/s'}"/>
               </TextBlock>
-              <!-- Server Name (when connected) -->
-              <TextBlock Text="{Binding HomeShortName}" FontSize="14" FontWeight="SemiBold" Foreground="#1A1A1A" MaxWidth="180" TextTrimming="CharacterEllipsis" Margin="0,0,0,4" IsVisible="{Binding IsConnected}"/>
-              <!-- Live Speed (always visible) -->
-              <StackPanel Orientation="Horizontal" Spacing="12">
-                <TextBlock FontSize="11" Foreground="#888888">
-                  <Run Text="↓"/>
-                  <Run Text="{Binding LiveDownSpeed, Mode=OneWay, FallbackValue='0 B/s'}"/>
-                </TextBlock>
-                <TextBlock FontSize="11" Foreground="#888888">
-                  <Run Text="↑"/>
-                  <Run Text="{Binding LiveUpSpeed, Mode=OneWay, FallbackValue='0 B/s'}"/>
-                </TextBlock>
+            </StackPanel>
+          </StackPanel>
+
+          <!-- Buttons (right) -->
+          <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
+            <!-- Smart Connect -->
+            <Button Command="{Binding SmartConnectCommand}" Padding="14,8" CornerRadius="8" Background="#FFFFFF" Foreground="#0E7C6B" BorderThickness="1" BorderBrush="#D0D0D0" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Text="⚡" FontSize="12" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}" VerticalAlignment="Center"/>
               </StackPanel>
-            </StackPanel>
-          </Grid>
-        </Border>
+            </Button>
+            <!-- System Proxy -->
+            <Button Command="{Binding ToggleSystemProxyCommand}" Padding="14,6" CornerRadius="8" FontSize="11" FontWeight="Medium" HorizontalAlignment="Right"
+                    Background="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#0E7C6B,#F3F4F6'}"
+                    Foreground="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#FFFFFF,#666666'}">
+              System Proxy
+            </Button>
+          </StackPanel>
 
-        <!-- Reconnect + Mode Buttons (Column 1 = right in RTL) -->
-        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
-          <!-- Smart Connect Button -->
-          <Button Command="{Binding SmartConnectCommand}" Padding="16,10" CornerRadius="10" Background="#FFFFFF" Foreground="#0E7C6B" BorderThickness="1" BorderBrush="#D0D0D0" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock Text="⚡" FontSize="14" FontWeight="Bold"/>
-              <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}" VerticalAlignment="Center"/>
-            </StackPanel>
-          </Button>
-          <!-- System Proxy Button -->
-          <Button Command="{Binding ToggleSystemProxyCommand}" Padding="12,6" CornerRadius="8" FontSize="12" FontWeight="Medium" HorizontalAlignment="Right"
-                  Background="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#0E7C6B,#F3F4F6'}"
-                  Foreground="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#FFFFFF,#666666'}">
-            System Proxy
-          </Button>
-        </StackPanel>
-      </Grid>
+        </Grid>
+      </Border>
     </Border>
 
     <!-- Tabs -->

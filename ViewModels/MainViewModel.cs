@@ -132,6 +132,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private string _liveUpSpeed = "";
     private long _lastBytesIn;
     private long _lastBytesOut;
+    private string _lastInterfaceId = "";
     private DispatcherTimer? _speedTimer;
 
     public MainViewModel()
@@ -194,14 +195,24 @@ public partial class MainViewModel : ViewModelBase
 
     private void UpdateLiveSpeed()
     {
+        if (!IsConnected) { LiveDownSpeed = ""; LiveUpSpeed = ""; return; }
         try
         {
             var ni = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
                 .Where(n => n.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
-                            n.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback)
-                .OrderByDescending(n => n.GetIPStatistics().BytesReceived)
+                            n.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Tunnel)
                 .FirstOrDefault();
+            if (ni == null)
+            {
+                ni = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
+                    .Where(n => n.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
+                                n.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback &&
+                                n.Id != _lastInterfaceId)
+                    .OrderByDescending(n => n.GetIPStatistics().BytesReceived)
+                    .FirstOrDefault();
+            }
             if (ni == null) return;
+            _lastInterfaceId = ni.Id;
             var stats = ni.GetIPStatistics();
             long bytesIn = stats.BytesReceived;
             long bytesOut = stats.BytesSent;
@@ -210,8 +221,8 @@ public partial class MainViewModel : ViewModelBase
             {
                 long diffIn = bytesIn - _lastBytesIn;
                 long diffOut = bytesOut - _lastBytesOut;
-                LiveDownSpeed = FormatSpeed(diffIn);
-                LiveUpSpeed = FormatSpeed(diffOut);
+                LiveDownSpeed = diffIn >= 0 ? FormatSpeed(diffIn) : "";
+                LiveUpSpeed = diffOut >= 0 ? FormatSpeed(diffOut) : "";
             }
             _lastBytesIn = bytesIn;
             _lastBytesOut = bytesOut;
@@ -249,6 +260,14 @@ public partial class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(PortText));
         OnPropertyChanged(nameof(ShowSmartConnectButton));
         RefreshConnectionFlags();
+        if (!value)
+        {
+            LiveDownSpeed = "";
+            LiveUpSpeed = "";
+            _lastBytesIn = 0;
+            _lastBytesOut = 0;
+            _lastInterfaceId = "";
+        }
     }
 
     partial void OnIsSmartConnectingChanged(bool value) => OnPropertyChanged(nameof(ShowSmartConnectButton));

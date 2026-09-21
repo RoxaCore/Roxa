@@ -198,6 +198,13 @@
 
           <!-- Buttons (right) -->
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
+            <!-- Smart Connect -->
+            <Button Command="{Binding SmartConnectCommand}" Padding="14,8" CornerRadius="8" Background="#FFFFFF" Foreground="#0E7C6B" BorderThickness="1" BorderBrush="#D0D0D0" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Text="⚡" FontSize="12" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
             <!-- System Proxy -->
             <Button Command="{Binding ToggleSystemProxyCommand}" Padding="14,6" CornerRadius="8" FontSize="11" FontWeight="Medium" HorizontalAlignment="Right"
                     Background="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#0E7C6B,#F3F4F6'}"
@@ -267,12 +274,6 @@
                     </MenuFlyout>
                   </Button.Flyout>
                   افزودن
-                </Button>
-                <Button Command="{Binding SmartConnectCommand}" IsVisible="{Binding ShowSmartConnectButton}" Padding="14,10" CornerRadius="10" Background="#7C3AED" Foreground="White" FontSize="13" FontWeight="SemiBold">
-                  <StackPanel Orientation="Horizontal" Spacing="6">
-                    <TextBlock Text="⚡" VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}" VerticalAlignment="Center"/>
-                  </StackPanel>
                 </Button>
                 <Button IsVisible="{Binding IsSmartConnecting}" IsEnabled="False" Padding="14,10" CornerRadius="10" Background="#5B21B6" Foreground="White" FontSize="13" FontWeight="SemiBold">
                   <Grid>

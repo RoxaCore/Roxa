@@ -21,6 +21,15 @@
     <Style Selector="Button:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource AncestorType=Button}}"/>
     </Style>
+    <Style Selector="Button.smart-connect">
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="14,10"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+    </Style>
   </Window.Styles>
 
   <Design.DataContext>
@@ -199,7 +208,7 @@
           <!-- Buttons (right) -->
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
             <!-- Smart Connect / Find Better (unified) -->
-            <Button Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}" Padding="14,10" CornerRadius="10" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right" Background="Transparent" BorderThickness="0">
+            <Button Classes="smart-connect" Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}">
               <Grid>
                 <Border CornerRadius="10" Background="#0E7C6B" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"/>
                 <Border CornerRadius="10" Background="#5B21B6" IsVisible="{Binding IsSmartConnecting}"/>

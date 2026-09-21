@@ -150,7 +150,7 @@
               <Button.Effect>
                 <DropShadowEffect Color="#E53E3E" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
-              <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
+              <TextBlock Text="⏻" FontSize="22" FontWeight="Bold" RenderTransform="RotateTransform(0)"/>
             </Button>
             <!-- Power Button (connected) - Green outline, power ON -->
             <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
@@ -159,7 +159,10 @@
               <Button.Effect>
                 <DropShadowEffect Color="#0E7C6B" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
-              <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
+              <Panel>
+                <Ellipse Width="8" Height="8" Fill="#0E7C6B" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,3,0,0"/>
+                <TextBlock Text="⏻" FontSize="22" FontWeight="Bold"/>
+              </Panel>
             </Button>
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
               <!-- Status -->

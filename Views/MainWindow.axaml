@@ -21,15 +21,6 @@
     <Style Selector="Button:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource AncestorType=Button}}"/>
     </Style>
-    <Style Selector="Button.smart-connect">
-      <Setter Property="BorderThickness" Value="0"/>
-      <Setter Property="BorderBrush" Value="Transparent"/>
-      <Setter Property="CornerRadius" Value="10"/>
-      <Setter Property="Padding" Value="14,10"/>
-      <Setter Property="FontSize" Value="13"/>
-      <Setter Property="FontWeight" Value="SemiBold"/>
-      <Setter Property="HorizontalAlignment" Value="Right"/>
-    </Style>
   </Window.Styles>
 
   <Design.DataContext>
@@ -49,6 +40,24 @@
     <SolidColorBrush x:Key="BorderLight">#E1E8E6</SolidColorBrush>
     <SolidColorBrush x:Key="TextPrimary">#122A25</SolidColorBrush>
     <SolidColorBrush x:Key="TextSecondary">#5C6E6A</SolidColorBrush>
+
+    <ControlTheme x:Key="SmartConnectButton" TargetType="Button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="14,10"/>
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" BorderThickness="0">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Padding="{TemplateBinding Padding}"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center"/>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </ControlTheme>
 
     <DataTemplate x:Key="ServerRowTemplate" DataType="models:ServerInfo">
       <Border CornerRadius="8" 
@@ -208,7 +217,7 @@
           <!-- Buttons (right) -->
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
             <!-- Smart Connect / Find Better (unified) -->
-            <Button Classes="smart-connect" Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}">
+            <Button Theme="{StaticResource SmartConnectButton}" Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}">
               <Grid>
                 <Border CornerRadius="10" Background="#0E7C6B" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"/>
                 <Border CornerRadius="10" Background="#5B21B6" IsVisible="{Binding IsSmartConnecting}"/>

@@ -150,8 +150,11 @@
               <Button.Effect>
                 <DropShadowEffect Color="#E53E3E" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
-              <Viewbox Width="24" Height="24">
-                <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M12,2 L12,9 M7,11 A5,5 0 1,0 17,11"/>
+              <Viewbox Width="24" Height="24" Stretch="Uniform">
+                <Canvas Width="24" Height="24">
+                  <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M12,3 L12,11"/>
+                  <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M8,13 A4.5,4.5 0 1,0 16,13"/>
+                </Canvas>
               </Viewbox>
             </Button>
             <!-- Power Button (connected) - Green outline -->
@@ -161,8 +164,11 @@
               <Button.Effect>
                 <DropShadowEffect Color="#0E7C6B" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
               </Button.Effect>
-              <Viewbox Width="24" Height="24">
-                <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M12,2 L12,9 M7,11 A5,5 0 1,0 17,11"/>
+              <Viewbox Width="24" Height="24" Stretch="Uniform">
+                <Canvas Width="24" Height="24">
+                  <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M12,3 L12,11"/>
+                  <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M8,13 A4.5,4.5 0 1,0 16,13"/>
+                </Canvas>
               </Viewbox>
             </Button>
             <StackPanel Grid.Column="1" VerticalAlignment="Center">

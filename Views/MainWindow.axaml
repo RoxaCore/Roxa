@@ -185,26 +185,19 @@
 
         <!-- Reconnect + Mode Buttons (Column 1 = right in RTL) -->
         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
-          <!-- Reconnect Button -->
-          <Button Command="{Binding ReconnectCommand}" Padding="16,10" CornerRadius="10" Background="#FFFFFF" Foreground="#0E7C6B" BorderThickness="1" BorderBrush="#D0D0D0" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right">
+          <!-- Smart Connect Button -->
+          <Button Command="{Binding SmartConnectCommand}" Padding="16,10" CornerRadius="10" Background="#FFFFFF" Foreground="#0E7C6B" BorderThickness="1" BorderBrush="#D0D0D0" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right">
             <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock Text="↻" FontSize="14" FontWeight="Bold"/>
-              <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Reconnect}" VerticalAlignment="Center"/>
+              <TextBlock Text="⚡" FontSize="14" FontWeight="Bold"/>
+              <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}" VerticalAlignment="Center"/>
             </StackPanel>
           </Button>
-          <!-- Mode Buttons -->
-          <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
-            <Button Command="{Binding ToggleTunCommand}" Padding="12,6" CornerRadius="8" FontSize="12" FontWeight="Medium"
-                    Background="{Binding UseTunMode, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#0E7C6B,#F3F4F6'}"
-                    Foreground="{Binding UseTunMode, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#FFFFFF,#666666'}">
-              TUN
-            </Button>
-            <Button Command="{Binding ToggleSystemProxyCommand}" Padding="12,6" CornerRadius="8" FontSize="12" FontWeight="Medium"
-                    Background="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#0E7C6B,#F3F4F6'}"
-                    Foreground="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#FFFFFF,#666666'}">
-              System Proxy
-            </Button>
-          </StackPanel>
+          <!-- System Proxy Button -->
+          <Button Command="{Binding ToggleSystemProxyCommand}" Padding="12,6" CornerRadius="8" FontSize="12" FontWeight="Medium" HorizontalAlignment="Right"
+                  Background="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#0E7C6B,#F3F4F6'}"
+                  Foreground="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#FFFFFF,#666666'}">
+            System Proxy
+          </Button>
         </StackPanel>
       </Grid>
     </Border>

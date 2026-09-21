@@ -210,7 +210,7 @@
                     <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
                   </Border.RenderTransform>
                 </Border>
-                <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}">
+                <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="10" IsVisible="{Binding ShowSmartConnectButton}">
                   <TextBlock Text="⚡" VerticalAlignment="Center"/>
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}" VerticalAlignment="Center"/>
                 </StackPanel>

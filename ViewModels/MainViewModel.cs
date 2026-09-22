@@ -1138,8 +1138,27 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task FindBetterServer()
     {
-        if (IsTesting) return;
-        if (!IsConnected || SelectedServer == null) return;
+        if (IsTesting)
+        {
+            Status = "یافتن سرور بهتر: تست دیگری در حال اجراست";
+            ToastHandler?.Invoke("تست دیگری در حال اجراست — صبر کنید");
+            AppendLog("Find better: blocked — another test is running");
+            return;
+        }
+        if (!IsConnected)
+        {
+            Status = "یافتن سرور بهتر: اول متصل شوید";
+            ToastHandler?.Invoke("اول به سرور متصل شوید");
+            AppendLog("Find better: blocked — not connected");
+            return;
+        }
+        if (SelectedServer == null)
+        {
+            Status = "یافتن سرور بهتر: سروری انتخاب نشده";
+            ToastHandler?.Invoke("سروری انتخاب نشده — ابتدا یک سرور انتخاب کنید");
+            AppendLog("Find better: blocked — no server selected");
+            return;
+        }
 
         // بررسی انقضا: اگه ۱۵ دقیقه گذشته، از اول شروع کن
         if (_searchPool.Count == 0 || (DateTime.Now - _lastSearchTime) > SearchExpiry)
@@ -1213,6 +1232,7 @@ public partial class MainViewModel : ViewModelBase
                 IsTesting = false;
                 IsFindingBetter = false;
                 Status = "یافتن سرور بهتر: هیچ کاندیدی پاسخ نداد";
+                ToastHandler?.Invoke("هیچ سروری در این دسته پاسخ نداد");
                 AppendLog("Find better: no survivors from TCP ping");
                 return;
             }
@@ -1221,6 +1241,7 @@ public partial class MainViewModel : ViewModelBase
 
             // --- مرحله ۲: تأخیر واقعی ---
             ServerInfo? bestCandidate = null;
+            int bestMs = int.MaxValue;
             foreach (var candidate in survivors)
             {
                 if (ct.IsCancellationRequested) break;
@@ -1252,8 +1273,11 @@ public partial class MainViewModel : ViewModelBase
                             AppendLog($"Find better: {candidate.Name} → {ms}ms");
                             Post(() => candidate.RecordRealDelay(ms));
 
-                            if (bestCandidate == null || ms < bestCandidate.LatencyMs)
+                            if (bestCandidate == null || ms < bestMs)
+                            {
                                 bestCandidate = candidate;
+                                bestMs = ms;
+                            }
                         }
                         else
                         {
@@ -1272,16 +1296,20 @@ public partial class MainViewModel : ViewModelBase
                 catch (OperationCanceledException) { break; }
             }
 
-            // --- مقایسه با سرور فعلی ---
-            if (bestCandidate != null && bestCandidate.LatencyMs > 0)
-            {
-                int currentMs = SelectedServer.LatencyMs > 0 ? SelectedServer.LatencyMs : 999;
+            // اجرای Post های باقی‌مانده UI قبل از مقایسه
+            await Dispatcher.UIThread.InvokeAsync(() => { });
 
-                if (bestCandidate.LatencyMs < currentMs)
+            // --- مقایسه با سرور فعلی ---
+            if (bestCandidate != null && bestMs < int.MaxValue)
+            {
+                int currentMs = SelectedServer.RealDelayMs > 0 ? SelectedServer.RealDelayMs
+                    : SelectedServer.LatencyMs > 0 ? SelectedServer.LatencyMs : 999;
+
+                if (bestMs < currentMs)
                 {
                     // سرور بهتر پیدا شد → سوییچ
-                    AppendLog($"Find better: switching from {SelectedServer.Name} ({currentMs}ms) → {bestCandidate.Name} ({bestCandidate.LatencyMs}ms)");
-                    ToastHandler?.Invoke($"سوییچ به {bestCandidate.Name} ({bestCandidate.LatencyMs}ms)");
+                    AppendLog($"Find better: switching from {SelectedServer.Name} ({currentMs}ms) → {bestCandidate.Name} ({bestMs}ms)");
+                    ToastHandler?.Invoke($"سوییچ به {bestCandidate.Name} ({bestMs}ms)");
 
                     Disconnect();
                     SelectedServer = bestCandidate;
@@ -1291,7 +1319,7 @@ public partial class MainViewModel : ViewModelBase
                 }
                 else
                 {
-                    AppendLog($"Find better: current server ({currentMs}ms) is still best. Best candidate: {bestCandidate.Name} ({bestCandidate.LatencyMs}ms)");
+                    AppendLog($"Find better: current server ({currentMs}ms) is still best. Best candidate: {bestCandidate.Name} ({bestMs}ms)");
                     ToastHandler?.Invoke($"سرور فعلی هنوز بهترینه ({currentMs}ms)");
                     Status = $"یافتن سرور بهتر: سرور فعلی بهترینه ({currentMs}ms)";
                 }
@@ -1299,12 +1327,14 @@ public partial class MainViewModel : ViewModelBase
             else
             {
                 Status = "یافتن سرور بهتر: تأخیر واقعی ناموفق";
+                ToastHandler?.Invoke("تست تأخیر واقعی هیچ سروری را تأیید نکرد");
                 AppendLog("Find better: all real delay tests failed");
             }
         }
         catch (OperationCanceledException)
         {
             Status = "یافتن سرور بهتر لغو شد";
+            ToastHandler?.Invoke("یافتن سرور بهتر لغو شد");
         }
         catch (Exception ex)
         {

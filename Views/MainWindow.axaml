@@ -107,7 +107,7 @@
               <!-- Latency pill -->
               <Border CornerRadius="4" Padding="4,1" Margin="6,0,0,0" VerticalAlignment="Center"
                       Background="{Binding LatencyBgColor}" IsVisible="{Binding HasLatency}">
-                <TextBlock Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" FontWeight="SemiBold" Foreground="#1A1A1A"/>
+                <TextBlock Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" FontWeight="SemiBold" Foreground="{Binding LatencyTextColor}"/>
               </Border>
               <TextBlock Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" Foreground="{Binding LatencyColor}" VerticalAlignment="Center" Margin="6,0,0,0"
                          IsVisible="{Binding HasLatency, Converter={StaticResource Not}}"/>

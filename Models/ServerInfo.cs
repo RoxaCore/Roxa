@@ -103,10 +103,19 @@ public partial class ServerInfo : ObservableObject
     [JsonIgnore]
     public string LatencyBgColor => LatencyMs switch
     {
-        > 0 and < 100 => "#BBF7D0",
-        >= 100 and < 300 => "#D1FAE5",
-        >= 300 => "#FEF3C7",
+        > 0 and < 200 => "#BBF7D0",
+        >= 200 and < 500 => "#FEF3C7",
+        >= 500 => "#FECACA",
         _ => "Transparent"
+    };
+
+    [JsonIgnore]
+    public string LatencyTextColor => LatencyMs switch
+    {
+        > 0 and < 200 => "#166534",
+        >= 200 and < 500 => "#92400E",
+        >= 500 => "#991B1B",
+        _ => "#AAAAAA"
     };
 
     [JsonIgnore]

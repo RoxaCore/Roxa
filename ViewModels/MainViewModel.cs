@@ -2079,6 +2079,14 @@ public partial class MainViewModel : ViewModelBase
      }
 
     [RelayCommand]
+    private async Task CopySubscriptionUrl(SubscriptionInfo? sub)
+    {
+        if (sub == null || Clipboard == null) return;
+        await Clipboard.SetTextAsync(sub.Url);
+        ToastHandler?.Invoke("لینک اشتراک کپی شد");
+    }
+
+    [RelayCommand]
     private void ExportServers()
     {
         string path = Path.Combine(Storage.DataDir, "servers_export.json");

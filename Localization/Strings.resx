@@ -59,8 +59,9 @@
   <data name="Btn_UpdateAll" xml:space="preserve"><value>بروزرسانی همه</value></data>
   <data name="Btn_Update" xml:space="preserve"><value>بروزرسانی</value></data>
   <data name="Btn_Add" xml:space="preserve"><value>+ افزودن</value></data>
-  <data name="Btn_RemoveSub" xml:space="preserve"><value>حذف ساب</value></data>
+  <data name="Btn_RemoveSub" xml:space="preserve"><value>حذف اشتراک</value></data>
   <data name="Btn_CopyUrl" xml:space="preserve"><value>کپی لینک</value></data>
+  <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>بروزرسانی بدون پروکسی</value></data>
   <data name="Btn_RemoveAll" xml:space="preserve"><value>حذف همه</value></data>
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ حذف تکراری</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 صادرات</value></data>

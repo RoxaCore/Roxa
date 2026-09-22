@@ -350,7 +350,6 @@
                             </Grid>
                           </StackPanel>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateAll}" Padding="8,4" IsVisible="{Binding IsAllGroup}" Command="{Binding Owner.UpdateSubscriptionsCommand}" CornerRadius="6" Background="#FFF3E0" Foreground="#E65100" FontSize="11" BorderThickness="0"/>
-                          <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}" Padding="8,4" IsVisible="{Binding IsSubscription}" Command="{Binding Owner.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding Subscription}" CornerRadius="6" Background="#FFF3E0" Foreground="#E65100" FontSize="11" BorderThickness="0"/>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}" Padding="8,4" IsVisible="{Binding IsManualGroup}" Command="{Binding Owner.UpdateGroupServersCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="#FFF3E0" Foreground="#E65100" FontSize="11" BorderThickness="0"/>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveAll}" Padding="8,4" IsVisible="{Binding IsManualGroup}" Command="{Binding Owner.RemoveGroupServersCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="#FFF5F5" Foreground="#E53E3E" FontSize="11" BorderThickness="0"/>
                         </StackPanel>
@@ -361,6 +360,8 @@
                             <Button.Flyout>
                             <MenuFlyout Placement="Bottom">
                               <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_CopyUrl}" Command="{Binding Owner.CopySubscriptionUrlCommand}" CommandParameter="{Binding Subscription}"/>
+                              <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}" Command="{Binding Owner.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding Subscription}"/>
+                              <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateNoProxy}" Command="{Binding Owner.UpdateSingleSubscriptionNoProxyCommand}" CommandParameter="{Binding Subscription}"/>
                               <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Speed}" Command="{Binding Owner.TestGroupSpeedCommand}" CommandParameter="{Binding}"/>
                               <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Ping}" Command="{Binding Owner.TestGroupCommand}" CommandParameter="{Binding}"/>
                               <Separator/>

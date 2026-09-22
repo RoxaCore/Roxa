@@ -2082,8 +2082,47 @@ public partial class MainViewModel : ViewModelBase
     private async Task CopySubscriptionUrl(SubscriptionInfo? sub)
     {
         if (sub == null || Clipboard == null) return;
-        await Clipboard.SetTextAsync(sub.Url);
-        ToastHandler?.Invoke("لینک اشتراک کپی شد");
+         await Clipboard.SetTextAsync(sub.Url);
+         ToastHandler?.Invoke("لینک اشتراک کپی شد");
+     }
+
+    [RelayCommand]
+    private async Task UpdateSingleSubscriptionNoProxy(SubscriptionInfo? sub)
+    {
+        sub ??= Subscriptions.FirstOrDefault(s => s.Name == SelectedSubscriptionName);
+        if (sub == null) return;
+        try
+        {
+            Status = $"دریافت {sub.Name} ...";
+            var (fetched, subInfo) = await SubscriptionManager.FetchWithInfoAsync(sub.Url);
+            if (fetched.Count == 0)
+            {
+                AppendLog($"خطا در {sub.Name}: سروری دریافت نشد — سرورهای قبلی حفظ شد");
+                Status = $"سروری از «{sub.Name}» دریافت نشد";
+                return;
+            }
+            string? activeId = SelectedServer?.Id;
+            foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
+            {
+                if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
+                Servers.Remove(o);
+            }
+            foreach (var s in fetched) { s.SubscriptionName = sub.Name; Servers.Add(s); }
+            if (subInfo != null) { sub.DataLimit = subInfo.DataLimit; sub.UsedTraffic = subInfo.UsedTraffic; sub.ExpireDate = subInfo.ExpireDate; }
+            sub.ServerCount = fetched.Count;
+            sub.LastUpdated = DateTime.Now;
+            SaveServers();
+            SaveSubs();
+            RefreshGroups();
+            if (activeId != null) SelectedServer = Servers.FirstOrDefault(s => s.Id == activeId);
+            Status = $"{fetched.Count} سرور از «{sub.Name}» دریافت شد";
+            AppendLog(string.Format(TranslationManager.Instance["Log_SubUpdated"], sub.Name, fetched.Count));
+        }
+        catch (Exception ex)
+        {
+            Status = $"خطا در بروزرسانی {sub.Name}";
+            AppendLog($"خطا در بروزرسانی {sub.Name}: {ex.Message}");
+        }
     }
 
     [RelayCommand]

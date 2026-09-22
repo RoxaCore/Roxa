@@ -51,10 +51,10 @@
   <data name="Btn_SmartConnect" xml:space="preserve"><value>اتصال هوشمند</value></data>
   <data name="Btn_FindBetter" xml:space="preserve"><value>یافتن سرور بهتر</value></data>
   <data name="Btn_Ping" xml:space="preserve"><value>پینگ</value></data>
-  <data name="Btn_PingAll" xml:space="preserve"><value>🔄 پینگ همه</value></data>
-  <data name="Btn_Real" xml:space="preserve"><value>تأخیر واقعی</value></data>
+  <data name="Btn_PingAll" xml:space="preserve"><value>تست پینگ</value></data>
+  <data name="Btn_Real" xml:space="preserve"><value>تست تاخیر واقعی</value></data>
   <data name="Btn_Speed" xml:space="preserve"><value>سرعت</value></data>
-  <data name="Btn_SpeedAll" xml:space="preserve"><value>🚀 سرعت</value></data>
+  <data name="Btn_SpeedAll" xml:space="preserve"><value>تست سرعت</value></data>
   <data name="Btn_Stop" xml:space="preserve"><value>توقف</value></data>
   <data name="Btn_UpdateAll" xml:space="preserve"><value>بروزرسانی همه</value></data>
   <data name="Btn_Update" xml:space="preserve"><value>بروزرسانی</value></data>

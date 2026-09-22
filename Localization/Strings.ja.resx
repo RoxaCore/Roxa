@@ -50,6 +50,8 @@
   <data name="Btn_Update" xml:space="preserve"><value>更新</value></data>
   <data name="Btn_Add" xml:space="preserve"><value>+ 追加</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>サブスク削除</value></data>
+  <data name="Btn_CopyUrl" xml:space="preserve"><value>リンクをコピー</value></data>
+  <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>プロキシなしで更新</value></data>
   <data name="Btn_RemoveAll" xml:space="preserve"><value>全て削除</value></data>
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ 重複削除</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 エクスポート</value></data>

@@ -52,6 +52,8 @@
   <data name="Btn_Update" xml:space="preserve"><value>Обновить</value></data>
   <data name="Btn_Add" xml:space="preserve"><value>+ Добавить</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>Удалить подписку</value></data>
+  <data name="Btn_CopyUrl" xml:space="preserve"><value>Копировать ссылку</value></data>
+  <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>Обновить без прокси</value></data>
   <data name="Btn_RemoveAll" xml:space="preserve"><value>Удалить все</value></data>
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ Удалить дубликаты</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 Экспорт</value></data>

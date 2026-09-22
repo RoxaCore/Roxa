@@ -50,6 +50,8 @@
   <data name="Btn_Update"><value>Actualizar</value></data>
   <data name="Btn_Add"><value>+ Añadir</value></data>
   <data name="Btn_RemoveSub"><value>Eliminar Sub</value></data>
+  <data name="Btn_CopyUrl"><value>Copiar Enlace</value></data>
+  <data name="Btn_UpdateNoProxy"><value>Actualizar sin proxy</value></data>
   <data name="Btn_RemoveAll"><value>Eliminar Todo</value></data>
   <data name="Btn_RemoveDupes"><value>🗑️ Eliminar Duplicados</value></data>
   <data name="Btn_Export"><value>📦 Exportar</value></data>

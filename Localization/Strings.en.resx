@@ -52,6 +52,8 @@
   <data name="Btn_Update" xml:space="preserve"><value>Update</value></data>
   <data name="Btn_Add" xml:space="preserve"><value>+ Add</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>Remove Sub</value></data>
+  <data name="Btn_CopyUrl" xml:space="preserve"><value>Copy Link</value></data>
+  <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>Update without proxy</value></data>
   <data name="Btn_RemoveAll" xml:space="preserve"><value>Remove All</value></data>
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ Remove Dupes</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 Export</value></data>

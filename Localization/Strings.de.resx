@@ -50,6 +50,8 @@
   <data name="Btn_Update" xml:space="preserve"><value>Aktualisieren</value></data>
   <data name="Btn_Add" xml:space="preserve"><value>+ Hinzufügen</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>Abonnement entfernen</value></data>
+  <data name="Btn_CopyUrl" xml:space="preserve"><value>Link kopieren</value></data>
+  <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>Ohne Proxy aktualisieren</value></data>
   <data name="Btn_RemoveAll" xml:space="preserve"><value>Alle entfernen</value></data>
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ Duplikate entfernen</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 Exportieren</value></data>

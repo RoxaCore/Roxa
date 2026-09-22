@@ -50,6 +50,8 @@
   <data name="Btn_Update" xml:space="preserve"><value>اپ ڈیٹ</value></data>
   <data name="Btn_Add" xml:space="preserve"><value>+ شامل کریں</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>سبسکرپشن ہٹائیں</value></data>
+  <data name="Btn_CopyUrl" xml:space="preserve"><value>لنک کاپی کریں</value></data>
+  <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>پراکسی کے بغیر اپ ڈیٹ</value></data>
   <data name="Btn_RemoveAll" xml:space="preserve"><value>سب ہٹائیں</value></data>
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ نقلیں ہٹائیں</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 برآمد</value></data>

@@ -50,6 +50,8 @@
   <data name="Btn_Update" xml:space="preserve"><value>अपडेट करें</value></data>
   <data name="Btn_Add" xml:space="preserve"><value>+ जोड़ें</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>सब्सक्रिप्शन हटाएं</value></data>
+  <data name="Btn_CopyUrl" xml:space="preserve"><value>लिंक कॉपी करें</value></data>
+  <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>बिना प्रॉक्सी अपडेट करें</value></data>
   <data name="Btn_RemoveAll" xml:space="preserve"><value>सभी हटाएं</value></data>
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ डुप्लिकेट हटाएं</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 एक्सपोर्ट</value></data>

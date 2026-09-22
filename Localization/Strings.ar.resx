@@ -52,6 +52,8 @@
   <data name="Btn_Update" xml:space="preserve"><value>تحديث</value></data>
   <data name="Btn_Add" xml:space="preserve"><value>+ إضافة</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>حذف الاشتراك</value></data>
+  <data name="Btn_CopyUrl" xml:space="preserve"><value>نسخ الرابط</value></data>
+  <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>تحديث بدون بروكسي</value></data>
   <data name="Btn_RemoveAll" xml:space="preserve"><value>حذف الكل</value></data>
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ حذف المكررات</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 تصدير</value></data>

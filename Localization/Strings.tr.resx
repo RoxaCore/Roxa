@@ -92,6 +92,12 @@
   <data name="Btn_RemoveSub" xml:space="preserve">
     <value>🗑️ Aboneliği Sil</value>
   </data>
+  <data name="Btn_CopyUrl" xml:space="preserve">
+    <value>Bağlantıyı Kopyala</value>
+  </data>
+  <data name="Btn_UpdateNoProxy" xml:space="preserve">
+    <value>Proxy'siz Güncelle</value>
+  </data>
   <data name="Btn_RemoveAll" xml:space="preserve">
     <value>🗑️ Tümünü Sil</value>
   </data>

@@ -50,6 +50,8 @@
   <data name="Btn_Update" xml:space="preserve"><value>Atualizar</value></data>
   <data name="Btn_Add" xml:space="preserve"><value>+ Adicionar</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>Remover Assinatura</value></data>
+  <data name="Btn_CopyUrl" xml:space="preserve"><value>Copiar Link</value></data>
+  <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>Atualizar sem proxy</value></data>
   <data name="Btn_RemoveAll" xml:space="preserve"><value>Remover Tudo</value></data>
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ Remover Duplicatas</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 Exportar</value></data>

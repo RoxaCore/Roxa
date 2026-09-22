@@ -143,6 +143,26 @@ public partial class ServerInfo : ObservableObject
     };
 
     [JsonIgnore]
+    public string RealDelayBgColor => RealDelayMs switch
+    {
+        > 0 and < 200 => "#BBF7D0",
+        >= 200 and < 500 => "#FEF3C7",
+        >= 500 => "#FECACA",
+        -2 => "#FECACA",
+        _ => "Transparent"
+    };
+
+    [JsonIgnore]
+    public string RealDelayTextColor => RealDelayMs switch
+    {
+        > 0 and < 200 => "#166534",
+        >= 200 and < 500 => "#92400E",
+        >= 500 => "#991B1B",
+        -2 => "#991B1B",
+        _ => "#AAAAAA"
+    };
+
+    [JsonIgnore]
     public string SpeedDisplay => DownloadMbps switch
     {
         < -1.5 => Localization.TranslationManager.Instance["Status_Error"],
@@ -289,7 +309,7 @@ public partial class ServerInfo : ObservableObject
 
     partial void OnLatencyMsChanged(int value) { OnPropertyChanged(nameof(LatencyDisplay)); OnPropertyChanged(nameof(LatencyColor)); OnPropertyChanged(nameof(HasLatency)); OnPropertyChanged(nameof(LatencyBgColor)); OnPropertyChanged(nameof(StatusColor)); }
     partial void OnPingMsChanged(int value) { OnPropertyChanged(nameof(PingDisplay)); OnPropertyChanged(nameof(PingSortKey)); }
-    partial void OnRealDelayMsChanged(int value) { OnPropertyChanged(nameof(RealDelayDisplay)); OnPropertyChanged(nameof(RealDelaySortKey)); }
+    partial void OnRealDelayMsChanged(int value) { OnPropertyChanged(nameof(RealDelayDisplay)); OnPropertyChanged(nameof(RealDelaySortKey)); OnPropertyChanged(nameof(RealDelayBgColor)); OnPropertyChanged(nameof(RealDelayTextColor)); }
     partial void OnDownloadMbpsChanged(double value) => OnPropertyChanged(nameof(SpeedDisplay));
     partial void OnCountryCodeChanged(string value) { OnPropertyChanged(nameof(Flag)); OnPropertyChanged(nameof(ShortName)); }
     partial void OnIsCheckedChanged(bool value) => Owner?.UpdateSelectedCount();

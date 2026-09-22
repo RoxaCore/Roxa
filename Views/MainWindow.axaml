@@ -372,11 +372,18 @@
                         </dg:DataGridTextColumn>
 
                         <!-- Real delay -->
-                        <dg:DataGridTextColumn Binding="{Binding RealDelayDisplay, Mode=OneWay}" SortMemberPath="RealDelaySortKey" Width="100" IsReadOnly="True">
-                          <dg:DataGridTextColumn.Header>
+                        <dg:DataGridTemplateColumn Width="100" SortMemberPath="RealDelaySortKey" IsReadOnly="True">
+                          <dg:DataGridTemplateColumn.Header>
                             <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_RealDelay]}" VerticalAlignment="Center"/>
-                          </dg:DataGridTextColumn.Header>
-                        </dg:DataGridTextColumn>
+                          </dg:DataGridTemplateColumn.Header>
+                          <dg:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                              <Border Background="{Binding RealDelayBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding RealDelayDisplay}" Foreground="{Binding RealDelayTextColor}" FontWeight="SemiBold" FontSize="11"/>
+                              </Border>
+                            </DataTemplate>
+                          </dg:DataGridTemplateColumn.CellTemplate>
+                        </dg:DataGridTemplateColumn>
 
                         <!-- Speed -->
                         <dg:DataGridTextColumn Binding="{Binding SpeedDisplay, Mode=OneWay}" SortMemberPath="DownloadMbps" Width="90" IsReadOnly="True">

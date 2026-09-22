@@ -481,6 +481,13 @@ public partial class MainViewModel : ViewModelBase
         group.UpdateTitle();
     }
 
+    private static List<ServerInfo> PrioritySorted(IEnumerable<ServerInfo> source)
+    {
+        var list = source.ToList();
+        list.Sort(ServerInfo.CompareByPriority);
+        return list;
+    }
+
     private void SortServers(List<ServerInfo> servers)
     {
         try
@@ -501,7 +508,7 @@ public partial class MainViewModel : ViewModelBase
                     sorted = rest.OrderBy(s => s.Name).ToList();
                     break;
                 default:
-                    sorted = rest.OrderBy(s => 0).ThenBy(s => s.Name).ToList();
+                    sorted = PrioritySorted(rest);
                     break;
             }
 
@@ -841,7 +848,7 @@ public partial class MainViewModel : ViewModelBase
         {
             "name" => Servers.OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase).ToList(),
             "speed" => Servers.OrderByDescending(s => s.DownloadMbps).ToList(),
-            _ => Servers.OrderBy(s => s.LatencyMs < 0 ? int.MaxValue : s.LatencyMs).ToList()
+            _ => PrioritySorted(Servers)
         };
         Servers.Clear();
         foreach (var s in ordered)
@@ -986,7 +993,7 @@ public partial class MainViewModel : ViewModelBase
             ToastHandler?.Invoke("در حال پیدا کردن بهترین سرور ...");
             AppendLog("Smart connect: stage 1 - fast TCP ping on all servers");
 
-            foreach (var s in Servers) { s.LatencyMs = -1; s.RealDelayMs = -1; s.PingMs = -1; s.DownloadMbps = -1; }
+            foreach (var s in Servers) { s.LatencyMs = -1; s.PingMs = -1; }
 
             using var sem1 = new SemaphoreSlim(20);
             var pingTasks = Servers.ToList().Select(async s =>
@@ -1360,7 +1367,13 @@ public partial class MainViewModel : ViewModelBase
          try
          {
             Status = $"پینگ {Servers.Count} سرور ...";
-            foreach (var s in Servers) { s.LatencyMs = -1; s.RealDelayMs = -1; s.PingMs = -1; }
+            bool resetReal = SelectedPingType == PingType.RealDelay;
+            foreach (var s in Servers)
+            {
+                s.LatencyMs = -1;
+                if (resetReal) s.RealDelayMs = -1;
+                else s.PingMs = -1;
+            }
             using var sem = new SemaphoreSlim(8);
             var tasks = Servers.ToList().Select(async s =>
             {
@@ -1464,6 +1477,7 @@ public partial class MainViewModel : ViewModelBase
                 finally { try { sem.Release(); } catch { } }
             });
             await Task.WhenAll(tasks);
+            AutoSortAfterTest("latency");
         }
         finally { IsTesting = false; SaveServers(); }
     }
@@ -1500,9 +1514,10 @@ public partial class MainViewModel : ViewModelBase
               catch (OperationCanceledException) { }
             foreach (var s in targets)
                 if (s.DownloadMbps == -1) s.RecordSpeed(-2);
-            int okCount = targets.Count(s => s.DownloadMbps >= 0);
-            Status = $"سرعت تمام شد: {okCount} از {targets.Count} موفق";
-            SaveServers();
+             int okCount = targets.Count(s => s.DownloadMbps >= 0);
+             Status = $"سرعت تمام شد: {okCount} از {targets.Count} موفق";
+             AutoSortAfterTest("speed");
+             SaveServers();
         }
         finally { IsTesting = false; }
     }
@@ -1539,7 +1554,13 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = $"پینگ {targets.Count} سرور منتخب ...";
-            foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; s.PingMs = -1; }
+            bool resetReal = SelectedPingType == PingType.RealDelay;
+            foreach (var s in targets)
+            {
+                s.LatencyMs = -1;
+                if (resetReal) s.RealDelayMs = -1;
+                else s.PingMs = -1;
+            }
             using var sem = new SemaphoreSlim(8);
             var tasks = targets.Select(async s =>
             {
@@ -1635,7 +1656,13 @@ public partial class MainViewModel : ViewModelBase
          try
          {
             Status = $"پینگ گروه «{group!.Title}» ({targets.Count} سرور) ...";
-            foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; s.PingMs = -1; }
+            bool resetReal = SelectedPingType == PingType.RealDelay;
+            foreach (var s in targets)
+            {
+                s.LatencyMs = -1;
+                if (resetReal) s.RealDelayMs = -1;
+                else s.PingMs = -1;
+            }
             using var sem = new SemaphoreSlim(SelectedPingType == PingType.RealDelay ? 3 : 8);
             var tasks = targets.Select(async s =>
             {
@@ -1895,6 +1922,7 @@ public partial class MainViewModel : ViewModelBase
                 if (s.LatencyMs == -1) s.RecordRealDelay(-2);
             int okCount = targets.Count(s => s.LatencyMs >= 0);
             Status = $"تأخیر واقعی تمام شد: {okCount} از {targets.Count} موفق";
+            AutoSortAfterTest("latency");
             SaveServers();
         }
         finally { IsTesting = false; }

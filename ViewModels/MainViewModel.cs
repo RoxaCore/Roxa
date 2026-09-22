@@ -428,16 +428,8 @@ public partial class MainViewModel : ViewModelBase
         }
         DuplicateCount = dupeCount;
 
-        // تب «همه سرورها» — اولین تب، بدون دسته‌بندی
-        bool allExp = expanded.TryGetValue("__all__", out bool ae) ? ae : true;
-        var allGroup = new ServerGroup(this, "__all__", TranslationManager.Instance["AllServers_Title"], null, allExp);
-        var allServers = Servers.ToList();
-        SortServers(allServers);
-        foreach (var s in allServers)
-            allGroup.Servers.Add(s);
-        Groups.Add(allGroup);
-
-        foreach (var sub in Subscriptions)
+        // ساب‌ها — جدیدترین بالاتر
+        foreach (var sub in Subscriptions.AsEnumerable().Reverse())
         {
             bool isExp = expanded.TryGetValue(sub.Name, out bool e) ? e : !_settings.CollapsedGroups.Contains(sub.Name);
             var group = new ServerGroup(this, sub.Name, sub.Name, sub, isExp);
@@ -457,6 +449,15 @@ public partial class MainViewModel : ViewModelBase
                 group.Servers.Add(s);
             Groups.Add(group);
         }
+
+        // تب «همه سرورها» — آخرین تب، بسته به صورت پیش‌فرض
+        bool allExp = expanded.TryGetValue("__all__", out bool ae) ? ae : false;
+        var allGroup = new ServerGroup(this, "__all__", TranslationManager.Instance["AllServers_Title"], null, allExp);
+        var allServers = Servers.ToList();
+        SortServers(allServers);
+        foreach (var s in allServers)
+            allGroup.Servers.Add(s);
+        Groups.Add(allGroup);
     }
 
     private void UpdateGroupContent(ServerGroup group)

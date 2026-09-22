@@ -116,24 +116,53 @@
             </StackPanel>
 
             <!-- Action Buttons -->
-            <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" Margin="8,0,0,0">
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Padding="6,4" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="6" BorderThickness="1" BorderBrush="#D0D0D0">
-                <TextBlock Text="▶" FontSize="11"/>
+            <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" Margin="8,0,0,0">
+              <!-- Connect -->
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Width="30" Height="28" Padding="0" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="7" BorderThickness="1" BorderBrush="#C9DDD8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Viewbox Width="15" Height="15" Stretch="Uniform">
+                  <Canvas Width="24" Height="24">
+                    <Path Fill="#0E7C6B" Stroke="#0E7C6B" StrokeThickness="1.5" StrokeLineCap="Round" Data="M9,6.5 L18,12 L9,17.5 Z"/>
+                  </Canvas>
+                </Viewbox>
               </Button>
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Disconnect}" Padding="6,4" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="Transparent" Foreground="#E53E3E" CornerRadius="6" BorderThickness="1" BorderBrush="#E53E3E">
-                <Button.Effect>
-                  <DropShadowEffect Color="#E53E3E" BlurRadius="12" Opacity="0.6" OffsetX="0" OffsetY="0"/>
-                </Button.Effect>
-                <TextBlock Text="✕" FontSize="24"/>
+              <!-- Disconnect -->
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Disconnect}" Width="30" Height="28" Padding="0" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="#FFF5F5" Foreground="#E53E3E" CornerRadius="7" BorderThickness="1" BorderBrush="#E53E3E" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Viewbox Width="14" Height="14" Stretch="Uniform">
+                  <Canvas Width="24" Height="24">
+                    <Path Stroke="#E53E3E" StrokeThickness="2.5" StrokeLineCap="Round" Data="M7,7 L17,17 M17,7 L7,17"/>
+                  </Canvas>
+                </Viewbox>
               </Button>
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Edit}" Padding="6,4" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="6" BorderThickness="1" BorderBrush="#D0D0D0">
-                <TextBlock Text="✎" FontSize="11"/>
+              <!-- Edit -->
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Edit}" Width="30" Height="28" Padding="0" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="7" BorderThickness="1" BorderBrush="#C9DDD8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Viewbox Width="15" Height="15" Stretch="Uniform">
+                  <Canvas Width="24" Height="24">
+                    <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M4.5,19.5 L5.5,15.5 L16.5,4.5 L19.5,7.5 L8.5,18.5 Z"/>
+                    <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M14.5,6.5 L17.5,9.5"/>
+                  </Canvas>
+                </Viewbox>
               </Button>
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Share}" Padding="6,4" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#D97706" CornerRadius="6" BorderThickness="1" BorderBrush="#D0D0D0">
-                <TextBlock Text="📋" FontSize="10"/>
+              <!-- Share -->
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Share}" Width="30" Height="28" Padding="0" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#D97706" CornerRadius="7" BorderThickness="1" BorderBrush="#F0D9B5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Viewbox Width="15" Height="15" Stretch="Uniform">
+                  <Canvas Width="24" Height="24">
+                    <Ellipse Canvas.Left="15.5" Canvas.Top="2.5" Width="6" Height="6" Stroke="#D97706" StrokeThickness="2"/>
+                    <Ellipse Canvas.Left="2.5" Canvas.Top="9" Width="6" Height="6" Stroke="#D97706" StrokeThickness="2"/>
+                    <Ellipse Canvas.Left="15.5" Canvas.Top="15.5" Width="6" Height="6" Stroke="#D97706" StrokeThickness="2"/>
+                    <Path Stroke="#D97706" StrokeThickness="2" StrokeLineCap="Round" Data="M8,11 L16.5,6.5 M8,13.5 L16.5,17.5"/>
+                  </Canvas>
+                </Viewbox>
               </Button>
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Delete}" Padding="6,4" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#E53E3E" CornerRadius="6" BorderThickness="1" BorderBrush="#D0D0D0">
-                <TextBlock Text="🗑" FontSize="10"/>
+              <!-- Delete -->
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Delete}" Width="30" Height="28" Padding="0" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#E53E3E" CornerRadius="7" BorderThickness="1" BorderBrush="#F5C6C6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Viewbox Width="15" Height="15" Stretch="Uniform">
+                  <Canvas Width="24" Height="24">
+                    <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M4,7 H20"/>
+                    <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M9.5,7 V5.5 A1.5,1.5 0 0,1 11,4 H13 A1.5,1.5 0 0,1 14.5,5.5 V7"/>
+                    <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M6.5,7 L7.4,19.2 A2,2 0 0,0 9.4,21 H14.6 A2,2 0 0,0 16.6,19.2 L17.5,7"/>
+                    <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M10,11 V17 M14,11 V17"/>
+                  </Canvas>
+                </Viewbox>
               </Button>
             </StackPanel>
         </Grid>

@@ -98,6 +98,18 @@ public partial class ServerInfo : ObservableObject
     };
 
     [JsonIgnore]
+    public bool HasLatency => LatencyMs > 0;
+
+    [JsonIgnore]
+    public string LatencyBgColor => LatencyMs switch
+    {
+        > 0 and < 100 => "#BBF7D0",
+        >= 100 and < 300 => "#D1FAE5",
+        >= 300 => "#FEF3C7",
+        _ => "Transparent"
+    };
+
+    [JsonIgnore]
     public string SpeedDisplay => DownloadMbps switch
     {
         < -1.5 => Localization.TranslationManager.Instance["Status_Error"],
@@ -242,7 +254,7 @@ public partial class ServerInfo : ObservableObject
 
     [JsonIgnore] public string LastTestedDisplay => LastTested == DateTime.MinValue ? "" : LastTested.ToString("HH:mm dd/MM");
 
-    partial void OnLatencyMsChanged(int value) { OnPropertyChanged(nameof(LatencyDisplay)); OnPropertyChanged(nameof(StatusColor)); }
+    partial void OnLatencyMsChanged(int value) { OnPropertyChanged(nameof(LatencyDisplay)); OnPropertyChanged(nameof(LatencyColor)); OnPropertyChanged(nameof(HasLatency)); OnPropertyChanged(nameof(LatencyBgColor)); OnPropertyChanged(nameof(StatusColor)); }
     partial void OnDownloadMbpsChanged(double value) => OnPropertyChanged(nameof(SpeedDisplay));
     partial void OnCountryCodeChanged(string value) { OnPropertyChanged(nameof(Flag)); OnPropertyChanged(nameof(ShortName)); }
     partial void OnIsCheckedChanged(bool value) => Owner?.UpdateSelectedCount();

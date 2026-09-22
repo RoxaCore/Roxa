@@ -101,14 +101,19 @@
                    Source="{Binding CountryCode, Converter={x:Static converters:FlagToImageConverter.Instance}}"
                    ToolTip.Tip="{Binding ToolTipText}"/>
 
-            <!-- Server Name + Ping/Speed on one line -->
-            <TextBlock Grid.Column="3" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="13" FontWeight="SemiBold" Foreground="#1A1A1A" ToolTip.Tip="{Binding ToolTipText}">
-              <Run Text="{Binding ShortName, Mode=OneWay}"/>
-              <Run Text="  " FontSize="10" Foreground="#AAAAAA"/>
-              <Run Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" Foreground="{Binding LatencyColor}"/>
-              <Run Text=" · " FontSize="10" Foreground="#CCCCCC"/>
-              <Run Text="{Binding SpeedDisplay, Mode=OneWay}" FontSize="10" Foreground="#AAAAAA"/>
-            </TextBlock>
+            <!-- Server Name + Ping/Speed -->
+            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Spacing="0">
+              <TextBlock Text="{Binding ShortName, Mode=OneWay}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="13" FontWeight="SemiBold" Foreground="#1A1A1A" MaxWidth="160" ToolTip.Tip="{Binding ToolTipText}"/>
+              <!-- Latency pill -->
+              <Border CornerRadius="4" Padding="4,1" Margin="6,0,0,0" VerticalAlignment="Center"
+                      Background="{Binding LatencyBgColor}" IsVisible="{Binding HasLatency}">
+                <TextBlock Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" FontWeight="SemiBold" Foreground="#1A1A1A"/>
+              </Border>
+              <TextBlock Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" Foreground="{Binding LatencyColor}" VerticalAlignment="Center" Margin="6,0,0,0"
+                         IsVisible="{Binding HasLatency, Converter={StaticResource Not}}"/>
+              <TextBlock Text=" · " FontSize="10" Foreground="#CCCCCC" VerticalAlignment="Center"/>
+              <TextBlock Text="{Binding SpeedDisplay, Mode=OneWay}" FontSize="10" Foreground="#AAAAAA" VerticalAlignment="Center"/>
+            </StackPanel>
 
             <!-- Action Buttons -->
             <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" Margin="8,0,0,0">

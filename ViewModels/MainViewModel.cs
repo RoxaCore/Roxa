@@ -136,6 +136,7 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty] private string _liveDownSpeed = "0 B/s";
     [ObservableProperty] private string _liveUpSpeed = "0 B/s";
+    [ObservableProperty] private double _speedBlinkOpacity = 1.0;
     private long _lastBytesIn;
     private long _lastBytesOut;
     private string _lastInterfaceId = "";
@@ -194,14 +195,14 @@ public partial class MainViewModel : ViewModelBase
         _engine.Stopped += () => Post(() => IsConnected = false);
         AppendLog(string.Format(TranslationManager.Instance["Log_ServersLoaded"], Servers.Count, Subscriptions.Count));
 
-        _speedTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _speedTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
         _speedTimer.Tick += (_, _) => UpdateLiveSpeed();
         _speedTimer.Start();
     }
 
     private void UpdateLiveSpeed()
     {
-        if (!IsConnected) { LiveDownSpeed = ""; LiveUpSpeed = ""; return; }
+        if (!IsConnected) { LiveDownSpeed = "0 B/s"; LiveUpSpeed = "0 B/s"; SpeedBlinkOpacity = 1.0; return; }
         try
         {
             var ni = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
@@ -227,8 +228,9 @@ public partial class MainViewModel : ViewModelBase
             {
                 long diffIn = bytesIn - _lastBytesIn;
                 long diffOut = bytesOut - _lastBytesOut;
-                LiveDownSpeed = diffIn >= 0 ? FormatSpeed(diffIn) : "";
-                LiveUpSpeed = diffOut >= 0 ? FormatSpeed(diffOut) : "";
+                LiveDownSpeed = diffIn >= 0 ? FormatSpeed(diffIn) : "0 B/s";
+                LiveUpSpeed = diffOut >= 0 ? FormatSpeed(diffOut) : "0 B/s";
+                SpeedBlinkOpacity = SpeedBlinkOpacity > 0.5 ? 0.3 : 1.0;
             }
             _lastBytesIn = bytesIn;
             _lastBytesOut = bytesOut;

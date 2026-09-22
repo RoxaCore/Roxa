@@ -39,135 +39,20 @@
     <SolidColorBrush x:Key="TextPrimary">#122A25</SolidColorBrush>
     <SolidColorBrush x:Key="TextSecondary">#5C6E6A</SolidColorBrush>
 
-    <DataTemplate x:Key="ServerRowTemplate" DataType="models:ServerInfo">
-      <Border CornerRadius="8" 
-              Padding="10,6" 
-              Margin="0,2,0,0"
-              HorizontalAlignment="Stretch"
-              BorderThickness="1"
-              Cursor="Hand"
-              PointerPressed="ServerCard_PointerPressed">
-        <Border.Background>
-          <MultiBinding Converter="{x:Static converters:ServerBgConverter.Instance}">
-            <Binding Path="IsActiveConnection"/>
-            <Binding Path="IsHighlighted"/>
-            <Binding Path="IsSelected"/>
-          </MultiBinding>
-        </Border.Background>
-        <Border.BorderBrush>
-          <MultiBinding Converter="{x:Static converters:ServerBorderConverter.Instance}">
-            <Binding Path="IsActiveConnection"/>
-            <Binding Path="IsHighlighted"/>
-          </MultiBinding>
-        </Border.BorderBrush>
-        
-        <Border.ContextMenu>
-          <ContextMenu Padding="4">
-            <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Connect}" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}"/>
-            <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Disconnect}" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}"/>
-            <Separator/>
-            <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Edit}" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}"/>
-            <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Clone}" Command="{Binding Owner.CloneServerCommand}" CommandParameter="{Binding}"/>
-            <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Share}" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}"/>
-            <Separator/>
-            <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestPing}" Command="{Binding Owner.TestOneServerCommand}" CommandParameter="{Binding}"/>
-            <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestReal}" Command="{Binding Owner.TestOneRealDelayCommand}" CommandParameter="{Binding}"/>
-            <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestSpeed}" Command="{Binding Owner.TestOneSpeedCommand}" CommandParameter="{Binding}"/>
-            <Separator/>
-            <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Delete}" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Foreground="{StaticResource ErrorBrush}"/>
-          </ContextMenu>
-        </Border.ContextMenu>
-
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-          </Grid.RowDefinitions>
-
-            <!-- Status Dot -->
-            <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,8,0" Fill="{Binding StatusColor}"/>
-
-            <!-- Checkbox -->
-            <CheckBox Grid.Column="1" IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-
-            <!-- Flag Icon -->
-            <Image Grid.Column="2" Width="24" Height="18" VerticalAlignment="Center" Margin="0,0,8,0"
-                   Source="{Binding CountryCode, Converter={x:Static converters:FlagToImageConverter.Instance}}"
-                   ToolTip.Tip="{Binding ToolTipText}"/>
-
-            <!-- Server Name + Ping/Speed -->
-            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Spacing="0">
-              <TextBlock Text="{Binding ShortName, Mode=OneWay}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="13" FontWeight="SemiBold" Foreground="#1A1A1A" MaxWidth="160" ToolTip.Tip="{Binding ToolTipText}"/>
-              <!-- Latency pill -->
-              <Border CornerRadius="4" Padding="4,1" Margin="6,0,0,0" VerticalAlignment="Center"
-                      Background="{Binding LatencyBgColor}" IsVisible="{Binding HasLatency}">
-                <TextBlock Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" FontWeight="SemiBold" Foreground="{Binding LatencyTextColor}"/>
-              </Border>
-              <TextBlock Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" Foreground="{Binding LatencyColor}" VerticalAlignment="Center" Margin="6,0,0,0"
-                         IsVisible="{Binding HasLatency, Converter={StaticResource Not}}"/>
-              <TextBlock Text=" · " FontSize="10" Foreground="#CCCCCC" VerticalAlignment="Center"/>
-              <TextBlock Text="{Binding SpeedDisplay, Mode=OneWay}" FontSize="10" Foreground="#AAAAAA" VerticalAlignment="Center"/>
-            </StackPanel>
-
-            <!-- Action Buttons -->
-            <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" Margin="8,0,0,0">
-              <!-- Connect -->
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Height="29" Padding="11,0" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="#0E7C6B" Foreground="#FFFFFF" CornerRadius="7" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center">
-                  <TextBlock.Text>
-                    <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Connect" StringFormat="▶  {0}"/>
-                  </TextBlock.Text>
-                </TextBlock>
-              </Button>
-              <!-- Disconnect -->
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Disconnect}" Height="29" Padding="11,0" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="#FFF5F5" Foreground="#E53E3E" CornerRadius="7" BorderThickness="1" BorderBrush="#E53E3E" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center">
-                  <TextBlock.Text>
-                    <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Disconnect" StringFormat="✕  {0}"/>
-                  </TextBlock.Text>
-                </TextBlock>
-              </Button>
-              <!-- Edit -->
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Edit}" Width="30" Height="28" Padding="0" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="7" BorderThickness="1" BorderBrush="#C9DDD8" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Viewbox Width="15" Height="15" Stretch="Uniform">
-                  <Canvas Width="24" Height="24">
-                    <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M4.5,19.5 L5.5,15.5 L16.5,4.5 L19.5,7.5 L8.5,18.5 Z"/>
-                    <Path Stroke="#0E7C6B" StrokeThickness="2" StrokeLineCap="Round" Data="M14.5,6.5 L17.5,9.5"/>
-                  </Canvas>
-                </Viewbox>
-              </Button>
-              <!-- Share -->
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Share}" Width="30" Height="28" Padding="0" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#D97706" CornerRadius="7" BorderThickness="1" BorderBrush="#F0D9B5" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Viewbox Width="15" Height="15" Stretch="Uniform">
-                  <Canvas Width="24" Height="24">
-                    <Ellipse Canvas.Left="15.5" Canvas.Top="2.5" Width="6" Height="6" Stroke="#D97706" StrokeThickness="2"/>
-                    <Ellipse Canvas.Left="2.5" Canvas.Top="9" Width="6" Height="6" Stroke="#D97706" StrokeThickness="2"/>
-                    <Ellipse Canvas.Left="15.5" Canvas.Top="15.5" Width="6" Height="6" Stroke="#D97706" StrokeThickness="2"/>
-                    <Path Stroke="#D97706" StrokeThickness="2" StrokeLineCap="Round" Data="M8,11 L16.5,6.5 M8,13.5 L16.5,17.5"/>
-                  </Canvas>
-                </Viewbox>
-              </Button>
-              <!-- Delete -->
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Delete}" Width="30" Height="28" Padding="0" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#E53E3E" CornerRadius="7" BorderThickness="1" BorderBrush="#F5C6C6" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Viewbox Width="15" Height="15" Stretch="Uniform">
-                  <Canvas Width="24" Height="24">
-                    <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M4,7 H20"/>
-                    <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M9.5,7 V5.5 A1.5,1.5 0 0,1 11,4 H13 A1.5,1.5 0 0,1 14.5,5.5 V7"/>
-                    <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M6.5,7 L7.4,19.2 A2,2 0 0,0 9.4,21 H14.6 A2,2 0 0,0 16.6,19.2 L17.5,7"/>
-                    <Path Stroke="#E53E3E" StrokeThickness="2" StrokeLineCap="Round" Data="M10,11 V17 M14,11 V17"/>
-                  </Canvas>
-                </Viewbox>
-              </Button>
-            </StackPanel>
-        </Grid>
-      </Border>
-    </DataTemplate>
+    <ContextMenu x:Key="ServerRowContextMenu" x:DataType="models:ServerInfo" Padding="4">
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Connect}" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}"/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Disconnect}" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}"/>
+      <Separator/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Edit}" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}"/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Clone}" Command="{Binding Owner.CloneServerCommand}" CommandParameter="{Binding}"/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Share}" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}"/>
+      <Separator/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestPing}" Command="{Binding Owner.TestOneServerCommand}" CommandParameter="{Binding}"/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestReal}" Command="{Binding Owner.TestOneRealDelayCommand}" CommandParameter="{Binding}"/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestSpeed}" Command="{Binding Owner.TestOneSpeedCommand}" CommandParameter="{Binding}"/>
+      <Separator/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Delete}" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Foreground="{StaticResource ErrorBrush}"/>
+    </ContextMenu>
   </Window.Resources>
 
   <Grid RowDefinitions="Auto,*" Background="#F7F8FA">
@@ -410,13 +295,150 @@
                         </StackPanel>
                       </Grid>
                     </Expander.Header>
-                    <ItemsControl ItemsSource="{Binding Servers}" ItemTemplate="{StaticResource ServerRowTemplate}" Margin="0,0,0,0">
-                      <ItemsControl.Styles>
-                        <Style Selector="ContentPresenter">
-                          <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <!-- Excel-like sortable server table -->
+                    <dg:DataGrid ItemsSource="{Binding Servers}"
+                                 AutoGenerateColumns="False"
+                                 CanUserSortColumns="True"
+                                 CanUserResizeColumns="True"
+                                 CanUserReorderColumns="True"
+                                 GridLinesVisibility="Horizontal"
+                                 HeadersVisibility="Column"
+                                 SelectionMode="Single"
+                                 SelectedItem="{Binding Owner.SelectedServer, Mode=TwoWay}"
+                                 IsReadOnly="False"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 RowBackground="#FFFFFF"
+                                 FontSize="12"
+                                 RowHeight="34"
+                                 ColumnHeaderHeight="36"
+                                 Margin="0,4,0,0">
+                      <dg:DataGrid.Styles>
+                        <Style Selector="DataGridColumnHeader">
+                          <Setter Property="Background" Value="#F3F4F6"/>
+                          <Setter Property="Foreground" Value="#374151"/>
+                          <Setter Property="FontWeight" Value="SemiBold"/>
+                          <Setter Property="BorderBrush" Value="#E5E7EB"/>
+                          <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                          <Setter Property="Padding" Value="8,0"/>
                         </Style>
-                      </ItemsControl.Styles>
-                    </ItemsControl>
+                        <Style Selector="DataGridRow">
+                          <Setter Property="BorderBrush" Value="#F0F0F0"/>
+                          <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        </Style>
+                        <Style Selector="DataGridRow:pointerover /template/ ContentPresenter">
+                          <Setter Property="Background" Value="#F0FDFA"/>
+                        </Style>
+                        <Style Selector="DataGridRow:selected /template/ ContentPresenter">
+                          <Setter Property="Background" Value="#E0F2FE"/>
+                        </Style>
+                        <Style Selector="DataGridCell">
+                          <Setter Property="BorderThickness" Value="0"/>
+                          <Setter Property="Padding" Value="4,0"/>
+                          <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        </Style>
+                        <Style Selector="DataGridCell:selected /template/ ContentPresenter">
+                          <Setter Property="Background" Value="Transparent"/>
+                        </Style>
+                      </dg:DataGrid.Styles>
+                      <dg:DataGrid.Columns>
+                        <!-- Select -->
+                        <dg:DataGridCheckBoxColumn Binding="{Binding IsChecked, Mode=TwoWay}" Width="40"/>
+
+                        <!-- Name + flag -->
+                        <dg:DataGridTemplateColumn Width="*" SortMemberPath="Name" MinWidth="120">
+                          <dg:DataGridTemplateColumn.Header>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Name]}" VerticalAlignment="Center"/>
+                          </dg:DataGridTemplateColumn.Header>
+                          <dg:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
+                                          ContextMenu="{StaticResource ServerRowContextMenu}">
+                                <Ellipse Width="8" Height="8" Fill="{Binding StatusColor}" VerticalAlignment="Center"/>
+                                <Image Width="18" Height="13" VerticalAlignment="Center"
+                                       Source="{Binding CountryCode, Converter={x:Static converters:FlagToImageConverter.Instance}}"/>
+                                <TextBlock Text="{Binding ShortName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                           FontWeight="SemiBold" Foreground="#1A1A1A" ToolTip.Tip="{Binding ToolTipText}"/>
+                              </StackPanel>
+                            </DataTemplate>
+                          </dg:DataGridTemplateColumn.CellTemplate>
+                        </dg:DataGridTemplateColumn>
+
+                        <!-- Ping -->
+                        <dg:DataGridTextColumn Binding="{Binding PingDisplay, Mode=OneWay}" SortMemberPath="PingSortKey" Width="80" IsReadOnly="True">
+                          <dg:DataGridTextColumn.Header>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Ping]}" VerticalAlignment="Center"/>
+                          </dg:DataGridTextColumn.Header>
+                        </dg:DataGridTextColumn>
+
+                        <!-- Real delay -->
+                        <dg:DataGridTextColumn Binding="{Binding RealDelayDisplay, Mode=OneWay}" SortMemberPath="RealDelaySortKey" Width="100" IsReadOnly="True">
+                          <dg:DataGridTextColumn.Header>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_RealDelay]}" VerticalAlignment="Center"/>
+                          </dg:DataGridTextColumn.Header>
+                        </dg:DataGridTextColumn>
+
+                        <!-- Speed -->
+                        <dg:DataGridTextColumn Binding="{Binding SpeedDisplay, Mode=OneWay}" SortMemberPath="DownloadMbps" Width="90" IsReadOnly="True">
+                          <dg:DataGridTextColumn.Header>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Speed]}" VerticalAlignment="Center"/>
+                          </dg:DataGridTextColumn.Header>
+                        </dg:DataGridTextColumn>
+
+                        <!-- Protocol -->
+                        <dg:DataGridTextColumn Binding="{Binding ProtocolDisplay}" SortMemberPath="Protocol" Width="90" IsReadOnly="True">
+                          <dg:DataGridTextColumn.Header>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Protocol]}" VerticalAlignment="Center"/>
+                          </dg:DataGridTextColumn.Header>
+                        </dg:DataGridTextColumn>
+
+                        <!-- Actions -->
+                        <dg:DataGridTemplateColumn Width="130" IsReadOnly="True">
+                          <dg:DataGridTemplateColumn.Header>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Status]}" VerticalAlignment="Center"/>
+                          </dg:DataGridTemplateColumn.Header>
+                          <dg:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                              <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                <!-- Connect -->
+                                <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Height="26" Padding="8,0" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="#0E7C6B" Foreground="#FFFFFF" CornerRadius="6" BorderThickness="0">
+                                  <TextBlock FontSize="11" FontWeight="SemiBold">
+                                    <TextBlock.Text>
+                                      <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Connect" StringFormat="▶  {0}"/>
+                                    </TextBlock.Text>
+                                  </TextBlock>
+                                </Button>
+                                <!-- Disconnect -->
+                                <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Disconnect}" Height="26" Padding="8,0" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="#FFF5F5" Foreground="#E53E3E" CornerRadius="6" BorderThickness="1" BorderBrush="#E53E3E">
+                                  <TextBlock FontSize="11" FontWeight="SemiBold">
+                                    <TextBlock.Text>
+                                      <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Disconnect" StringFormat="✕  {0}"/>
+                                    </TextBlock.Text>
+                                  </TextBlock>
+                                </Button>
+                                <!-- More menu -->
+                                <Button Padding="6,4" CornerRadius="6" Background="Transparent" Foreground="#6B7280" FontSize="14" BorderThickness="0" ToolTip.Tip="...">
+                                  <Button.Flyout>
+                                    <MenuFlyout Placement="Bottom">
+                                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Edit}" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}"/>
+                                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Clone}" Command="{Binding Owner.CloneServerCommand}" CommandParameter="{Binding}"/>
+                                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Share}" Command="{Binding Owner.ShareServerCommand}" CommandParameter="{Binding}"/>
+                                      <Separator/>
+                                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestPing}" Command="{Binding Owner.TestOneServerCommand}" CommandParameter="{Binding}"/>
+                                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestReal}" Command="{Binding Owner.TestOneRealDelayCommand}" CommandParameter="{Binding}"/>
+                                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestSpeed}" Command="{Binding Owner.TestOneSpeedCommand}" CommandParameter="{Binding}"/>
+                                      <Separator/>
+                                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Delete}" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Foreground="#E53E3E"/>
+                                    </MenuFlyout>
+                                  </Button.Flyout>
+                                  <TextBlock Text="⋯" FontSize="16"/>
+                                </Button>
+                              </StackPanel>
+                            </DataTemplate>
+                          </dg:DataGridTemplateColumn.CellTemplate>
+                        </dg:DataGridTemplateColumn>
+                      </dg:DataGrid.Columns>
+                    </dg:DataGrid>
                   </Expander>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>

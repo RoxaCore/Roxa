@@ -178,6 +178,7 @@
 
   <data name="Header_Name" xml:space="preserve"><value>Nom</value></data>
   <data name="Header_Ping" xml:space="preserve"><value>Ping</value></data>
+  <data name="Header_RealDelay" xml:space="preserve"><value>Délai réel</value></data>
   <data name="Header_Speed" xml:space="preserve"><value>Vitesse</value></data>
   <data name="Header_Status" xml:space="preserve"><value>État</value></data>
   <data name="Header_Country" xml:space="preserve"><value>Pays</value></data>

@@ -164,6 +164,7 @@
   <data name="AllServers_Title"><value>📋 Todos los Servidores</value></data>
   <data name="Header_Name"><value>Nombre</value></data>
   <data name="Header_Ping"><value>Ping</value></data>
+  <data name="Header_RealDelay"><value>Retardo real</value></data>
   <data name="Header_Speed"><value>Velocidad</value></data>
   <data name="Header_Status"><value>Estado</value></data>
   <data name="Header_Country"><value>País</value></data>

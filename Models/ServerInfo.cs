@@ -92,6 +92,28 @@ public partial class ServerInfo : ObservableObject
     };
 
     [JsonIgnore]
+    public string PingDisplay => PingMs switch
+    {
+        -1 => "—",
+        -2 => Localization.TranslationManager.Instance["Status_Failed"],
+        _ => $"{PingMs}ms"
+    };
+
+    [JsonIgnore]
+    public string RealDelayDisplay => RealDelayMs switch
+    {
+        -1 => "—",
+        -2 => Localization.TranslationManager.Instance["Status_Failed"],
+        _ => $"{RealDelayMs}ms"
+    };
+
+    [JsonIgnore]
+    public int PingSortKey => PingMs < 0 ? int.MaxValue : PingMs;
+
+    [JsonIgnore]
+    public int RealDelaySortKey => RealDelayMs < 0 ? int.MaxValue : RealDelayMs;
+
+    [JsonIgnore]
     public string LatencyColor => LatencyMs switch
     {
         -1 => "#EF4444",
@@ -266,6 +288,8 @@ public partial class ServerInfo : ObservableObject
     [JsonIgnore] public string LastTestedDisplay => LastTested == DateTime.MinValue ? "" : LastTested.ToString("HH:mm dd/MM");
 
     partial void OnLatencyMsChanged(int value) { OnPropertyChanged(nameof(LatencyDisplay)); OnPropertyChanged(nameof(LatencyColor)); OnPropertyChanged(nameof(HasLatency)); OnPropertyChanged(nameof(LatencyBgColor)); OnPropertyChanged(nameof(StatusColor)); }
+    partial void OnPingMsChanged(int value) { OnPropertyChanged(nameof(PingDisplay)); OnPropertyChanged(nameof(PingSortKey)); }
+    partial void OnRealDelayMsChanged(int value) { OnPropertyChanged(nameof(RealDelayDisplay)); OnPropertyChanged(nameof(RealDelaySortKey)); }
     partial void OnDownloadMbpsChanged(double value) => OnPropertyChanged(nameof(SpeedDisplay));
     partial void OnCountryCodeChanged(string value) { OnPropertyChanged(nameof(Flag)); OnPropertyChanged(nameof(ShortName)); }
     partial void OnIsCheckedChanged(bool value) => Owner?.UpdateSelectedCount();

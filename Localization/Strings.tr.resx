@@ -467,6 +467,9 @@
   <data name="Header_Ping" xml:space="preserve">
     <value>Ping</value>
   </data>
+  <data name="Header_RealDelay" xml:space="preserve">
+    <value>Gerçek Gecikme</value>
+  </data>
   <data name="Header_Speed" xml:space="preserve">
     <value>Hız</value>
   </data>

@@ -177,6 +177,7 @@
   <!-- Headers -->
   <data name="Header_Name" xml:space="preserve"><value>Название</value></data>
   <data name="Header_Ping" xml:space="preserve"><value>Пинг</value></data>
+  <data name="Header_RealDelay" xml:space="preserve"><value>Реальная задержка</value></data>
   <data name="Header_Speed" xml:space="preserve"><value>Скорость</value></data>
   <data name="Header_Status" xml:space="preserve"><value>Статус</value></data>
   <data name="Header_Country" xml:space="preserve"><value>Страна</value></data>

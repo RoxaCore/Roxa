@@ -177,6 +177,7 @@
   <!-- Headers -->
   <data name="Header_Name" xml:space="preserve"><value>Name</value></data>
   <data name="Header_Ping" xml:space="preserve"><value>Ping</value></data>
+  <data name="Header_RealDelay" xml:space="preserve"><value>Real Delay</value></data>
   <data name="Header_Speed" xml:space="preserve"><value>Speed</value></data>
   <data name="Header_Status" xml:space="preserve"><value>Status</value></data>
   <data name="Header_Country" xml:space="preserve"><value>Country</value></data>
@@ -218,4 +219,13 @@
   <data name="Add_Link" xml:space="preserve"><value>Add</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>Use proxy for updates</value></data>
+
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>Connected to {0}
+Latency: {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>Disconnected</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>Smart Connect: {0}
+Latency: {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>Connection failed</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>Smart connect: real delay test failed</value></data>
 </root>

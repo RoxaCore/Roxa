@@ -185,6 +185,7 @@
   <!-- Headers -->
   <data name="Header_Name" xml:space="preserve"><value>نام</value></data>
   <data name="Header_Ping" xml:space="preserve"><value>پینگ</value></data>
+  <data name="Header_RealDelay" xml:space="preserve"><value>تاخیر واقعی</value></data>
   <data name="Header_Speed" xml:space="preserve"><value>سرعت</value></data>
   <data name="Header_Status" xml:space="preserve"><value>وضعیت</value></data>
   <data name="Header_Country" xml:space="preserve"><value>کشور</value></data>
@@ -226,4 +227,13 @@
   <data name="Add_Link" xml:space="preserve"><value>افزودن</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>بروزرسانی اشتراک از طریق پراکسی</value></data>
+
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>متصل به {0}
+تأخیر: {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>قطع شد</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>اتصال هوشمند: {0}
+تأخیر: {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>اتصال ناموفق</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>اتصال هوشمند: تست تأخیر واقعی ناموفق</value></data>
 </root>

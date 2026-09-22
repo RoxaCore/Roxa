@@ -177,6 +177,7 @@
   <!-- Headers -->
   <data name="Header_Name" xml:space="preserve"><value>名称</value></data>
   <data name="Header_Ping" xml:space="preserve"><value>Ping</value></data>
+  <data name="Header_RealDelay" xml:space="preserve"><value>真实延迟</value></data>
   <data name="Header_Speed" xml:space="preserve"><value>速度</value></data>
   <data name="Header_Status" xml:space="preserve"><value>状态</value></data>
   <data name="Header_Country" xml:space="preserve"><value>国家</value></data>

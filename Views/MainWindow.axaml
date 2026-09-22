@@ -118,7 +118,7 @@
             <!-- Action Buttons -->
             <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" Margin="8,0,0,0">
               <!-- Connect -->
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Height="32" Padding="12,0" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="#0E7C6B" Foreground="#FFFFFF" CornerRadius="7" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Height="29" Padding="11,0" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="#0E7C6B" Foreground="#FFFFFF" CornerRadius="7" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center">
                   <TextBlock.Text>
                     <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Connect" StringFormat="▶  {0}"/>
@@ -126,12 +126,12 @@
                 </TextBlock>
               </Button>
               <!-- Disconnect -->
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Disconnect}" Width="30" Height="28" Padding="0" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="#FFF5F5" Foreground="#E53E3E" CornerRadius="7" BorderThickness="1" BorderBrush="#E53E3E" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Viewbox Width="14" Height="14" Stretch="Uniform">
-                  <Canvas Width="24" Height="24">
-                    <Path Stroke="#E53E3E" StrokeThickness="2.5" StrokeLineCap="Round" Data="M7,7 L17,17 M17,7 L7,17"/>
-                  </Canvas>
-                </Viewbox>
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Disconnect}" Height="29" Padding="11,0" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="#FFF5F5" Foreground="#E53E3E" CornerRadius="7" BorderThickness="1" BorderBrush="#E53E3E" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center">
+                  <TextBlock.Text>
+                    <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Disconnect" StringFormat="✕  {0}"/>
+                  </TextBlock.Text>
+                </TextBlock>
               </Button>
               <!-- Edit -->
               <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Edit}" Width="30" Height="28" Padding="0" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="7" BorderThickness="1" BorderBrush="#C9DDD8" HorizontalAlignment="Center" VerticalAlignment="Center">

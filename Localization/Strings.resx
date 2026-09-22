@@ -190,7 +190,7 @@
   <data name="Header_Address" xml:space="preserve"><value>آدرس</value></data>
   <data name="Header_Port" xml:space="preserve"><value>پورت</value></data>
   <data name="Header_Sub" xml:space="preserve"><value>اشتراک</value></data>
-  <data name="ServerCount" xml:space="preserve"><value>تعداد سرورها: {0}</value></data>
+  <data name="ServerCount" xml:space="preserve"><value>سرورها: {0}</value></data>
   <!-- Display -->
   <data name="Status_Failed" xml:space="preserve"><value>ناموفق</value></data>
   <data name="Status_Error" xml:space="preserve"><value>خطا</value></data>

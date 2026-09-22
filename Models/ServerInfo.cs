@@ -86,7 +86,15 @@ public partial class ServerInfo : ObservableObject
     {
         -1 => "—",
         -2 => Localization.TranslationManager.Instance["Status_Failed"],
-        _ => $"{LatencyMs} ms"
+        _ => $"{LatencyMs}ms"
+    };
+
+    [JsonIgnore]
+    public string LatencyColor => LatencyMs switch
+    {
+        -1 => "#EF4444",
+        -2 => "#EF4444",
+        _ => "#AAAAAA"
     };
 
     [JsonIgnore]

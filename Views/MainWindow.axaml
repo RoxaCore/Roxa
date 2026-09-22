@@ -91,7 +91,7 @@
           </Grid.RowDefinitions>
 
             <!-- Status Dot -->
-            <Ellipse Grid.Column="0" Width="8" Height="8" VerticalAlignment="Center" Margin="0,0,8,0" Fill="{Binding StatusColor}"/>
+            <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,8,0" Fill="{Binding StatusColor}"/>
 
             <!-- Checkbox -->
             <CheckBox Grid.Column="1" IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,6,0"/>
@@ -105,7 +105,7 @@
             <TextBlock Grid.Column="3" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="13" FontWeight="SemiBold" Foreground="#1A1A1A" ToolTip.Tip="{Binding ToolTipText}">
               <Run Text="{Binding ShortName, Mode=OneWay}"/>
               <Run Text="  " FontSize="10" Foreground="#AAAAAA"/>
-              <Run Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" Foreground="#AAAAAA"/>
+              <Run Text="{Binding LatencyDisplay, Mode=OneWay}" FontSize="10" Foreground="{Binding LatencyColor}"/>
               <Run Text=" · " FontSize="10" Foreground="#CCCCCC"/>
               <Run Text="{Binding SpeedDisplay, Mode=OneWay}" FontSize="10" Foreground="#AAAAAA"/>
             </TextBlock>

@@ -73,6 +73,8 @@ public partial class ServerInfo : ObservableObject
     }
 
     [ObservableProperty] private int _latencyMs = -1;
+    [ObservableProperty] private int _realDelayMs = -1;
+    [ObservableProperty] private int _pingMs = -1;
     [ObservableProperty] private double _downloadMbps = -1;
     [ObservableProperty] private string _countryCode = "";
     [ObservableProperty] [property: JsonIgnore] private bool _isSelected;
@@ -282,6 +284,18 @@ public partial class ServerInfo : ObservableObject
         OnPropertyChanged(nameof(LastTestedDisplay));
     }
 
+    public void RecordRealDelay(int ms)
+    {
+        RealDelayMs = ms;
+        RecordLatency(ms);
+    }
+
+    public void RecordPing(int ms)
+    {
+        PingMs = ms;
+        RecordLatency(ms);
+    }
+
     public void RecordSpeed(double mbps)
     {
         DownloadMbps = mbps;
@@ -320,9 +334,14 @@ public partial class ServerInfo : ObservableObject
 
     public static int CompareByPriority(ServerInfo a, ServerInfo b)
     {
-        int ra = a.LatencyMs < 0 ? int.MaxValue : a.LatencyMs;
-        int rb = b.LatencyMs < 0 ? int.MaxValue : b.LatencyMs;
+        int ra = a.RealDelayMs < 0 ? int.MaxValue : a.RealDelayMs;
+        int rb = b.RealDelayMs < 0 ? int.MaxValue : b.RealDelayMs;
         int c = ra.CompareTo(rb);
+        if (c != 0) return c;
+
+        int pa = a.PingMs < 0 ? int.MaxValue : a.PingMs;
+        int pb = b.PingMs < 0 ? int.MaxValue : b.PingMs;
+        c = pa.CompareTo(pb);
         if (c != 0) return c;
 
         double sa = a.DownloadMbps < 0 ? -1 : a.DownloadMbps;

@@ -206,14 +206,14 @@
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
             <!-- Smart Connect / Find Better (unified) -->
             <Button Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}"
-                    Padding="16,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderThickness="0">
+                    Padding="16,10" CornerRadius="10" Background="#7C3AED" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderThickness="0">
               <Grid ClipToBounds="True">
-                <Border Background="#7C3AED" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5" IsVisible="{Binding IsSmartConnecting}">
+                <Border Background="#5B21B6" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5" IsVisible="{Binding IsSmartConnecting}">
                   <Border.RenderTransform>
                     <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
                   </Border.RenderTransform>
                 </Border>
-                <Border Background="#0E7C6B" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5" IsVisible="{Binding IsConnected}">
+                <Border Background="#5B21B6" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5" IsVisible="{Binding IsConnected}">
                   <Border.RenderTransform>
                     <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
                   </Border.RenderTransform>

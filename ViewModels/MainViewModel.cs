@@ -902,7 +902,7 @@ public partial class MainViewModel : ViewModelBase
                     if (resp.IsSuccessStatusCode)
                     {
                         int ms = (int)sw.ElapsedMilliseconds;
-                        Post(() => server.RecordLatency(ms));
+                        Post(() => server.RecordRealDelay(ms));
                     }
                 }
                 catch { }
@@ -986,7 +986,7 @@ public partial class MainViewModel : ViewModelBase
             ToastHandler?.Invoke("در حال پیدا کردن بهترین سرور ...");
             AppendLog("Smart connect: stage 1 - fast TCP ping on all servers");
 
-            foreach (var s in Servers) { s.LatencyMs = -1; s.DownloadMbps = -1; }
+            foreach (var s in Servers) { s.LatencyMs = -1; s.RealDelayMs = -1; s.PingMs = -1; s.DownloadMbps = -1; }
 
             using var sem1 = new SemaphoreSlim(20);
             var pingTasks = Servers.ToList().Select(async s =>
@@ -996,9 +996,9 @@ public partial class MainViewModel : ViewModelBase
                 try
                 {
                     var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 3000);
-                    Post(() => s.RecordLatency(ok ? ms : -2));
+                    Post(() => s.RecordPing(ok ? ms : -2));
                 }
-                catch { Post(() => s.RecordLatency(-2)); }
+                catch { Post(() => s.RecordPing(-2)); }
                 finally
                 {
                     try { sem1.Release(); } catch { }
@@ -1073,18 +1073,18 @@ public partial class MainViewModel : ViewModelBase
                         {
                             int ms = (int)sw.ElapsedMilliseconds;
                             AppendLog($"Smart connect: {candidate.Name} → {ms}ms");
-                            Post(() => candidate.RecordLatency(ms));
+                            Post(() => candidate.RecordRealDelay(ms));
                         }
                         else
                         {
                             AppendLog($"Smart connect: {candidate.Name} → failed (status {resp.StatusCode})");
-                            Post(() => candidate.RecordLatency(-2));
+                            Post(() => candidate.RecordRealDelay(-2));
                         }
                     }
                     catch (Exception ex)
                     {
                         AppendLog($"Smart connect: {candidate.Name} → error: {ex.Message}");
-                        Post(() => candidate.RecordLatency(-2));
+                        Post(() => candidate.RecordRealDelay(-2));
                     }
                     finally
                     {
@@ -1190,9 +1190,9 @@ public partial class MainViewModel : ViewModelBase
                 try
                 {
                     var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 3000);
-                    Post(() => s.RecordLatency(ok ? ms : -2));
+                    Post(() => s.RecordPing(ok ? ms : -2));
                 }
-                catch { Post(() => s.RecordLatency(-2)); }
+                catch { Post(() => s.RecordPing(-2)); }
                 finally
                 {
                     try { sem.Release(); } catch { }
@@ -1250,19 +1250,19 @@ public partial class MainViewModel : ViewModelBase
                         {
                             int ms = (int)sw.ElapsedMilliseconds;
                             AppendLog($"Find better: {candidate.Name} → {ms}ms");
-                            Post(() => candidate.RecordLatency(ms));
+                            Post(() => candidate.RecordRealDelay(ms));
 
                             if (bestCandidate == null || ms < bestCandidate.LatencyMs)
                                 bestCandidate = candidate;
                         }
                         else
                         {
-                            Post(() => candidate.RecordLatency(-2));
+                            Post(() => candidate.RecordRealDelay(-2));
                         }
                     }
                     catch
                     {
-                        Post(() => candidate.RecordLatency(-2));
+                        Post(() => candidate.RecordRealDelay(-2));
                     }
                     finally
                     {
@@ -1329,28 +1329,29 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = true;
          try
          {
-             Status = $"پینگ {Servers.Count} سرور ...";
-             foreach (var s in Servers) s.LatencyMs = -1;
-             using var sem = new SemaphoreSlim(8);
-             var tasks = Servers.ToList().Select(async s =>
-             {
-                 if (_testCts.Token.IsCancellationRequested) return;
-                 await sem.WaitAsync(_testCts.Token);
-                 try
-                 {
-                     if (_testCts.Token.IsCancellationRequested) return;
-                     var (ok, ms) = SelectedPingType switch
-                     {
-                         PingType.TcpPing or PingType.Ping => await LatencyTester.TcpAsync(s.Address, s.Port),
-                         PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
-                         _ => await RealDelayTester.TestAsync(s, _testCts.Token)
-                     };
-                     if (!_testCts.Token.IsCancellationRequested)
-                         Post(() => s.RecordLatency(ok ? ms : -2));
-                 }
-                 catch { Post(() => s.RecordLatency(-2)); }
-                 finally { sem.Release(); }
-             });
+            Status = $"پینگ {Servers.Count} سرور ...";
+            foreach (var s in Servers) { s.LatencyMs = -1; s.RealDelayMs = -1; s.PingMs = -1; }
+            using var sem = new SemaphoreSlim(8);
+            var tasks = Servers.ToList().Select(async s =>
+            {
+                if (_testCts.Token.IsCancellationRequested) return;
+                await sem.WaitAsync(_testCts.Token);
+                try
+                {
+                    if (_testCts.Token.IsCancellationRequested) return;
+                    var isReal = SelectedPingType == PingType.RealDelay;
+                    var (ok, ms) = SelectedPingType switch
+                    {
+                        PingType.TcpPing or PingType.Ping => await LatencyTester.TcpAsync(s.Address, s.Port),
+                        PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
+                        _ => await RealDelayTester.TestAsync(s, _testCts.Token)
+                    };
+                    if (!_testCts.Token.IsCancellationRequested)
+                        Post(() => { if (isReal) s.RecordRealDelay(ok ? ms : -2); else s.RecordPing(ok ? ms : -2); });
+                }
+                catch { Post(() => { if (SelectedPingType == PingType.RealDelay) s.RecordRealDelay(-2); else s.RecordPing(-2); }); }
+                finally { sem.Release(); }
+            });
              try { await Task.WhenAll(tasks); }
              catch (OperationCanceledException) { }
              int okCount = Servers.Count(s => s.LatencyMs >= 0);
@@ -1420,15 +1421,16 @@ public partial class MainViewModel : ViewModelBase
                 await sem.WaitAsync();
                 try
                 {
+                    var isReal = SelectedPingType == PingType.RealDelay;
                     var (ok, ms) = SelectedPingType switch
                     {
                         PingType.TcpPing or PingType.Ping => await LatencyTester.TcpAsync(s.Address, s.Port),
                         PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
                         _ => await RealDelayTester.TestAsync(s)
                     };
-                    Post(() => s.RecordLatency(ok ? ms : -2));
+                    Post(() => { if (isReal) s.RecordRealDelay(ok ? ms : -2); else s.RecordPing(ok ? ms : -2); });
                 }
-                catch { Post(() => s.RecordLatency(-2)); }
+                catch { Post(() => { if (SelectedPingType == PingType.RealDelay) s.RecordRealDelay(-2); else s.RecordPing(-2); }); }
                 finally { try { sem.Release(); } catch { } }
             });
             await Task.WhenAll(tasks);
@@ -1507,22 +1509,23 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = $"پینگ {targets.Count} سرور منتخب ...";
-            foreach (var s in targets) s.LatencyMs = -1;
+            foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; s.PingMs = -1; }
             using var sem = new SemaphoreSlim(8);
             var tasks = targets.Select(async s =>
             {
                 await sem.WaitAsync();
                 try
                 {
+                    var isReal = SelectedPingType == PingType.RealDelay;
                     var (ok, ms) = SelectedPingType switch
                     {
                         PingType.TcpPing or PingType.Ping => await LatencyTester.TcpAsync(s.Address, s.Port),
                         PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
                         _ => await RealDelayTester.TestAsync(s)
                     };
-                    Post(() => s.RecordLatency(ok ? ms : -2));
+                    Post(() => { if (isReal) s.RecordRealDelay(ok ? ms : -2); else s.RecordPing(ok ? ms : -2); });
                 }
-                catch { Post(() => s.RecordLatency(-2)); }
+                catch { Post(() => { if (SelectedPingType == PingType.RealDelay) s.RecordRealDelay(-2); else s.RecordPing(-2); }); }
                 finally { sem.Release(); }
             });
             await Task.WhenAll(tasks);
@@ -1601,28 +1604,29 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = true;
          try
          {
-             Status = $"پینگ گروه «{group!.Title}» ({targets.Count} سرور) ...";
-             foreach (var s in targets) s.LatencyMs = -1;
-             using var sem = new SemaphoreSlim(SelectedPingType == PingType.RealDelay ? 3 : 8);
-             var tasks = targets.Select(async s =>
-             {
-                 if (_testCts.Token.IsCancellationRequested) return;
-                 await sem.WaitAsync(_testCts.Token);
-                 try
-                 {
-                     if (_testCts.Token.IsCancellationRequested) return;
-                     var (ok, ms) = SelectedPingType switch
-                     {
-                         PingType.TcpPing or PingType.Ping => await LatencyTester.TcpAsync(s.Address, s.Port),
-                         PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
-                         _ => await RealDelayTester.TestAsync(s, _testCts.Token)
-                     };
-                     if (!_testCts.Token.IsCancellationRequested)
-                         Post(() => s.RecordLatency(ok ? ms : -2));
-                 }
-                 catch { Post(() => s.RecordLatency(-2)); }
-                 finally { sem.Release(); }
-             });
+            Status = $"پینگ گروه «{group!.Title}» ({targets.Count} سرور) ...";
+            foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; s.PingMs = -1; }
+            using var sem = new SemaphoreSlim(SelectedPingType == PingType.RealDelay ? 3 : 8);
+            var tasks = targets.Select(async s =>
+            {
+                if (_testCts.Token.IsCancellationRequested) return;
+                await sem.WaitAsync(_testCts.Token);
+                try
+                {
+                    if (_testCts.Token.IsCancellationRequested) return;
+                    var isReal = SelectedPingType == PingType.RealDelay;
+                    var (ok, ms) = SelectedPingType switch
+                    {
+                        PingType.TcpPing or PingType.Ping => await LatencyTester.TcpAsync(s.Address, s.Port),
+                        PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
+                        _ => await RealDelayTester.TestAsync(s, _testCts.Token)
+                    };
+                    if (!_testCts.Token.IsCancellationRequested)
+                        Post(() => { if (isReal) s.RecordRealDelay(ok ? ms : -2); else s.RecordPing(ok ? ms : -2); });
+                }
+                catch { Post(() => { if (SelectedPingType == PingType.RealDelay) s.RecordRealDelay(-2); else s.RecordPing(-2); }); }
+                finally { sem.Release(); }
+            });
              try { await Task.WhenAll(tasks); }
              catch (OperationCanceledException) { }
              int okCount = targets.Count(t => t.LatencyMs >= 0);
@@ -1643,23 +1647,23 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = true;
          try
          {
-              Status = $"تست تأخیر واقعی گروه «{group!.Title}» ({targets.Count} سرور) ...";
-             foreach (var s in targets) s.LatencyMs = -1;
-             using var sem = new SemaphoreSlim(3);
-             var tasks = targets.Select(async s =>
-             {
-                 if (_testCts.Token.IsCancellationRequested) return;
-                 await sem.WaitAsync(_testCts.Token);
-                 try
-                 {
-                     if (_testCts.Token.IsCancellationRequested) return;
-                     var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                     if (!_testCts.Token.IsCancellationRequested)
-                         Post(() => s.RecordLatency(ok ? ms : -2));
-                 }
-                 catch { Post(() => s.RecordLatency(-2)); }
-                 finally { sem.Release(); }
-             });
+            Status = $"تست تأخیر واقعی گروه «{group!.Title}» ({targets.Count} سرور) ...";
+            foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; }
+            using var sem = new SemaphoreSlim(3);
+            var tasks = targets.Select(async s =>
+            {
+                if (_testCts.Token.IsCancellationRequested) return;
+                await sem.WaitAsync(_testCts.Token);
+                try
+                {
+                    if (_testCts.Token.IsCancellationRequested) return;
+                    var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
+                    if (!_testCts.Token.IsCancellationRequested)
+                        Post(() => s.RecordRealDelay(ok ? ms : -2));
+                }
+                catch { Post(() => s.RecordRealDelay(-2)); }
+                finally { sem.Release(); }
+            });
              try { await Task.WhenAll(tasks); }
              catch (OperationCanceledException) { }
              int okCount = targets.Count(t => t.LatencyMs >= 0);
@@ -1719,27 +1723,27 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = true;
          try
          {
-             Status = $"بروزرسانی گروه «{group!.Title}» ({targets.Count} سرور) ...";
-             foreach (var s in targets) { s.LatencyMs = -1; s.RecordSpeed(-1); }
-             using var sem = new SemaphoreSlim(3);
-             var tasks = targets.Select(async s =>
-             {
-                 if (_testCts.Token.IsCancellationRequested) return;
-                 await sem.WaitAsync(_testCts.Token);
-                 try
-                 {
-                     if (_testCts.Token.IsCancellationRequested) return;
-                     Post(() => Status = $"بروزرسانی: {s.Name} ...");
-                     var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                     Post(() => s.LatencyMs = ok ? ms : -2);
-                 }
-                 catch { Post(() => s.LatencyMs = -2); }
-                 finally { try { sem.Release(); } catch { } }
-             });
+            Status = $"بروزرسانی گروه «{group!.Title}» ({targets.Count} سرور) ...";
+            foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; s.RecordSpeed(-1); }
+            using var sem = new SemaphoreSlim(3);
+            var tasks = targets.Select(async s =>
+            {
+                if (_testCts.Token.IsCancellationRequested) return;
+                await sem.WaitAsync(_testCts.Token);
+                try
+                {
+                    if (_testCts.Token.IsCancellationRequested) return;
+                    Post(() => Status = $"بروزرسانی: {s.Name} ...");
+                    var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
+                    Post(() => s.RecordRealDelay(ok ? ms : -2));
+                }
+                catch { Post(() => s.RecordRealDelay(-2)); }
+                finally { try { sem.Release(); } catch { } }
+            });
              try { await Task.WhenAll(tasks); }
              catch (OperationCanceledException) { }
-             foreach (var s in targets)
-                 if (s.LatencyMs == -1) s.LatencyMs = -2;
+            foreach (var s in targets)
+                if (s.LatencyMs == -1) s.RecordRealDelay(-2);
              int okCount = targets.Count(s => s.LatencyMs >= 0);
              Status = $"بروزرسانی گروه تمام شد ({okCount} موفق)";
              AutoSortAfterTest("latency");
@@ -1762,8 +1766,8 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = true;
          try
          {
-             Status = $"تست تأخیر واقعی {targets.Count} سرور (کند ولی دقیق) ...";
-             foreach (var s in targets) s.LatencyMs = -1;
+            Status = $"تست تأخیر واقعی {targets.Count} سرور (کند ولی دقیق) ...";
+            foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; }
             using var sem = new SemaphoreSlim(3);
             var tasks = targets.Select(async s =>
             {
@@ -1773,15 +1777,15 @@ public partial class MainViewModel : ViewModelBase
                 {
                     if (_testCts.Token.IsCancellationRequested) return;
                     var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                    Post(() => s.RecordLatency(ok ? ms : -2));
+                    Post(() => s.RecordRealDelay(ok ? ms : -2));
                 }
-                catch { Post(() => s.RecordLatency(-2)); }
+                catch { Post(() => s.RecordRealDelay(-2)); }
                 finally { try { sem.Release(); } catch { } }
             });
             try { await Task.WhenAll(tasks); }
             catch (OperationCanceledException) { }
             foreach (var s in targets)
-                if (s.LatencyMs == -1) s.RecordLatency(-2);
+                if (s.LatencyMs == -1) s.RecordRealDelay(-2);
             int okCount = targets.Count(t => t.LatencyMs >= 0);
             Status = $"تأخیر واقعی تمام شد ({okCount} موفق)";
             AutoSortAfterTest("latency");
@@ -1801,7 +1805,7 @@ public partial class MainViewModel : ViewModelBase
         try
         {
              Status = $"تست تأخیر واقعی {targets.Count} سرور منتخب ...";
-            foreach (var s in targets) s.LatencyMs = -1;
+            foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; }
             using var sem = new SemaphoreSlim(3);
             var tasks = targets.Select(async s =>
             {
@@ -1811,15 +1815,15 @@ public partial class MainViewModel : ViewModelBase
                 {
                     if (_testCts.Token.IsCancellationRequested) return;
                     var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                    Post(() => s.RecordLatency(ok ? ms : -2));
+                    Post(() => s.RecordRealDelay(ok ? ms : -2));
                 }
-                catch { Post(() => s.RecordLatency(-2)); }
+                catch { Post(() => s.RecordRealDelay(-2)); }
                 finally { try { sem.Release(); } catch { } }
             });
             try { await Task.WhenAll(tasks); }
             catch (OperationCanceledException) { }
             foreach (var s in targets)
-                if (s.LatencyMs == -1) s.RecordLatency(-2);
+                if (s.LatencyMs == -1) s.RecordRealDelay(-2);
             Status = $"تأخیر واقعی منتخب‌ها تمام شد ({targets.Count(t => t.LatencyMs >= 0)} موفق)";
             AutoSortAfterTest("latency");
             SaveServers();
@@ -1839,7 +1843,7 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = $"تست تأخیر واقعی {targets.Count} سرور ...";
-            foreach (var s in targets) s.LatencyMs = -1;
+            foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; }
             using var sem = new SemaphoreSlim(3);
             var tasks = targets.Select(async s =>
             {
@@ -1850,15 +1854,15 @@ public partial class MainViewModel : ViewModelBase
                     if (_testCts.Token.IsCancellationRequested) return;
                     Post(() => Status = $"تأخیر واقعی: {s.Name} ...");
                     var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                    Post(() => s.LatencyMs = ok ? ms : -2);
+                    Post(() => s.RecordRealDelay(ok ? ms : -2));
                 }
-                catch { Post(() => s.LatencyMs = -2); }
+                catch { Post(() => s.RecordRealDelay(-2)); }
                 finally { try { sem.Release(); } catch { } }
             });
             try { await Task.WhenAll(tasks); }
             catch (OperationCanceledException) { }
             foreach (var s in targets)
-                if (s.LatencyMs == -1) s.LatencyMs = -2;
+                if (s.LatencyMs == -1) s.RecordRealDelay(-2);
             int okCount = targets.Count(s => s.LatencyMs >= 0);
             Status = $"تأخیر واقعی تمام شد: {okCount} از {targets.Count} موفق";
             SaveServers();

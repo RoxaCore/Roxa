@@ -219,4 +219,12 @@
   <data name="Add_Link" xml:space="preserve"><value>Добавить</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>Обновление через прокси</value></data>
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>Подключено к {0}
+Задержка: {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>Отключено</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>Умное подключение: {0}
+Задержка: {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>Не удалось подключиться</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>Умное подключение: тест реальной задержки не пройден</value></data>
 </root>

@@ -219,4 +219,12 @@
   <data name="Add_Link" xml:space="preserve"><value>إضافة</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>استخدام بروكسي للتحديث</value></data>
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>متصل إلى {0}
+زمن الاستجابة: {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>تم قطع الاتصال</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>اتصال ذكي: {0}
+زمن الاستجابة: {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>فشل الاتصال</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>الاتصال الذكي: فشل اختبار التأخير الحقيقي</value></data>
 </root>

@@ -913,7 +913,7 @@ public partial class MainViewModel : ViewModelBase
             IsConnected = false;
             RefreshConnectionFlags();
             Status = "خطا در اتصال";
-            NotificationHelper.ShowError("Connection failed");
+            NotificationHelper.ShowError(TranslationManager.Get("Notify_ConnectFailed"));
             AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
         }
         finally { ConnectCommand.NotifyCanExecuteChanged(); }
@@ -1104,7 +1104,7 @@ public partial class MainViewModel : ViewModelBase
             {
                 Status = "اتصال هوشمند: تأخیر واقعی ناموفق";
                 ToastHandler?.Invoke("تأخیر واقعی ناموفق بود");
-                NotificationHelper.ShowError("Smart connect: real delay test failed");
+                NotificationHelper.ShowError(TranslationManager.Get("Notify_SmartRealDelayFailed"));
                 AppendLog("Smart connect: real delay test failed for all candidates");
                 return;
             }

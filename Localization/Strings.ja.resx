@@ -203,4 +203,12 @@
   <data name="Add_Link" xml:space="preserve"><value>追加</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>プロキシで更新</value></data>
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>{0} に接続しました
+レイテンシ: {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>切断されました</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>スマート接続: {0}
+レイテンシ: {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>接続に失敗しました</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>スマート接続: 実レイテンシテストに失敗しました</value></data>
 </root>

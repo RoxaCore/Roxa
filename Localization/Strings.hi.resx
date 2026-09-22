@@ -203,4 +203,12 @@
   <data name="Add_Link" xml:space="preserve"><value>जोड़ें</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>अपडेट के लिए प्रॉक्सी का उपयोग करें</value></data>
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>{0} से जुड़ा
+लेटेंसी: {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>डिस्कनेक्ट हो गया</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>स्मार्ट कनेक्ट: {0}
+लेटेंसी: {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>कनेक्शन विफल</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>स्मार्ट कनेक्ट: वास्तविक विलंबता परीक्षण विफल</value></data>
 </root>

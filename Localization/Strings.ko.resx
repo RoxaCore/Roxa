@@ -203,4 +203,12 @@
   <data name="Add_Link" xml:space="preserve"><value>추가</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>프록시로 업데이트</value></data>
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>{0}에 연결됨
+지연 시간: {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>연결이 끊어졌습니다</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>스마트 연결: {0}
+지연 시간: {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>연결 실패</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>스마트 연결: 실제 지연 시간 테스트 실패</value></data>
 </root>

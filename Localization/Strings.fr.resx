@@ -221,4 +221,12 @@
   <data name="Add_Link" xml:space="preserve"><value>Ajouter</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>Utiliser un proxy pour les mises à jour</value></data>
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>Connecté à {0}
+Latence : {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>Déconnecté</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>Connexion intelligente : {0}
+Latence : {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>Échec de la connexion</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>Connexion intelligente : échec du test de latence réelle</value></data>
 </root>

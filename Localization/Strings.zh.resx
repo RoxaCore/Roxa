@@ -219,4 +219,12 @@
   <data name="Add_Link" xml:space="preserve"><value>添加</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>通过代理更新</value></data>
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>已连接到 {0}
+延迟: {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>已断开连接</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>智能连接: {0}
+延迟: {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>连接失败</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>智能连接: 真实延迟测试失败</value></data>
 </root>

@@ -93,17 +93,17 @@ public static class NotificationHelper
 
     public static void ShowConnected(string serverName, string latency)
     {
-        Show("Roxa", $"Connected to {serverName}\nLatency: {latency}");
+        Show("Roxa", string.Format(Localization.TranslationManager.Get("Notify_Connected"), serverName, latency));
     }
 
     public static void ShowDisconnected()
     {
-        Show("Roxa", "Disconnected");
+        Show("Roxa", Localization.TranslationManager.Get("Notify_Disconnected"));
     }
 
     public static void ShowSmartConnect(string serverName, string latency)
     {
-        Show("Roxa", $"Smart Connect: {serverName}\nLatency: {latency}");
+        Show("Roxa", string.Format(Localization.TranslationManager.Get("Notify_SmartConnect"), serverName, latency));
     }
 
     public static void ShowError(string message)

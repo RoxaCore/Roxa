@@ -203,4 +203,12 @@
   <data name="Add_Link" xml:space="preserve"><value>شامل کریں</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>اپڈیٹ کے لیے پراکسی استعمال کریں</value></data>
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>{0} سے منسلک
+تاخیر: {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>ڈسکنیکٹ ہو گیا</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>سمارٹ کنیکٹ: {0}
+تاخیر: {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>کنیکشن ناکام</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>سمارٹ کنیکٹ: اصل تاخیر ٹیسٹ ناکام</value></data>
 </root>

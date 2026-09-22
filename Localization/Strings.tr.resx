@@ -566,4 +566,12 @@
   </data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>Güncellemeleri proxy üzerinden yap</value></data>
+  <!-- Notifications -->
+  <data name="Notify_Connected" xml:space="preserve"><value>{0} sunucusuna bağlanıldı
+Gecikme: {1}</value></data>
+  <data name="Notify_Disconnected" xml:space="preserve"><value>Bağlantı kesildi</value></data>
+  <data name="Notify_SmartConnect" xml:space="preserve"><value>Akıllı bağlantı: {0}
+Gecikme: {1}</value></data>
+  <data name="Notify_ConnectFailed" xml:space="preserve"><value>Bağlantı başarısız</value></data>
+  <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>Akıllı bağlantı: gerçek gecikme testi başarısız</value></data>
 </root>

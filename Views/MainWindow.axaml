@@ -118,12 +118,12 @@
             <!-- Action Buttons -->
             <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" Margin="8,0,0,0">
               <!-- Connect -->
-              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Width="30" Height="28" Padding="0" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="Transparent" Foreground="#0E7C6B" CornerRadius="7" BorderThickness="1" BorderBrush="#C9DDD8" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Viewbox Width="15" Height="15" Stretch="Uniform">
-                  <Canvas Width="24" Height="24">
-                    <Path Fill="#0E7C6B" Stroke="#0E7C6B" StrokeThickness="1.5" StrokeLineCap="Round" Data="M9,6.5 L18,12 L9,17.5 Z"/>
-                  </Canvas>
-                </Viewbox>
+              <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Height="32" Padding="12,0" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="#0E7C6B" Foreground="#FFFFFF" CornerRadius="7" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center">
+                  <TextBlock.Text>
+                    <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Connect" StringFormat="▶  {0}"/>
+                  </TextBlock.Text>
+                </TextBlock>
               </Button>
               <!-- Disconnect -->
               <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Disconnect}" Width="30" Height="28" Padding="0" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="#FFF5F5" Foreground="#E53E3E" CornerRadius="7" BorderThickness="1" BorderBrush="#E53E3E" HorizontalAlignment="Center" VerticalAlignment="Center">

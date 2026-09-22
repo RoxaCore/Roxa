@@ -230,7 +230,7 @@
             <Button Command="{Binding ToggleSystemProxyCommand}" Padding="14,6" CornerRadius="8" FontSize="11" FontWeight="Medium" HorizontalAlignment="Right"
                     Background="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#0E7C6B,#F3F4F6'}"
                     Foreground="{Binding SetSystemProxy, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#FFFFFF,#666666'}">
-              System Proxy
+              <TextBlock Text="{Binding SetSystemProxy, Converter={x:Static converters:BoolToStatusTextConverter.Instance}, ConverterParameter='پراکسی سیستم (فعال),پراکسی سیستم (غیرفعال)'}"/>
             </Button>
           </StackPanel>
 

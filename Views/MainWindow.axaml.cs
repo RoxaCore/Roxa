@@ -180,6 +180,23 @@ public partial class MainWindow : Window
         }
     }
 
+    private void ServerCard_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (sender is Border border && DataContext is MainViewModel vm)
+        {
+            var panel = border.Child;
+            if (panel is Grid grid)
+            {
+                // Find the server info from the DataContext of the border
+                var dc = border.DataContext;
+                if (dc is Models.ServerInfo server)
+                {
+                    vm.SelectServerCommand.Execute(server);
+                }
+            }
+        }
+    }
+
     private void SetupResizeHandles()
     {
         var header = this.FindControl<Grid>("TableHeader");

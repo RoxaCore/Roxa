@@ -44,11 +44,14 @@
               Padding="10,6" 
               Margin="0,2,0,0"
               HorizontalAlignment="Stretch"
-              BorderThickness="1">
+              BorderThickness="1"
+              Cursor="Hand"
+              PointerPressed="ServerCard_PointerPressed">
         <Border.Background>
           <MultiBinding Converter="{x:Static converters:ServerBgConverter.Instance}">
             <Binding Path="IsActiveConnection"/>
             <Binding Path="IsHighlighted"/>
+            <Binding Path="IsSelected"/>
           </MultiBinding>
         </Border.Background>
         <Border.BorderBrush>

@@ -9,6 +9,7 @@ public class ServerBgConverter : IMultiValueConverter
     public static readonly ServerBgConverter Instance = new();
     private static readonly SolidColorBrush HighlightedBrush = new(Color.Parse("#D4EDDA"));
     private static readonly SolidColorBrush ActiveBrush = new(Color.Parse("#E8F5E9"));
+    private static readonly SolidColorBrush SelectedBrush = new(Color.Parse("#E0F2FE"));
     private static readonly SolidColorBrush DefaultBrush = new(Colors.Transparent);
 
     public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
@@ -17,6 +18,8 @@ public class ServerBgConverter : IMultiValueConverter
         if (isHighlighted) return HighlightedBrush;
         bool isActive = values.Count > 0 && values[0] is true;
         if (isActive) return ActiveBrush;
+        bool isSelected = values.Count > 2 && values[2] is true;
+        if (isSelected) return SelectedBrush;
         return DefaultBrush;
     }
 }

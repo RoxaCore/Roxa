@@ -205,37 +205,44 @@ public partial class MainViewModel : ViewModelBase
         if (!IsConnected) { LiveDownSpeed = "0 B/s"; LiveUpSpeed = "0 B/s"; SpeedBlinkOpacity = 1.0; return; }
         try
         {
-            var ni = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
-                .Where(n => n.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
-                            n.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Tunnel)
-                .FirstOrDefault();
-            if (ni == null)
-            {
-                ni = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
-                    .Where(n => n.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
-                                n.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback &&
-                                n.Id != _lastInterfaceId)
-                    .OrderByDescending(n => n.GetIPStatistics().BytesReceived)
-                    .FirstOrDefault();
-            }
+            var ni = FindActiveNetworkInterface();
             if (ni == null) return;
-            _lastInterfaceId = ni.Id;
+            if (ni.Id != _lastInterfaceId)
+            {
+                _lastInterfaceId = ni.Id;
+                var initStats = ni.GetIPStatistics();
+                _lastBytesIn = initStats.BytesReceived;
+                _lastBytesOut = initStats.BytesSent;
+                return;
+            }
             var stats = ni.GetIPStatistics();
             long bytesIn = stats.BytesReceived;
             long bytesOut = stats.BytesSent;
 
-            if (_lastBytesIn > 0)
-            {
-                long diffIn = bytesIn - _lastBytesIn;
-                long diffOut = bytesOut - _lastBytesOut;
-                LiveDownSpeed = diffIn >= 0 ? FormatSpeed(diffIn) : "0 B/s";
-                LiveUpSpeed = diffOut >= 0 ? FormatSpeed(diffOut) : "0 B/s";
-                SpeedBlinkOpacity = SpeedBlinkOpacity > 0.5 ? 0.3 : 1.0;
-            }
+            long diffIn = bytesIn - _lastBytesIn;
+            long diffOut = bytesOut - _lastBytesOut;
+            LiveDownSpeed = diffIn > 0 ? FormatSpeed(diffIn / 3) : "0 B/s";
+            LiveUpSpeed = diffOut > 0 ? FormatSpeed(diffOut / 3) : "0 B/s";
+            SpeedBlinkOpacity = SpeedBlinkOpacity > 0.5 ? 0.3 : 1.0;
             _lastBytesIn = bytesIn;
             _lastBytesOut = bytesOut;
         }
         catch { }
+    }
+
+    private static System.Net.NetworkInformation.NetworkInterface? FindActiveNetworkInterface()
+    {
+        var ni = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
+            .Where(n => n.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
+                        n.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Tunnel)
+            .FirstOrDefault();
+        if (ni != null) return ni;
+        return System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
+            .Where(n => n.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
+                        n.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback &&
+                        n.GetIPStatistics().BytesReceived > 0)
+            .OrderByDescending(n => n.GetIPStatistics().BytesReceived)
+            .FirstOrDefault();
     }
 
     private static string FormatSpeed(long bytes)
@@ -855,17 +862,32 @@ public partial class MainViewModel : ViewModelBase
             Status = "در حال اتصال ...";
             await _engine.StartAsync(server, SetSystemProxy, _settings);
             IsConnected = true;
-            _lastBytesIn = 0;
-            _lastBytesOut = 0;
-            _lastInterfaceId = "";
             LiveDownSpeed = "0 B/s";
             LiveUpSpeed = "0 B/s";
+            SpeedBlinkOpacity = 1.0;
             RefreshConnectionFlags();
             Status = $"متصل به {server.Name}";
             _settings.ActiveServerId = server.Id;
             SaveSettings();
             AppendLog(string.Format(TranslationManager.Instance["Log_Connected"], _engine.HttpPort));
             NotificationHelper.ShowConnected(server.Name, server.LatencyDisplay);
+
+            // Initialize byte counters for speed calculation
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    var ni = FindActiveNetworkInterface();
+                    if (ni != null)
+                    {
+                        _lastInterfaceId = ni.Id;
+                        var stats = ni.GetIPStatistics();
+                        _lastBytesIn = stats.BytesReceived;
+                        _lastBytesOut = stats.BytesSent;
+                    }
+                }
+                catch { }
+            });
 
             // آپدیت تأخیر واقعی بعد از اتصال
             _ = Task.Run(async () =>

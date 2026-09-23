@@ -45,9 +45,10 @@ public static class BaselineRunner
                 runs = n;
 
         string algorithm = args.Contains("--validate") ? "v2" : "baseline-v1";
+        string baselinePath = Path.Combine(Storage.DataDir, "real-delay-baseline.json");
         string outPath = args.Contains("--validate")
             ? Path.Combine(Storage.DataDir, "real-delay-validate.json")
-            : Path.Combine(Storage.DataDir, "real-delay-baseline.json");
+            : baselinePath;
 
         Console.WriteLine($"[{algorithm}] loading servers...");
         var all = Storage.LoadServers()
@@ -59,8 +60,27 @@ public static class BaselineRunner
             return 1;
         }
 
-        var picked = await PickSpreadServersAsync(all, 10, ct);
-        Console.WriteLine($"Picked {picked.Count} servers:");
+        List<ServerInfo> picked;
+        if (args.Contains("--validate") && File.Exists(baselinePath))
+        {
+            var baseline = JsonSerializer.Deserialize<Report>(await File.ReadAllTextAsync(baselinePath));
+            var ids = baseline?.ServerIds ?? new List<string>();
+            picked = ids.Select(id => all.FirstOrDefault(s => s.Id == id)).Where(s => s != null).ToList()!;
+            if (picked.Count == 0)
+            {
+                Console.WriteLine("Baseline servers not found; picking spread.");
+                picked = await PickSpreadServersAsync(all, 10, ct);
+            }
+            else
+            {
+                Console.WriteLine($"Reusing {picked.Count} baseline servers.");
+            }
+        }
+        else
+        {
+            picked = await PickSpreadServersAsync(all, 10, ct);
+        }
+        Console.WriteLine($"Using {picked.Count} servers:");
         foreach (var s in picked)
             Console.WriteLine($"  {s.Name} ({s.Address}:{s.Port})");
 

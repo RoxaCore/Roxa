@@ -256,7 +256,26 @@ public partial class MainViewModel : ViewModelBase
 
     partial void OnSelectedServerChanged(ServerInfo? value)
     {
-        _settings.ActiveServerId = value?.Id;
+        // DataGrid Clear() during sort can push null while still connected — restore active server
+        if (value == null && IsConnected)
+        {
+            ServerInfo? restore = null;
+            if (!string.IsNullOrEmpty(_settings.ActiveServerId))
+                restore = Servers.FirstOrDefault(s => s.Id == _settings.ActiveServerId);
+            restore ??= Servers.FirstOrDefault(s => s.IsActiveConnection);
+            if (restore != null)
+            {
+                Post(() =>
+                {
+                    if (SelectedServer == null)
+                        SelectedServer = restore;
+                });
+            }
+            return;
+        }
+
+        if (value != null)
+            _settings.ActiveServerId = value.Id;
         SaveSettings();
         foreach (var s in Servers)
             s.IsSelected = ReferenceEquals(s, value);
@@ -422,6 +441,7 @@ public partial class MainViewModel : ViewModelBase
     /// <summary>بازسازی گروه‌های تاشو از روی سرورها و ساب‌ها. وضعیت باز/بسته هر گروه حفظ می‌شود.</summary>
     public void RefreshGroups()
     {
+        var keepSelected = SelectedServer;
         var expanded = Groups.ToDictionary(g => g.Key, g => g.IsExpanded);
         Groups.Clear();
         foreach (var s in Servers)
@@ -467,6 +487,9 @@ public partial class MainViewModel : ViewModelBase
         foreach (var s in allServers)
             allGroup.Servers.Add(s);
         Groups.Add(allGroup);
+
+        if (SelectedServer == null && keepSelected != null && Servers.Contains(keepSelected))
+            SelectedServer = keepSelected;
     }
 
     private void UpdateGroupContent(ServerGroup group)
@@ -523,40 +546,43 @@ public partial class MainViewModel : ViewModelBase
 
     private void AutoSortAfterTest(string metric)
     {
-        if (GlobalSort)
+        var keepSelected = SelectedServer;
+        try
         {
-            var allServers = Servers.ToList();
-            var connected = allServers.FirstOrDefault(s => s.IsActiveConnection);
-            var rest = allServers.Where(s => s != connected).ToList();
-            rest.Sort(ServerInfo.CompareByPriority);
-
-            var sorted = new List<ServerInfo>();
-            if (connected != null) sorted.Add(connected);
-            sorted.AddRange(rest);
-
-            var grouped = sorted.GroupBy(s => s.SubscriptionName ?? "").ToDictionary(g => g.Key, g => g.ToList());
-            foreach (var g in Groups)
+            if (GlobalSort)
             {
-                g.Servers.Clear();
-                if (g.Key == "__all__")
-                {
-                    foreach (var s in sorted) g.Servers.Add(s);
-                    continue;
-                }
-                if (grouped.TryGetValue(g.Key == "__all__" ? "" : g.Key, out var groupServers))
-                    foreach (var s in groupServers) g.Servers.Add(s);
-            }
-        }
-        else
-        {
-            foreach (var g in Groups)
-            {
-                if (g.Key == "__all__")
+                var allServers = Servers.ToList();
+                var connected = allServers.FirstOrDefault(s => s.IsActiveConnection);
+                var rest = allServers.Where(s => s != connected).ToList();
+                rest.Sort(ServerInfo.CompareByPriority);
+
+                var sorted = new List<ServerInfo>();
+                if (connected != null) sorted.Add(connected);
+                sorted.AddRange(rest);
+
+                var grouped = sorted.GroupBy(s => s.SubscriptionName ?? "").ToDictionary(g => g.Key, g => g.ToList());
+                foreach (var g in Groups)
                 {
                     g.Servers.Clear();
-                    foreach (var s in Servers) g.Servers.Add(s);
-                    continue;
+                    if (g.Key == "__all__")
+                    {
+                        foreach (var s in sorted) g.Servers.Add(s);
+                        continue;
+                    }
+                    if (grouped.TryGetValue(g.Key == "__all__" ? "" : g.Key, out var groupServers))
+                        foreach (var s in groupServers) g.Servers.Add(s);
                 }
+            }
+            else
+            {
+                foreach (var g in Groups)
+                {
+                    if (g.Key == "__all__")
+                    {
+                        g.Servers.Clear();
+                        foreach (var s in Servers) g.Servers.Add(s);
+                        continue;
+                    }
                 var connected = g.Servers.FirstOrDefault(s => s.IsActiveConnection);
                 var rest = g.Servers.Where(s => s != connected).ToList();
                 rest.Sort(ServerInfo.CompareByPriority);
@@ -565,6 +591,12 @@ public partial class MainViewModel : ViewModelBase
                 if (connected != null) g.Servers.Add(connected);
                 foreach (var s in rest) g.Servers.Add(s);
             }
+        }
+        }
+        finally
+        {
+            if (SelectedServer == null && keepSelected != null && Servers.Contains(keepSelected))
+                SelectedServer = keepSelected;
         }
     }
 

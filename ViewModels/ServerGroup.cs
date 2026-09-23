@@ -107,9 +107,12 @@ public partial class ServerGroup : ObservableObject
                     break;
             }
 
+            var keepSelected = Owner.SelectedServer;
             Servers.Clear();
             foreach (var s in sorted)
                 Servers.Add(s);
+            if (Owner.SelectedServer == null && keepSelected != null && Servers.Contains(keepSelected))
+                Owner.SelectedServer = keepSelected;
         }
         catch
         {

@@ -167,9 +167,9 @@ public partial class ServerInfo : ObservableObject
     [JsonIgnore]
     public string RealDelayBgColor => RealDelayMs switch
     {
-        > 0 and < 450 => "#4ADE80",
-        >= 450 and <= 800 => "#FDE047",
-        > 800 => "#FB923C",
+        > 0 and < 600 => "#4ADE80",
+        >= 600 and < 1000 => "#FEF9C3",
+        >= 1000 => "#FB923C",
         -2 => "#FCA5A5",
         _ => "Transparent"
     };
@@ -177,9 +177,9 @@ public partial class ServerInfo : ObservableObject
     [JsonIgnore]
     public string RealDelayTextColor => RealDelayMs switch
     {
-        > 0 and < 450 => "#052E16",
-        >= 450 and <= 800 => "#422006",
-        > 800 => "#431407",
+        > 0 and < 600 => "#052E16",
+        >= 600 and < 1000 => "#713F12",
+        >= 1000 => "#431407",
         -2 => "#7F1D1D",
         _ => "#AAAAAA"
     };

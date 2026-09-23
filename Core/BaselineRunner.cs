@@ -17,6 +17,8 @@ public static class BaselineRunner
         public double Jitter { get; set; }
         public int WarmupMs { get; set; }
         public int SuccessCount { get; set; }
+        public int StartupMs { get; set; }
+        public string Url { get; set; } = "";
     }
 
     public sealed class Run
@@ -145,7 +147,8 @@ public static class BaselineRunner
             if (r.Extra.TryGetValue("jitter", out var j) && double.TryParse(j, out var jd)) sample.Jitter = jd;
             if (r.Extra.TryGetValue("warmup_ms", out var w) && int.TryParse(w, out var wi)) sample.WarmupMs = wi;
             if (r.Extra.TryGetValue("ok_count", out var o) && int.TryParse(o, out var oi)) sample.SuccessCount = oi;
-            if (r.Extra.TryGetValue("startup_ms", out var su)) sample.Status += $";startup={su}";
+            if (r.Extra.TryGetValue("startup_ms", out var su) && int.TryParse(su, out var sui)) sample.StartupMs = sui;
+            if (r.Extra.TryGetValue("url", out var u)) sample.Url = u;
             if (r.Extra.TryGetValue("unstable", out _)) sample.Status += ";unstable";
             return sample;
         }

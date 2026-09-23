@@ -76,6 +76,8 @@ public partial class ServerInfo : ObservableObject
     [ObservableProperty] private int _realDelayMs = -1;
     [ObservableProperty] [property: JsonIgnore] private int _pingMs = -1;
     [ObservableProperty] [property: JsonIgnore] private double _downloadMbps = -1;
+    [ObservableProperty] [property: JsonIgnore] private double _realDelaySuccessRate = -1;
+    [ObservableProperty] [property: JsonIgnore] private int _realDelayJitter;
     [ObservableProperty] private string _countryCode = "";
     [ObservableProperty] [property: JsonIgnore] private bool _isSelected;
     [ObservableProperty] [property: JsonIgnore] private bool _isActiveConnection;
@@ -348,7 +350,63 @@ public partial class ServerInfo : ObservableObject
     public void RecordRealDelay(int ms)
     {
         RealDelayMs = ms;
+        if (ms >= 0)
+        {
+            RealDelaySuccessRate = 1.0;
+            RealDelayJitter = 0;
+        }
+        else if (ms == -2)
+        {
+            RealDelaySuccessRate = 0;
+            RealDelayJitter = 0;
+        }
+        else
+        {
+            RealDelaySuccessRate = -1;
+            RealDelayJitter = 0;
+        }
         RecordLatency(ms);
+    }
+
+    public void RecordRealDelay(TestResult result)
+    {
+        if (result.Status == TestStatus.Cancelled) return;
+
+        if (result.Status != TestStatus.Ok)
+        {
+            RealDelayMs = -2;
+            RealDelaySuccessRate = 0;
+            RealDelayJitter = 0;
+            RecordLatency(-2);
+            return;
+        }
+
+        RealDelayMs = (int)Math.Round(result.Value);
+        double rate = 1.0;
+        if (result.Extra.TryGetValue("ok_count", out var oc) && int.TryParse(oc, out var okc))
+        {
+            int total = SampleCountOrDefault(result);
+            rate = total > 0 ? Math.Clamp(okc / (double)total, 0, 1) : 1.0;
+        }
+        RealDelaySuccessRate = rate;
+        if (result.Extra.TryGetValue("jitter", out var j) && int.TryParse(j, out var ji))
+            RealDelayJitter = Math.Max(0, ji);
+        RecordLatency(RealDelayMs);
+    }
+
+    private static int SampleCountOrDefault(TestResult result)
+        => result.Extra.TryGetValue("total_samples", out var t) && int.TryParse(t, out var n) && n > 0 ? n : 3;
+
+    public void RecordPing(TestResult result)
+    {
+        if (result.Status == TestStatus.Cancelled) return;
+        RecordPing(result.Status == TestStatus.Ok ? (int)Math.Round(result.Value) : -2);
+    }
+
+    public void RecordSpeed(TestResult result)
+    {
+        if (result.Status == TestStatus.Cancelled) return;
+        RecordSpeed(result.Status == TestStatus.Ok ? result.Value : -2);
     }
 
     public void RecordPing(int ms)
@@ -395,20 +453,37 @@ public partial class ServerInfo : ObservableObject
 
     public static int CompareByPriority(ServerInfo a, ServerInfo b)
     {
+        bool aTested = a.RealDelaySuccessRate >= 0 && a.RealDelayMs >= 0;
+        bool bTested = b.RealDelaySuccessRate >= 0 && b.RealDelayMs >= 0;
+        if (aTested && bTested)
+        {
+            int c = b.RealDelaySuccessRate.CompareTo(a.RealDelaySuccessRate);
+            if (c != 0) return c;
+
+            double scoreA = a.RealDelayMs + 2.0 * a.RealDelayJitter;
+            double scoreB = b.RealDelayMs + 2.0 * b.RealDelayJitter;
+            c = scoreA.CompareTo(scoreB);
+            if (c != 0) return c;
+        }
+        else if (aTested != bTested)
+        {
+            return aTested ? -1 : 1;
+        }
+
         int ra = a.RealDelayMs < 0 ? int.MaxValue : a.RealDelayMs;
         int rb = b.RealDelayMs < 0 ? int.MaxValue : b.RealDelayMs;
-        int c = ra.CompareTo(rb);
-        if (c != 0) return c;
+        int r = ra.CompareTo(rb);
+        if (r != 0) return r;
 
         int pa = a.PingMs < 0 ? int.MaxValue : a.PingMs;
         int pb = b.PingMs < 0 ? int.MaxValue : b.PingMs;
-        c = pa.CompareTo(pb);
-        if (c != 0) return c;
+        r = pa.CompareTo(pb);
+        if (r != 0) return r;
 
         double sa = a.DownloadMbps < 0 ? -1 : a.DownloadMbps;
         double sb = b.DownloadMbps < 0 ? -1 : b.DownloadMbps;
-        c = sb.CompareTo(sa);
-        if (c != 0) return c;
+        r = sb.CompareTo(sa);
+        if (r != 0) return r;
 
         return string.Compare(a.Name, b.Name, StringComparison.Ordinal);
     }

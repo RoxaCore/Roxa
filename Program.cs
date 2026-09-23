@@ -11,6 +11,14 @@ sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        if (args.Length > 0 && (args[0] == "--baseline" || args[0] == "--validate"))
+        {
+            var ct = new CancellationTokenSource().Token;
+            int code = Core.BaselineRunner.RunAsync(args, ct).GetAwaiter().GetResult();
+            Environment.Exit(code);
+            return;
+        }
+
         using var mutex = new Mutex(true, MutexName, out bool createdNew);
         if (!createdNew)
         {

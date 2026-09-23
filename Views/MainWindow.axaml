@@ -398,11 +398,18 @@
                         </dg:DataGridTemplateColumn>
 
                         <!-- Ping -->
-                        <dg:DataGridTextColumn Binding="{Binding PingDisplay, Mode=OneWay}" SortMemberPath="PingSortKey" Width="80" IsReadOnly="True">
-                          <dg:DataGridTextColumn.Header>
+                        <dg:DataGridTemplateColumn Width="80" SortMemberPath="PingSortKey" IsReadOnly="True">
+                          <dg:DataGridTemplateColumn.Header>
                             <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Ping]}" VerticalAlignment="Center"/>
-                          </dg:DataGridTextColumn.Header>
-                        </dg:DataGridTextColumn>
+                          </dg:DataGridTemplateColumn.Header>
+                          <dg:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                              <Border Background="{Binding PingBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding PingDisplay}" Foreground="{Binding PingTextColor}" FontWeight="SemiBold" FontSize="11"/>
+                              </Border>
+                            </DataTemplate>
+                          </dg:DataGridTemplateColumn.CellTemplate>
+                        </dg:DataGridTemplateColumn>
 
                         <!-- Real delay -->
                         <dg:DataGridTemplateColumn Width="100" SortMemberPath="RealDelaySortKey" IsReadOnly="True">

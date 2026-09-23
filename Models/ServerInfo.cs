@@ -127,38 +127,60 @@ public partial class ServerInfo : ObservableObject
     [JsonIgnore]
     public string LatencyBgColor => LatencyMs switch
     {
-        > 0 and < 200 => "#BBF7D0",
-        >= 200 and < 500 => "#FEF3C7",
-        >= 500 => "#FECACA",
+        > 0 and < 450 => "#4ADE80",
+        >= 450 and <= 800 => "#FDE047",
+        > 800 => "#FB923C",
+        -2 => "#FCA5A5",
         _ => "Transparent"
     };
 
     [JsonIgnore]
     public string LatencyTextColor => LatencyMs switch
     {
-        > 0 and < 200 => "#166534",
-        >= 200 and < 500 => "#92400E",
-        >= 500 => "#991B1B",
+        > 0 and < 450 => "#052E16",
+        >= 450 and <= 800 => "#422006",
+        > 800 => "#431407",
+        -2 => "#7F1D1D",
+        _ => "#AAAAAA"
+    };
+
+    [JsonIgnore]
+    public string PingBgColor => PingMs switch
+    {
+        > 0 and < 450 => "#4ADE80",
+        >= 450 and <= 800 => "#FDE047",
+        > 800 => "#FB923C",
+        -2 => "#FCA5A5",
+        _ => "Transparent"
+    };
+
+    [JsonIgnore]
+    public string PingTextColor => PingMs switch
+    {
+        > 0 and < 450 => "#052E16",
+        >= 450 and <= 800 => "#422006",
+        > 800 => "#431407",
+        -2 => "#7F1D1D",
         _ => "#AAAAAA"
     };
 
     [JsonIgnore]
     public string RealDelayBgColor => RealDelayMs switch
     {
-        > 0 and < 200 => "#BBF7D0",
-        >= 200 and < 500 => "#FEF3C7",
-        >= 500 => "#FECACA",
-        -2 => "#FECACA",
+        > 0 and < 450 => "#4ADE80",
+        >= 450 and <= 800 => "#FDE047",
+        > 800 => "#FB923C",
+        -2 => "#FCA5A5",
         _ => "Transparent"
     };
 
     [JsonIgnore]
     public string RealDelayTextColor => RealDelayMs switch
     {
-        > 0 and < 200 => "#166534",
-        >= 200 and < 500 => "#92400E",
-        >= 500 => "#991B1B",
-        -2 => "#991B1B",
+        > 0 and < 450 => "#052E16",
+        >= 450 and <= 800 => "#422006",
+        > 800 => "#431407",
+        -2 => "#7F1D1D",
         _ => "#AAAAAA"
     };
 
@@ -303,7 +325,7 @@ public partial class ServerInfo : ObservableObject
     [JsonIgnore] public string LastTestedDisplay => LastTested == DateTime.MinValue ? "" : LastTested.ToString("HH:mm dd/MM");
 
     partial void OnLatencyMsChanged(int value) { OnPropertyChanged(nameof(LatencyDisplay)); OnPropertyChanged(nameof(LatencyColor)); OnPropertyChanged(nameof(HasLatency)); OnPropertyChanged(nameof(LatencyBgColor)); OnPropertyChanged(nameof(StatusColor)); }
-    partial void OnPingMsChanged(int value) { OnPropertyChanged(nameof(PingDisplay)); OnPropertyChanged(nameof(PingSortKey)); }
+    partial void OnPingMsChanged(int value) { OnPropertyChanged(nameof(PingDisplay)); OnPropertyChanged(nameof(PingSortKey)); OnPropertyChanged(nameof(PingBgColor)); OnPropertyChanged(nameof(PingTextColor)); }
     partial void OnRealDelayMsChanged(int value) { OnPropertyChanged(nameof(RealDelayDisplay)); OnPropertyChanged(nameof(RealDelaySortKey)); OnPropertyChanged(nameof(RealDelayBgColor)); OnPropertyChanged(nameof(RealDelayTextColor)); }
     partial void OnDownloadMbpsChanged(double value) => OnPropertyChanged(nameof(SpeedDisplay));
     partial void OnCountryCodeChanged(string value) { OnPropertyChanged(nameof(Flag)); OnPropertyChanged(nameof(ShortName)); }

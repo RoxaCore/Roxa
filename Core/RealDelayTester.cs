@@ -20,6 +20,9 @@ public static class RealDelayTester
     private const int PerRequestTimeoutMs = 3000;
     private const int TcpWaitTimeoutMs = 3000;
     private const int HttpPhaseTimeoutMs = 12000;
+    private const int WarmupBudgetMs = 6000;
+    private const int WarmupSkipThresholdMs = 300;
+    private const int EngineStartTimeoutMs = 5000;
 
     private enum MeasureStatus { Ok, Timeout, Non204, Drop, Cancelled }
 
@@ -33,7 +36,7 @@ public static class RealDelayTester
 
             var swStartup = Stopwatch.StartNew();
             using var startCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            startCts.CancelAfter(TimeSpan.FromSeconds(15));
+            startCts.CancelAfter(TimeSpan.FromMilliseconds(EngineStartTimeoutMs));
             try
             {
                 await engine.StartAsync(server, setSystemProxy: false, null, startCts.Token);
@@ -76,14 +79,24 @@ public static class RealDelayTester
 
             string? chosenUrl = null;
             int warmupMs = 0;
+            var warmupBudget = Stopwatch.StartNew();
             foreach (var url in WarmupUrls)
             {
                 if (ct.IsCancellationRequested) return TestResult.Cancelled(extra);
                 if (httpCts.IsCancellationRequested) break;
+
+                int elapsedBudget = (int)warmupBudget.ElapsedMilliseconds;
+                int remaining = WarmupBudgetMs - elapsedBudget;
+                if (remaining < WarmupSkipThresholdMs) break;
+
+                int urlTimeout = Math.Min(PerRequestTimeoutMs, remaining);
+                using var urlCts = CancellationTokenSource.CreateLinkedTokenSource(httpCts.Token);
+                urlCts.CancelAfter(urlTimeout);
+
                 var t0 = Stopwatch.GetTimestamp();
                 try
                 {
-                    using var resp = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, httpCts.Token);
+                    using var resp = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, urlCts.Token);
                     var elapsed = ElapsedMs(t0);
                     if ((int)resp.StatusCode == 204)
                     {

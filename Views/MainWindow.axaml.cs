@@ -39,6 +39,8 @@ public partial class MainWindow : Window
         Close();
     }
 
+    private string? _lastClipboardLink;
+
     private async void OnActivated(object? sender, EventArgs e)
     {
         try
@@ -50,11 +52,53 @@ public partial class MainWindow : Window
             if (string.IsNullOrWhiteSpace(text)) return;
             var trimmed = text.Trim();
             if (!Core.UrlParser.IsProtocolLink(trimmed)) return;
+            if (string.Equals(_lastClipboardLink, trimmed, StringComparison.Ordinal)) return;
             if (vm.Servers.Any(s => string.Equals(s.Link, trimmed, StringComparison.Ordinal))) return;
+
+            bool confirmed = await ConfirmImportFromClipboard(trimmed);
+            if (!confirmed) return;
+            _lastClipboardLink = trimmed;
             vm.ServerLink = trimmed;
             vm.AddLinkCommand.Execute(null);
         }
         catch { }
+    }
+
+    private async Task<bool> ConfirmImportFromClipboard(string link)
+    {
+        var tr = Localization.TranslationManager.Instance;
+        bool result = false;
+        var btnYes = new Button { Content = tr["Dlg_Yes"], Width = 80 };
+        var btnNo = new Button { Content = tr["Dlg_No"], Width = 80 };
+        var window = new Window
+        {
+            Title = tr["Add_Clipboard"],
+            Width = 400,
+            Height = 160,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = new StackPanel
+            {
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                Spacing = 15,
+                Margin = new Avalonia.Thickness(20),
+                Children =
+                {
+                    new TextBlock { Text = $"{tr["Add_Clipboard"]}\n{link}", TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    new StackPanel
+                    {
+                        Orientation = Avalonia.Layout.Orientation.Horizontal,
+                        Spacing = 10,
+                        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                        Children = { btnYes, btnNo }
+                    }
+                }
+            }
+        };
+        btnYes.Click += (_, _) => { result = true; window.Close(); };
+        btnNo.Click += (_, _) => { result = false; window.Close(); };
+        await window.ShowDialog(this);
+        return result;
     }
 
     public void ShowToast(string message, int durationMs = 3000)

@@ -34,10 +34,20 @@ public static class TunManager
             Directory.CreateDirectory(WintunDirectory);
             string arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "amd64";
             string url = $"https://www.wintun.net/builds/wintun-{arch}-0.14.1.zip";
+            const string expectedSha256 = "07c256185d6ee3652e09fa55c0b673e2624b565e02c4b9091c79ca7d2f24ef51";
             string zipPath = Path.Combine(WintunDirectory, "wintun.zip");
 
             using var http = new HttpClient();
             var data = await http.GetByteArrayAsync(url);
+
+            string actual = BitConverter.ToString(System.Security.Cryptography.SHA256.HashData(data)).Replace("-", "").ToLowerInvariant();
+            if (!string.Equals(actual, expectedSha256, StringComparison.OrdinalIgnoreCase))
+            {
+                Log($"wintun hash mismatch: expected {expectedSha256}, got {actual}");
+                log?.Invoke("Hash فایل wintun نادرست است — دانلود لغو شد.");
+                return false;
+            }
+
             await File.WriteAllBytesAsync(zipPath, data);
 
             System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, WintunDirectory, true);

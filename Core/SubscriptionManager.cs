@@ -179,8 +179,15 @@ public static class SubscriptionManager
         return info;
     }
 
+    private static void EnsureHttps(string url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
+            throw new InvalidOperationException("Only https subscription URLs are allowed.");
+    }
+
     public static async Task<string> FetchRawAsync(string url, CancellationToken ct = default)
     {
+        EnsureHttps(url);
         using var handler = CreateHandler();
         using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
         http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
@@ -190,6 +197,7 @@ public static class SubscriptionManager
 
     public static async Task<string> FetchRawAsync(string url, string proxyAddress, CancellationToken ct = default)
     {
+        EnsureHttps(url);
         using var handler = CreateHandler(proxyAddress);
         using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
         http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);

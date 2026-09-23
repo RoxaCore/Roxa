@@ -16,10 +16,10 @@ public static class RealDelayTester
         "https://www.google.com/generate_204",
     };
 
-    private const int SampleCount = 5;
+    private const int SampleCount = 3;
     private const int PerRequestTimeoutMs = 3000;
     private const int TcpWaitTimeoutMs = 3000;
-    private const int HttpPhaseTimeoutMs = 20000;
+    private const int HttpPhaseTimeoutMs = 12000;
 
     private enum MeasureStatus { Ok, Timeout, Non204, Drop, Cancelled }
 

@@ -62,12 +62,19 @@ public sealed class XrayEngine : IDisposable
         };
 
         string downloadUrl = "";
+        string? expectedSha256 = null;
         foreach (var asset in doc.RootElement.GetProperty("assets").EnumerateArray())
         {
             if (asset.TryGetProperty("name", out var name) && name.GetString() == assetName
                 && asset.TryGetProperty("browser_download_url", out var url))
             {
                 downloadUrl = url.GetString() ?? "";
+                if (asset.TryGetProperty("digest", out var digest))
+                {
+                    string? d = digest.GetString();
+                    if (d != null && d.StartsWith("sha256:", StringComparison.OrdinalIgnoreCase))
+                        expectedSha256 = d["sha256:".Length..].Trim();
+                }
                 break;
             }
         }
@@ -75,14 +82,29 @@ public sealed class XrayEngine : IDisposable
             throw new InvalidOperationException($"Asset {assetName} not found in latest Xray release.");
 
         byte[] data;
+        bool usedMirror = false;
         try
         {
             data = await http.GetByteArrayAsync(downloadUrl, ct);
         }
         catch (HttpRequestException)
         {
+            if (string.IsNullOrEmpty(expectedSha256))
+                throw;
             Log("Direct GitHub unreachable, trying mirror ...");
             data = await http.GetByteArrayAsync("https://gh-proxy.com/" + downloadUrl, ct);
+            usedMirror = true;
+        }
+
+        if (!string.IsNullOrEmpty(expectedSha256))
+        {
+            string actual = HashHex(data);
+            if (!string.Equals(actual, expectedSha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException($"Xray-core download digest mismatch: expected {expectedSha256}, got {actual}.");
+        }
+        else if (usedMirror)
+        {
+            throw new InvalidDataException("Cannot verify Xray-core download via mirror without GitHub digest.");
         }
 
         string zipPath = Path.Combine(Path.GetTempPath(), "xray-core-download.zip");
@@ -108,7 +130,30 @@ public sealed class XrayEngine : IDisposable
             }
             catch { /* best effort */ }
         }
+        File.WriteAllText(EnginePath + ".sha256", HashHex(File.ReadAllBytes(EnginePath)));
         Log($"Xray-core {version} ready.");
+    }
+
+    private static string HashHex(byte[] data)
+        => BitConverter.ToString(System.Security.Cryptography.SHA256.HashData(data)).Replace("-", "").ToLowerInvariant();
+
+    private static bool VerifyEngineIntegrity(bool requireSidecar)
+    {
+        try
+        {
+            if (!File.Exists(EnginePath)) return false;
+            string sidecar = EnginePath + ".sha256";
+            if (!File.Exists(sidecar))
+            {
+                if (requireSidecar) return false;
+                File.WriteAllText(sidecar, HashHex(File.ReadAllBytes(EnginePath)));
+                return true;
+            }
+            string expected = File.ReadAllText(sidecar).Trim();
+            string actual = HashHex(File.ReadAllBytes(EnginePath));
+            return string.Equals(actual, expected, StringComparison.OrdinalIgnoreCase);
+        }
+        catch { return false; }
     }
 
     public async Task StartAsync(ServerInfo server, bool setSystemProxy, AppSettings? settings = null, CancellationToken ct = default)
@@ -119,6 +164,13 @@ public sealed class XrayEngine : IDisposable
         {
             Log("Engine not found, downloading ...");
             await EnsureEngineAsync(false, ct);
+        }
+        else if (!VerifyEngineIntegrity(requireSidecar: AdminHelper.IsRunningAsAdmin()))
+        {
+            Log("Engine integrity check failed. Re-downloading ...");
+            await EnsureEngineAsync(true, ct);
+            if (!VerifyEngineIntegrity(requireSidecar: true))
+                throw new InvalidDataException("Xray engine failed integrity verification.");
         }
 
         bool useTun = settings?.UseTunMode == true;
@@ -153,6 +205,7 @@ public sealed class XrayEngine : IDisposable
         string configJson = XrayConfigBuilder.Build(server, SocksPort, HttpPort, settings);
         string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-config-{Guid.NewGuid():N}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
+        RestrictTempFile(configPath);
 
         try
         {
@@ -226,6 +279,7 @@ public sealed class XrayEngine : IDisposable
 
         string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-test-{Guid.NewGuid():N}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
+        RestrictTempFile(configPath);
 
         try
         {
@@ -341,6 +395,7 @@ public sealed class XrayEngine : IDisposable
 
         string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-multi-{Guid.NewGuid():N}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
+        RestrictTempFile(configPath);
 
         try
         {
@@ -419,5 +474,36 @@ public sealed class XrayEngine : IDisposable
     private void CleanupTempConfig(string? configPath)
     {
         try { if (configPath != null && File.Exists(configPath)) File.Delete(configPath); } catch { }
+    }
+
+    private static void RestrictTempFile(string path)
+    {
+        try
+        {
+            if (IsWindows)
+            {
+#pragma warning disable CA1416
+                var fi = new FileInfo(path);
+                var security = fi.GetAccessControl();
+                security.SetAccessRuleProtection(true, false);
+                var rules = security.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
+                foreach (System.Security.AccessControl.AuthorizationRule rule in rules)
+                    security.RemoveAccessRule((System.Security.AccessControl.FileSystemAccessRule)rule);
+                var user = System.Security.Principal.WindowsIdentity.GetCurrent().User;
+                if (user != null)
+                    security.AddAccessRule(new System.Security.AccessControl.FileSystemAccessRule(
+                        user, System.Security.AccessControl.FileSystemRights.FullControl,
+                        System.Security.AccessControl.AccessControlType.Allow));
+                fi.SetAccessControl(security);
+#pragma warning restore CA1416
+            }
+            else
+            {
+#pragma warning disable CA1416 // non-Windows branch of IsWindows
+                File.SetUnixFileMode(path, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+#pragma warning restore CA1416
+            }
+        }
+        catch { /* best effort */ }
     }
 }

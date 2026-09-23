@@ -1,12 +1,15 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using XrayClient.Models;
 
 namespace XrayClient.Core;
 
-/// <summary>ذخیره‌سازی JSON در پوشه AppData/Roxa.</summary>
+/// <summary>ذخیره‌سازی JSON در پوشه AppData/Roxa. servers.json با DPAPI (CurrentUser) رمزنگاری می‌شود.</summary>
 public static class Storage
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
+    private static readonly byte[] ServersEntropy = Encoding.UTF8.GetBytes("Roxa.servers.dpapi.v1");
 
     private static readonly string _dataDir;
     static Storage()
@@ -26,13 +29,47 @@ public static class Storage
         try
         {
             if (!File.Exists(ServersFile)) return new List<ServerInfo>();
-            return JsonSerializer.Deserialize<List<ServerInfo>>(File.ReadAllText(ServersFile)) ?? new List<ServerInfo>();
+            byte[] raw = File.ReadAllBytes(ServersFile);
+            string json;
+            if (OperatingSystem.IsWindows())
+            {
+#pragma warning disable CA1416
+                try
+                {
+                    byte[] plain = ProtectedData.Unprotect(raw, ServersEntropy, DataProtectionScope.CurrentUser);
+                    json = Encoding.UTF8.GetString(plain);
+                }
+                catch (CryptographicException)
+                {
+                    json = Encoding.UTF8.GetString(raw);
+                }
+#pragma warning restore CA1416
+            }
+            else
+            {
+                json = Encoding.UTF8.GetString(raw);
+            }
+            return JsonSerializer.Deserialize<List<ServerInfo>>(json) ?? new List<ServerInfo>();
         }
         catch { return new List<ServerInfo>(); }
     }
 
     public static void SaveServers(List<ServerInfo> servers)
-        => File.WriteAllText(ServersFile, JsonSerializer.Serialize(servers, Options));
+    {
+        string json = JsonSerializer.Serialize(servers, Options);
+        byte[] plain = Encoding.UTF8.GetBytes(json);
+        if (OperatingSystem.IsWindows())
+        {
+#pragma warning disable CA1416
+            byte[] protectedBytes = ProtectedData.Protect(plain, ServersEntropy, DataProtectionScope.CurrentUser);
+#pragma warning restore CA1416
+            File.WriteAllBytes(ServersFile, protectedBytes);
+        }
+        else
+        {
+            File.WriteAllBytes(ServersFile, plain);
+        }
+    }
 
     public static List<SubscriptionInfo> LoadSubscriptions()
     {

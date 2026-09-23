@@ -72,10 +72,10 @@ public partial class ServerInfo : ObservableObject
         return $"{val:F1}{Units[unit]}";
     }
 
-    [ObservableProperty] private int _latencyMs = -1;
+    [ObservableProperty] [property: JsonIgnore] private int _latencyMs = -1;
     [ObservableProperty] private int _realDelayMs = -1;
-    [ObservableProperty] private int _pingMs = -1;
-    [ObservableProperty] private double _downloadMbps = -1;
+    [ObservableProperty] [property: JsonIgnore] private int _pingMs = -1;
+    [ObservableProperty] [property: JsonIgnore] private double _downloadMbps = -1;
     [ObservableProperty] private string _countryCode = "";
     [ObservableProperty] [property: JsonIgnore] private bool _isSelected;
     [ObservableProperty] [property: JsonIgnore] private bool _isActiveConnection;
@@ -163,12 +163,7 @@ public partial class ServerInfo : ObservableObject
     };
 
     [JsonIgnore]
-    public string SpeedDisplay => DownloadMbps switch
-    {
-        < -1.5 => Localization.TranslationManager.Instance["Status_Error"],
-        < -0.5 => "—",
-        _ => $"{DownloadMbps:F1} Mb/s"
-    };
+    public string SpeedDisplay => DownloadMbps < 0 ? "—" : $"{DownloadMbps:F1} Mb/s";
 
     [JsonIgnore] public string Flag => Core.GeoFlags.FlagEmoji(CountryCode);
 

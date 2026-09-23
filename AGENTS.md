@@ -29,7 +29,7 @@ if ($p.HasExited) { "CRASHED: exit code $($p.ExitCode)" } else { "RUNNING (PID $
 
 ### Important Properties on ServerInfo
 - `LatencyDisplay`: `-1` → "—", `-2` → "ناموفق", else `"{ms} ms"`
-- `SpeedDisplay`: `< -1.5` → "خطا", `< -0.5` → "—", else `"{mbps} Mb/s"`
+- `SpeedDisplay`: `< 0` → "—", else `"{mbps} Mb/s"` (no "خطا")
 - `IsActiveConnection`: `bool`, must be set via `RefreshConnectionFlags()` in ViewModel
 - `ProtocolDisplay`, `Security`, `Network` (Transport), `SNI`, `Flag` (country emoji)
 

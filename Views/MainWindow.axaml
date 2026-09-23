@@ -326,6 +326,17 @@
                           <Setter Property="BorderBrush" Value="#F0F0F0"/>
                           <Setter Property="BorderThickness" Value="0,0,0,1"/>
                         </Style>
+                        <Style Selector="DataGridRow /template/ ContentPresenter">
+                          <Setter Property="Background">
+                            <Setter.Value>
+                              <MultiBinding Converter="{x:Static converters:ServerBgConverter.Instance}">
+                                <Binding Path="IsActiveConnection" x:DataType="models:ServerInfo"/>
+                                <Binding Path="IsHighlighted" x:DataType="models:ServerInfo"/>
+                                <Binding Path="IsSelected" x:DataType="models:ServerInfo"/>
+                              </MultiBinding>
+                            </Setter.Value>
+                          </Setter>
+                        </Style>
                         <Style Selector="DataGridRow:pointerover /template/ ContentPresenter">
                           <Setter Property="Background" Value="#F0FDFA"/>
                         </Style>

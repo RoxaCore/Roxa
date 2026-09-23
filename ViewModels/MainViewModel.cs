@@ -490,6 +490,9 @@ public partial class MainViewModel : ViewModelBase
 
         if (SelectedServer == null && keepSelected != null && Servers.Contains(keepSelected))
             SelectedServer = keepSelected;
+        foreach (var s in Servers)
+            s.IsSelected = ReferenceEquals(s, SelectedServer);
+        RefreshConnectionFlags();
     }
 
     private void UpdateGroupContent(ServerGroup group)
@@ -595,8 +598,15 @@ public partial class MainViewModel : ViewModelBase
         }
         finally
         {
-            if (SelectedServer == null && keepSelected != null && Servers.Contains(keepSelected))
-                SelectedServer = keepSelected;
+            if (keepSelected != null && Servers.Contains(keepSelected))
+            {
+                if (SelectedServer == null)
+                    SelectedServer = keepSelected;
+                // force IsSelected/IsActiveConnection refresh after list rebuild
+                foreach (var s in Servers)
+                    s.IsSelected = ReferenceEquals(s, SelectedServer);
+                RefreshConnectionFlags();
+            }
         }
     }
 

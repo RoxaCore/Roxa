@@ -223,7 +223,17 @@
               <!-- Action Buttons -->
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_PingAll}" Command="{Binding TestAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
-                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Stop}" Command="{Binding StopTestCommand}" IsVisible="{Binding IsTesting}" Padding="12,8" CornerRadius="8" Background="#FFF5F5" Foreground="#E53E3E" FontSize="12" BorderThickness="0"/>
+                <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsTesting}" VerticalAlignment="Center">
+                  <Border Width="120" Height="8" Background="#E5E7EB" CornerRadius="4" ClipToBounds="True" VerticalAlignment="Center">
+                    <Border Background="#0E7C6B" Height="8" CornerRadius="4" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
+                      <Border.RenderTransform>
+                        <ScaleTransform ScaleX="{Binding TestProgressPercent}"/>
+                      </Border.RenderTransform>
+                    </Border>
+                  </Border>
+                  <TextBlock Text="{Binding TestProgressText}" FontSize="11" Foreground="#666666" VerticalAlignment="Center" MinWidth="36"/>
+                  <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Stop}" Command="{Binding StopTestCommand}" Padding="12,8" CornerRadius="8" Background="#FFF5F5" Foreground="#E53E3E" FontSize="12" BorderThickness="0"/>
+                </StackPanel>
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Real}" Command="{Binding TestRealDelayAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SpeedAll}" Command="{Binding TestSpeedCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
                 <Button Command="{Binding RemoveDuplicatesCommand}" IsVisible="{Binding HasDuplicates}" Padding="12,8" CornerRadius="8" Background="#FFF5F5" Foreground="#E53E3E" FontSize="12" BorderThickness="0">
@@ -256,20 +266,19 @@
                             <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
                             <TextBlock Text="{Binding CountText}" Opacity="0.5" FontSize="12" VerticalAlignment="Center"/>
                           </StackPanel>
-                          <StackPanel Orientation="Vertical" Spacing="2" IsVisible="{Binding IsSubscription}" MinWidth="200" Margin="24,0,0,0">
-                            <Grid ColumnDefinitions="*" Margin="0,0,0,2">
-                              <Border CornerRadius="4" Height="8" Background="#E0E0E0" ClipToBounds="True" HorizontalAlignment="Stretch">
-                                <Border CornerRadius="4" Height="8" Background="#2FC1A6" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5">
-                                  <Border.RenderTransform>
-                                    <ScaleTransform ScaleX="{Binding Subscription.TrafficPercent}"/>
-                                  </Border.RenderTransform>
-                                </Border>
+                          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" IsVisible="{Binding IsSubscription}">
+                            <Border Width="72" Height="6" Background="#E0E0E0" CornerRadius="3" ClipToBounds="True" VerticalAlignment="Center"
+                                    IsVisible="{Binding Subscription.TrafficDisplay, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                              <Border Width="72" Height="6" Background="#2FC1A6" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
+                                <Border.RenderTransform>
+                                  <ScaleTransform ScaleX="{Binding Subscription.TrafficPercent}"/>
+                                </Border.RenderTransform>
                               </Border>
-                            </Grid>
-                            <Grid ColumnDefinitions="*,Auto">
-                              <TextBlock Text="{Binding Subscription.TrafficDisplay}" FontSize="10" Foreground="#666666" VerticalAlignment="Center"/>
-                              <TextBlock Grid.Column="1" Text="{Binding Subscription.ExpireText}" FontSize="10" Foreground="#666666" VerticalAlignment="Center"/>
-                            </Grid>
+                            </Border>
+                            <TextBlock Text="{Binding Subscription.TrafficDisplay}" FontSize="11" Foreground="#666666" VerticalAlignment="Center"
+                                       IsVisible="{Binding Subscription.TrafficDisplay, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                            <TextBlock Text="{Binding Subscription.ExpireText}" FontSize="11" Foreground="#666666" VerticalAlignment="Center"
+                                       IsVisible="{Binding Subscription.ExpireText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                           </StackPanel>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateAll}" Padding="8,4" IsVisible="{Binding IsAllGroup}" Command="{Binding Owner.UpdateSubscriptionsCommand}" CornerRadius="6" Background="#FFF3E0" Foreground="#E65100" FontSize="11" BorderThickness="0"/>
                           <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}" Padding="8,4" IsVisible="{Binding IsManualGroup}" Command="{Binding Owner.UpdateGroupServersCommand}" CommandParameter="{Binding}" CornerRadius="6" Background="#FFF3E0" Foreground="#E65100" FontSize="11" BorderThickness="0"/>

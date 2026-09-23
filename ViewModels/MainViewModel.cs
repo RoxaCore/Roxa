@@ -50,11 +50,15 @@ public partial class MainViewModel : ViewModelBase
       [ObservableProperty] private bool _isFindingBetter;
       [ObservableProperty] private int _searchTestedCount;
       [ObservableProperty] private int _searchTotalCount;
+      [ObservableProperty] private int _testTestedCount;
+      [ObservableProperty] private int _testTotalCount;
 
       public double SearchProgressPercent => SearchTotalCount > 0 ? (double)SearchTestedCount / SearchTotalCount : 0;
       public string SearchProgressText => SearchTotalCount > 0
           ? string.Format(TranslationManager.Instance["Tray_SearchingProgress"], SearchTestedCount, SearchTotalCount)
           : TranslationManager.Instance["Tray_Searching"];
+      public double TestProgressPercent => TestTotalCount > 0 ? Math.Min(1.0, (double)TestTestedCount / TestTotalCount) : 0;
+      public string TestProgressText => TestTotalCount > 0 ? $"{TestTestedCount}/{TestTotalCount}" : "";
       public string LastUpdateDisplay
       {
           get
@@ -309,6 +313,32 @@ public partial class MainViewModel : ViewModelBase
     partial void OnDuplicateCountChanged(int value) => OnPropertyChanged(nameof(HasDuplicates));
     partial void OnSearchTestedCountChanged(int value) { OnPropertyChanged(nameof(SearchProgressPercent)); OnPropertyChanged(nameof(SearchProgressText)); }
     partial void OnSearchTotalCountChanged(int value) { OnPropertyChanged(nameof(SearchProgressPercent)); OnPropertyChanged(nameof(SearchProgressText)); }
+    partial void OnTestTestedCountChanged(int value) { OnPropertyChanged(nameof(TestProgressPercent)); OnPropertyChanged(nameof(TestProgressText)); }
+    partial void OnTestTotalCountChanged(int value) { OnPropertyChanged(nameof(TestProgressPercent)); OnPropertyChanged(nameof(TestProgressText)); }
+
+    private void BeginTestProgress(int total)
+    {
+        TestTotalCount = total;
+        TestTestedCount = 0;
+    }
+
+    private void TickTestProgress()
+    {
+        Post(() =>
+        {
+            if (TestTestedCount < TestTotalCount)
+                TestTestedCount++;
+        });
+    }
+
+    private void EndTestProgress()
+    {
+        Post(() =>
+        {
+            if (TestTotalCount > 0)
+                TestTestedCount = TestTotalCount;
+        });
+    }
 
     partial void OnSetSystemProxyChanged(bool value)
     {
@@ -1413,6 +1443,7 @@ public partial class MainViewModel : ViewModelBase
          var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
          oldCts?.Dispose();
          IsTesting = true;
+         BeginTestProgress(Servers.Count);
          try
          {
             Status = $"پینگ {Servers.Count} سرور ...";
@@ -1442,7 +1473,7 @@ public partial class MainViewModel : ViewModelBase
                         Post(() => { if (isReal) s.RecordRealDelay(ok ? ms : -2); else s.RecordPing(ok ? ms : -2); });
                 }
                 catch { Post(() => { if (SelectedPingType == PingType.RealDelay) s.RecordRealDelay(-2); else s.RecordPing(-2); }); }
-                finally { sem.Release(); }
+                finally { sem.Release(); TickTestProgress(); }
             });
              try { await Task.WhenAll(tasks); }
              catch (OperationCanceledException) { }
@@ -1451,6 +1482,7 @@ public partial class MainViewModel : ViewModelBase
              AppendLog(Status);
              AutoSortAfterTest("latency");
              SaveServers();
+             EndTestProgress();
          }
          finally { IsTesting = false; ConnectCommand.NotifyCanExecuteChanged(); }
      }
@@ -1465,6 +1497,7 @@ public partial class MainViewModel : ViewModelBase
          var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
          oldCts?.Dispose();
          IsTesting = true;
+         BeginTestProgress(targets.Count);
          try
          {
               Status = $"تست سرعت {targets.Count} سرور (از طریق پروکسی) ...";
@@ -1482,7 +1515,7 @@ public partial class MainViewModel : ViewModelBase
                       Post(() => s.RecordSpeed(ok ? mbps : -2));
                   }
                   catch { Post(() => s.RecordSpeed(-2)); }
-                  finally { try { sem.Release(); } catch { } }
+                  finally { try { sem.Release(); } catch { } TickTestProgress(); }
               });
               try { await Task.WhenAll(tasks); }
               catch (OperationCanceledException) { }
@@ -1493,6 +1526,7 @@ public partial class MainViewModel : ViewModelBase
              AppendLog(Status);
              AutoSortAfterTest("speed");
              SaveServers();
+             EndTestProgress();
          }
          finally { IsTesting = false; ConnectCommand.NotifyCanExecuteChanged(); }
      }
@@ -1505,6 +1539,7 @@ public partial class MainViewModel : ViewModelBase
         if (targets.Count == 0) return;
         if (IsTesting) return;
         IsTesting = true;
+        BeginTestProgress(targets.Count);
         try
         {
             using var sem = new SemaphoreSlim(3);
@@ -1523,10 +1558,11 @@ public partial class MainViewModel : ViewModelBase
                     Post(() => { if (isReal) s.RecordRealDelay(ok ? ms : -2); else s.RecordPing(ok ? ms : -2); });
                 }
                 catch { Post(() => { if (SelectedPingType == PingType.RealDelay) s.RecordRealDelay(-2); else s.RecordPing(-2); }); }
-                finally { try { sem.Release(); } catch { } }
+                finally { try { sem.Release(); } catch { } TickTestProgress(); }
             });
             await Task.WhenAll(tasks);
             AutoSortAfterTest("latency");
+            EndTestProgress();
         }
         finally { IsTesting = false; SaveServers(); }
     }
@@ -1540,6 +1576,7 @@ public partial class MainViewModel : ViewModelBase
         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
         oldCts?.Dispose();
         IsTesting = true;
+        BeginTestProgress(targets.Count);
         try
         {
             Status = $"تست سرعت {targets.Count} سرور ...";
@@ -1557,7 +1594,7 @@ public partial class MainViewModel : ViewModelBase
                       Post(() => s.RecordSpeed(ok ? mbps : -2));
                   }
                   catch { Post(() => s.RecordSpeed(-2)); }
-                  finally { try { sem.Release(); } catch { } }
+                  finally { try { sem.Release(); } catch { } TickTestProgress(); }
               });
               try { await Task.WhenAll(tasks); }
               catch (OperationCanceledException) { }
@@ -1567,6 +1604,7 @@ public partial class MainViewModel : ViewModelBase
              Status = $"سرعت تمام شد: {okCount} از {targets.Count} موفق";
              AutoSortAfterTest("speed");
              SaveServers();
+             EndTestProgress();
         }
         finally { IsTesting = false; }
     }
@@ -1600,6 +1638,7 @@ public partial class MainViewModel : ViewModelBase
         var targets = Servers.Where(s => s.IsChecked).ToList();
         if (targets.Count == 0 || IsTesting) return;
         IsTesting = true;
+        BeginTestProgress(targets.Count);
         try
         {
             Status = $"پینگ {targets.Count} سرور منتخب ...";
@@ -1626,12 +1665,13 @@ public partial class MainViewModel : ViewModelBase
                     Post(() => { if (isReal) s.RecordRealDelay(ok ? ms : -2); else s.RecordPing(ok ? ms : -2); });
                 }
                 catch { Post(() => { if (SelectedPingType == PingType.RealDelay) s.RecordRealDelay(-2); else s.RecordPing(-2); }); }
-                finally { sem.Release(); }
+                finally { sem.Release(); TickTestProgress(); }
             });
             await Task.WhenAll(tasks);
             Status = $"پینگ منتخب‌ها تمام شد ({targets.Count(t => t.LatencyMs >= 0)} موفق)";
             AutoSortAfterTest("latency");
             SaveServers();
+            EndTestProgress();
         }
         finally { IsTesting = false; TestSelectedCommand.NotifyCanExecuteChanged(); }
     }
@@ -1642,6 +1682,7 @@ public partial class MainViewModel : ViewModelBase
         var targets = Servers.Where(s => s.IsChecked).ToList();
         if (targets.Count == 0 || IsTesting) return;
         IsTesting = true;
+        BeginTestProgress(targets.Count);
         try
         {
             Status = $"تست سرعت {targets.Count} سرور منتخب ...";
@@ -1656,12 +1697,13 @@ public partial class MainViewModel : ViewModelBase
                     Post(() => s.RecordSpeed(ok ? mbps : -2));
                 }
                 catch { Post(() => s.RecordSpeed(-2)); }
-                finally { sem.Release(); }
+                finally { sem.Release(); TickTestProgress(); }
             });
             await Task.WhenAll(tasks);
             Status = $"سرعت منتخب‌ها تمام شد ({targets.Count(t => t.DownloadMbps >= 0)} موفق)";
             AutoSortAfterTest("speed");
             SaveServers();
+            EndTestProgress();
         }
         finally { IsTesting = false; TestSelectedSpeedCommand.NotifyCanExecuteChanged(); }
     }
@@ -1702,6 +1744,7 @@ public partial class MainViewModel : ViewModelBase
          var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
          oldCts?.Dispose();
          IsTesting = true;
+         BeginTestProgress(targets.Count);
          try
          {
             Status = $"پینگ گروه «{group!.Title}» ({targets.Count} سرور) ...";
@@ -1731,7 +1774,7 @@ public partial class MainViewModel : ViewModelBase
                         Post(() => { if (isReal) s.RecordRealDelay(ok ? ms : -2); else s.RecordPing(ok ? ms : -2); });
                 }
                 catch { Post(() => { if (SelectedPingType == PingType.RealDelay) s.RecordRealDelay(-2); else s.RecordPing(-2); }); }
-                finally { sem.Release(); }
+                finally { sem.Release(); TickTestProgress(); }
             });
              try { await Task.WhenAll(tasks); }
              catch (OperationCanceledException) { }
@@ -1739,6 +1782,7 @@ public partial class MainViewModel : ViewModelBase
              Status = $"پینگ گروه تمام شد ({okCount} موفق)";
              AutoSortAfterTest("latency");
              SaveServers();
+             EndTestProgress();
          }
          finally { IsTesting = false; }
      }
@@ -1748,34 +1792,36 @@ public partial class MainViewModel : ViewModelBase
      {
           var targets = group?.Servers.ToList() ?? new List<ServerInfo>();
          if (targets.Count == 0 || IsTesting) return;
-         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-         oldCts?.Dispose();
-         IsTesting = true;
-         try
-         {
-            Status = $"تست تأخیر واقعی گروه «{group!.Title}» ({targets.Count} سرور) ...";
-            foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; }
-            using var sem = new SemaphoreSlim(3);
-            var tasks = targets.Select(async s =>
-            {
-                if (_testCts.Token.IsCancellationRequested) return;
-                await sem.WaitAsync(_testCts.Token);
-                try
-                {
-                    if (_testCts.Token.IsCancellationRequested) return;
-                    var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
-                    if (!_testCts.Token.IsCancellationRequested)
-                        Post(() => s.RecordRealDelay(ok ? ms : -2));
-                }
-                catch { Post(() => s.RecordRealDelay(-2)); }
-                finally { sem.Release(); }
-            });
-             try { await Task.WhenAll(tasks); }
-             catch (OperationCanceledException) { }
-             int okCount = targets.Count(t => t.LatencyMs >= 0);
-              Status = $"تأخیر واقعی گروه تمام شد ({okCount} موفق)";
-             AutoSortAfterTest("latency");
-             SaveServers();
+          var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
+          oldCts?.Dispose();
+          IsTesting = true;
+          BeginTestProgress(targets.Count);
+          try
+          {
+             Status = $"تست تأخیر واقعی گروه «{group!.Title}» ({targets.Count} سرور) ...";
+             foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; }
+             using var sem = new SemaphoreSlim(3);
+             var tasks = targets.Select(async s =>
+             {
+                 if (_testCts.Token.IsCancellationRequested) return;
+                 await sem.WaitAsync(_testCts.Token);
+                 try
+                 {
+                     if (_testCts.Token.IsCancellationRequested) return;
+                     var (ok, ms) = await RealDelayTester.TestAsync(s, _testCts.Token);
+                     if (!_testCts.Token.IsCancellationRequested)
+                         Post(() => s.RecordRealDelay(ok ? ms : -2));
+                 }
+                 catch { Post(() => s.RecordRealDelay(-2)); }
+                 finally { sem.Release(); TickTestProgress(); }
+             });
+              try { await Task.WhenAll(tasks); }
+              catch (OperationCanceledException) { }
+              int okCount = targets.Count(t => t.LatencyMs >= 0);
+               Status = $"تأخیر واقعی گروه تمام شد ({okCount} موفق)";
+              AutoSortAfterTest("latency");
+              SaveServers();
+              EndTestProgress();
          }
          finally { IsTesting = false; }
      }
@@ -1788,6 +1834,7 @@ public partial class MainViewModel : ViewModelBase
          var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
          oldCts?.Dispose();
          IsTesting = true;
+         BeginTestProgress(targets.Count);
          try
          {
               Status = $"تست سرعت گروه «{group!.Title}» ({targets.Count} سرور) ...";
@@ -1805,7 +1852,7 @@ public partial class MainViewModel : ViewModelBase
                       Post(() => s.RecordSpeed(ok ? mbps : -2));
                   }
                   catch { Post(() => s.RecordSpeed(-2)); }
-                  finally { try { sem.Release(); } catch { } }
+                  finally { try { sem.Release(); } catch { } TickTestProgress(); }
               });
               try { await Task.WhenAll(tasks); }
               catch (OperationCanceledException) { }
@@ -1815,6 +1862,7 @@ public partial class MainViewModel : ViewModelBase
               Status = $"سرعت گروه تمام شد ({okCount} موفق)";
              AutoSortAfterTest("speed");
              SaveServers();
+             EndTestProgress();
          }
          finally { IsTesting = false; }
      }
@@ -1827,6 +1875,7 @@ public partial class MainViewModel : ViewModelBase
          var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
          oldCts?.Dispose();
          IsTesting = true;
+         BeginTestProgress(targets.Count);
          try
          {
             Status = $"بروزرسانی گروه «{group!.Title}» ({targets.Count} سرور) ...";
@@ -1844,7 +1893,7 @@ public partial class MainViewModel : ViewModelBase
                     Post(() => s.RecordRealDelay(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordRealDelay(-2)); }
-                finally { try { sem.Release(); } catch { } }
+                finally { try { sem.Release(); } catch { } TickTestProgress(); }
             });
              try { await Task.WhenAll(tasks); }
              catch (OperationCanceledException) { }
@@ -1854,6 +1903,7 @@ public partial class MainViewModel : ViewModelBase
              Status = $"بروزرسانی گروه تمام شد ({okCount} موفق)";
              AutoSortAfterTest("latency");
              SaveServers();
+             EndTestProgress();
          }
          catch (Exception ex) { Status = $"خطا: {ex.Message}"; }
          finally { IsTesting = false; }
@@ -1870,6 +1920,7 @@ public partial class MainViewModel : ViewModelBase
          var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
          oldCts?.Dispose();
          IsTesting = true;
+         BeginTestProgress(targets.Count);
          try
          {
             Status = $"تست تأخیر واقعی {targets.Count} سرور (کند ولی دقیق) ...";
@@ -1886,7 +1937,7 @@ public partial class MainViewModel : ViewModelBase
                     Post(() => s.RecordRealDelay(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordRealDelay(-2)); }
-                finally { try { sem.Release(); } catch { } }
+                finally { try { sem.Release(); } catch { } TickTestProgress(); }
             });
             try { await Task.WhenAll(tasks); }
             catch (OperationCanceledException) { }
@@ -1896,6 +1947,7 @@ public partial class MainViewModel : ViewModelBase
             Status = $"تأخیر واقعی تمام شد ({okCount} موفق)";
             AutoSortAfterTest("latency");
             SaveServers();
+            EndTestProgress();
          }
          finally { IsTesting = false; }
      }
@@ -1908,6 +1960,7 @@ public partial class MainViewModel : ViewModelBase
         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
         oldCts?.Dispose();
         IsTesting = true;
+        BeginTestProgress(targets.Count);
         try
         {
              Status = $"تست تأخیر واقعی {targets.Count} سرور منتخب ...";
@@ -1924,7 +1977,7 @@ public partial class MainViewModel : ViewModelBase
                     Post(() => s.RecordRealDelay(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordRealDelay(-2)); }
-                finally { try { sem.Release(); } catch { } }
+                finally { try { sem.Release(); } catch { } TickTestProgress(); }
             });
             try { await Task.WhenAll(tasks); }
             catch (OperationCanceledException) { }
@@ -1933,6 +1986,7 @@ public partial class MainViewModel : ViewModelBase
             Status = $"تأخیر واقعی منتخب‌ها تمام شد ({targets.Count(t => t.LatencyMs >= 0)} موفق)";
             AutoSortAfterTest("latency");
             SaveServers();
+            EndTestProgress();
         }
         finally { IsTesting = false; TestRealDelaySelectedCommand.NotifyCanExecuteChanged(); }
     }
@@ -1946,6 +2000,7 @@ public partial class MainViewModel : ViewModelBase
         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
         oldCts?.Dispose();
         IsTesting = true;
+        BeginTestProgress(targets.Count);
         try
         {
             Status = $"تست تأخیر واقعی {targets.Count} سرور ...";
@@ -1963,7 +2018,7 @@ public partial class MainViewModel : ViewModelBase
                     Post(() => s.RecordRealDelay(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordRealDelay(-2)); }
-                finally { try { sem.Release(); } catch { } }
+                finally { try { sem.Release(); } catch { } TickTestProgress(); }
             });
             try { await Task.WhenAll(tasks); }
             catch (OperationCanceledException) { }
@@ -1973,6 +2028,7 @@ public partial class MainViewModel : ViewModelBase
             Status = $"تأخیر واقعی تمام شد: {okCount} از {targets.Count} موفق";
             AutoSortAfterTest("latency");
             SaveServers();
+            EndTestProgress();
         }
         finally { IsTesting = false; }
     }
@@ -2296,6 +2352,7 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = false;
           Status = TranslationManager.Instance["Log_TestStopped"];
           AppendLog(TranslationManager.Instance["Log_TestStopped"]);
+          Post(() => { TestTestedCount = 0; TestTotalCount = 0; });
       }
 
       [RelayCommand]

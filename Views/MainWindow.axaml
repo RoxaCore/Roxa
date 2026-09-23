@@ -327,9 +327,10 @@
                           <Setter Property="Background" Value="#F3F4F6"/>
                           <Setter Property="Foreground" Value="#374151"/>
                           <Setter Property="FontWeight" Value="SemiBold"/>
+                          <Setter Property="FontSize" Value="11"/>
                           <Setter Property="BorderBrush" Value="#E5E7EB"/>
                           <Setter Property="BorderThickness" Value="0,0,1,1"/>
-                          <Setter Property="Padding" Value="8,0"/>
+                          <Setter Property="Padding" Value="6,0"/>
                         </Style>
                         <Style Selector="DataGridRow">
                           <Setter Property="BorderBrush" Value="#F0F0F0"/>
@@ -381,7 +382,7 @@
                         <!-- Name + flag -->
                         <dg:DataGridTemplateColumn Width="*" SortMemberPath="Name" MinWidth="120">
                           <dg:DataGridTemplateColumn.Header>
-                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Name]}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Name]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Name]}"/>
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -398,9 +399,9 @@
                         </dg:DataGridTemplateColumn>
 
                         <!-- Ping -->
-                        <dg:DataGridTemplateColumn Width="80" SortMemberPath="PingSortKey" IsReadOnly="True">
+                        <dg:DataGridTemplateColumn Width="90" MinWidth="90" SortMemberPath="PingSortKey" IsReadOnly="True">
                           <dg:DataGridTemplateColumn.Header>
-                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Ping]}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Ping]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Ping]}"/>
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -412,9 +413,9 @@
                         </dg:DataGridTemplateColumn>
 
                         <!-- Real delay -->
-                        <dg:DataGridTemplateColumn Width="100" SortMemberPath="RealDelaySortKey" IsReadOnly="True">
+                        <dg:DataGridTemplateColumn Width="125" MinWidth="125" SortMemberPath="RealDelaySortKey" IsReadOnly="True">
                           <dg:DataGridTemplateColumn.Header>
-                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_RealDelay]}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_RealDelay]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_RealDelay]}"/>
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -426,23 +427,23 @@
                         </dg:DataGridTemplateColumn>
 
                         <!-- Speed -->
-                        <dg:DataGridTextColumn Binding="{Binding SpeedDisplay, Mode=OneWay}" SortMemberPath="DownloadMbps" Width="90" IsReadOnly="True">
+                        <dg:DataGridTextColumn Binding="{Binding SpeedDisplay, Mode=OneWay}" SortMemberPath="DownloadMbps" Width="110" MinWidth="110" IsReadOnly="True">
                           <dg:DataGridTextColumn.Header>
-                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Speed]}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Speed]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Speed]}"/>
                           </dg:DataGridTextColumn.Header>
                         </dg:DataGridTextColumn>
 
                         <!-- Protocol -->
-                        <dg:DataGridTextColumn Binding="{Binding ProtocolDisplay}" SortMemberPath="Protocol" Width="90" IsReadOnly="True">
+                        <dg:DataGridTextColumn Binding="{Binding ProtocolDisplay}" SortMemberPath="Protocol" Width="110" MinWidth="110" IsReadOnly="True">
                           <dg:DataGridTextColumn.Header>
-                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Protocol]}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Protocol]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Protocol]}"/>
                           </dg:DataGridTextColumn.Header>
                         </dg:DataGridTextColumn>
 
                         <!-- Actions -->
-                        <dg:DataGridTemplateColumn Width="130" IsReadOnly="True">
+                        <dg:DataGridTemplateColumn Width="140" MinWidth="140" IsReadOnly="True">
                           <dg:DataGridTemplateColumn.Header>
-                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Status]}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Status]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Status]}"/>
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>

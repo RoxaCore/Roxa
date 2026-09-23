@@ -606,6 +606,13 @@ public partial class MainViewModel : ViewModelBase
                 foreach (var s in Servers)
                     s.IsSelected = ReferenceEquals(s, SelectedServer);
                 RefreshConnectionFlags();
+                // re-push selection so DataGrid :selected / row bg re-applies after Clear()
+                var current = SelectedServer;
+                if (current != null)
+                {
+                    SelectedServer = null;
+                    SelectedServer = current;
+                }
             }
         }
     }

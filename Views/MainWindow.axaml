@@ -308,7 +308,7 @@
                                  IsReadOnly="False"
                                  Background="Transparent"
                                  BorderThickness="0"
-                                 RowBackground="#FFFFFF"
+                                 RowBackground="Transparent"
                                  FontSize="12"
                                  RowHeight="34"
                                  ColumnHeaderHeight="36"
@@ -325,6 +325,15 @@
                         <Style Selector="DataGridRow">
                           <Setter Property="BorderBrush" Value="#F0F0F0"/>
                           <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                          <Setter Property="Background">
+                            <Setter.Value>
+                              <MultiBinding Converter="{x:Static converters:ServerBgConverter.Instance}">
+                                <Binding Path="IsActiveConnection" x:DataType="models:ServerInfo"/>
+                                <Binding Path="IsHighlighted" x:DataType="models:ServerInfo"/>
+                                <Binding Path="IsSelected" x:DataType="models:ServerInfo"/>
+                              </MultiBinding>
+                            </Setter.Value>
+                          </Setter>
                         </Style>
                         <Style Selector="DataGridRow /template/ ContentPresenter">
                           <Setter Property="Background">
@@ -347,6 +356,10 @@
                           <Setter Property="BorderThickness" Value="0"/>
                           <Setter Property="Padding" Value="4,0"/>
                           <Setter Property="VerticalContentAlignment" Value="Center"/>
+                          <Setter Property="Background" Value="Transparent"/>
+                        </Style>
+                        <Style Selector="DataGridCell /template/ ContentPresenter">
+                          <Setter Property="Background" Value="Transparent"/>
                         </Style>
                         <Style Selector="DataGridCell:selected /template/ ContentPresenter">
                           <Setter Property="Background" Value="Transparent"/>

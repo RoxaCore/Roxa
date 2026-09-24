@@ -249,14 +249,14 @@ public static class XrayConfigBuilder
                 stream["wsSettings"] = new JsonObject
                 {
                     ["path"] = string.IsNullOrEmpty(s.Path) ? "/" : s.Path,
-                    ["headers"] = new JsonObject { ["Host"] = s.Host ?? "" }
+                    ["headers"] = new JsonObject { ["Host"] = string.IsNullOrEmpty(s.Host) ? (string.IsNullOrEmpty(s.SNI) ? s.Address : s.SNI) : s.Host }
                 };
                 break;
             case "http":
                 stream["httpSettings"] = new JsonObject
                 {
                     ["path"] = string.IsNullOrEmpty(s.Path) ? "/" : s.Path,
-                    ["host"] = new JsonArray(string.IsNullOrEmpty(s.Host) ? s.Address : s.Host)
+                    ["host"] = new JsonArray(string.IsNullOrEmpty(s.Host) ? (string.IsNullOrEmpty(s.SNI) ? s.Address : s.SNI) : s.Host)
                 };
                 break;
             case "grpc":
@@ -266,7 +266,7 @@ public static class XrayConfigBuilder
                 stream["xhttpSettings"] = new JsonObject
                 {
                     ["path"] = string.IsNullOrEmpty(s.Path) ? "/" : s.Path,
-                    ["host"] = s.Host ?? ""
+                    ["host"] = string.IsNullOrEmpty(s.Host) ? (string.IsNullOrEmpty(s.SNI) ? s.Address : s.SNI) : s.Host
                 };
                 break;
         }

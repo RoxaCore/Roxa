@@ -307,6 +307,23 @@ public static class SubscriptionManager
             case "grpc":
                 server.ServiceName = GetString(GetObject(stream, "grpcSettings"), "serviceName") ?? "";
                 break;
+            case "xhttp":
+            case "splithttp":
+                var xhttp = GetObject(stream, "xhttpSettings");
+                if (xhttp.ValueKind != JsonValueKind.Object) xhttp = GetObject(stream, "splithttpSettings");
+                server.Path = GetString(xhttp, "path") ?? "";
+                server.Host = GetString(xhttp, "host") ?? "";
+                break;
+            case "h2":
+            case "http":
+                var httpSt = GetObject(stream, "httpSettings");
+                server.Path = GetString(httpSt, "path") ?? "";
+                var hosts = GetObject(httpSt, "host");
+                if (hosts.ValueKind == JsonValueKind.Array && hosts.GetArrayLength() > 0)
+                    server.Host = hosts[0].GetString() ?? "";
+                else
+                    server.Host = GetString(httpSt, "host") ?? "";
+                break;
         }
         switch (server.Protocol)
         {

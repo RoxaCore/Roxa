@@ -234,7 +234,7 @@
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_PingAll}" Command="{Binding TestAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
                 <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsTesting}" VerticalAlignment="Center">
                   <Border Width="120" Height="8" Background="#E5E7EB" CornerRadius="4" ClipToBounds="True" VerticalAlignment="Center">
-                    <Border Background="#0E7C6B" Height="8" CornerRadius="4" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
+                    <Border Width="120" Background="#7C3AED" Height="8" CornerRadius="4" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
                       <Border.RenderTransform>
                         <ScaleTransform ScaleX="{Binding TestProgressPercent}"/>
                       </Border.RenderTransform>

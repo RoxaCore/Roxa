@@ -47,6 +47,11 @@ public static class SpeedRunner
             if (args[i] == "--ids-file")
                 idsFile = args[i + 1];
 
+        int take = 0;
+        for (int i = 0; i < args.Length - 1; i++)
+            if (args[i] == "--take" && int.TryParse(args[i + 1], out var t) && t > 0)
+                take = t;
+
         Console.WriteLine($"[speed] concurrency={concurrency} loading servers...");
         var all = Storage.LoadServers()
             .Where(s => !string.IsNullOrWhiteSpace(s.Address) && s.Port > 0)
@@ -57,9 +62,13 @@ public static class SpeedRunner
             return 1;
         }
 
-        var picked = !string.IsNullOrEmpty(idsFile) && File.Exists(idsFile)
-            ? PickByIds(all, idsFile)
-            : PickServerSet(all);
+        List<ServerInfo> picked;
+        if (!string.IsNullOrEmpty(idsFile) && File.Exists(idsFile))
+            picked = PickByIds(all, idsFile);
+        else if (take > 0)
+            picked = all.Take(take).ToList();
+        else
+            picked = PickServerSet(all);
         Console.WriteLine($"Using {picked.Count} servers:");
         foreach (var s in picked)
             Console.WriteLine($"  {s.Name} ({s.Address}:{s.Port})");

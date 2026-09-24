@@ -1482,25 +1482,18 @@ public partial class MainViewModel : ViewModelBase
          BeginTestProgress(targets.Count);
          try
          {
-              Status = $"تست سرعت {targets.Count} سرور (از طریق پروکسی) ...";
-              foreach (var s in targets) s.RecordSpeed(-1);
-               using var sem = new SemaphoreSlim(SpeedTester.MaxConcurrency);
-               var tasks = targets.Select(async s =>
-               {
-                   if (_testCts.Token.IsCancellationRequested) return;
-                   await sem.WaitAsync(_testCts.Token);
-                   try
-                   {
-                       if (_testCts.Token.IsCancellationRequested) return;
-                       Post(() => Status = $"تست سرعت: {s.Name} ...");
-                       var speedResult = await SpeedTester.TestAsync(s, _testCts.Token);
-                       Post(() => s.RecordSpeed(speedResult));
-                   }
-                   catch { Post(() => s.RecordSpeed(-2)); }
-                   finally { try { sem.Release(); } catch { } TickTestProgress(); }
-               });
-               try { await Task.WhenAll(tasks); }
-               catch (OperationCanceledException) { }
+               Status = $"تست سرعت {targets.Count} سرور (از طریق پروکسی) ...";
+               foreach (var s in targets) s.RecordSpeed(-1);
+                try
+                {
+                    await SpeedTester.TestBatchAsync(targets, _testCts.Token, (s, r) =>
+                    {
+                        Post(() => Status = $"تست سرعت: {s.Name} ...");
+                        Post(() => s.RecordSpeed(r));
+                        TickTestProgress();
+                    });
+                }
+                catch (OperationCanceledException) { }
               foreach (var s in targets)
                   if (s.DownloadMbps == -1) s.RecordSpeed(-2);
               int okCount = targets.Count(s => s.DownloadMbps >= 0);

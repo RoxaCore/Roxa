@@ -109,28 +109,18 @@ public static class BaselineRunner
             ServerIds = picked.Select(s => s.Id).ToList(),
         };
 
-        using var sem = new SemaphoreSlim(3);
+        RealDelayTester.ResetSessionCache();
         for (int r = 1; r <= runs; r++)
         {
             if (ct.IsCancellationRequested) break;
             Console.WriteLine($"--- run {r}/{runs} ---");
             var run = new Run { Index = r, At = DateTime.UtcNow };
-            var tasks = picked.Select(async s =>
+            await RealDelayTester.TestBatchAsync(picked, ct, (s, result) =>
             {
-                await sem.WaitAsync(ct);
-                Sample sample;
-                try
-                {
-                    sample = await SampleOneAsync(s, ct);
-                }
-                finally
-                {
-                    sem.Release();
-                }
+                var sample = SampleFromResult(s, result);
                 lock (run.Samples) run.Samples.Add(sample);
                 Console.WriteLine($"  [{(sample.Ok ? "OK" : "FAIL")}] {sample.Name}: {sample.Ms}ms status={sample.Status} total={sample.TotalMs}ms phases(tcp={sample.PhaseTcpMs},wu={sample.PhaseWarmupMs},smp={sample.PhaseSamplesMs},disp={sample.PhaseDisposeMs})");
             });
-            await Task.WhenAll(tasks);
             run.Samples = run.Samples
                 .OrderBy(x => picked.FindIndex(p => p.Id == x.Id))
                 .ToList();
@@ -156,11 +146,10 @@ public static class BaselineRunner
         return 0;
     }
 
-    private static async Task<Sample> SampleOneAsync(ServerInfo s, CancellationToken ct)
+    private static Sample SampleFromResult(ServerInfo s, TestResult r)
     {
         try
         {
-            var r = await RealDelayTester.TestAsync(s, ct);
             var sample = new Sample
             {
                 Id = s.Id,

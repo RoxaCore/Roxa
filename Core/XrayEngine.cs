@@ -426,7 +426,8 @@ public sealed class XrayEngine : IDisposable
 
             // Wait for ports to be ready
             bool allReady = false;
-            for (int i = 0; i < 30 && !ct.IsCancellationRequested; i++)
+            int maxAttempts = 30 + portMap.Count * 2;
+            for (int i = 0; i < maxAttempts && !ct.IsCancellationRequested; i++)
             {
                 await Task.Delay(300, ct);
                 lock (_lock)

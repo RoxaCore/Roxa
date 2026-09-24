@@ -325,17 +325,18 @@ public static class XrayConfigBuilder
         return arr;
     }
 
-    public static (string Json, Dictionary<int, ServerInfo> PortMap) BuildMultiServerConfig(List<ServerInfo> servers)
+    public static (string Json, Dictionary<int, ServerInfo> PortMap) BuildMultiServerConfig(
+        List<ServerInfo> servers, AppSettings? settings = null)
     {
         var portMap = new Dictionary<int, ServerInfo>();
         var inbounds = new JsonArray();
         var outbounds = new JsonArray();
-
-        int basePort = 20000;
+        var ports = new List<int>(servers.Count);
 
         for (int i = 0; i < servers.Count; i++)
         {
-            int port = basePort + i;
+            int port = XrayEngine.FindFreePort();
+            ports.Add(port);
             portMap[port] = servers[i];
 
             inbounds.Add(new JsonObject
@@ -352,7 +353,18 @@ public static class XrayConfigBuilder
             outbounds.Add(outbound);
         }
 
-        var routingRules = new JsonArray();
+        outbounds.Add(new JsonObject { ["protocol"] = "freedom", ["tag"] = "direct" });
+        outbounds.Add(new JsonObject { ["protocol"] = "blackhole", ["tag"] = "block" });
+
+        var routingRules = new JsonArray
+        {
+            new JsonObject
+            {
+                ["type"] = "field",
+                ["outboundTag"] = "direct",
+                ["ip"] = new JsonArray("geoip:private")
+            }
+        };
         for (int i = 0; i < servers.Count; i++)
         {
             routingRules.Add(new JsonObject
@@ -374,6 +386,9 @@ public static class XrayConfigBuilder
                 ["rules"] = routingRules
             }
         };
+
+        var dns = BuildDnsObject(settings);
+        if (dns is not null) config["dns"] = dns;
 
         string json = config.ToJsonString(new JsonSerializerOptions
         {

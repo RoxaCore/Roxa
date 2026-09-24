@@ -238,7 +238,7 @@
               
               <!-- Action Buttons -->
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_PingAll}" Command="{Binding TestAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
+                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SpeedAll}" Command="{Binding TestSpeedCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
                 <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsTesting}" VerticalAlignment="Center">
                   <Border Width="120" Height="8" Background="#E5E7EB" CornerRadius="4" ClipToBounds="True" VerticalAlignment="Center">
                     <Border Width="120" Background="#7C3AED" Height="8" CornerRadius="4" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5">
@@ -251,7 +251,7 @@
                   <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Stop}" Command="{Binding StopTestCommand}" Padding="12,8" CornerRadius="8" Background="#FFF5F5" Foreground="#E53E3E" FontSize="12" BorderThickness="0"/>
                 </StackPanel>
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Real}" Command="{Binding TestRealDelayAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
-                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SpeedAll}" Command="{Binding TestSpeedCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
+                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_PingAll}" Command="{Binding TestAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
                 <Button Command="{Binding RemoveDuplicatesCommand}" IsVisible="{Binding HasDuplicates}" Padding="12,8" CornerRadius="8" Background="#FFF5F5" Foreground="#E53E3E" FontSize="12" BorderThickness="0">
                   <StackPanel Orientation="Horizontal" Spacing="4">
                     <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveDupes}"/>
@@ -432,9 +432,11 @@
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                              <Border Background="{Binding PingBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding PingDisplay}" Foreground="{Binding PingTextColor}" FontWeight="SemiBold" FontSize="11"/>
-                              </Border>
+                              <Panel Background="Transparent" ToolTip.Tip="⟳" PointerPressed="PingCell_PointerPressed">
+                                <Border Background="{Binding PingBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                  <TextBlock Text="{Binding PingDisplay}" Foreground="{Binding PingTextColor}" FontWeight="SemiBold" FontSize="11"/>
+                                </Border>
+                              </Panel>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
                         </dg:DataGridTemplateColumn>
@@ -446,19 +448,28 @@
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                              <Border Background="{Binding RealDelayBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding RealDelayDisplay}" Foreground="{Binding RealDelayTextColor}" FontWeight="SemiBold" FontSize="11"/>
-                              </Border>
+                              <Panel Background="Transparent" ToolTip.Tip="⟳" PointerPressed="RealDelayCell_PointerPressed">
+                                <Border Background="{Binding RealDelayBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                  <TextBlock Text="{Binding RealDelayDisplay}" Foreground="{Binding RealDelayTextColor}" FontWeight="SemiBold" FontSize="11"/>
+                                </Border>
+                              </Panel>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
                         </dg:DataGridTemplateColumn>
 
                         <!-- Speed -->
-                        <dg:DataGridTextColumn Binding="{Binding SpeedDisplay, Mode=OneWay}" SortMemberPath="DownloadMbps" Width="110" MinWidth="110" IsReadOnly="True">
-                          <dg:DataGridTextColumn.Header>
+                        <dg:DataGridTemplateColumn SortMemberPath="DownloadMbps" Width="110" MinWidth="110" IsReadOnly="True">
+                          <dg:DataGridTemplateColumn.Header>
                             <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Speed]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Speed]}"/>
-                          </dg:DataGridTextColumn.Header>
-                        </dg:DataGridTextColumn>
+                          </dg:DataGridTemplateColumn.Header>
+                          <dg:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                              <Panel Background="Transparent" ToolTip.Tip="⟳" PointerPressed="SpeedCell_PointerPressed">
+                                <TextBlock Text="{Binding SpeedDisplay, Mode=OneWay}" VerticalAlignment="Center"/>
+                              </Panel>
+                            </DataTemplate>
+                          </dg:DataGridTemplateColumn.CellTemplate>
+                        </dg:DataGridTemplateColumn>
 
                         <!-- Protocol -->
                         <dg:DataGridTextColumn Binding="{Binding ProtocolDisplay}" SortMemberPath="Protocol" Width="110" MinWidth="110" IsReadOnly="True">

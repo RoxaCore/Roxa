@@ -48,7 +48,7 @@
   <data name="Btn_Stop" xml:space="preserve"><value>रोकें</value></data>
   <data name="Btn_UpdateAll" xml:space="preserve"><value>सभी अपडेट करें</value></data>
   <data name="Btn_Update" xml:space="preserve"><value>अपडेट करें</value></data>
-  <data name="Btn_Add" xml:space="preserve"><value>+ जोड़ें</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>जोड़ें</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>सब्सक्रिप्शन हटाएं</value></data>
   <data name="Btn_CopyUrl" xml:space="preserve"><value>लिंक कॉपी करें</value></data>
   <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>बिना प्रॉक्सी अपडेट करें</value></data>

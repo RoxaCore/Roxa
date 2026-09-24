@@ -48,7 +48,7 @@
   <data name="Btn_Stop" xml:space="preserve"><value>停止</value></data>
   <data name="Btn_UpdateAll" xml:space="preserve"><value>全て更新</value></data>
   <data name="Btn_Update" xml:space="preserve"><value>更新</value></data>
-  <data name="Btn_Add" xml:space="preserve"><value>+ 追加</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>追加</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>サブスク削除</value></data>
   <data name="Btn_CopyUrl" xml:space="preserve"><value>リンクをコピー</value></data>
   <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>プロキシなしで更新</value></data>

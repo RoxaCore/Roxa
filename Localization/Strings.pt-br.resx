@@ -48,7 +48,7 @@
   <data name="Btn_Stop" xml:space="preserve"><value>Parar</value></data>
   <data name="Btn_UpdateAll" xml:space="preserve"><value>Atualizar Tudo</value></data>
   <data name="Btn_Update" xml:space="preserve"><value>Atualizar</value></data>
-  <data name="Btn_Add" xml:space="preserve"><value>+ Adicionar</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>Adicionar</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>Remover Assinatura</value></data>
   <data name="Btn_CopyUrl" xml:space="preserve"><value>Copiar Link</value></data>
   <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>Atualizar sem proxy</value></data>

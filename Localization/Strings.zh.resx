@@ -50,7 +50,7 @@
   <data name="Btn_Stop" xml:space="preserve"><value>停止</value></data>
   <data name="Btn_UpdateAll" xml:space="preserve"><value>全部更新</value></data>
   <data name="Btn_Update" xml:space="preserve"><value>更新</value></data>
-  <data name="Btn_Add" xml:space="preserve"><value>+ 添加</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>添加</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>删除订阅</value></data>
   <data name="Btn_CopyUrl" xml:space="preserve"><value>复制链接</value></data>
   <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>无代理更新</value></data>

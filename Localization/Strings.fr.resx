@@ -50,7 +50,7 @@
   <data name="Btn_Stop" xml:space="preserve"><value>Arrêter</value></data>
   <data name="Btn_UpdateAll" xml:space="preserve"><value>Tout Mettre à Jour</value></data>
   <data name="Btn_Update" xml:space="preserve"><value>Mettre à Jour</value></data>
-  <data name="Btn_Add" xml:space="preserve"><value>+ Ajouter</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>Ajouter</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>Supprimer Sub</value></data>
   <data name="Btn_CopyUrl" xml:space="preserve"><value>Copier le Lien</value></data>
   <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>Mettre à jour sans proxy</value></data>

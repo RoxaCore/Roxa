@@ -48,7 +48,7 @@
   <data name="Btn_Stop" xml:space="preserve"><value>중지</value></data>
   <data name="Btn_UpdateAll" xml:space="preserve"><value>전체 업데이트</value></data>
   <data name="Btn_Update" xml:space="preserve"><value>업데이트</value></data>
-  <data name="Btn_Add" xml:space="preserve"><value>+ 추가</value></data>
+  <data name="Btn_Add" xml:space="preserve"><value>추가</value></data>
   <data name="Btn_RemoveSub" xml:space="preserve"><value>구독 삭제</value></data>
   <data name="Btn_CopyUrl" xml:space="preserve"><value>링크 복사</value></data>
   <data name="Btn_UpdateNoProxy" xml:space="preserve"><value>프록시 없이 업데이트</value></data>

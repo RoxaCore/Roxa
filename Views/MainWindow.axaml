@@ -481,12 +481,17 @@
                                   </TextBlock>
                                 </Button>
                                 <!-- Disconnect -->
-                                <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Disconnect}" Height="26" Padding="8,0" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="#FFF5F5" Foreground="#E53E3E" CornerRadius="6" BorderThickness="1" BorderBrush="#E53E3E">
-                                  <TextBlock FontSize="11" FontWeight="SemiBold">
-                                    <TextBlock.Text>
-                                      <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Disconnect" StringFormat="✕  {0}"/>
-                                    </TextBlock.Text>
-                                  </TextBlock>
+                                <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Disconnect}" Height="30" Padding="12,0" Command="{Binding Owner.DisconnectCommand}" IsVisible="{Binding IsActiveConnection}" Background="#E53E3E" Foreground="#FFFFFF" CornerRadius="8" BorderThickness="0">
+                                  <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <Viewbox Width="13" Height="13" VerticalAlignment="Center">
+                                      <Path Data="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10" Stroke="White" StrokeThickness="2.2" StrokeLineCap="Round"/>
+                                    </Viewbox>
+                                    <TextBlock FontSize="12" FontWeight="SemiBold">
+                                      <TextBlock.Text>
+                                        <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Disconnect"/>
+                                      </TextBlock.Text>
+                                    </TextBlock>
+                                  </StackPanel>
                                 </Button>
                                 <!-- More menu -->
                                 <Button Padding="6,4" CornerRadius="6" Background="Transparent" Foreground="#6B7280" FontSize="14" BorderThickness="0" ToolTip.Tip="...">
@@ -529,7 +534,18 @@
             <StackPanel Orientation="Horizontal" Spacing="8">
               <TextBox Text="{Binding SubName, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ph_SubName}" Width="150" Padding="10,8" CornerRadius="6"/>
               <TextBox Text="{Binding SubUrl, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="https://..." Width="400" Padding="10,8" CornerRadius="6"/>
-              <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Add}" Command="{Binding AddSubscriptionCommand}" Padding="16,8" CornerRadius="6" Background="{StaticResource PrimaryBrush}" Foreground="White"/>
+              <Button Command="{Binding AddSubscriptionCommand}" Padding="16,8" CornerRadius="6" Background="{StaticResource PrimaryBrush}" Foreground="White">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <Viewbox Width="13" Height="13">
+                    <Path Data="M12 5v14M5 12h14" Stroke="White" StrokeThickness="2.4" StrokeLineCap="Round"/>
+                  </Viewbox>
+                  <TextBlock FontSize="13">
+                    <TextBlock.Text>
+                      <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Btn_Add"/>
+                    </TextBlock.Text>
+                  </TextBlock>
+                </StackPanel>
+              </Button>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="12">
               <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateAll}" Command="{Binding UpdateSubscriptionsCommand}" Padding="12,8" CornerRadius="6"/>
@@ -558,9 +574,24 @@
                           </Border>
                         </Border>
                       </StackPanel>
-                      <Button Grid.Column="1" Content="📋" Padding="8" Margin="12,0,0,0" Command="{Binding #RootWindow.DataContext.CopySubscriptionUrlCommand}" CommandParameter="{Binding}" ToolTip.Tip="کپی لینک"/>
-                      <Button Grid.Column="2" Content="🔄" Padding="8" Margin="4,0,0,0" Command="{Binding #RootWindow.DataContext.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding}"/>
-                      <Button Grid.Column="3" Content="🗑️" Padding="8" Margin="8,0,0,0" Command="{Binding #RootWindow.DataContext.RemoveSubscriptionCommand}" CommandParameter="{Binding}"/>
+                      <Button Grid.Column="1" Padding="0" Width="32" Height="32" Margin="12,0,0,0" CornerRadius="8" Background="#EEF2FF" BorderThickness="0" Command="{Binding #RootWindow.DataContext.CopySubscriptionUrlCommand}" CommandParameter="{Binding}" ToolTip.Tip="کپی لینک">
+                        <Viewbox Width="15" Height="15">
+                          <Path Data="M8 8h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1"
+                                Fill="Transparent" Stroke="#4F46E5" StrokeThickness="2"/>
+                        </Viewbox>
+                      </Button>
+                      <Button Grid.Column="2" Padding="0" Width="32" Height="32" Margin="4,0,0,0" CornerRadius="8" Background="#FFF7ED" BorderThickness="0" Command="{Binding #RootWindow.DataContext.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding}" ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}">
+                        <Viewbox Width="15" Height="15">
+                          <Path Data="M21 4v6h-6M3 20v-6h6M4.5 9a9 9 0 0 1 15-3.4L21 9M3 15l1.5 3.4A9 9 0 0 0 19.5 15"
+                                Fill="Transparent" Stroke="#EA580C" StrokeThickness="2" StrokeLineCap="Round"/>
+                        </Viewbox>
+                      </Button>
+                      <Button Grid.Column="3" Padding="0" Width="32" Height="32" Margin="4,0,8,0" CornerRadius="8" Background="#FEF2F2" BorderThickness="0" Command="{Binding #RootWindow.DataContext.RemoveSubscriptionCommand}" CommandParameter="{Binding}" ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveSub}">
+                        <Viewbox Width="15" Height="15">
+                          <Path Data="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6"
+                                Fill="Transparent" Stroke="#DC2626" StrokeThickness="2" StrokeLineCap="Round"/>
+                        </Viewbox>
+                      </Button>
                     </Grid>
                   </Border>
                 </DataTemplate>

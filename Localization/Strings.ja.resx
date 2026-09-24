@@ -75,6 +75,7 @@
   <data name="Ctx_TestReal" xml:space="preserve"><value>実際の遅延テスト</value></data>
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>速度テスト</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>サーバー削除</value></data>
+  <data name="Ctx_ClearSel" xml:space="preserve"><value>選択を解除</value></data>
   <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess追加</value></data>
   <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS追加</value></data>
   <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks追加</value></data>

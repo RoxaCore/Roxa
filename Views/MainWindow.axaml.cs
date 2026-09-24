@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using XrayClient.Core;
 using XrayClient.Models;
 using XrayClient.ViewModels;
@@ -239,6 +240,52 @@ public partial class MainWindow : Window
                 }
             }
         }
+    }
+
+    private static ServerInfo? FindServerFromVisual(object? source)
+    {
+        if (source is not Visual v) return null;
+        for (var cur = v; cur != null; cur = cur.GetVisualParent())
+        {
+            if (cur is DataGridRow row && row.DataContext is ServerInfo server)
+                return server;
+        }
+        return null;
+    }
+
+    private void ServerGrid_ContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if (sender is not DataGrid grid) return;
+        var server = FindServerFromVisual(e.Source);
+        if (server == null) return;
+
+        var selected = grid.SelectedItems?.OfType<ServerInfo>().ToList() ?? new List<ServerInfo>();
+        bool multi = selected.Count > 1 && selected.Contains(server);
+
+        ContextMenu menu;
+        if (multi)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                foreach (var s in vm.Servers)
+                    s.IsChecked = selected.Contains(s);
+                vm.UpdateSelectedCount();
+            }
+            menu = (ContextMenu)this.FindResource("MultiServerContextMenu")!;
+        }
+        else
+        {
+            if (!selected.Contains(server) || selected.Count > 1)
+                grid.SelectedItem = server;
+            menu = (ContextMenu)this.FindResource("ServerRowContextMenu")!;
+        }
+
+        menu.DataContext = server;
+        e.Handled = true;
+        if (e.Source is Control target)
+            menu.Open(target);
+        else
+            menu.Open(grid);
     }
 
     private void SetupResizeHandles()

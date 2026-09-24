@@ -75,6 +75,7 @@
   <data name="Ctx_TestReal"><value>Test de Retraso Real</value></data>
   <data name="Ctx_TestSpeed"><value>Test de Velocidad</value></data>
   <data name="Ctx_Delete"><value>Eliminar Servidor</value></data>
+  <data name="Ctx_ClearSel"><value>Limpiar selección</value></data>
   <data name="Add_VMess"><value>🟢 Añadir VMess</value></data>
   <data name="Add_VLESS"><value>🔵 Añadir VLESS</value></data>
   <data name="Add_SS"><value>🟠 Añadir Shadowsocks</value></data>

@@ -81,6 +81,7 @@
   <data name="Ctx_TestReal" xml:space="preserve"><value>测试实际延迟</value></data>
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>测试速度</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>删除服务器</value></data>
+  <data name="Ctx_ClearSel" xml:space="preserve"><value>清除选择</value></data>
   <!-- Add Menu -->
   <data name="Add_VMess" xml:space="preserve"><value>🟢 添加 VMess</value></data>
   <data name="Add_VLESS" xml:space="preserve"><value>🔵 添加 VLESS</value></data>

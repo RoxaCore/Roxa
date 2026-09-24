@@ -89,6 +89,7 @@
   <data name="Ctx_TestReal" xml:space="preserve"><value>تأخیر واقعی</value></data>
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>تست سرعت</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>حذف سرور</value></data>
+  <data name="Ctx_ClearSel" xml:space="preserve"><value>لغو انتخاب</value></data>
   <!-- Add Menu -->
   <data name="Add_VMess" xml:space="preserve"><value>🟢 افزودن VMess</value></data>
   <data name="Add_VLESS" xml:space="preserve"><value>🔵 افزودن VLESS</value></data>

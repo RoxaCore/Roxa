@@ -75,6 +75,7 @@
   <data name="Ctx_TestReal" xml:space="preserve"><value>اصل تاخیر ٹیسٹ</value></data>
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>رفتار ٹیسٹ</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>سرور حذف</value></data>
+  <data name="Ctx_ClearSel" xml:space="preserve"><value>انتخاب صاف کریں</value></data>
   <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess شامل کریں</value></data>
   <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS شامل کریں</value></data>
   <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks شامل کریں</value></data>

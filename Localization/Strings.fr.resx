@@ -81,6 +81,7 @@
   <data name="Ctx_TestReal" xml:space="preserve"><value>Test de Délai Réel</value></data>
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>Test de Vitesse</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>Supprimer le Serveur</value></data>
+  <data name="Ctx_ClearSel" xml:space="preserve"><value>Effacer la sélection</value></data>
 
   <data name="Add_VMess" xml:space="preserve"><value>🟢 Ajouter VMess</value></data>
   <data name="Add_VLESS" xml:space="preserve"><value>🔵 Ajouter VLESS</value></data>

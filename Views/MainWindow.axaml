@@ -53,6 +53,15 @@
       <Separator/>
       <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Delete}" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Foreground="{StaticResource ErrorBrush}"/>
     </ContextMenu>
+
+    <ContextMenu x:Key="MultiServerContextMenu" x:DataType="models:ServerInfo" Padding="4">
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestPing}" Command="{Binding Owner.TestSelectedCommand}"/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestReal}" Command="{Binding Owner.TestRealDelaySelectedCommand}"/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_TestSpeed}" Command="{Binding Owner.TestSelectedSpeedCommand}"/>
+      <Separator/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Delete}" Command="{Binding Owner.RemoveSelectedCommand}" Foreground="{StaticResource ErrorBrush}"/>
+      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_ClearSel}" Command="{Binding Owner.ClearSelectionCommand}"/>
+    </ContextMenu>
   </Window.Resources>
 
   <Grid RowDefinitions="Auto,*" Background="#F7F8FA">
@@ -312,9 +321,10 @@
                                  CanUserReorderColumns="True"
                                  GridLinesVisibility="Horizontal"
                                  HeadersVisibility="Column"
-                                 SelectionMode="Single"
+                                 SelectionMode="Extended"
                                  SelectedItem="{Binding Owner.SelectedServer, Mode=TwoWay}"
                                  IsReadOnly="False"
+                                 ContextRequested="ServerGrid_ContextRequested"
                                  Background="Transparent"
                                  BorderThickness="0"
                                  RowBackground="Transparent"
@@ -377,7 +387,18 @@
                       </dg:DataGrid.Styles>
                       <dg:DataGrid.Columns>
                         <!-- Select -->
-                        <dg:DataGridCheckBoxColumn Binding="{Binding IsChecked, Mode=TwoWay}" Width="40"/>
+                        <dg:DataGridTemplateColumn Width="40" IsReadOnly="False" SortMemberPath="IsChecked">
+                          <dg:DataGridTemplateColumn.Header>
+                            <TextBlock Text="✓" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#0E7C6B"/>
+                          </dg:DataGridTemplateColumn.Header>
+                          <dg:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="models:ServerInfo">
+                              <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        MinWidth="0" Padding="0" Margin="0"/>
+                            </DataTemplate>
+                          </dg:DataGridTemplateColumn.CellTemplate>
+                        </dg:DataGridTemplateColumn>
 
                         <!-- Name + flag -->
                         <dg:DataGridTemplateColumn Width="*" SortMemberPath="Name" MinWidth="120">
@@ -385,9 +406,8 @@
                             <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Name]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Name]}"/>
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
-                                          ContextMenu="{StaticResource ServerRowContextMenu}">
+                            <DataTemplate x:DataType="models:ServerInfo">
+                              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                                 <Ellipse Width="8" Height="8" Fill="{Binding StatusColor}" VerticalAlignment="Center"/>
                                 <Image Width="18" Height="13" VerticalAlignment="Center"
                                        Source="{Binding CountryCode, Converter={x:Static converters:FlagToImageConverter.Instance}}"/>

@@ -75,6 +75,7 @@
   <data name="Ctx_TestReal" xml:space="preserve"><value>실제 지연 테스트</value></data>
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>속도 테스트</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>서버 삭제</value></data>
+  <data name="Ctx_ClearSel" xml:space="preserve"><value>선택 해제</value></data>
   <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess 추가</value></data>
   <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS 추가</value></data>
   <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks 추가</value></data>

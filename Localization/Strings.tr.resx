@@ -181,6 +181,9 @@
   <data name="Ctx_Delete" xml:space="preserve">
     <value>🗑️ Sunucuyu Sil</value>
   </data>
+  <data name="Ctx_ClearSel" xml:space="preserve">
+    <value>Seçimi Temizle</value>
+  </data>
 
   <!-- Add Methods -->
   <data name="Add_Link" xml:space="preserve">

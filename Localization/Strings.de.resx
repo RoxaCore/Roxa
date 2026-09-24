@@ -75,6 +75,7 @@
   <data name="Ctx_TestReal" xml:space="preserve"><value>Realen Verzögerungstest</value></data>
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>Geschwindigkeitstest</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>Server löschen</value></data>
+  <data name="Ctx_ClearSel" xml:space="preserve"><value>Auswahl aufheben</value></data>
   <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess hinzufügen</value></data>
   <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS hinzufügen</value></data>
   <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks hinzufügen</value></data>

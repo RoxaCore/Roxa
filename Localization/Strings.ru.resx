@@ -81,6 +81,7 @@
   <data name="Ctx_TestReal" xml:space="preserve"><value>Реальная задержка</value></data>
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>Тест скорости</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>Удалить сервер</value></data>
+  <data name="Ctx_ClearSel" xml:space="preserve"><value>Снять выделение</value></data>
   <!-- Add Menu -->
   <data name="Add_VMess" xml:space="preserve"><value>🟢 Добавить VMess</value></data>
   <data name="Add_VLESS" xml:space="preserve"><value>🔵 Добавить VLESS</value></data>

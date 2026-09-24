@@ -23,7 +23,7 @@ public static class RealDelayTester
     private const int WarmupBudgetMs = 6000;
     private const int WarmupSkipThresholdMs = 300;
     private const int EngineStartTimeoutMs = 5000;
-    private const int BatchHttpConcurrency = 3;
+    private const int BatchHttpConcurrency = 8;
 
     private static readonly TimeSpan SessionUrlTtl = TimeSpan.FromSeconds(90);
     private static readonly object SessionUrlLock = new();

@@ -6,6 +6,7 @@ public class SubscriptionInfo : System.ComponentModel.INotifyPropertyChanged
     private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
 
     private static readonly string[] Units = ["B", "KB", "MB", "GB", "TB"];
+    private static readonly string[] UnitsFa = ["بایت", "کیلوبایت", "مگابایت", "گیگابایت", "ترابایت"];
 
     public string Name { get; set; } = "";
     public string Url { get; set; } = "";
@@ -30,8 +31,31 @@ public class SubscriptionInfo : System.ComponentModel.INotifyPropertyChanged
         get
         {
             if (DataLimit <= 0) return "";
-            return $"{FormatBytes(UsedTraffic)} / {FormatBytes(DataLimit)}";
+            int totalUnit = UnitIndex(DataLimit);
+            string totalVal = ValueText(DataLimit, totalUnit);
+            if (UsedTraffic <= 0)
+                return $"حجم مصرفی 0 از {totalVal} {UnitsFa[totalUnit]}";
+            int usedUnit = UnitIndex(UsedTraffic);
+            string usedVal = ValueText(UsedTraffic, usedUnit);
+            return usedUnit == totalUnit
+                ? $"حجم مصرفی {usedVal} از {totalVal} {UnitsFa[totalUnit]}"
+                : $"حجم مصرفی {usedVal} {UnitsFa[usedUnit]} از {totalVal} {UnitsFa[totalUnit]}";
         }
+    }
+
+    private static int UnitIndex(long bytes)
+    {
+        double val = bytes;
+        int unit = 0;
+        while (val >= 1024 && unit < Units.Length - 1) { val /= 1024; unit++; }
+        return unit;
+    }
+
+    private static string ValueText(long bytes, int unit)
+    {
+        double val = bytes;
+        for (int i = 0; i < unit; i++) val /= 1024;
+        return val.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
     }
 
     public double TrafficPercent
@@ -66,15 +90,6 @@ public class SubscriptionInfo : System.ComponentModel.INotifyPropertyChanged
             if (remaining.TotalDays < 30) return $"{(int)remaining.TotalDays} روز باقی‌مانده";
             return ExpireDate.ToString("yyyy/MM/dd");
         }
-    }
-
-    private static string FormatBytes(long bytes)
-    {
-        if (bytes <= 0) return "0 B";
-        double val = bytes;
-        int unit = 0;
-        while (val >= 1024 && unit < Units.Length - 1) { val /= 1024; unit++; }
-        return $"{val:F2} {Units[unit]}";
     }
 }
 

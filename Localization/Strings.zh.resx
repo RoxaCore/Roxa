@@ -186,7 +186,7 @@
   <data name="Header_Address" xml:space="preserve"><value>地址</value></data>
   <data name="Header_Port" xml:space="preserve"><value>端口</value></data>
   <data name="Header_Sub" xml:space="preserve"><value>订阅</value></data>
-  <data name="ServerCount" xml:space="preserve"><value>服务器数量：{0}</value></data>
+  <data name="ServerCount" xml:space="preserve"><value>{0} 台服务器</value></data>
   <!-- Display -->
   <data name="Status_Failed" xml:space="preserve"><value>失败</value></data>
   <data name="Status_Error" xml:space="preserve"><value>错误</value></data>

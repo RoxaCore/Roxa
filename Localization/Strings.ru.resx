@@ -186,7 +186,7 @@
   <data name="Header_Address" xml:space="preserve"><value>Адрес</value></data>
   <data name="Header_Port" xml:space="preserve"><value>Порт</value></data>
   <data name="Header_Sub" xml:space="preserve"><value>Подписка</value></data>
-  <data name="ServerCount" xml:space="preserve"><value>Серверов: {0}</value></data>
+  <data name="ServerCount" xml:space="preserve"><value>{0} серверов</value></data>
   <!-- Display -->
   <data name="Status_Failed" xml:space="preserve"><value>Ошибка</value></data>
   <data name="Status_Error" xml:space="preserve"><value>Ошибка</value></data>

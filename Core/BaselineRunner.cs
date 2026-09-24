@@ -55,6 +55,11 @@ public static class BaselineRunner
             if (args[i] == "--baseline-runs" && int.TryParse(args[i + 1], out var n) && n > 0)
                 runs = n;
 
+        int gapBetweenRunsMs = 0;
+        for (int i = 0; i < args.Length - 1; i++)
+            if (args[i] == "--run-gap-ms" && int.TryParse(args[i + 1], out var g) && g >= 0)
+                gapBetweenRunsMs = g;
+
         string algorithm = args.Contains("--validate") ? "v2" : "baseline-v1";
         string baselinePath = Path.Combine(Storage.DataDir, "real-delay-baseline.json");
         string outPath = args.Contains("--validate")
@@ -130,6 +135,11 @@ public static class BaselineRunner
                 .OrderBy(x => picked.FindIndex(p => p.Id == x.Id))
                 .ToList();
             report.Data.Add(run);
+            if (r < runs && gapBetweenRunsMs > 0 && !ct.IsCancellationRequested)
+            {
+                Console.WriteLine($"  gap {gapBetweenRunsMs}ms before next run...");
+                await Task.Delay(gapBetweenRunsMs, ct);
+            }
         }
 
         report.Analysis = Analyze(report, picked);

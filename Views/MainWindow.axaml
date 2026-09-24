@@ -111,14 +111,18 @@
               وصل نیستید
             </TextBlock>
             <!-- Server Name (when connected) -->
-            <TextBlock Text="{Binding HomeShortName}" FontSize="13" FontWeight="SemiBold" Foreground="#1A1A1A" MaxWidth="120" TextTrimming="CharacterEllipsis" Margin="0,0,0,2" IsVisible="{Binding IsConnected}"/>
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,2" IsVisible="{Binding IsConnected}">
+              <TextBlock Text="{Binding HomeProtocol}" FontSize="11" FontWeight="SemiBold" Foreground="#7C3AED" VerticalAlignment="Center"/>
+              <TextBlock Text="{Binding HomeShortName}" FontSize="13" FontWeight="SemiBold" Foreground="#1A1A1A" MaxWidth="120" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+              <TextBlock Text="{Binding HomeIp}" FontSize="11" Foreground="#888888" VerticalAlignment="Center"/>
+            </StackPanel>
             <!-- Live Speed (always visible) -->
             <StackPanel Orientation="Horizontal" Spacing="10" Opacity="{Binding SpeedBlinkOpacity}">
-              <TextBlock FontSize="10" Foreground="#888888">
+              <TextBlock FontSize="10" Foreground="{Binding IsConnected, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#0E7C6B,#888888'}">
                 <Run Text="↓"/>
                 <Run Text="{Binding LiveDownSpeed, Mode=OneWay, FallbackValue='0 B/s'}"/>
               </TextBlock>
-              <TextBlock FontSize="10" Foreground="#888888">
+              <TextBlock FontSize="10" Foreground="{Binding IsConnected, Converter={x:Static converters:BoolToBrushConverter.Instance}, ConverterParameter='#0E7C6B,#888888'}">
                 <Run Text="↑"/>
                 <Run Text="{Binding LiveUpSpeed, Mode=OneWay, FallbackValue='0 B/s'}"/>
               </TextBlock>
@@ -136,7 +140,7 @@
                     <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
                   </Border.RenderTransform>
                 </Border>
-                <Border Background="#5B21B6" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5" IsVisible="{Binding IsConnected}">
+                <Border Background="#5B21B6" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5" IsVisible="{Binding IsFindingBetter}">
                   <Border.RenderTransform>
                     <ScaleTransform ScaleX="{Binding SearchProgressPercent}"/>
                   </Border.RenderTransform>

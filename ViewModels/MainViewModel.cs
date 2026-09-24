@@ -130,6 +130,8 @@ public partial class MainViewModel : ViewModelBase
 
     public string HomeServerName => SelectedServer?.Name ?? "سروری انتخاب نشده";
     public string HomeShortName => SelectedServer?.ShortName ?? "";
+    public string HomeProtocol => SelectedServer != null ? SelectedServer.Protocol.ToString().ToLowerInvariant() : "";
+    public string HomeIp => SelectedServer?.Address ?? "";
     public string HomeFlag => SelectedServer?.Flag ?? "🌐";
     public string HomeAddress => SelectedServer != null ? $"{SelectedServer.Address}:{SelectedServer.Port}" : "";
     public string HomeLatency => SelectedServer?.LatencyDisplay ?? "";
@@ -285,6 +287,8 @@ public partial class MainViewModel : ViewModelBase
             s.IsSelected = ReferenceEquals(s, value);
         OnPropertyChanged(nameof(HomeServerName));
         OnPropertyChanged(nameof(HomeShortName));
+        OnPropertyChanged(nameof(HomeProtocol));
+        OnPropertyChanged(nameof(HomeIp));
         OnPropertyChanged(nameof(HomeFlag));
         OnPropertyChanged(nameof(HomeAddress));
         OnPropertyChanged(nameof(HomeLatency));
@@ -904,6 +908,8 @@ public partial class MainViewModel : ViewModelBase
             SaveServers();
             OnPropertyChanged(nameof(HomeServerName));
             OnPropertyChanged(nameof(HomeShortName));
+            OnPropertyChanged(nameof(HomeProtocol));
+            OnPropertyChanged(nameof(HomeIp));
             OnPropertyChanged(nameof(HomeFlag));
             OnPropertyChanged(nameof(HomeAddress));
             AppendLog($"«{server.Name}» ویرایش شد.");

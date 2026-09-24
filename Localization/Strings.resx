@@ -206,7 +206,7 @@
   <data name="Card_Edit" xml:space="preserve"><value>ویرایش</value></data>
   <data name="Card_Share" xml:space="preserve"><value>اشتراک</value></data>
   <data name="Card_Delete" xml:space="preserve"><value>حذف</value></data>
-  <data name="Card_Connected" xml:space="preserve"><value>متصل</value></data>
+  <data name="Card_Connected" xml:space="preserve"><value>وصل هستید</value></data>
   <!-- System Tray -->
   <data name="Tray_Show" xml:space="preserve"><value>نمایش</value></data>
   <data name="Tray_SmartConnect" xml:space="preserve"><value>⚡ اتصال هوشمند</value></data>

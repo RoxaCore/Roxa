@@ -189,6 +189,15 @@ public partial class ServerInfo : ObservableObject
     [JsonIgnore]
     public string SpeedDisplay => DownloadMbps < 0 ? "—" : $"{DownloadMbps:F1} Mb/s";
 
+    [JsonIgnore]
+    public bool ShowSpeedTest => DownloadMbps < 0;
+
+    [JsonIgnore]
+    public bool ShowPingTest => PingMs == -1;
+
+    [JsonIgnore]
+    public bool ShowRealDelayTest => RealDelayMs == -1;
+
     [JsonIgnore] public string Flag => Core.GeoFlags.FlagEmoji(CountryCode);
 
     [JsonIgnore]
@@ -327,9 +336,9 @@ public partial class ServerInfo : ObservableObject
     [JsonIgnore] public string LastTestedDisplay => LastTested == DateTime.MinValue ? "" : LastTested.ToString("HH:mm dd/MM");
 
     partial void OnLatencyMsChanged(int value) { OnPropertyChanged(nameof(LatencyDisplay)); OnPropertyChanged(nameof(LatencyColor)); OnPropertyChanged(nameof(HasLatency)); OnPropertyChanged(nameof(LatencyBgColor)); OnPropertyChanged(nameof(StatusColor)); }
-    partial void OnPingMsChanged(int value) { OnPropertyChanged(nameof(PingDisplay)); OnPropertyChanged(nameof(PingSortKey)); OnPropertyChanged(nameof(PingBgColor)); OnPropertyChanged(nameof(PingTextColor)); }
-    partial void OnRealDelayMsChanged(int value) { OnPropertyChanged(nameof(RealDelayDisplay)); OnPropertyChanged(nameof(RealDelaySortKey)); OnPropertyChanged(nameof(RealDelayBgColor)); OnPropertyChanged(nameof(RealDelayTextColor)); }
-    partial void OnDownloadMbpsChanged(double value) => OnPropertyChanged(nameof(SpeedDisplay));
+    partial void OnPingMsChanged(int value) { OnPropertyChanged(nameof(PingDisplay)); OnPropertyChanged(nameof(PingSortKey)); OnPropertyChanged(nameof(PingBgColor)); OnPropertyChanged(nameof(PingTextColor)); OnPropertyChanged(nameof(ShowPingTest)); }
+    partial void OnRealDelayMsChanged(int value) { OnPropertyChanged(nameof(RealDelayDisplay)); OnPropertyChanged(nameof(RealDelaySortKey)); OnPropertyChanged(nameof(RealDelayBgColor)); OnPropertyChanged(nameof(RealDelayTextColor)); OnPropertyChanged(nameof(ShowRealDelayTest)); }
+    partial void OnDownloadMbpsChanged(double value) { OnPropertyChanged(nameof(SpeedDisplay)); OnPropertyChanged(nameof(ShowSpeedTest)); }
     partial void OnCountryCodeChanged(string value) { OnPropertyChanged(nameof(Flag)); OnPropertyChanged(nameof(ShortName)); }
     partial void OnIsCheckedChanged(bool value) => Owner?.UpdateSelectedCount();
     partial void OnIsActiveConnectionChanged(bool value) => OnPropertyChanged(nameof(StatusColor));

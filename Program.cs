@@ -11,10 +11,12 @@ sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        if (args.Length > 0 && (args[0] == "--baseline" || args[0] == "--validate"))
+        if (args.Length > 0 && (args[0] == "--baseline" || args[0] == "--validate" || args[0] == "--speed"))
         {
             var ct = new CancellationTokenSource().Token;
-            int code = Core.BaselineRunner.RunAsync(args, ct).GetAwaiter().GetResult();
+            int code = args[0] == "--speed"
+                ? Core.SpeedRunner.RunAsync(args, ct).GetAwaiter().GetResult()
+                : Core.BaselineRunner.RunAsync(args, ct).GetAwaiter().GetResult();
             Environment.Exit(code);
             return;
         }

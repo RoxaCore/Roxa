@@ -1149,62 +1149,31 @@ public partial class MainViewModel : ViewModelBase
 
             AppendLog($"Smart connect: {candidates.Count} candidates selected (best: {candidates[0].LatencyDisplay})");
 
-            // --- مرحله ۲: تأخیر واقعی یکی یکی ---
+            // --- مرحله ۲: تأخیر واقعی batch (multi-outbound) ---
             Status = $"اتصال هوشمند: تأخیر واقعی {candidates.Count} کاندید ...";
-            AppendLog($"Smart connect: testing {candidates.Count} candidates one by one");
+            AppendLog($"Smart connect: testing {candidates.Count} candidates via batch multi-outbound");
 
-            foreach (var candidate in candidates)
+            foreach (var c in candidates) { c.RealDelayMs = -1; c.RealDelaySuccessRate = -1; c.RealDelayJitter = 0; }
+
+            try
             {
-                if (ct.IsCancellationRequested) break;
-
-                try
+                await RealDelayTester.TestBatchAsync(candidates, ct, (s, result) =>
                 {
-                    AppendLog($"Smart connect: testing {candidate.Name} ...");
-                    tested++;
-                    Post(() => { SearchTestedCount = tested; OnPropertyChanged(nameof(SearchProgressText)); });
-
-                    var testEngine = new XrayEngine();
-                    try
-                    {
-                        int socks = XrayEngine.FindFreePort();
-                        int http = XrayEngine.FindFreePort();
-                        string cfg = XrayConfigBuilder.Build(candidate, socks, http);
-                        await testEngine.StartWithConfigAsync(cfg, http, ct);
-
-                        using var handler = new HttpClientHandler { Proxy = new System.Net.WebProxy($"http://127.0.0.1:{http}"), UseProxy = true };
-                        using var http2 = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
-
-                        var sw = Stopwatch.StartNew();
-                        using var resp = await http2.GetAsync("http://www.gstatic.com/generate_204", ct);
-                        sw.Stop();
-
-                        if (resp.IsSuccessStatusCode)
-                        {
-                            int ms = (int)sw.ElapsedMilliseconds;
-                            AppendLog($"Smart connect: {candidate.Name} → {ms}ms");
-                            Post(() => candidate.RecordRealDelay(ms));
-                        }
-                        else
-                        {
-                            AppendLog($"Smart connect: {candidate.Name} → failed (status {resp.StatusCode})");
-                            Post(() => candidate.RecordRealDelay(-2));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        AppendLog($"Smart connect: {candidate.Name} → error: {ex.Message}");
-                        Post(() => candidate.RecordRealDelay(-2));
-                    }
-                    finally
-                    {
-                        try { testEngine.Stop(); testEngine.Dispose(); } catch { }
-                    }
-                }
-                catch (OperationCanceledException) { break; }
+                    Post(() => s.RecordRealDelay(result));
+                    int done = Interlocked.Increment(ref tested);
+                    Post(() => { SearchTestedCount = done; OnPropertyChanged(nameof(SearchProgressText)); });
+                });
             }
+            catch (OperationCanceledException) { }
 
-            // --- انتخاب نهایی ---
-            var finalBest = candidates.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).FirstOrDefault();
+            await Dispatcher.UIThread.InvokeAsync(() => { });
+
+            // --- انتخاب نهایی: کمترین تأخیر واقعی ---
+            var finalBest = candidates
+                .Where(s => s.RealDelayMs > 0 && s.LatencyMs > 0)
+                .OrderBy(s => s.RealDelayMs)
+                .ThenBy(s => s.LatencyMs)
+                .FirstOrDefault();
 
             IsTesting = false;
             IsSmartConnecting = false;
@@ -1348,65 +1317,31 @@ public partial class MainViewModel : ViewModelBase
 
             AppendLog($"Find better: {survivors.Count} survivors, starting real delay test");
 
-            // --- مرحله ۲: تأخیر واقعی ---
-            ServerInfo? bestCandidate = null;
-            int bestMs = int.MaxValue;
-            foreach (var candidate in survivors)
+            // --- مرحله ۲: تأخیر واقعی batch (multi-outbound) ---
+            AppendLog($"Find better: testing {survivors.Count} survivors via batch multi-outbound");
+
+            foreach (var c in survivors) { c.RealDelayMs = -1; c.RealDelaySuccessRate = -1; c.RealDelayJitter = 0; }
+
+            try
             {
-                if (ct.IsCancellationRequested) break;
-
-                try
+                await RealDelayTester.TestBatchAsync(survivors, ct, (s, result) =>
                 {
-                    AppendLog($"Find better: testing {candidate.Name} ...");
-                    tested++;
-                    Post(() => { SearchTestedCount = tested; OnPropertyChanged(nameof(SearchProgressText)); });
-
-                    var testEngine = new XrayEngine();
-                    try
-                    {
-                        int socks = XrayEngine.FindFreePort();
-                        int http = XrayEngine.FindFreePort();
-                        string cfg = XrayConfigBuilder.Build(candidate, socks, http);
-                        await testEngine.StartWithConfigAsync(cfg, http, ct);
-
-                        using var handler = new HttpClientHandler { Proxy = new System.Net.WebProxy($"http://127.0.0.1:{http}"), UseProxy = true };
-                        using var http2 = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
-
-                        var sw = Stopwatch.StartNew();
-                        using var resp = await http2.GetAsync("http://www.gstatic.com/generate_204", ct);
-                        sw.Stop();
-
-                        if (resp.IsSuccessStatusCode)
-                        {
-                            int ms = (int)sw.ElapsedMilliseconds;
-                            AppendLog($"Find better: {candidate.Name} → {ms}ms");
-                            Post(() => candidate.RecordRealDelay(ms));
-
-                            if (bestCandidate == null || ms < bestMs)
-                            {
-                                bestCandidate = candidate;
-                                bestMs = ms;
-                            }
-                        }
-                        else
-                        {
-                            Post(() => candidate.RecordRealDelay(-2));
-                        }
-                    }
-                    catch
-                    {
-                        Post(() => candidate.RecordRealDelay(-2));
-                    }
-                    finally
-                    {
-                        try { testEngine.Stop(); testEngine.Dispose(); } catch { }
-                    }
-                }
-                catch (OperationCanceledException) { break; }
+                    Post(() => s.RecordRealDelay(result));
+                    int done = Interlocked.Increment(ref tested);
+                    Post(() => { SearchTestedCount = done; OnPropertyChanged(nameof(SearchProgressText)); });
+                });
             }
+            catch (OperationCanceledException) { }
 
             // اجرای Post های باقی‌مانده UI قبل از مقایسه
             await Dispatcher.UIThread.InvokeAsync(() => { });
+
+            var bestCandidate = survivors
+                .Where(s => s.RealDelayMs > 0)
+                .OrderBy(s => s.RealDelayMs)
+                .ThenBy(s => s.LatencyMs)
+                .FirstOrDefault();
+            int bestMs = bestCandidate?.RealDelayMs ?? int.MaxValue;
 
             // --- مقایسه با سرور فعلی ---
             if (bestCandidate != null && bestMs < int.MaxValue)

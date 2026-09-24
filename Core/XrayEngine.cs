@@ -203,7 +203,8 @@ public sealed class XrayEngine : IDisposable
         SocksPort = FindFreePort();
         HttpPort = FindFreePort();
         string configJson = XrayConfigBuilder.Build(server, SocksPort, HttpPort, settings);
-        string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-config-{Guid.NewGuid():N}.json");
+        // Keep temp config for diagnosis (diff vs external client configs)
+        string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-config-{server.Id}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
         RestrictTempFile(configPath);
 
@@ -255,9 +256,10 @@ public sealed class XrayEngine : IDisposable
             }
             Log($"Connected. HTTP 127.0.0.1:{HttpPort}  SOCKS 127.0.0.1:{SocksPort} {(useTun ? "[TUN]" : "")}");
         }
-        finally
+        catch
         {
-            CleanupTempConfig(configPath);
+            // keep config on failure for diagnosis
+            throw;
         }
     }
 

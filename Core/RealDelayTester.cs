@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Text.Json;
 using XrayClient.Models;
 
 namespace XrayClient.Core;
@@ -30,6 +31,9 @@ public static class RealDelayTester
     {
         var extra = new Dictionary<string, string>();
         var engine = new XrayEngine();
+        var rawLog = new List<string>();
+        var swTotal = Stopwatch.StartNew();
+        int tcpWaitMs = 0, warmupTotalMs = 0, samplesPhaseMs = 0, disposeMs = 0;
         try
         {
             if (ct.IsCancellationRequested) return TestResult.Cancelled(extra);
@@ -49,15 +53,23 @@ public static class RealDelayTester
             {
                 return TestResult.Fail(TestStatus.Timeout, extra);
             }
-            catch
+            catch (Exception ex)
             {
+                extra["startup_error"] = Trunc(ex.Message);
                 return TestResult.Fail(TestStatus.Error, extra);
             }
             swStartup.Stop();
             extra["startup_ms"] = ((int)swStartup.ElapsedMilliseconds).ToString();
 
+            var swTcp = Stopwatch.StartNew();
             if (!await WaitTcpAsync(engine.HttpPort, TcpWaitTimeoutMs, ct))
-                return TestResult.Fail(TestStatus.Timeout, extra);
+            {
+                swTcp.Stop();
+                tcpWaitMs = (int)swTcp.ElapsedMilliseconds;
+                return FailWithPhases(extra, rawLog, swTotal, tcpWaitMs, warmupTotalMs, samplesPhaseMs, disposeMs, "tcp_wait_timeout");
+            }
+            swTcp.Stop();
+            tcpWaitMs = (int)swTcp.ElapsedMilliseconds;
             if (ct.IsCancellationRequested) return TestResult.Cancelled(extra);
 
             using var httpCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
@@ -80,6 +92,7 @@ public static class RealDelayTester
             string? chosenUrl = null;
             int warmupMs = 0;
             var warmupBudget = Stopwatch.StartNew();
+            var swWarmup = Stopwatch.StartNew();
             foreach (var url in WarmupUrls)
             {
                 if (ct.IsCancellationRequested) return TestResult.Cancelled(extra);
@@ -87,7 +100,11 @@ public static class RealDelayTester
 
                 int elapsedBudget = (int)warmupBudget.ElapsedMilliseconds;
                 int remaining = WarmupBudgetMs - elapsedBudget;
-                if (remaining < WarmupSkipThresholdMs) break;
+                if (remaining < WarmupSkipThresholdMs)
+                {
+                    rawLog.Add($"warmup skip remaining={remaining}");
+                    break;
+                }
 
                 int urlTimeout = Math.Min(PerRequestTimeoutMs, remaining);
                 using var urlCts = CancellationTokenSource.CreateLinkedTokenSource(httpCts.Token);
@@ -98,7 +115,9 @@ public static class RealDelayTester
                 {
                     using var resp = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, urlCts.Token);
                     var elapsed = ElapsedMs(t0);
-                    if ((int)resp.StatusCode == 204)
+                    int code = (int)resp.StatusCode;
+                    rawLog.Add($"warmup {url} => {code} in {elapsed}ms");
+                    if (code == 204)
                     {
                         chosenUrl = url;
                         warmupMs = elapsed;
@@ -109,27 +128,37 @@ public static class RealDelayTester
                 {
                     return TestResult.Cancelled(extra);
                 }
-                catch { /* next url */ }
+                catch (Exception ex)
+                {
+                    rawLog.Add($"warmup {url} => {ex.GetType().Name}: {Trunc(ex.Message)} in {ElapsedMs(t0)}ms");
+                }
             }
+            swWarmup.Stop();
+            warmupTotalMs = (int)swWarmup.ElapsedMilliseconds;
 
             extra["warmup_ms"] = warmupMs.ToString();
             if (chosenUrl == null)
-                return TestResult.Fail(TestStatus.Timeout, extra);
+                return FailWithPhases(extra, rawLog, swTotal, tcpWaitMs, warmupTotalMs, samplesPhaseMs, disposeMs, "no_warmup_204");
             extra["url"] = chosenUrl;
 
-            var samples = new List<int>(SampleCount);
+            var okSamples = new List<int>(SampleCount);
+            var rawSamples = new List<string>(SampleCount);
             bool reWarmupUsed = false;
+            var swSamples = Stopwatch.StartNew();
 
             for (int i = 0; i < SampleCount; i++)
             {
                 if (ct.IsCancellationRequested) return TestResult.Cancelled(extra);
                 if (httpCts.IsCancellationRequested) break;
 
+                var t0 = Stopwatch.GetTimestamp();
                 var (st, ms) = await MeasureOnceAsync(http, chosenUrl, httpCts.Token);
+                int el = ElapsedMs(t0);
+                rawSamples.Add($"s{i + 1}={st}/{ms}ms/{el}ms");
 
                 if (st == MeasureStatus.Ok)
                 {
-                    samples.Add(ms);
+                    okSamples.Add(ms);
                     continue;
                 }
                 if (st == MeasureStatus.Cancelled || ct.IsCancellationRequested)
@@ -138,34 +167,47 @@ public static class RealDelayTester
                 if (st == MeasureStatus.Drop && !reWarmupUsed)
                 {
                     reWarmupUsed = true;
+                    rawSamples.Add("rewarm");
+                    var rwT0 = Stopwatch.GetTimestamp();
                     var rw = await MeasureOnceAsync(http, chosenUrl, httpCts.Token);
+                    int rwEl = ElapsedMs(rwT0);
+                    rawSamples.Add($"rw={rw.St}/{rw.Ms}ms/{rwEl}ms");
                     if (rw.St == MeasureStatus.Ok)
                     {
-                        samples.Add(rw.Ms);
+                        okSamples.Add(rw.Ms);
                         continue;
                     }
                     extra["unstable"] = "1";
                     break;
                 }
             }
+            swSamples.Stop();
+            samplesPhaseMs = (int)swSamples.ElapsedMilliseconds;
 
-            if (samples.Count == 0)
-                return TestResult.Fail(TestStatus.Timeout, extra);
+            extra["raw_samples"] = string.Join(";", rawSamples);
+            extra["phase_tcp_ms"] = tcpWaitMs.ToString();
+            extra["phase_warmup_ms"] = warmupTotalMs.ToString();
+            extra["phase_samples_ms"] = samplesPhaseMs.ToString();
 
-            samples.Sort();
-            int median = samples.Count switch
+            if (okSamples.Count == 0)
+                return FailWithPhases(extra, rawLog, swTotal, tcpWaitMs, warmupTotalMs, samplesPhaseMs, disposeMs, "no_samples");
+
+            okSamples.Sort();
+            int median = okSamples.Count switch
             {
-                3 => samples[1],
-                2 => (samples[0] + samples[1]) / 2,
-                _ => samples[0],
+                3 => okSamples[1],
+                2 => (okSamples[0] + okSamples[1]) / 2,
+                _ => okSamples[0],
             };
-            int jitter = samples.Max() - samples.Min();
+            int jitter = okSamples.Max() - okSamples.Min();
 
             extra["jitter"] = jitter.ToString();
-            extra["ok_count"] = samples.Count.ToString();
+            extra["ok_count"] = okSamples.Count.ToString();
             extra["total_samples"] = SampleCount.ToString();
-            if (samples.Count < SampleCount)
+            if (okSamples.Count < SampleCount)
                 extra["unstable"] = "1";
+            extra["warmup_log"] = string.Join(" | ", rawLog);
+            extra["total_ms"] = ((int)swTotal.ElapsedMilliseconds).ToString();
 
             return TestResult.Success(median, extra);
         }
@@ -173,15 +215,51 @@ public static class RealDelayTester
         {
             return TestResult.Cancelled(extra);
         }
-        catch
+        catch (Exception ex)
         {
-            return TestResult.Fail(TestStatus.Error, extra);
+            extra["error"] = Trunc(ex.Message);
+            return FailWithPhases(extra, rawLog, swTotal, tcpWaitMs, warmupTotalMs, samplesPhaseMs, disposeMs, "exception");
         }
         finally
         {
+            var swDisp = Stopwatch.StartNew();
             engine.Dispose();
+            swDisp.Stop();
+            disposeMs = (int)swDisp.ElapsedMilliseconds;
+            extra["phase_dispose_ms"] = disposeMs.ToString();
+            if (!extra.ContainsKey("total_ms"))
+                extra["total_ms"] = ((int)swTotal.ElapsedMilliseconds).ToString();
+            if (rawLog.Count > 0 && !extra.ContainsKey("warmup_log"))
+                extra["warmup_log"] = string.Join(" | ", rawLog);
+            extra["phase_tcp_ms"] = tcpWaitMs.ToString();
+            extra["phase_warmup_ms"] = warmupTotalMs.ToString();
+            extra["phase_samples_ms"] = samplesPhaseMs.ToString();
         }
     }
+
+    private static TestResult FailWithPhases(
+        Dictionary<string, string> extra,
+        List<string> rawLog,
+        Stopwatch swTotal,
+        int tcpWaitMs,
+        int warmupMs,
+        int samplesMs,
+        int disposeMs,
+        string failReason)
+    {
+        extra["fail_reason"] = failReason;
+        extra["phase_tcp_ms"] = tcpWaitMs.ToString();
+        extra["phase_warmup_ms"] = warmupMs.ToString();
+        extra["phase_samples_ms"] = samplesMs.ToString();
+        extra["phase_dispose_ms"] = disposeMs.ToString();
+        extra["total_ms"] = ((int)swTotal.ElapsedMilliseconds).ToString();
+        if (rawLog.Count > 0)
+            extra["warmup_log"] = string.Join(" | ", rawLog);
+        return TestResult.Fail(TestStatus.Timeout, extra);
+    }
+
+    private static string Trunc(string s)
+        => s.Length <= 200 ? s : s[..200];
 
     private static int ElapsedMs(long startTimestamp)
         => (int)((Stopwatch.GetTimestamp() - startTimestamp) * 1000.0 / Stopwatch.Frequency);

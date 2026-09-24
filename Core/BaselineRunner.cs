@@ -19,6 +19,15 @@ public static class BaselineRunner
         public int SuccessCount { get; set; }
         public int StartupMs { get; set; }
         public string Url { get; set; } = "";
+        public string RawSamples { get; set; } = "";
+        public string WarmupLog { get; set; } = "";
+        public string FailReason { get; set; } = "";
+        public int PhaseTcpMs { get; set; }
+        public int PhaseWarmupMs { get; set; }
+        public int PhaseSamplesMs { get; set; }
+        public int PhaseDisposeMs { get; set; }
+        public int TotalMs { get; set; }
+        public Dictionary<string, string> Extra { get; set; } = new();
     }
 
     public sealed class Run
@@ -114,7 +123,7 @@ public static class BaselineRunner
                     sem.Release();
                 }
                 lock (run.Samples) run.Samples.Add(sample);
-                Console.WriteLine($"  [{(sample.Ok ? "OK" : "FAIL")}] {sample.Name}: {sample.Ms}ms status={sample.Status}");
+                Console.WriteLine($"  [{(sample.Ok ? "OK" : "FAIL")}] {sample.Name}: {sample.Ms}ms status={sample.Status} total={sample.TotalMs}ms phases(tcp={sample.PhaseTcpMs},wu={sample.PhaseWarmupMs},smp={sample.PhaseSamplesMs},disp={sample.PhaseDisposeMs})");
             });
             await Task.WhenAll(tasks);
             run.Samples = run.Samples
@@ -124,6 +133,12 @@ public static class BaselineRunner
         }
 
         report.Analysis = Analyze(report, picked);
+        report.Analysis["all_ok_ids"] = report.Data
+            .SelectMany(r => r.Samples.Where(s => s.Ok).Select(s => s.Id))
+            .GroupBy(id => id)
+            .Where(g => g.Count() == report.Data.Count)
+            .Select(g => g.Key)
+            .ToList();
         var json = JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(outPath, json);
         Console.WriteLine($"Saved: {outPath}");
@@ -149,6 +164,15 @@ public static class BaselineRunner
             if (r.Extra.TryGetValue("ok_count", out var o) && int.TryParse(o, out var oi)) sample.SuccessCount = oi;
             if (r.Extra.TryGetValue("startup_ms", out var su) && int.TryParse(su, out var sui)) sample.StartupMs = sui;
             if (r.Extra.TryGetValue("url", out var u)) sample.Url = u;
+            if (r.Extra.TryGetValue("raw_samples", out var rs)) sample.RawSamples = rs;
+            if (r.Extra.TryGetValue("warmup_log", out var wl)) sample.WarmupLog = wl;
+            if (r.Extra.TryGetValue("fail_reason", out var fr)) sample.FailReason = fr;
+            if (r.Extra.TryGetValue("phase_tcp_ms", out var pt) && int.TryParse(pt, out var pti)) sample.PhaseTcpMs = pti;
+            if (r.Extra.TryGetValue("phase_warmup_ms", out var pw) && int.TryParse(pw, out var pwi)) sample.PhaseWarmupMs = pwi;
+            if (r.Extra.TryGetValue("phase_samples_ms", out var ps) && int.TryParse(ps, out var psi)) sample.PhaseSamplesMs = psi;
+            if (r.Extra.TryGetValue("phase_dispose_ms", out var pd) && int.TryParse(pd, out var pdi)) sample.PhaseDisposeMs = pdi;
+            if (r.Extra.TryGetValue("total_ms", out var tm) && int.TryParse(tm, out var tmi)) sample.TotalMs = tmi;
+            sample.Extra = new Dictionary<string, string>(r.Extra);
             if (r.Extra.TryGetValue("unstable", out _)) sample.Status += ";unstable";
             return sample;
         }
@@ -232,6 +256,18 @@ public static class BaselineRunner
         analysis["spearman_pairs"] = rhos;
         analysis["spearman_mean"] = rhos.Count > 0 ? Math.Round(rhos.Average(), 4) : 0;
         analysis["spearman_min"] = rhos.Count > 0 ? Math.Round(rhos.Min(), 4) : 0;
+
+        // first-server stability across run pairs
+        var firsts = rankings.Select(r => r.Count > 0 ? r[0] : "").ToList();
+        int pairs = 0, same = 0;
+        for (int i = 0; i < firsts.Count; i++)
+        for (int j = i + 1; j < firsts.Count; j++)
+        {
+            pairs++;
+            if (firsts[i] == firsts[j]) same++;
+        }
+        analysis["first_server_per_run"] = firsts;
+        analysis["first_stable_pct"] = pairs > 0 ? Math.Round(100.0 * same / pairs, 1) : 0;
         return analysis;
     }
 

@@ -147,6 +147,8 @@ public partial class MainViewModel : ViewModelBase
     private long _lastBytesOut;
     private string _lastInterfaceId = "";
     private DispatcherTimer? _speedTimer;
+    private DispatcherTimer? _blinkTimer;
+    private double _blinkPhase;
 
     public MainViewModel()
     {
@@ -204,6 +206,18 @@ public partial class MainViewModel : ViewModelBase
         _speedTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
         _speedTimer.Tick += (_, _) => UpdateLiveSpeed();
         _speedTimer.Start();
+
+        _blinkTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+        _blinkTimer.Tick += (_, _) => BlinkTick();
+        _blinkTimer.Start();
+    }
+
+    private void BlinkTick()
+    {
+        if (!IsConnected) { SpeedBlinkOpacity = 1.0; _blinkPhase = 0; return; }
+        _blinkPhase += 0.45;
+        if (_blinkPhase > Math.PI * 2) _blinkPhase -= Math.PI * 2;
+        SpeedBlinkOpacity = 0.45 + 0.55 * (0.5 + 0.5 * Math.Cos(_blinkPhase));
     }
 
     private void UpdateLiveSpeed()
@@ -229,7 +243,6 @@ public partial class MainViewModel : ViewModelBase
             long diffOut = bytesOut - _lastBytesOut;
             LiveDownSpeed = diffIn > 0 ? FormatSpeed(diffIn / 3) : "0 B/s";
             LiveUpSpeed = diffOut > 0 ? FormatSpeed(diffOut / 3) : "0 B/s";
-            SpeedBlinkOpacity = SpeedBlinkOpacity > 0.5 ? 0.3 : 1.0;
             _lastBytesIn = bytesIn;
             _lastBytesOut = bytesOut;
         }

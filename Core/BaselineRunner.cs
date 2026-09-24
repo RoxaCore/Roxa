@@ -249,7 +249,7 @@ public static class BaselineRunner
         {
             var ordered = run.Samples
                 .OrderByDescending(s => s.SuccessCount > 0 ? s.SuccessCount : (s.Ok ? 1 : 0))
-                .ThenBy(s => s.Ok ? s.Ms + 2.0 * s.Jitter : double.MaxValue)
+                .ThenBy(s => s.Ok ? s.Ms : double.MaxValue)
                 .Select(s => s.Id)
                 .ToList();
             return ordered;

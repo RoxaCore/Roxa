@@ -460,8 +460,8 @@ public partial class ServerInfo : ObservableObject
             int c = b.RealDelaySuccessRate.CompareTo(a.RealDelaySuccessRate);
             if (c != 0) return c;
 
-            double scoreA = a.RealDelayMs + 2.0 * a.RealDelayJitter;
-            double scoreB = b.RealDelayMs + 2.0 * b.RealDelayJitter;
+            double scoreA = a.RealDelayMs;
+            double scoreB = b.RealDelayMs;
             c = scoreA.CompareTo(scoreB);
             if (c != 0) return c;
         }

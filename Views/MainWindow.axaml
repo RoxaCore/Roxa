@@ -380,6 +380,10 @@
                           <Setter Property="Background" Value="#E0F2FE"/>
                         </Style>
                         <Style Selector="DataGridCell">
+                          <Style.Resources>
+                            <SolidColorBrush x:Key="DataGridCellFocusVisualPrimaryBrush" Color="Transparent"/>
+                            <SolidColorBrush x:Key="DataGridCellFocusVisualSecondaryBrush" Color="Transparent"/>
+                          </Style.Resources>
                           <Setter Property="BorderThickness" Value="0"/>
                           <Setter Property="Padding" Value="4,0"/>
                           <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -391,28 +395,7 @@
                         <Style Selector="DataGridCell:selected /template/ ContentPresenter">
                           <Setter Property="Background" Value="Transparent"/>
                         </Style>
-                        <Style Selector="DataGridCell /template/ Border">
-                          <Setter Property="BorderThickness" Value="0"/>
-                          <Setter Property="BorderBrush" Value="Transparent"/>
-                        </Style>
-                        <Style Selector="DataGridCell:focus /template/ Border">
-                          <Setter Property="BorderThickness" Value="0"/>
-                          <Setter Property="BorderBrush" Value="Transparent"/>
-                        </Style>
-                        <Style Selector="DataGridCell:selected /template/ Border">
-                          <Setter Property="BorderThickness" Value="0"/>
-                          <Setter Property="BorderBrush" Value="Transparent"/>
-                        </Style>
-                        <Style Selector="Panel.cellHover > TextBlock.hoverLabel">
-                          <Setter Property="IsVisible" Value="False"/>
-                        </Style>
-                        <Style Selector="Panel.cellHover:pointerover > TextBlock.hoverLabel">
-                          <Setter Property="IsVisible" Value="True"/>
-                        </Style>
-                        <Style Selector="Panel.cellHover:pointerover > Border.cellValue">
-                          <Setter Property="IsVisible" Value="False"/>
-                        </Style>
-                        <Style Selector="Panel.cellHover:pointerover > TextBlock.cellValue">
+                        <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
                           <Setter Property="IsVisible" Value="False"/>
                         </Style>
                       </dg:DataGrid.Styles>
@@ -456,12 +439,14 @@
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                              <Panel Background="Transparent" Classes="cellHover" PointerPressed="PingCell_PointerPressed">
+                              <Panel Background="Transparent"
+                                     PointerEntered="CellHover_Entered" PointerExited="CellHover_Exited"
+                                     PointerPressed="PingCell_PointerPressed">
                                 <Border Classes="cellValue" Background="{Binding PingBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
                                   <TextBlock Text="{Binding PingDisplay}" Foreground="{Binding PingTextColor}" FontWeight="SemiBold" FontSize="11"/>
                                 </Border>
                                 <TextBlock Classes="hoverLabel" Text="{Binding PingRetestLabel}" Foreground="#0E7C6B" FontWeight="SemiBold" FontSize="11"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                           IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                               </Panel>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
@@ -474,12 +459,14 @@
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                              <Panel Background="Transparent" Classes="cellHover" PointerPressed="RealDelayCell_PointerPressed">
+                              <Panel Background="Transparent"
+                                     PointerEntered="CellHover_Entered" PointerExited="CellHover_Exited"
+                                     PointerPressed="RealDelayCell_PointerPressed">
                                 <Border Classes="cellValue" Background="{Binding RealDelayBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
                                   <TextBlock Text="{Binding RealDelayDisplay}" Foreground="{Binding RealDelayTextColor}" FontWeight="SemiBold" FontSize="11"/>
                                 </Border>
                                 <TextBlock Classes="hoverLabel" Text="{Binding RealDelayRetestLabel}" Foreground="#0E7C6B" FontWeight="SemiBold" FontSize="11"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                           IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                               </Panel>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
@@ -492,10 +479,12 @@
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                              <Panel Background="Transparent" Classes="cellHover" PointerPressed="SpeedCell_PointerPressed">
+                              <Panel Background="Transparent"
+                                     PointerEntered="CellHover_Entered" PointerExited="CellHover_Exited"
+                                     PointerPressed="SpeedCell_PointerPressed">
                                 <TextBlock Classes="cellValue" Text="{Binding SpeedDisplay, Mode=OneWay}" VerticalAlignment="Center"/>
                                 <TextBlock Classes="hoverLabel" Text="{Binding SpeedRetestLabel}" Foreground="#0E7C6B" FontWeight="SemiBold" FontSize="12"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                           IsVisible="False" VerticalAlignment="Center"/>
                               </Panel>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>

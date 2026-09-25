@@ -439,12 +439,9 @@
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                              <Panel Background="Transparent"
-                                     PointerPressed="PingCell_PointerPressed">
-                                <Border Classes="cellValue" Background="{Binding PingBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                  <TextBlock Text="{Binding PingDisplay}" Foreground="{Binding PingTextColor}" FontWeight="SemiBold" FontSize="11"/>
-                                </Border>
-                              </Panel>
+                              <Border Background="{Binding PingBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding PingDisplay}" Foreground="{Binding PingTextColor}" FontWeight="SemiBold" FontSize="11"/>
+                              </Border>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
                         </dg:DataGridTemplateColumn>
@@ -456,12 +453,9 @@
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                              <Panel Background="Transparent"
-                                     PointerPressed="RealDelayCell_PointerPressed">
-                                <Border Classes="cellValue" Background="{Binding RealDelayBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                  <TextBlock Text="{Binding RealDelayDisplay}" Foreground="{Binding RealDelayTextColor}" FontWeight="SemiBold" FontSize="11"/>
-                                </Border>
-                              </Panel>
+                              <Border Background="{Binding RealDelayBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding RealDelayDisplay}" Foreground="{Binding RealDelayTextColor}" FontWeight="SemiBold" FontSize="11"/>
+                              </Border>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
                         </dg:DataGridTemplateColumn>
@@ -473,10 +467,7 @@
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                              <Panel Background="Transparent"
-                                     PointerPressed="SpeedCell_PointerPressed">
-                                <TextBlock Classes="cellValue" Text="{Binding SpeedDisplay, Mode=OneWay}" VerticalAlignment="Center"/>
-                              </Panel>
+                              <TextBlock Text="{Binding SpeedDisplay, Mode=OneWay}" VerticalAlignment="Center"/>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
                         </dg:DataGridTemplateColumn>

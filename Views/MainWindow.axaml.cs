@@ -242,27 +242,6 @@ public partial class MainWindow : Window
         }
     }
 
-    private void PingCell_PointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed) return;
-        if (sender is Control { DataContext: ServerInfo s } && DataContext is MainViewModel vm)
-            vm.TestCellPingCommand.Execute(s);
-    }
-
-    private void RealDelayCell_PointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed) return;
-        if (sender is Control { DataContext: ServerInfo s } && DataContext is MainViewModel vm)
-            vm.TestCellRealDelayCommand.Execute(s);
-    }
-
-    private void SpeedCell_PointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed) return;
-        if (sender is Control { DataContext: ServerInfo s } && DataContext is MainViewModel vm)
-            vm.TestCellSpeedCommand.Execute(s);
-    }
-
     private static ServerInfo? FindServerFromVisual(object? source)
     {
         if (source is not Visual v) return null;

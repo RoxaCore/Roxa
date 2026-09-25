@@ -1,5 +1,6 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Avalonia.Data.Converters;
+using XrayClient.Localization;
 
 namespace XrayClient.Converters;
 
@@ -13,7 +14,7 @@ public class BoolToStatusTextConverter : IValueConverter
         {
             var parts = formats.Split(',');
             if (parts.Length == 2)
-                return b ? parts[0].Trim() : parts[1].Trim();
+                return TranslationManager.Instance[b ? parts[0].Trim() : parts[1].Trim()];
         }
         return "";
     }

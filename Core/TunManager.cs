@@ -1,5 +1,6 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using XrayClient.Localization;
 
 namespace XrayClient.Core;
 
@@ -27,7 +28,7 @@ public static class TunManager
         if (IsWintunAvailable()) return true;
 
         Log("Downloading wintun driver...");
-        log?.Invoke("دانلود درایور wintun...");
+        log?.Invoke(TranslationManager.Get("Tun_DownloadingDriver"));
 
         try
         {
@@ -44,7 +45,7 @@ public static class TunManager
             if (!string.Equals(actual, expectedSha256, StringComparison.OrdinalIgnoreCase))
             {
                 Log($"wintun hash mismatch: expected {expectedSha256}, got {actual}");
-                log?.Invoke("Hash فایل wintun نادرست است — دانلود لغو شد.");
+                log?.Invoke(TranslationManager.Get("Tun_HashBad"));
                 return false;
             }
 
@@ -54,13 +55,13 @@ public static class TunManager
             File.Delete(zipPath);
 
             Log("wintun driver downloaded successfully.");
-            log?.Invoke("درایور wintun با موفقیت دانلود شد.");
+            log?.Invoke(TranslationManager.Get("Tun_DriverDownloaded"));
             return true;
         }
         catch (Exception ex)
         {
             Log($"Failed to download wintun: {ex.Message}");
-            log?.Invoke($"خطا در دانلود wintun: {ex.Message}");
+            log?.Invoke(string.Format(TranslationManager.Get("Tun_DownloadError"), ex.Message));
             return false;
         }
     }
@@ -69,12 +70,12 @@ public static class TunManager
     {
         if (!AdminHelper.IsRunningAsAdmin())
         {
-            log?.Invoke("نیاز به دسترسی Administrator برای ساخت TUN adapter");
+            log?.Invoke(TranslationManager.Get("Tun_NeedAdmin"));
             return false;
         }
 
         Log("Creating TUN adapter...");
-        log?.Invoke("ساخت TUN adapter...");
+        log?.Invoke(TranslationManager.Get("Tun_CreatingAdapter"));
 
         try
         {
@@ -98,19 +99,19 @@ public static class TunManager
                 if (proc.ExitCode == 0)
                 {
                     Log("TUN adapter created.");
-                    log?.Invoke("TUN adapter ساخته شد.");
+                    log?.Invoke(TranslationManager.Get("Tun_AdapterCreated"));
                     return true;
                 }
 
                 if (error.Contains("already exists") || output.Contains("already exists"))
                 {
                     Log("TUN adapter already exists.");
-                    log?.Invoke("TUN adapter از قبل وجود دارد.");
+                    log?.Invoke(TranslationManager.Get("Tun_AdapterExists"));
                     return true;
                 }
 
                 Log($"TUN adapter creation failed: {error}");
-                log?.Invoke($"خطا در ساخت adapter: {error}");
+                log?.Invoke(string.Format(TranslationManager.Get("Tun_CreateError"), error));
                 return false;
             }
             return false;
@@ -118,7 +119,7 @@ public static class TunManager
         catch (Exception ex)
         {
             Log($"TUN adapter error: {ex.Message}");
-            log?.Invoke($"خطا: {ex.Message}");
+            log?.Invoke(string.Format(TranslationManager.Get("Log_Error"), ex.Message));
             return false;
         }
     }
@@ -126,7 +127,7 @@ public static class TunManager
     public static void CleanupTunAdapter(Action<string>? log = null)
     {
         Log("Cleaning up TUN adapter...");
-        log?.Invoke("پاکسازی TUN adapter...");
+        log?.Invoke(TranslationManager.Get("Tun_Cleaning"));
 
         try
         {
@@ -147,7 +148,7 @@ public static class TunManager
         catch (Exception ex)
         {
             Log($"TUN cleanup error: {ex.Message}");
-            log?.Invoke($"خطا در پاکسازی: {ex.Message}");
+            log?.Invoke(string.Format(TranslationManager.Get("Tun_CleanError"), ex.Message));
         }
     }
 

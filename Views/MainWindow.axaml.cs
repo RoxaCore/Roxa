@@ -397,7 +397,7 @@ public partial class MainWindow : Window
                     new TextBlock { Text = tr["Dlg_DNSHint"], FontSize = 11, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#888888")) },
                     new TextBlock { Text = tr["Dlg_DNSAdvanced"], FontWeight = Avalonia.Media.FontWeight.Bold, FontSize = 13 },
                     txtJson,
-                    new TextBlock { Text = "مثال: {\"servers\": [{\"address\": \"1.1.1.1\"}]}", FontSize = 11, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#888888")) },
+                    new TextBlock { Text = string.Format(tr["Dlg_DNSExample"], "{\"servers\": [{\"address\": \"1.1.1.1\"}]}"), FontSize = 11, Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#888888")) },
                     new TextBlock
                     {
                         FontSize = 11,

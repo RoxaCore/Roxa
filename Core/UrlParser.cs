@@ -1,5 +1,6 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
+using XrayClient.Localization;
 using XrayClient.Models;
 
 namespace XrayClient.Core;
@@ -23,7 +24,7 @@ public static class UrlParser
         if (text.StartsWith("vless://", StringComparison.OrdinalIgnoreCase)) return ParseVless(text);
         if (text.StartsWith("ss://", StringComparison.OrdinalIgnoreCase)) return ParseShadowsocks(text);
         if (text.StartsWith("trojan://", StringComparison.OrdinalIgnoreCase)) return ParseTrojan(text);
-        throw new FormatException("فقط vmess / vless / ss / trojan پشتیبانی می‌شود.");
+        throw new FormatException(TranslationManager.Get("Url_Unsupported"));
     }
 
     private static ServerInfo ParseVmess(string text)
@@ -79,7 +80,7 @@ public static class UrlParser
     {
         string rest = text["vless://".Length..];
         int at = rest.IndexOf('@');
-        if (at <= 0) throw new FormatException("لینک VLESS نامعتبر است.");
+        if (at <= 0) throw new FormatException(TranslationManager.Get("Url_InvalidVless"));
 
         var server = new ServerInfo
         {
@@ -116,7 +117,7 @@ public static class UrlParser
     {
         string rest = text["trojan://".Length..];
         int at = rest.IndexOf('@');
-        if (at <= 0) throw new FormatException("لینک Trojan نامعتبر است.");
+        if (at <= 0) throw new FormatException(TranslationManager.Get("Url_InvalidTrojan"));
 
         var server = new ServerInfo
         {
@@ -166,13 +167,13 @@ public static class UrlParser
         {
             string decoded = DecodeBase64(payload);
             int at = decoded.IndexOf('@');
-            if (at <= 0) throw new FormatException("لینک Shadowsocks نامعتبر است.");
+            if (at <= 0) throw new FormatException(TranslationManager.Get("Url_InvalidSs"));
             userinfo = decoded[..at];
             hostPort = decoded[(at + 1)..];
         }
 
         int colon = userinfo.IndexOf(':');
-        if (colon <= 0) throw new FormatException("لینک Shadowsocks نامعتبر است.");
+        if (colon <= 0) throw new FormatException(TranslationManager.Get("Url_InvalidSs"));
         var (address, port) = SplitHostPort(hostPort);
 
         return new ServerInfo

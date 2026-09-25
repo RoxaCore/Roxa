@@ -25,37 +25,37 @@
             <NumericUpDown Value="{Binding Port}" Minimum="1" Maximum="65535"/>
           </StackPanel>
         </Grid>
-        <TextBlock Text="User ID" FontWeight="Bold"/>
+        <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ed_UserId}" FontWeight="Bold"/>
         <TextBox Text="{Binding UserId}"/>
-        <TextBlock Text="Password" FontWeight="Bold"/>
+        <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ed_Password}" FontWeight="Bold"/>
         <TextBox Text="{Binding Password}"/>
         <Grid ColumnDefinitions="*,*">
           <StackPanel Spacing="4" Margin="0,0,8,0">
-            <TextBlock Text="SNI" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ed_SNI}" FontWeight="Bold"/>
             <TextBox Text="{Binding SNI}"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Spacing="4">
-            <TextBlock Text="Host" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ed_Host}" FontWeight="Bold"/>
             <TextBox Text="{Binding Host}"/>
           </StackPanel>
         </Grid>
         <Grid ColumnDefinitions="*,*">
           <StackPanel Spacing="4" Margin="0,0,8,0">
-            <TextBlock Text="Path" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ed_Path}" FontWeight="Bold"/>
             <TextBox Text="{Binding Path}"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Spacing="4">
-            <TextBlock Text="Network" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ed_Network}" FontWeight="Bold"/>
             <TextBox Text="{Binding Network}"/>
           </StackPanel>
         </Grid>
         <Grid ColumnDefinitions="*,*">
           <StackPanel Spacing="4" Margin="0,0,8,0">
-            <TextBlock Text="Security" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ed_Security}" FontWeight="Bold"/>
             <TextBox Text="{Binding Security}"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Spacing="4">
-            <TextBlock Text="Flow" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ed_Flow}" FontWeight="Bold"/>
             <TextBox Text="{Binding Flow}"/>
           </StackPanel>
         </Grid>

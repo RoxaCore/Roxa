@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using XrayClient.Localization;
 using XrayClient.Models;
 
 namespace XrayClient.Core;
@@ -43,7 +44,7 @@ public sealed class XrayEngine : IDisposable
     {
         if (!force && File.Exists(EnginePath)) return;
         Directory.CreateDirectory(EngineDir);
-        Log("Downloading Xray-core engine ...");
+        Log(TranslationManager.Get("Eng_Downloading"));
         using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(180) };
         http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Roxa/2.0");
 
@@ -58,7 +59,7 @@ public sealed class XrayEngine : IDisposable
             (true, Architecture.X86) => "Xray-windows-32.zip",
             (false, Architecture.X64) => "Xray-linux-64.zip",
             (false, Architecture.Arm64) => "Xray-linux-arm64-v8a.zip",
-            _ => throw new NotSupportedException("Unsupported OS/architecture.")
+            _ => throw new NotSupportedException(TranslationManager.Get("Eng_UnsupportedOs"))
         };
 
         string downloadUrl = "";
@@ -79,7 +80,7 @@ public sealed class XrayEngine : IDisposable
             }
         }
         if (string.IsNullOrEmpty(downloadUrl))
-            throw new InvalidOperationException($"Asset {assetName} not found in latest Xray release.");
+            throw new InvalidOperationException(string.Format(TranslationManager.Get("Eng_AssetMissing"), assetName));
 
         byte[] data;
         bool usedMirror = false;
@@ -91,7 +92,7 @@ public sealed class XrayEngine : IDisposable
         {
             if (string.IsNullOrEmpty(expectedSha256))
                 throw;
-            Log("Direct GitHub unreachable, trying mirror ...");
+            Log(TranslationManager.Get("Eng_MirrorTrying"));
             data = await http.GetByteArrayAsync("https://gh-proxy.com/" + downloadUrl, ct);
             usedMirror = true;
         }
@@ -100,11 +101,11 @@ public sealed class XrayEngine : IDisposable
         {
             string actual = HashHex(data);
             if (!string.Equals(actual, expectedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException($"Xray-core download digest mismatch: expected {expectedSha256}, got {actual}.");
+                throw new InvalidDataException(string.Format(TranslationManager.Get("Eng_DigestMismatch"), expectedSha256, actual));
         }
         else if (usedMirror)
         {
-            throw new InvalidDataException("Cannot verify Xray-core download via mirror without GitHub digest.");
+            throw new InvalidDataException(TranslationManager.Get("Eng_NoDigest"));
         }
 
         string zipPath = Path.Combine(Path.GetTempPath(), "xray-core-download.zip");
@@ -131,7 +132,7 @@ public sealed class XrayEngine : IDisposable
             catch { /* best effort */ }
         }
         File.WriteAllText(EnginePath + ".sha256", HashHex(File.ReadAllBytes(EnginePath)));
-        Log($"Xray-core {version} ready.");
+        Log(string.Format(TranslationManager.Get("Eng_Ready"), version));
     }
 
     private static string HashHex(byte[] data)
@@ -162,15 +163,15 @@ public sealed class XrayEngine : IDisposable
         _settings = settings;
         if (!File.Exists(EnginePath))
         {
-            Log("Engine not found, downloading ...");
+            Log(TranslationManager.Get("Eng_NotFound"));
             await EnsureEngineAsync(false, ct);
         }
         else if (!VerifyEngineIntegrity(requireSidecar: AdminHelper.IsRunningAsAdmin()))
         {
-            Log("Engine integrity check failed. Re-downloading ...");
+            Log(TranslationManager.Get("Eng_IntegrityRetry"));
             await EnsureEngineAsync(true, ct);
             if (!VerifyEngineIntegrity(requireSidecar: true))
-                throw new InvalidDataException("Xray engine failed integrity verification.");
+                throw new InvalidDataException(TranslationManager.Get("Eng_IntegrityFailed"));
         }
 
         bool useTun = settings?.UseTunMode == true;
@@ -178,7 +179,7 @@ public sealed class XrayEngine : IDisposable
         {
             if (!AdminHelper.IsRunningAsAdmin())
             {
-                Log("TUN mode requires Administrator. Falling back to proxy mode.");
+                Log(TranslationManager.Get("Eng_TunFallback"));
                 useTun = false;
             }
             else if (!TunManager.IsWintunAvailable())
@@ -186,7 +187,7 @@ public sealed class XrayEngine : IDisposable
                 bool ok = await TunManager.EnsureWintunDownloadedAsync();
                 if (!ok)
                 {
-                    Log("wintun.dll not available. Falling back to proxy mode.");
+                    Log(TranslationManager.Get("Eng_WintunFallback"));
                     useTun = false;
                 }
                 else if (!TunManager.IsTunAdapterActive())
@@ -234,7 +235,7 @@ public sealed class XrayEngine : IDisposable
             }
 
             CurrentServer = server;
-            Log($"Connecting to {server.Name} {(useTun ? "[TUN Mode]" : "")} ...");
+            Log(string.Format(TranslationManager.Get("Eng_ConnectingTo"), server.Name, useTun ? "[TUN Mode]" : ""));
 
             bool ready = false;
             for (int i = 0; i < 60 && !ct.IsCancellationRequested; i++)
@@ -243,18 +244,18 @@ public sealed class XrayEngine : IDisposable
                 lock (_lock)
                 {
                     if (_process == null || _process.HasExited)
-                        throw new InvalidOperationException("Xray engine exited unexpectedly.");
+                        throw new InvalidOperationException(TranslationManager.Get("Eng_ExitedUnexpectedly"));
                 }
                 if (TryConnect(HttpPort)) { ready = true; break; }
             }
-            if (!ready) throw new InvalidOperationException("Proxy port did not come up.");
+            if (!ready) throw new InvalidOperationException(TranslationManager.Get("Eng_PortNotUp"));
 
             if (!useTun && setSystemProxy && IsWindows && settings?.LeaveSystemProxyAsIs != true)
             {
                 SystemProxy.Set($"127.0.0.1:{HttpPort}");
                 _proxyActive = true;
             }
-            Log($"Connected. HTTP 127.0.0.1:{HttpPort}  SOCKS 127.0.0.1:{SocksPort} {(useTun ? "[TUN]" : "")}");
+            Log(string.Format(TranslationManager.Get("Eng_ConnectedPorts"), HttpPort, SocksPort, useTun ? "[TUN]" : ""));
         }
         catch
         {
@@ -275,7 +276,7 @@ public sealed class XrayEngine : IDisposable
         Stop();
         if (!File.Exists(EnginePath))
         {
-            Log("Engine not found, downloading ...");
+            Log(TranslationManager.Get("Eng_NotFound"));
             await EnsureEngineAsync(false, ct);
         }
 
@@ -317,13 +318,13 @@ public sealed class XrayEngine : IDisposable
                 lock (_lock)
                 {
                     if (_process == null || _process.HasExited)
-                        throw new InvalidOperationException("Xray test engine exited unexpectedly.");
+                        throw new InvalidOperationException(TranslationManager.Get("Eng_TestExited"));
                 }
                 if (TryConnect(HttpPort)) { ready = true; break; }
             }
-            if (!ready) throw new InvalidOperationException("Xray test port did not come up.");
+            if (!ready) throw new InvalidOperationException(TranslationManager.Get("Eng_TestPortNotUp"));
 
-            Log("Test Xray engine started.");
+            Log(TranslationManager.Get("Eng_TestStarted"));
         }
         finally
         {
@@ -362,7 +363,7 @@ public sealed class XrayEngine : IDisposable
             if (_settings?.LeaveSystemProxyAsIs != true && _settings?.ClearProxyOnDisconnect == true)
             {
                 try { SystemProxy.Clear(); }
-                catch (Exception ex) { Log($"Clear proxy failed: {ex.Message}"); }
+                catch (Exception ex) { Log(string.Format(TranslationManager.Get("Eng_ClearProxyFailed"), ex.Message)); }
             }
         }
         CurrentServer = null;
@@ -380,10 +381,10 @@ public sealed class XrayEngine : IDisposable
             if (TunManager.IsTunAdapterActive())
             {
                 TunManager.CleanupTunAdapter();
-                Log("TUN adapter cleaned up.");
+                Log(TranslationManager.Get("Eng_TunCleaned"));
             }
         }
-        catch (Exception ex) { Log($"TUN cleanup failed: {ex.Message}"); }
+        catch (Exception ex) { Log(string.Format(TranslationManager.Get("Eng_TunCleanupFailed"), ex.Message)); }
     }
 
     public async Task StartMultiAsync(string configJson, Dictionary<int, ServerInfo> portMap, CancellationToken ct = default)
@@ -391,7 +392,7 @@ public sealed class XrayEngine : IDisposable
         Stop();
         if (!File.Exists(EnginePath))
         {
-            Log("Engine not found, downloading ...");
+            Log(TranslationManager.Get("Eng_NotFound"));
             await EnsureEngineAsync(false, ct);
         }
 
@@ -433,15 +434,15 @@ public sealed class XrayEngine : IDisposable
                 lock (_lock)
                 {
                     if (_process == null || _process.HasExited)
-                        throw new InvalidOperationException("Xray multi-test engine exited unexpectedly.");
+                        throw new InvalidOperationException(TranslationManager.Get("Eng_MultiExited"));
                 }
                 allReady = portMap.Keys.All(p => TryConnect(p));
                 if (allReady) break;
             }
-            if (!allReady) throw new InvalidOperationException("Multi-test ports did not come up.");
+            if (!allReady) throw new InvalidOperationException(TranslationManager.Get("Eng_MultiPortsNotUp"));
 
             _tempConfigPath = configPath;
-            Log("Multi-test Xray engine started.");
+            Log(TranslationManager.Get("Eng_MultiStarted"));
         }
         catch
         {
@@ -463,7 +464,7 @@ public sealed class XrayEngine : IDisposable
             HttpPort = 0;
             SocksPort = 0;
         }
-        Log("Engine stopped.");
+        Log(TranslationManager.Get("Eng_Stopped"));
         Stopped?.Invoke();
     }
 

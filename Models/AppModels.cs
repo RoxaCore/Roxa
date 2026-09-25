@@ -1,3 +1,5 @@
+﻿using XrayClient.Localization;
+
 namespace XrayClient.Models;
 
 public class SubscriptionInfo : System.ComponentModel.INotifyPropertyChanged
@@ -6,7 +8,8 @@ public class SubscriptionInfo : System.ComponentModel.INotifyPropertyChanged
     private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
 
     private static readonly string[] Units = ["B", "KB", "MB", "GB", "TB"];
-    private static readonly string[] UnitsFa = ["بایت", "کیلوبایت", "مگابایت", "گیگابایت", "ترابایت"];
+    private static readonly string[] UnitKeys = ["Unit_B", "Unit_KB", "Unit_MB", "Unit_GB", "Unit_TB"];
+    private static string UnitText(int unit) => TranslationManager.Instance[UnitKeys[unit]];
 
     public string Name { get; set; } = "";
     public string Url { get; set; } = "";
@@ -15,7 +18,9 @@ public class SubscriptionInfo : System.ComponentModel.INotifyPropertyChanged
     public DateTime LastUpdated { get => _lastUpdated; set { _lastUpdated = value; OnPropertyChanged(nameof(LastUpdated)); } }
 
     private int _serverCount;
-    public int ServerCount { get => _serverCount; set { _serverCount = value; OnPropertyChanged(nameof(ServerCount)); } }
+    public int ServerCount { get => _serverCount; set { _serverCount = value; OnPropertyChanged(nameof(ServerCount)); OnPropertyChanged(nameof(ServerCountText)); } }
+
+    public string ServerCountText => string.Format(TranslationManager.Instance["Sub_ServerCount"], ServerCount);
 
     private long _dataLimit;
     public long DataLimit { get => _dataLimit; set { _dataLimit = value; OnPropertyChanged(nameof(DataLimit)); OnPropertyChanged(nameof(TrafficPercent)); OnPropertyChanged(nameof(TrafficDisplay)); } }
@@ -34,12 +39,12 @@ public class SubscriptionInfo : System.ComponentModel.INotifyPropertyChanged
             int totalUnit = UnitIndex(DataLimit);
             string totalVal = ValueText(DataLimit, totalUnit);
             if (UsedTraffic <= 0)
-                return $"حجم مصرفی 0 از {totalVal} {UnitsFa[totalUnit]}";
+                return string.Format(TranslationManager.Instance["Traffic_UsageZero"], totalVal, UnitText(totalUnit));
             int usedUnit = UnitIndex(UsedTraffic);
             string usedVal = ValueText(UsedTraffic, usedUnit);
             return usedUnit == totalUnit
-                ? $"حجم مصرفی {usedVal} از {totalVal} {UnitsFa[totalUnit]}"
-                : $"حجم مصرفی {usedVal} {UnitsFa[usedUnit]} از {totalVal} {UnitsFa[totalUnit]}";
+                ? string.Format(TranslationManager.Instance["Traffic_UsageSame"], usedVal, totalVal, UnitText(totalUnit))
+                : string.Format(TranslationManager.Instance["Traffic_UsageDiff"], usedVal, UnitText(usedUnit), totalVal, UnitText(totalUnit));
         }
     }
 
@@ -72,10 +77,10 @@ public class SubscriptionInfo : System.ComponentModel.INotifyPropertyChanged
         get
         {
             if (ExpireDate == DateTime.MinValue) return "";
-            if (ExpireDate < DateTime.Now) return "منقضی شده";
+            if (ExpireDate < DateTime.Now) return TranslationManager.Instance["Expire_Expired"];
             var remaining = ExpireDate - DateTime.Now;
-            if (remaining.TotalDays < 1) return $"{(int)remaining.TotalHours} ساعت باقی‌مانده";
-            return $"{(int)remaining.TotalDays} روز باقی‌مانده";
+            if (remaining.TotalDays < 1) return string.Format(TranslationManager.Instance["Expire_HoursLeft"], (int)remaining.TotalHours);
+            return string.Format(TranslationManager.Instance["Expire_DaysLeft"], (int)remaining.TotalDays);
         }
     }
 
@@ -84,10 +89,10 @@ public class SubscriptionInfo : System.ComponentModel.INotifyPropertyChanged
         get
         {
             if (ExpireDate == DateTime.MinValue) return "";
-            if (ExpireDate < DateTime.Now) return "منقضی شده";
+            if (ExpireDate < DateTime.Now) return TranslationManager.Instance["Expire_Expired"];
             var remaining = ExpireDate - DateTime.Now;
-            if (remaining.TotalDays < 1) return $"{(int)remaining.TotalHours} ساعت باقی‌مانده";
-            if (remaining.TotalDays < 30) return $"{(int)remaining.TotalDays} روز باقی‌مانده";
+            if (remaining.TotalDays < 1) return string.Format(TranslationManager.Instance["Expire_HoursLeft"], (int)remaining.TotalHours);
+            if (remaining.TotalDays < 30) return string.Format(TranslationManager.Instance["Expire_DaysLeft"], (int)remaining.TotalDays);
             return ExpireDate.ToString("yyyy/MM/dd");
         }
     }

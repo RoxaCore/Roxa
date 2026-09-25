@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text.Json;
+using XrayClient.Localization;
 using XrayClient.Models;
 
 namespace XrayClient.Core;
@@ -182,7 +183,7 @@ public static class SubscriptionManager
     private static void EnsureHttps(string url)
     {
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
-            throw new InvalidOperationException("Only https subscription URLs are allowed.");
+            throw new InvalidOperationException(TranslationManager.Get("Sub_OnlyHttps"));
     }
 
     public static async Task<string> FetchRawAsync(string url, CancellationToken ct = default)

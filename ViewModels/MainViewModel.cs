@@ -1030,7 +1030,7 @@ public partial class MainViewModel : ViewModelBase
                     if (resp.IsSuccessStatusCode)
                     {
                         int ms = (int)sw.ElapsedMilliseconds;
-                        Post(() => server.RecordRealDelay(ms));
+                        Post(() => { if (server.RealDelayMs <= 0) server.RecordRealDelay(ms); });
                     }
                 }
                 catch { }

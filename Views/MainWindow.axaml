@@ -440,13 +440,10 @@
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                               <Panel Background="Transparent"
-                                     PointerEntered="CellHover_Entered" PointerExited="CellHover_Exited"
                                      PointerPressed="PingCell_PointerPressed">
                                 <Border Classes="cellValue" Background="{Binding PingBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
                                   <TextBlock Text="{Binding PingDisplay}" Foreground="{Binding PingTextColor}" FontWeight="SemiBold" FontSize="11"/>
                                 </Border>
-                                <TextBlock Classes="hoverLabel" Text="{Binding PingRetestLabel}" Foreground="#0E7C6B" FontWeight="SemiBold" FontSize="11"
-                                           IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                               </Panel>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
@@ -460,13 +457,10 @@
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                               <Panel Background="Transparent"
-                                     PointerEntered="CellHover_Entered" PointerExited="CellHover_Exited"
                                      PointerPressed="RealDelayCell_PointerPressed">
                                 <Border Classes="cellValue" Background="{Binding RealDelayBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
                                   <TextBlock Text="{Binding RealDelayDisplay}" Foreground="{Binding RealDelayTextColor}" FontWeight="SemiBold" FontSize="11"/>
                                 </Border>
-                                <TextBlock Classes="hoverLabel" Text="{Binding RealDelayRetestLabel}" Foreground="#0E7C6B" FontWeight="SemiBold" FontSize="11"
-                                           IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                               </Panel>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
@@ -480,11 +474,8 @@
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                               <Panel Background="Transparent"
-                                     PointerEntered="CellHover_Entered" PointerExited="CellHover_Exited"
                                      PointerPressed="SpeedCell_PointerPressed">
                                 <TextBlock Classes="cellValue" Text="{Binding SpeedDisplay, Mode=OneWay}" VerticalAlignment="Center"/>
-                                <TextBlock Classes="hoverLabel" Text="{Binding SpeedRetestLabel}" Foreground="#0E7C6B" FontWeight="SemiBold" FontSize="12"
-                                           IsVisible="False" VerticalAlignment="Center"/>
                               </Panel>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>

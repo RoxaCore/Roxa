@@ -263,63 +263,6 @@ public partial class MainWindow : Window
             vm.TestCellSpeedCommand.Execute(s);
     }
 
-    private DispatcherTimer? _cellHoverTimer;
-    private Panel? _cellHoverTarget;
-    private Panel? _cellHoverShown;
-
-    private void CellHover_Entered(object? sender, PointerEventArgs e)
-    {
-        if (sender is not Panel p) return;
-        if (_cellHoverTarget == p) return;
-
-        if (_cellHoverShown != null && _cellHoverShown != p)
-        {
-            SetCellHover(_cellHoverShown, false);
-            _cellHoverShown = null;
-        }
-
-        _cellHoverTimer?.Stop();
-        _cellHoverTarget = p;
-
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1000) };
-        timer.Tick += (_, _) =>
-        {
-            timer.Stop();
-            if (_cellHoverTimer != timer) return;
-            _cellHoverTimer = null;
-            _cellHoverTarget = null;
-            _cellHoverShown = p;
-            SetCellHover(p, true);
-        };
-        _cellHoverTimer = timer;
-        timer.Start();
-    }
-
-    private void CellHover_Exited(object? sender, PointerEventArgs e)
-    {
-        if (sender is not Panel p) return;
-
-        if (_cellHoverTarget == p)
-        {
-            _cellHoverTimer?.Stop();
-            _cellHoverTimer = null;
-            _cellHoverTarget = null;
-        }
-
-        if (_cellHoverShown == p)
-        {
-            SetCellHover(p, false);
-            _cellHoverShown = null;
-        }
-    }
-
-    private static void SetCellHover(Panel panel, bool showLabel)
-    {
-        if (panel.Children.Count < 2) return;
-        panel.Children[0].IsVisible = !showLabel;
-        panel.Children[1].IsVisible = showLabel;
-    }
-
     private static ServerInfo? FindServerFromVisual(object? source)
     {
         if (source is not Visual v) return null;

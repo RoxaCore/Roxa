@@ -228,4 +228,181 @@
 Задержка: {1}</value></data>
   <data name="Notify_ConnectFailed" xml:space="preserve"><value>Не удалось подключиться</value></data>
   <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>Умное подключение: тест реальной задержки не пройден</value></data>
+  <data name="Dlg_ConfirmDeleteFromGroup" xml:space="preserve"><value>Удалить {0} серверов из группы «{1}»?</value></data>
+  <data name="Dlg_ConfirmDeleteN" xml:space="preserve"><value>Удалить серверов: {0}?</value></data>
+  <data name="Dlg_ConfirmDeleteSelected" xml:space="preserve"><value>Удалить выбранные серверы ({0})?</value></data>
+  <data name="Dlg_ConfirmDeleteSub" xml:space="preserve"><value>Удалить подписку "{0}" и все её серверы?</value></data>
+  <data name="Dlg_DNSExample" xml:space="preserve"><value>Пример: {0}</value></data>
+  <data name="Ed_Flow" xml:space="preserve"><value>Flow</value></data>
+  <data name="Ed_Host" xml:space="preserve"><value>Хост</value></data>
+  <data name="Ed_Network" xml:space="preserve"><value>Сеть</value></data>
+  <data name="Ed_Password" xml:space="preserve"><value>Parol</value></data>
+  <data name="Ed_Path" xml:space="preserve"><value>Путь</value></data>
+  <data name="Ed_SNI" xml:space="preserve"><value>SNI</value></data>
+  <data name="Ed_Security" xml:space="preserve"><value>Безопасность</value></data>
+  <data name="Ed_UserId" xml:space="preserve"><value>Идентификатор пользователя</value></data>
+  <data name="Expire_DaysLeft" xml:space="preserve"><value>Осталось {0} дн.</value></data>
+  <data name="Expire_Expired" xml:space="preserve"><value>Истёк</value></data>
+  <data name="Expire_HoursLeft" xml:space="preserve"><value>Осталось {0} ч</value></data>
+  <data name="Group_Manual" xml:space="preserve"><value>📝 Вручную</value></data>
+  <data name="Home_NoServer" xml:space="preserve"><value>Сервер не выбран</value></data>
+  <data name="Home_NotConnected" xml:space="preserve"><value>Не подключено</value></data>
+  <data name="LastUpdate_DayAgo" xml:space="preserve"><value>Последнее обновление: {0} дн. назад</value></data>
+  <data name="LastUpdate_HourAgo" xml:space="preserve"><value>Последнее обновление: {0} ч назад</value></data>
+  <data name="LastUpdate_MinAgo" xml:space="preserve"><value>Последнее обновление: {0} мин назад</value></data>
+  <data name="LastUpdate_Never" xml:space="preserve"><value>Последнее обновление: никогда</value></data>
+  <data name="Log_AllGroupSelected" xml:space="preserve"><value>Выбраны все серверы группы «{0}»</value></data>
+  <data name="Log_AutoConnectNoServer" xml:space="preserve"><value>Автоподключение: сервер не выбран</value></data>
+  <data name="Log_FetchNoneKept" xml:space="preserve"><value>Ошибка в {0}: серверы не получены — прежние серверы сохранены</value></data>
+  <data name="Log_FetchedCount" xml:space="preserve"><value>Получено серверов: {0}</value></data>
+  <data name="Log_RemovedFromGroup" xml:space="preserve"><value>Из группы «{1}» удалено серверов: {0}</value></data>
+  <data name="Log_ServerEdited" xml:space="preserve"><value>"{0}" изменён.</value></data>
+  <data name="Log_SubError" xml:space="preserve"><value>Ошибка в {0}: {1}</value></data>
+  <data name="Log_SubInfo" xml:space="preserve"><value>Трафик: {0}/{1} | Истекает: {2}</value></data>
+  <data name="Log_SubInfoMissing" xml:space="preserve"><value>Информация о подписке (трафик/срок) не получена от сервера</value></data>
+  <data name="Log_UpdateErrorIn" xml:space="preserve"><value>Ошибка обновления {0}: {1}</value></data>
+  <data name="Proxy_Off" xml:space="preserve"><value>Системный прокси (выкл)</value></data>
+  <data name="Proxy_On" xml:space="preserve"><value>Системный прокси (вкл)</value></data>
+  <data name="Status_ClipboardAdded" xml:space="preserve"><value>Добавлено серверов из буфера: {0}</value></data>
+  <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Буфер обмена пуст</value></data>
+  <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Нет доступа к буферу обмена</value></data>
+  <data name="Status_ConnectError" xml:space="preserve"><value>Ошибка подключения</value></data>
+  <data name="Status_ConnectedTo" xml:space="preserve"><value>Подключено к {0}</value></data>
+  <data name="Status_Connecting" xml:space="preserve"><value>Подключение ...</value></data>
+  <data name="Status_DupCount" xml:space="preserve"><value>Серверов-дубликатов: {0}</value></data>
+  <data name="Status_DupServer" xml:space="preserve"><value>Сервер "{0}" уже добавлен</value></data>
+  <data name="Status_FetchError" xml:space="preserve"><value>Ошибка получения</value></data>
+  <data name="Status_FetchedFromSub" xml:space="preserve"><value>Получено серверов от "{1}": {0}</value></data>
+  <data name="Status_Fetching" xml:space="preserve"><value>Получение {0} ...</value></data>
+  <data name="Status_FindBusy" xml:space="preserve"><value>Поиск лучшего: другой тест уже выполняется</value></data>
+  <data name="Status_FindCancelled" xml:space="preserve"><value>Поиск лучшего отменён</value></data>
+  <data name="Status_FindNoCandidate" xml:space="preserve"><value>Поиск лучшего: ни один кандидат не ответил</value></data>
+  <data name="Status_FindNoServer" xml:space="preserve"><value>Поиск лучшего: сервер не выбран</value></data>
+  <data name="Status_FindNotConnected" xml:space="preserve"><value>Поиск лучшего: сначала подключитесь</value></data>
+  <data name="Status_FindRealFailed" xml:space="preserve"><value>Поиск лучшего: тест реальной задержки не пройден</value></data>
+  <data name="Status_FindStillBest" xml:space="preserve"><value>Поиск лучшего: текущий сервер всё ещё лучший ({0}ms)</value></data>
+  <data name="Status_FindTestingBatch" xml:space="preserve"><value>Поиск лучшего: тестируем {0} серверов ...</value></data>
+  <data name="Status_GroupPing" xml:space="preserve"><value>Пинг группы «{0}» ({1} серверов) ...</value></data>
+  <data name="Status_GroupPingDone" xml:space="preserve"><value>Пинг группы завершён (успешно: {0})</value></data>
+  <data name="Status_GroupReal" xml:space="preserve"><value>Тест реальной задержки группы «{0}» ({1} серверов) ...</value></data>
+  <data name="Status_GroupRealDone" xml:space="preserve"><value>Тест реальной задержки группы завершён (успешно: {0})</value></data>
+  <data name="Status_GroupSpeed" xml:space="preserve"><value>Тест скорости группы «{0}» ({1} серверов) ...</value></data>
+  <data name="Status_GroupSpeedDone" xml:space="preserve"><value>Тест скорости группы завершён (успешно: {0})</value></data>
+  <data name="Status_GroupUpdate" xml:space="preserve"><value>Обновление группы «{0}» ({1} серверов) ...</value></data>
+  <data name="Status_GroupUpdateDone" xml:space="preserve"><value>Обновление группы завершено (успешно: {0})</value></data>
+  <data name="Status_NewServerName" xml:space="preserve"><value>Новый сервер ({0})</value></data>
+  <data name="Status_NoServerFromSub" xml:space="preserve"><value>Серверы от "{0}" не получены</value></data>
+  <data name="Status_NoServers" xml:space="preserve"><value>Нет серверов</value></data>
+  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>В буфере обмена нет допустимой ссылки</value></data>
+  <data name="Status_PingAll" xml:space="preserve"><value>Пинг {0} серверов ...</value></data>
+  <data name="Status_PingDoneCount" xml:space="preserve"><value>Пинг завершён: ответили {0} из {1}</value></data>
+  <data name="Status_PingSelDone" xml:space="preserve"><value>Пинг выбранных завершён (успешно: {0})</value></data>
+  <data name="Status_PingSelected" xml:space="preserve"><value>Пинг {0} выбранных серверов ...</value></data>
+  <data name="Status_RealAll" xml:space="preserve"><value>Тест реальной задержки {0} серверов (медленно, но точно) ...</value></data>
+  <data name="Status_RealCount" xml:space="preserve"><value>Тест реальной задержки {0} серверов ...</value></data>
+  <data name="Status_RealDone" xml:space="preserve"><value>Тест реальной задержки завершён (успешно: {0})</value></data>
+  <data name="Status_RealDoneCount" xml:space="preserve"><value>Тест реальной задержки завершён: успешно {0} из {1}</value></data>
+  <data name="Status_RealSelDone" xml:space="preserve"><value>Тест реальной задержки выбранных завершён (успешно: {0})</value></data>
+  <data name="Status_RealSelected" xml:space="preserve"><value>Тест реальной задержки {0} выбранных серверов ...</value></data>
+  <data name="Status_ServerAdded" xml:space="preserve"><value>Сервер "{0}" добавлен</value></data>
+  <data name="Status_ServersAdded" xml:space="preserve"><value>Добавлено серверов: {0}</value></data>
+  <data name="Status_SmartBest" xml:space="preserve"><value>Умное подключение: лучший сервер → {0} ({1})</value></data>
+  <data name="Status_SmartCancelled" xml:space="preserve"><value>Умное подключение отменено</value></data>
+  <data name="Status_SmartNoResponse" xml:space="preserve"><value>Умное подключение: серверы не отвечают</value></data>
+  <data name="Status_SmartRealDelay" xml:space="preserve"><value>Умное подключение: реальная задержка у {0} кандидатов ...</value></data>
+  <data name="Status_SmartRealFailed" xml:space="preserve"><value>Умное подключение: тест реальной задержки не пройден</value></data>
+  <data name="Status_SmartStage1" xml:space="preserve"><value>Умное подключение: быстрый пинг ...</value></data>
+  <data name="Status_SpeedAll" xml:space="preserve"><value>Тест скорости {0} серверов ...</value></data>
+  <data name="Status_SpeedAllProxy" xml:space="preserve"><value>Тест скорости {0} серверов (через прокси) ...</value></data>
+  <data name="Status_SpeedDoneCount" xml:space="preserve"><value>Тест скорости завершён: успешно {0} из {1}</value></data>
+  <data name="Status_SpeedSelDone" xml:space="preserve"><value>Тест скорости выбранных завершён (успешно: {0})</value></data>
+  <data name="Status_SpeedSelected" xml:space="preserve"><value>Тест скорости {0} выбранных серверов ...</value></data>
+  <data name="Status_Stopped" xml:space="preserve"><value>Остановлено</value></data>
+  <data name="Status_SubAddedCount" xml:space="preserve"><value>"{0}" добавлено ({1} серверов)</value></data>
+  <data name="Status_SubUpdatedN" xml:space="preserve"><value>"{0}" обновлено (новых серверов: {1})</value></data>
+  <data name="Status_TestSpeedOne" xml:space="preserve"><value>Тест скорости: {0} ...</value></data>
+  <data name="Status_UpdateError" xml:space="preserve"><value>Ошибка обновления</value></data>
+  <data name="Status_UpdateErrorIn" xml:space="preserve"><value>Ошибка обновления {0}</value></data>
+  <data name="Status_UpdateNoProxy" xml:space="preserve"><value>Обновление без прокси ...</value></data>
+  <data name="Status_UpdateWithProxy" xml:space="preserve"><value>Обновление через прокси ...</value></data>
+  <data name="Sub_ServerCount" xml:space="preserve"><value>Количество серверов: {0}</value></data>
+  <data name="Toast_AllChecked" xml:space="preserve"><value>Все серверы уже проверены</value></data>
+  <data name="Toast_AnotherTestRunning" xml:space="preserve"><value>Другой тест уже выполняется — подождите</value></data>
+  <data name="Toast_AutoConnectSelect" xml:space="preserve"><value>Автоподключение: сначала выберите сервер</value></data>
+  <data name="Toast_CheckingNew" xml:space="preserve"><value>Проверяем {0} новых серверов ...</value></data>
+  <data name="Toast_ConnectingTo" xml:space="preserve"><value>Подключение к {0} ({1})</value></data>
+  <data name="Toast_EnterLink" xml:space="preserve"><value>Введите ссылку</value></data>
+  <data name="Toast_FindingBest" xml:space="preserve"><value>Ищем лучший сервер ...</value></data>
+  <data name="Toast_FirstConnect" xml:space="preserve"><value>Сначала подключитесь к серверу</value></data>
+  <data name="Toast_NoServerForConnect" xml:space="preserve"><value>Нет сервера для подключения</value></data>
+  <data name="Toast_NoServerInBatch" xml:space="preserve"><value>Ни один сервер из этой партии не ответил</value></data>
+  <data name="Toast_NoServerResponded" xml:space="preserve"><value>Ни один сервер не ответил</value></data>
+  <data name="Toast_RealDelayFailed" xml:space="preserve"><value>Тест реальной задержки не удался</value></data>
+  <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>Тест реальной задержки не подтвердил ни один сервер</value></data>
+  <data name="Toast_SelectServerFirst" xml:space="preserve"><value>Сервер не выбран — сначала выберите его</value></data>
+  <data name="Toast_StillBest" xml:space="preserve"><value>Текущий сервер всё ещё лучший ({0}ms)</value></data>
+  <data name="Toast_SubLinkCopied" xml:space="preserve"><value>Ссылка подписки скопирована</value></data>
+  <data name="Toast_SwitchTo" xml:space="preserve"><value>Переключение на {0} ({1} мс)</value></data>
+  <data name="Traffic_UsageDiff" xml:space="preserve"><value>Использовано {0} {1} из {2} {3}</value></data>
+  <data name="Traffic_UsageSame" xml:space="preserve"><value>Использовано {0} из {1} {2}</value></data>
+  <data name="Traffic_UsageZero" xml:space="preserve"><value>Использовано 0 из {0} {1}</value></data>
+  <data name="Tun_AdapterCreated" xml:space="preserve"><value>TUN-адаптер создан.</value></data>
+  <data name="Tun_AdapterExists" xml:space="preserve"><value>TUN-адаптер уже существует.</value></data>
+  <data name="Tun_CleanError" xml:space="preserve"><value>Ошибка очистки: {0}</value></data>
+  <data name="Tun_Cleaning" xml:space="preserve"><value>Очистка TUN-адаптера...</value></data>
+  <data name="Tun_CreateError" xml:space="preserve"><value>Ошибка создания адаптера: {0}</value></data>
+  <data name="Tun_CreatingAdapter" xml:space="preserve"><value>Создание TUN-адаптера...</value></data>
+  <data name="Tun_DownloadError" xml:space="preserve"><value>Ошибка загрузки wintun: {0}</value></data>
+  <data name="Tun_DownloadingDriver" xml:space="preserve"><value>Загрузка драйвера wintun...</value></data>
+  <data name="Tun_DriverDownloaded" xml:space="preserve"><value>Драйвер wintun успешно загружен</value></data>
+  <data name="Tun_HashBad" xml:space="preserve"><value>Хеш файла wintun не совпадает — загрузка отменена</value></data>
+  <data name="Tun_NeedAdmin" xml:space="preserve"><value>Для создания TUN-адаптера нужны права администратора</value></data>
+  <data name="Unit_B" xml:space="preserve"><value>Байт</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>Гигабайт</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>Килобайт</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>Мегабайт</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>Терабайт</value></data>
+  <data name="Url_InvalidSs" xml:space="preserve"><value>Недопустимая ссылка Shadowsocks</value></data>
+  <data name="Url_InvalidTrojan" xml:space="preserve"><value>Недопустимая ссылка Trojan</value></data>
+  <data name="Url_InvalidVless" xml:space="preserve"><value>Недопустимая ссылка VLESS</value></data>
+  <data name="Url_Unsupported" xml:space="preserve"><value>Поддерживаются только vmess / vless / ss / trojan</value></data>
+  <data name="Log_FindBusy" xml:space="preserve"><value>Поиск лучшего: прерван — другой тест уже выполняется</value></data>
+  <data name="Log_FindError" xml:space="preserve"><value>Ошибка поиска лучшего: {0}</value></data>
+  <data name="Log_FindNoMore" xml:space="preserve"><value>Поиск лучшего: больше нет серверов для тестирования</value></data>
+  <data name="Log_FindNoSelection" xml:space="preserve"><value>Поиск лучшего: прерван — сервер не выбран</value></data>
+  <data name="Log_FindNoSurvivors" xml:space="preserve"><value>Поиск лучшего: нет выживших после TCP-пинга</value></data>
+  <data name="Log_FindNotConnected" xml:space="preserve"><value>Поиск лучшего: прерван — нет подключения</value></data>
+  <data name="Log_FindRealBatch" xml:space="preserve"><value>Поиск лучшего: тестируем {0} выживших пакетным multi-outbound</value></data>
+  <data name="Log_FindRealFailedAll" xml:space="preserve"><value>Поиск лучшего: все тесты реальной задержки не пройдены</value></data>
+  <data name="Log_FindSurvivors" xml:space="preserve"><value>Поиск лучшего: выжило {0}, начинаем тест реальной задержки</value></data>
+  <data name="Log_PoolExpired" xml:space="preserve"><value>Пул поиска устарел или пуст. Перестроение из всех серверов...</value></data>
+  <data name="Log_SearchPool" xml:space="preserve"><value>Пул поиска: сохранено нетестированных серверов: {0} (для пошагового поиска)</value></data>
+  <data name="Log_SmartFailedAll" xml:space="preserve"><value>Умное подключение: тест реальной задержки не пройден ни для одного кандидата</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>Ресурс {0} не найден в последнем релизе Xray.</value></data>
+  <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>Не удалось сбросить прокси: {0}</value></data>
+  <data name="Eng_ConnectedPorts" xml:space="preserve"><value>Подключено. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
+  <data name="Eng_ConnectingTo" xml:space="preserve"><value>Подключение к {0} {1} ...</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Несовпадение суммы Xray-core при загрузке: ожидалось {0}, получено {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Загрузка Xray-core ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Движок Xray неожиданно завершился.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Проверка целостности движка Xray не пройдена.</value></data>
+  <data name="Eng_IntegrityRetry" xml:space="preserve"><value>Проверка целостности движка не пройдена. Повторная загрузка ...</value></data>
+  <data name="Eng_MirrorTrying" xml:space="preserve"><value>Прямой доступ к GitHub недоступен, пробуем зеркало ...</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>Многотестовый движок Xray неожиданно завершился.</value></data>
+  <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>Порты многотестового режима не были запущены.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>Многотестовый движок Xray запущен.</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>Невозможно проверить загрузку Xray-core через зеркало без суммы GitHub.</value></data>
+  <data name="Eng_NotFound" xml:space="preserve"><value>Движок не найден, загрузка ...</value></data>
+  <data name="Eng_PortNotUp" xml:space="preserve"><value>Порт прокси не был запущен.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} готов.</value></data>
+  <data name="Eng_Stopped" xml:space="preserve"><value>Движок остановлен.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>Тестовый движок Xray неожиданно завершился.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Тестовый порт Xray не был запущен.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>Тестовый движок Xray запущен.</value></data>
+  <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN-адаптер очищен.</value></data>
+  <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>Не удалось очистить TUN: {0}</value></data>
+  <data name="Eng_TunFallback" xml:space="preserve"><value>Режим TUN требует прав администратора. Возврат в режим прокси.</value></data>
+  <data name="Eng_UnsupportedOs" xml:space="preserve"><value>Неподдерживаемая ОС/архитектура.</value></data>
+  <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll недоступен. Возврат в режим прокси.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Разрешены только URL подписки https.</value></data>
 </root>

@@ -229,4 +229,181 @@ Latency: {1}</value></data>
 Latency: {1}</value></data>
   <data name="Notify_ConnectFailed" xml:space="preserve"><value>Connection failed</value></data>
   <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>Smart connect: real delay test failed</value></data>
+  <data name="Dlg_ConfirmDeleteFromGroup" xml:space="preserve"><value>Are you sure you want to delete {0} servers from group "{1}"?</value></data>
+  <data name="Dlg_ConfirmDeleteN" xml:space="preserve"><value>Are you sure you want to delete {0} servers?</value></data>
+  <data name="Dlg_ConfirmDeleteSelected" xml:space="preserve"><value>Are you sure you want to delete {0} selected servers?</value></data>
+  <data name="Dlg_ConfirmDeleteSub" xml:space="preserve"><value>Are you sure you want to delete subscription "{0}" and all its servers?</value></data>
+  <data name="Dlg_DNSExample" xml:space="preserve"><value>Example: {0}</value></data>
+  <data name="Ed_Flow" xml:space="preserve"><value>Flow</value></data>
+  <data name="Ed_Host" xml:space="preserve"><value>Host</value></data>
+  <data name="Ed_Network" xml:space="preserve"><value>Network</value></data>
+  <data name="Ed_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Ed_Path" xml:space="preserve"><value>Path</value></data>
+  <data name="Ed_SNI" xml:space="preserve"><value>SNI</value></data>
+  <data name="Ed_Security" xml:space="preserve"><value>Security</value></data>
+  <data name="Ed_UserId" xml:space="preserve"><value>User ID</value></data>
+  <data name="Expire_DaysLeft" xml:space="preserve"><value>{0} days left</value></data>
+  <data name="Expire_Expired" xml:space="preserve"><value>Expired</value></data>
+  <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} hours left</value></data>
+  <data name="Group_Manual" xml:space="preserve"><value>📝 Manual</value></data>
+  <data name="Home_NoServer" xml:space="preserve"><value>No server selected</value></data>
+  <data name="Home_NotConnected" xml:space="preserve"><value>Not connected</value></data>
+  <data name="LastUpdate_DayAgo" xml:space="preserve"><value>Last updated: {0} days ago</value></data>
+  <data name="LastUpdate_HourAgo" xml:space="preserve"><value>Last updated: {0} hr ago</value></data>
+  <data name="LastUpdate_MinAgo" xml:space="preserve"><value>Last updated: {0} min ago</value></data>
+  <data name="LastUpdate_Never" xml:space="preserve"><value>Last updated: never</value></data>
+  <data name="Log_AllGroupSelected" xml:space="preserve"><value>All servers in group "{0}" selected</value></data>
+  <data name="Log_AutoConnectNoServer" xml:space="preserve"><value>Auto-connect: no server selected</value></data>
+  <data name="Log_FetchNoneKept" xml:space="preserve"><value>Error in {0}: no servers received — previous servers kept</value></data>
+  <data name="Log_FetchedCount" xml:space="preserve"><value>Servers received: {0}</value></data>
+  <data name="Log_RemovedFromGroup" xml:space="preserve"><value>{0} servers removed from group "{1}"</value></data>
+  <data name="Log_ServerEdited" xml:space="preserve"><value>"{0}" edited.</value></data>
+  <data name="Log_SubError" xml:space="preserve"><value>Error in {0}: {1}</value></data>
+  <data name="Log_SubInfo" xml:space="preserve"><value>Traffic: {0}/{1} | Expires: {2}</value></data>
+  <data name="Log_SubInfoMissing" xml:space="preserve"><value>Subscription info (traffic/expiry) was not received from the server</value></data>
+  <data name="Log_UpdateErrorIn" xml:space="preserve"><value>Error updating {0}: {1}</value></data>
+  <data name="Proxy_Off" xml:space="preserve"><value>System proxy (off)</value></data>
+  <data name="Proxy_On" xml:space="preserve"><value>System proxy (on)</value></data>
+  <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servers added from clipboard</value></data>
+  <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Clipboard is empty</value></data>
+  <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Clipboard access is not available</value></data>
+  <data name="Status_ConnectError" xml:space="preserve"><value>Connection error</value></data>
+  <data name="Status_ConnectedTo" xml:space="preserve"><value>Connected to {0}</value></data>
+  <data name="Status_Connecting" xml:space="preserve"><value>Connecting ...</value></data>
+  <data name="Status_DupCount" xml:space="preserve"><value>{0} servers were duplicates</value></data>
+  <data name="Status_DupServer" xml:space="preserve"><value>Server "{0}" already exists</value></data>
+  <data name="Status_FetchError" xml:space="preserve"><value>Fetch error</value></data>
+  <data name="Status_FetchedFromSub" xml:space="preserve"><value>{0} servers received from "{1}"</value></data>
+  <data name="Status_Fetching" xml:space="preserve"><value>Fetching {0} ...</value></data>
+  <data name="Status_FindBusy" xml:space="preserve"><value>Find better: another test is running</value></data>
+  <data name="Status_FindCancelled" xml:space="preserve"><value>Find better cancelled</value></data>
+  <data name="Status_FindNoCandidate" xml:space="preserve"><value>Find better: no candidate responded</value></data>
+  <data name="Status_FindNoServer" xml:space="preserve"><value>Find better: no server selected</value></data>
+  <data name="Status_FindNotConnected" xml:space="preserve"><value>Find better: connect first</value></data>
+  <data name="Status_FindRealFailed" xml:space="preserve"><value>Find better: real delay test failed</value></data>
+  <data name="Status_FindStillBest" xml:space="preserve"><value>Find better: current server is still best ({0}ms)</value></data>
+  <data name="Status_FindTestingBatch" xml:space="preserve"><value>Find better: testing {0} servers ...</value></data>
+  <data name="Status_GroupPing" xml:space="preserve"><value>Ping group "{0}" ({1} servers) ...</value></data>
+  <data name="Status_GroupPingDone" xml:space="preserve"><value>Group ping done ({0} ok)</value></data>
+  <data name="Status_GroupReal" xml:space="preserve"><value>Real delay test for group "{0}" ({1} servers) ...</value></data>
+  <data name="Status_GroupRealDone" xml:space="preserve"><value>Group real delay test done ({0} ok)</value></data>
+  <data name="Status_GroupSpeed" xml:space="preserve"><value>Speed test for group "{0}" ({1} servers) ...</value></data>
+  <data name="Status_GroupSpeedDone" xml:space="preserve"><value>Group speed test done ({0} ok)</value></data>
+  <data name="Status_GroupUpdate" xml:space="preserve"><value>Updating group "{0}" ({1} servers) ...</value></data>
+  <data name="Status_GroupUpdateDone" xml:space="preserve"><value>Group update done ({0} ok)</value></data>
+  <data name="Status_NewServerName" xml:space="preserve"><value>New server ({0})</value></data>
+  <data name="Status_NoServerFromSub" xml:space="preserve"><value>No servers received from "{0}"</value></data>
+  <data name="Status_NoServers" xml:space="preserve"><value>No servers</value></data>
+  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>No valid link in the clipboard</value></data>
+  <data name="Status_PingAll" xml:space="preserve"><value>Pinging {0} servers ...</value></data>
+  <data name="Status_PingDoneCount" xml:space="preserve"><value>Ping done: {0} of {1} responded</value></data>
+  <data name="Status_PingSelDone" xml:space="preserve"><value>Ping of selected done ({0} ok)</value></data>
+  <data name="Status_PingSelected" xml:space="preserve"><value>Pinging {0} selected servers ...</value></data>
+  <data name="Status_RealAll" xml:space="preserve"><value>Real delay test on {0} servers (slow but accurate) ...</value></data>
+  <data name="Status_RealCount" xml:space="preserve"><value>Real delay test on {0} servers ...</value></data>
+  <data name="Status_RealDone" xml:space="preserve"><value>Real delay test done ({0} ok)</value></data>
+  <data name="Status_RealDoneCount" xml:space="preserve"><value>Real delay test done: {0} of {1} succeeded</value></data>
+  <data name="Status_RealSelDone" xml:space="preserve"><value>Real delay test of selected done ({0} ok)</value></data>
+  <data name="Status_RealSelected" xml:space="preserve"><value>Real delay test on {0} selected servers ...</value></data>
+  <data name="Status_ServerAdded" xml:space="preserve"><value>Server "{0}" added</value></data>
+  <data name="Status_ServersAdded" xml:space="preserve"><value>{0} servers added</value></data>
+  <data name="Status_SmartBest" xml:space="preserve"><value>Smart connect: best server → {0} ({1})</value></data>
+  <data name="Status_SmartCancelled" xml:space="preserve"><value>Smart connect cancelled</value></data>
+  <data name="Status_SmartNoResponse" xml:space="preserve"><value>Smart connect: no server responded</value></data>
+  <data name="Status_SmartRealDelay" xml:space="preserve"><value>Smart connect: real delay on {0} candidates ...</value></data>
+  <data name="Status_SmartRealFailed" xml:space="preserve"><value>Smart connect: real delay test failed</value></data>
+  <data name="Status_SmartStage1" xml:space="preserve"><value>Smart connect: fast ping ...</value></data>
+  <data name="Status_SpeedAll" xml:space="preserve"><value>Speed test on {0} servers ...</value></data>
+  <data name="Status_SpeedAllProxy" xml:space="preserve"><value>Speed test on {0} servers (via proxy) ...</value></data>
+  <data name="Status_SpeedDoneCount" xml:space="preserve"><value>Speed test done: {0} of {1} succeeded</value></data>
+  <data name="Status_SpeedSelDone" xml:space="preserve"><value>Speed test of selected done ({0} ok)</value></data>
+  <data name="Status_SpeedSelected" xml:space="preserve"><value>Speed test on {0} selected servers ...</value></data>
+  <data name="Status_Stopped" xml:space="preserve"><value>Stopped</value></data>
+  <data name="Status_SubAddedCount" xml:space="preserve"><value>"{0}" added ({1} servers)</value></data>
+  <data name="Status_SubUpdatedN" xml:space="preserve"><value>"{0}" updated ({1} new servers)</value></data>
+  <data name="Status_TestSpeedOne" xml:space="preserve"><value>Speed test: {0} ...</value></data>
+  <data name="Status_UpdateError" xml:space="preserve"><value>Update error</value></data>
+  <data name="Status_UpdateErrorIn" xml:space="preserve"><value>Error updating {0}</value></data>
+  <data name="Status_UpdateNoProxy" xml:space="preserve"><value>Updating without proxy ...</value></data>
+  <data name="Status_UpdateWithProxy" xml:space="preserve"><value>Updating via proxy ...</value></data>
+  <data name="Sub_ServerCount" xml:space="preserve"><value>Servers: {0}</value></data>
+  <data name="Toast_AllChecked" xml:space="preserve"><value>All servers have already been checked</value></data>
+  <data name="Toast_AnotherTestRunning" xml:space="preserve"><value>Another test is running — please wait</value></data>
+  <data name="Toast_AutoConnectSelect" xml:space="preserve"><value>Auto-connect: select a server first</value></data>
+  <data name="Toast_CheckingNew" xml:space="preserve"><value>Checking {0} new servers ...</value></data>
+  <data name="Toast_ConnectingTo" xml:space="preserve"><value>Connecting to {0} ({1})</value></data>
+  <data name="Toast_EnterLink" xml:space="preserve"><value>Enter a link</value></data>
+  <data name="Toast_FindingBest" xml:space="preserve"><value>Finding the best server ...</value></data>
+  <data name="Toast_FirstConnect" xml:space="preserve"><value>Connect to a server first</value></data>
+  <data name="Toast_NoServerForConnect" xml:space="preserve"><value>No server available to connect</value></data>
+  <data name="Toast_NoServerInBatch" xml:space="preserve"><value>No server in this batch responded</value></data>
+  <data name="Toast_NoServerResponded" xml:space="preserve"><value>No server responded</value></data>
+  <data name="Toast_RealDelayFailed" xml:space="preserve"><value>Real delay test failed</value></data>
+  <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>Real delay test did not confirm any server</value></data>
+  <data name="Toast_SelectServerFirst" xml:space="preserve"><value>No server selected — select one first</value></data>
+  <data name="Toast_StillBest" xml:space="preserve"><value>Current server is still the best ({0}ms)</value></data>
+  <data name="Toast_SubLinkCopied" xml:space="preserve"><value>Subscription link copied</value></data>
+  <data name="Toast_SwitchTo" xml:space="preserve"><value>Switching to {0} ({1}ms)</value></data>
+  <data name="Traffic_UsageDiff" xml:space="preserve"><value>Used {0} {1} of {2} {3}</value></data>
+  <data name="Traffic_UsageSame" xml:space="preserve"><value>Used {0} of {1} {2}</value></data>
+  <data name="Traffic_UsageZero" xml:space="preserve"><value>Used 0 of {0} {1}</value></data>
+  <data name="Tun_AdapterCreated" xml:space="preserve"><value>TUN adapter created.</value></data>
+  <data name="Tun_AdapterExists" xml:space="preserve"><value>TUN adapter already exists.</value></data>
+  <data name="Tun_CleanError" xml:space="preserve"><value>Cleanup error: {0}</value></data>
+  <data name="Tun_Cleaning" xml:space="preserve"><value>Cleaning up TUN adapter...</value></data>
+  <data name="Tun_CreateError" xml:space="preserve"><value>Error creating adapter: {0}</value></data>
+  <data name="Tun_CreatingAdapter" xml:space="preserve"><value>Creating TUN adapter...</value></data>
+  <data name="Tun_DownloadError" xml:space="preserve"><value>Error downloading wintun: {0}</value></data>
+  <data name="Tun_DownloadingDriver" xml:space="preserve"><value>Downloading wintun driver...</value></data>
+  <data name="Tun_DriverDownloaded" xml:space="preserve"><value>wintun driver downloaded successfully</value></data>
+  <data name="Tun_HashBad" xml:space="preserve"><value>wintun file hash mismatch — download cancelled</value></data>
+  <data name="Tun_NeedAdmin" xml:space="preserve"><value>Administrator access is required to create the TUN adapter</value></data>
+  <data name="Unit_B" xml:space="preserve"><value>Byte</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>Gigabyte</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>Kilobyte</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>Megabyte</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>Terabyte</value></data>
+  <data name="Url_InvalidSs" xml:space="preserve"><value>Invalid Shadowsocks link</value></data>
+  <data name="Url_InvalidTrojan" xml:space="preserve"><value>Invalid Trojan link</value></data>
+  <data name="Url_InvalidVless" xml:space="preserve"><value>Invalid VLESS link</value></data>
+  <data name="Url_Unsupported" xml:space="preserve"><value>Only vmess / vless / ss / trojan are supported</value></data>
+  <data name="Log_FindBusy" xml:space="preserve"><value>Find better: blocked — another test is running</value></data>
+  <data name="Log_FindError" xml:space="preserve"><value>Find better error: {0}</value></data>
+  <data name="Log_FindNoMore" xml:space="preserve"><value>Find better: no more servers to test</value></data>
+  <data name="Log_FindNoSelection" xml:space="preserve"><value>Find better: blocked — no server selected</value></data>
+  <data name="Log_FindNoSurvivors" xml:space="preserve"><value>Find better: no survivors from TCP ping</value></data>
+  <data name="Log_FindNotConnected" xml:space="preserve"><value>Find better: blocked — not connected</value></data>
+  <data name="Log_FindRealBatch" xml:space="preserve"><value>Find better: testing {0} survivors via batch multi-outbound</value></data>
+  <data name="Log_FindRealFailedAll" xml:space="preserve"><value>Find better: all real delay tests failed</value></data>
+  <data name="Log_FindSurvivors" xml:space="preserve"><value>Find better: {0} survivors, starting real delay test</value></data>
+  <data name="Log_PoolExpired" xml:space="preserve"><value>Search pool expired or empty. Rebuilding from all servers...</value></data>
+  <data name="Log_SearchPool" xml:space="preserve"><value>Search pool: {0} untested servers saved for incremental search</value></data>
+  <data name="Log_SmartFailedAll" xml:space="preserve"><value>Smart connect: real delay test failed for all candidates</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>Asset {0} not found in latest Xray release.</value></data>
+  <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>Clear proxy failed: {0}</value></data>
+  <data name="Eng_ConnectedPorts" xml:space="preserve"><value>Connected. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
+  <data name="Eng_ConnectingTo" xml:space="preserve"><value>Connecting to {0} {1} ...</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Xray-core download digest mismatch: expected {0}, got {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Downloading Xray-core engine ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Xray engine exited unexpectedly.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Xray engine failed integrity verification.</value></data>
+  <data name="Eng_IntegrityRetry" xml:space="preserve"><value>Engine integrity check failed. Re-downloading ...</value></data>
+  <data name="Eng_MirrorTrying" xml:space="preserve"><value>Direct GitHub unreachable, trying mirror ...</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>Xray multi-test engine exited unexpectedly.</value></data>
+  <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>Multi-test ports did not come up.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>Multi-test Xray engine started.</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>Cannot verify Xray-core download via mirror without GitHub digest.</value></data>
+  <data name="Eng_NotFound" xml:space="preserve"><value>Engine not found, downloading ...</value></data>
+  <data name="Eng_PortNotUp" xml:space="preserve"><value>Proxy port did not come up.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} ready.</value></data>
+  <data name="Eng_Stopped" xml:space="preserve"><value>Engine stopped.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>Xray test engine exited unexpectedly.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray test port did not come up.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>Test Xray engine started.</value></data>
+  <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN adapter cleaned up.</value></data>
+  <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>TUN cleanup failed: {0}</value></data>
+  <data name="Eng_TunFallback" xml:space="preserve"><value>TUN mode requires Administrator. Falling back to proxy mode.</value></data>
+  <data name="Eng_UnsupportedOs" xml:space="preserve"><value>Unsupported OS/architecture.</value></data>
+  <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll not available. Falling back to proxy mode.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Only https subscription URLs are allowed.</value></data>
 </root>

@@ -212,4 +212,181 @@
 지연 시간: {1}</value></data>
   <data name="Notify_ConnectFailed" xml:space="preserve"><value>연결 실패</value></data>
   <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>스마트 연결: 실제 지연 시간 테스트 실패</value></data>
+  <data name="Dlg_ConfirmDeleteFromGroup" xml:space="preserve"><value>그룹 "{1}"에서 서버 {0}개를 삭제할까요?</value></data>
+  <data name="Dlg_ConfirmDeleteN" xml:space="preserve"><value>서버 {0}개를 삭제할까요?</value></data>
+  <data name="Dlg_ConfirmDeleteSelected" xml:space="preserve"><value>선택한 서버 {0}개를 삭제할까요?</value></data>
+  <data name="Dlg_ConfirmDeleteSub" xml:space="preserve"><value>구독 "{0}"과 그 안의 모든 서버를 삭제할까요?</value></data>
+  <data name="Dlg_DNSExample" xml:space="preserve"><value>예: {0}</value></data>
+  <data name="Ed_Flow" xml:space="preserve"><value>Flow</value></data>
+  <data name="Ed_Host" xml:space="preserve"><value>호스트</value></data>
+  <data name="Ed_Network" xml:space="preserve"><value>네트워크</value></data>
+  <data name="Ed_Password" xml:space="preserve"><value>비밀번호</value></data>
+  <data name="Ed_Path" xml:space="preserve"><value>경로</value></data>
+  <data name="Ed_SNI" xml:space="preserve"><value>SNI</value></data>
+  <data name="Ed_Security" xml:space="preserve"><value>보안</value></data>
+  <data name="Ed_UserId" xml:space="preserve"><value>사용자 ID</value></data>
+  <data name="Expire_DaysLeft" xml:space="preserve"><value>{0}일 남음</value></data>
+  <data name="Expire_Expired" xml:space="preserve"><value>만료됨</value></data>
+  <data name="Expire_HoursLeft" xml:space="preserve"><value>{0}시간 남음</value></data>
+  <data name="Group_Manual" xml:space="preserve"><value>📝 수동</value></data>
+  <data name="Home_NoServer" xml:space="preserve"><value>서버 선택 안 됨</value></data>
+  <data name="Home_NotConnected" xml:space="preserve"><value>연결되지 않음</value></data>
+  <data name="LastUpdate_DayAgo" xml:space="preserve"><value>마지막 업데이트: {0}일 전</value></data>
+  <data name="LastUpdate_HourAgo" xml:space="preserve"><value>마지막 업데이트: {0}시간 전</value></data>
+  <data name="LastUpdate_MinAgo" xml:space="preserve"><value>마지막 업데이트: {0}분 전</value></data>
+  <data name="LastUpdate_Never" xml:space="preserve"><value>마지막 업데이트: 없음</value></data>
+  <data name="Log_AllGroupSelected" xml:space="preserve"><value>그룹 "{0}"의 모든 서버 선택됨</value></data>
+  <data name="Log_AutoConnectNoServer" xml:space="preserve"><value>자동 연결: 서버가 선택되지 않음</value></data>
+  <data name="Log_FetchNoneKept" xml:space="preserve"><value>{0} 오류: 서버를 받지 못했습니다 — 이전 서버 유지됨</value></data>
+  <data name="Log_FetchedCount" xml:space="preserve"><value>수신된 서버 수: {0}</value></data>
+  <data name="Log_RemovedFromGroup" xml:space="preserve"><value>그룹 "{1}"에서 서버 {0}개 제거됨</value></data>
+  <data name="Log_ServerEdited" xml:space="preserve"><value>"{0}" 편집됨.</value></data>
+  <data name="Log_SubError" xml:space="preserve"><value>{0} 오류: {1}</value></data>
+  <data name="Log_SubInfo" xml:space="preserve"><value>트래픽: {0}/{1} | 만료: {2}</value></data>
+  <data name="Log_SubInfoMissing" xml:space="preserve"><value>구독 정보(트래픽/만료)를 서버에서 받지 못했습니다</value></data>
+  <data name="Log_UpdateErrorIn" xml:space="preserve"><value>{0} 업데이트 오류: {1}</value></data>
+  <data name="Proxy_Off" xml:space="preserve"><value>시스템 프록시 (끔)</value></data>
+  <data name="Proxy_On" xml:space="preserve"><value>시스템 프록시 (켬)</value></data>
+  <data name="Status_ClipboardAdded" xml:space="preserve"><value>클립보드에서 서버 {0}개 추가됨</value></data>
+  <data name="Status_ClipboardEmpty" xml:space="preserve"><value>클립보드가 비어 있습니다</value></data>
+  <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>클립보드에 접근할 수 없습니다</value></data>
+  <data name="Status_ConnectError" xml:space="preserve"><value>연결 오류</value></data>
+  <data name="Status_ConnectedTo" xml:space="preserve"><value>{0}에 연결됨</value></data>
+  <data name="Status_Connecting" xml:space="preserve"><value>연결 중 ...</value></data>
+  <data name="Status_DupCount" xml:space="preserve"><value>서버 {0}개가 중복이었습니다</value></data>
+  <data name="Status_DupServer" xml:space="preserve"><value>서버 "{0}"가 이미 있습니다</value></data>
+  <data name="Status_FetchError" xml:space="preserve"><value>가져오기 오류</value></data>
+  <data name="Status_FetchedFromSub" xml:space="preserve"><value>"{1}"에서 서버 {0}개 받음</value></data>
+  <data name="Status_Fetching" xml:space="preserve"><value>{0} 가져오는 중 ...</value></data>
+  <data name="Status_FindBusy" xml:space="preserve"><value>더 나은 서버 찾기: 다른 테스트가 실행 중입니다</value></data>
+  <data name="Status_FindCancelled" xml:space="preserve"><value>더 나은 서버 찾기 취소됨</value></data>
+  <data name="Status_FindNoCandidate" xml:space="preserve"><value>더 나은 서버 찾기: 응답한 후보가 없음</value></data>
+  <data name="Status_FindNoServer" xml:space="preserve"><value>더 나은 서버 찾기: 서버 선택 안 됨</value></data>
+  <data name="Status_FindNotConnected" xml:space="preserve"><value>더 나은 서버 찾기: 먼저 연결하세요</value></data>
+  <data name="Status_FindRealFailed" xml:space="preserve"><value>더 나은 서버 찾기: 실제 지연 테스트 실패</value></data>
+  <data name="Status_FindStillBest" xml:space="preserve"><value>더 나은 서버 찾기: 현재 서버가 여전히 최적입니다 ({0}ms)</value></data>
+  <data name="Status_FindTestingBatch" xml:space="preserve"><value>더 나은 서버 찾기: 서버 {0}개 테스트 중 ...</value></data>
+  <data name="Status_GroupPing" xml:space="preserve"><value>그룹 "{0}" 핑 ({1}개 서버) ...</value></data>
+  <data name="Status_GroupPingDone" xml:space="preserve"><value>그룹 핑 완료 ({0}개 성공)</value></data>
+  <data name="Status_GroupReal" xml:space="preserve"><value>그룹 "{0}" 실제 지연 테스트 ({1}개 서버) ...</value></data>
+  <data name="Status_GroupRealDone" xml:space="preserve"><value>그룹 실제 지연 테스트 완료 ({0}개 성공)</value></data>
+  <data name="Status_GroupSpeed" xml:space="preserve"><value>그룹 "{0}" 속도 테스트 ({1}개 서버) ...</value></data>
+  <data name="Status_GroupSpeedDone" xml:space="preserve"><value>그룹 속도 테스트 완료 ({0}개 성공)</value></data>
+  <data name="Status_GroupUpdate" xml:space="preserve"><value>그룹 "{0}" 업데이트 중 ({1}개 서버) ...</value></data>
+  <data name="Status_GroupUpdateDone" xml:space="preserve"><value>그룹 업데이트 완료 ({0}개 성공)</value></data>
+  <data name="Status_NewServerName" xml:space="preserve"><value>새 서버 ({0})</value></data>
+  <data name="Status_NoServerFromSub" xml:space="preserve"><value>"{0}"에서 서버를 받지 못했습니다</value></data>
+  <data name="Status_NoServers" xml:space="preserve"><value>서버 없음</value></data>
+  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>클립보드에 유효한 링크가 없습니다</value></data>
+  <data name="Status_PingAll" xml:space="preserve"><value>서버 {0}개 핑 중 ...</value></data>
+  <data name="Status_PingDoneCount" xml:space="preserve"><value>핑 완료: {1}개 중 {0}개 응답</value></data>
+  <data name="Status_PingSelDone" xml:space="preserve"><value>선택 항목 핑 완료 ({0}개 성공)</value></data>
+  <data name="Status_PingSelected" xml:space="preserve"><value>선택한 서버 {0}개 핑 중 ...</value></data>
+  <data name="Status_RealAll" xml:space="preserve"><value>서버 {0}개 실제 지연 테스트 (느리지만 정확) ...</value></data>
+  <data name="Status_RealCount" xml:space="preserve"><value>서버 {0}개 실제 지연 테스트 ...</value></data>
+  <data name="Status_RealDone" xml:space="preserve"><value>실제 지연 테스트 완료 ({0}개 성공)</value></data>
+  <data name="Status_RealDoneCount" xml:space="preserve"><value>실제 지연 테스트 완료: {1}개 중 {0}개 성공</value></data>
+  <data name="Status_RealSelDone" xml:space="preserve"><value>선택 항목 실제 지연 테스트 완료 ({0}개 성공)</value></data>
+  <data name="Status_RealSelected" xml:space="preserve"><value>선택한 서버 {0}개 실제 지연 테스트 ...</value></data>
+  <data name="Status_ServerAdded" xml:space="preserve"><value>서버 "{0}" 추가됨</value></data>
+  <data name="Status_ServersAdded" xml:space="preserve"><value>서버 {0}개 추가됨</value></data>
+  <data name="Status_SmartBest" xml:space="preserve"><value>스마트 연결: 최적 서버 → {0} ({1})</value></data>
+  <data name="Status_SmartCancelled" xml:space="preserve"><value>스마트 연결 취소됨</value></data>
+  <data name="Status_SmartNoResponse" xml:space="preserve"><value>스마트 연결: 응답한 서버가 없음</value></data>
+  <data name="Status_SmartRealDelay" xml:space="preserve"><value>스마트 연결: 후보 {0}개의 실제 지연 ...</value></data>
+  <data name="Status_SmartRealFailed" xml:space="preserve"><value>스마트 연결: 실제 지연 테스트 실패</value></data>
+  <data name="Status_SmartStage1" xml:space="preserve"><value>스마트 연결: 빠른 핑 ...</value></data>
+  <data name="Status_SpeedAll" xml:space="preserve"><value>서버 {0}개 속도 테스트 ...</value></data>
+  <data name="Status_SpeedAllProxy" xml:space="preserve"><value>서버 {0}개 속도 테스트 (프록시 경유) ...</value></data>
+  <data name="Status_SpeedDoneCount" xml:space="preserve"><value>속도 테스트 완료: {1}개 중 {0}개 성공</value></data>
+  <data name="Status_SpeedSelDone" xml:space="preserve"><value>선택 항목 속도 테스트 완료 ({0}개 성공)</value></data>
+  <data name="Status_SpeedSelected" xml:space="preserve"><value>선택한 서버 {0}개 속도 테스트 ...</value></data>
+  <data name="Status_Stopped" xml:space="preserve"><value>중지됨</value></data>
+  <data name="Status_SubAddedCount" xml:space="preserve"><value>"{0}" 추가됨 ({1}개 서버)</value></data>
+  <data name="Status_SubUpdatedN" xml:space="preserve"><value>"{0}" 업데이트됨 (새 서버 {1}개)</value></data>
+  <data name="Status_TestSpeedOne" xml:space="preserve"><value>속도 테스트: {0} ...</value></data>
+  <data name="Status_UpdateError" xml:space="preserve"><value>업데이트 오류</value></data>
+  <data name="Status_UpdateErrorIn" xml:space="preserve"><value>{0} 업데이트 오류</value></data>
+  <data name="Status_UpdateNoProxy" xml:space="preserve"><value>프록시 없이 업데이트 중 ...</value></data>
+  <data name="Status_UpdateWithProxy" xml:space="preserve"><value>프록시를 통해 업데이트 중 ...</value></data>
+  <data name="Sub_ServerCount" xml:space="preserve"><value>서버 수: {0}</value></data>
+  <data name="Toast_AllChecked" xml:space="preserve"><value>모든 서버가 이미 확인되었습니다</value></data>
+  <data name="Toast_AnotherTestRunning" xml:space="preserve"><value>다른 테스트가 실행 중입니다 — 잠시 기다려 주세요</value></data>
+  <data name="Toast_AutoConnectSelect" xml:space="preserve"><value>자동 연결: 먼저 서버를 선택하세요</value></data>
+  <data name="Toast_CheckingNew" xml:space="preserve"><value>새 서버 {0}개 확인 중 ...</value></data>
+  <data name="Toast_ConnectingTo" xml:space="preserve"><value>{0} ({1})에 연결 중</value></data>
+  <data name="Toast_EnterLink" xml:space="preserve"><value>링크를 입력하세요</value></data>
+  <data name="Toast_FindingBest" xml:space="preserve"><value>최적의 서버를 찾는 중 ...</value></data>
+  <data name="Toast_FirstConnect" xml:space="preserve"><value>먼저 서버에 연결하세요</value></data>
+  <data name="Toast_NoServerForConnect" xml:space="preserve"><value>연결할 서버가 없습니다</value></data>
+  <data name="Toast_NoServerInBatch" xml:space="preserve"><value>이 배치의 서버가 응답하지 않았습니다</value></data>
+  <data name="Toast_NoServerResponded" xml:space="preserve"><value>응답한 서버가 없음</value></data>
+  <data name="Toast_RealDelayFailed" xml:space="preserve"><value>실제 지연 테스트 실패</value></data>
+  <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>실제 지연 테스트에서 확인된 서버가 없습니다</value></data>
+  <data name="Toast_SelectServerFirst" xml:space="preserve"><value>서버 선택 안 됨 — 먼저 하나를 선택하세요</value></data>
+  <data name="Toast_StillBest" xml:space="preserve"><value>현재 서버가 여전히 최적입니다 ({0}ms)</value></data>
+  <data name="Toast_SubLinkCopied" xml:space="preserve"><value>구독 링크가 복사되었습니다</value></data>
+  <data name="Toast_SwitchTo" xml:space="preserve"><value>{0} ({1}ms)로 전환</value></data>
+  <data name="Traffic_UsageDiff" xml:space="preserve"><value>사용량 {0} {1} / {2} {3}</value></data>
+  <data name="Traffic_UsageSame" xml:space="preserve"><value>사용량 {0} / {1} {2}</value></data>
+  <data name="Traffic_UsageZero" xml:space="preserve"><value>사용량 0 / {0} {1}</value></data>
+  <data name="Tun_AdapterCreated" xml:space="preserve"><value>TUN 어댑터가 생성되었습니다.</value></data>
+  <data name="Tun_AdapterExists" xml:space="preserve"><value>TUN 어댑터가 이미 존재합니다.</value></data>
+  <data name="Tun_CleanError" xml:space="preserve"><value>정리 오류: {0}</value></data>
+  <data name="Tun_Cleaning" xml:space="preserve"><value>TUN 어댑터 정리 중...</value></data>
+  <data name="Tun_CreateError" xml:space="preserve"><value>어댑터 생성 오류: {0}</value></data>
+  <data name="Tun_CreatingAdapter" xml:space="preserve"><value>TUN 어댑터 생성 중...</value></data>
+  <data name="Tun_DownloadError" xml:space="preserve"><value>wintun 다운로드 오류: {0}</value></data>
+  <data name="Tun_DownloadingDriver" xml:space="preserve"><value>wintun 드라이버 다운로드 중...</value></data>
+  <data name="Tun_DriverDownloaded" xml:space="preserve"><value>wintun 드라이버 다운로드 완료</value></data>
+  <data name="Tun_HashBad" xml:space="preserve"><value>wintun 파일 해시 불일치 — 다운로드 취소됨</value></data>
+  <data name="Tun_NeedAdmin" xml:space="preserve"><value>TUN 어댑터를 만들려면 관리자 권한이 필요합니다</value></data>
+  <data name="Unit_B" xml:space="preserve"><value>바이트</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>기가바이트</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>킬로바이트</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>메가바이트</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>테라바이트</value></data>
+  <data name="Url_InvalidSs" xml:space="preserve"><value>잘못된 Shadowsocks 링크입니다</value></data>
+  <data name="Url_InvalidTrojan" xml:space="preserve"><value>잘못된 Trojan 링크입니다</value></data>
+  <data name="Url_InvalidVless" xml:space="preserve"><value>잘못된 VLESS 링크입니다</value></data>
+  <data name="Url_Unsupported" xml:space="preserve"><value>vmess / vless / ss / trojan만 지원됩니다</value></data>
+  <data name="Log_FindBusy" xml:space="preserve"><value>더 나은 서버 찾기: 차단됨 — 다른 테스트가 실행 중입니다</value></data>
+  <data name="Log_FindError" xml:space="preserve"><value>더 나은 서버 찾기 오류: {0}</value></data>
+  <data name="Log_FindNoMore" xml:space="preserve"><value>더 나은 서버 찾기: 테스트할 서버가 없음</value></data>
+  <data name="Log_FindNoSelection" xml:space="preserve"><value>더 나은 서버 찾기: 차단됨 — 서버 선택 안 됨</value></data>
+  <data name="Log_FindNoSurvivors" xml:space="preserve"><value>더 나은 서버 찾기: TCP 핑 생존자가 없음</value></data>
+  <data name="Log_FindNotConnected" xml:space="preserve"><value>더 나은 서버 찾기: 차단됨 — 연결되지 않음</value></data>
+  <data name="Log_FindRealBatch" xml:space="preserve"><value>더 나은 서버 찾기: 배치 multi-outbound로 생존 {0}개 테스트</value></data>
+  <data name="Log_FindRealFailedAll" xml:space="preserve"><value>더 나은 서버 찾기: 모든 실제 지연 테스트 실패</value></data>
+  <data name="Log_FindSurvivors" xml:space="preserve"><value>더 나은 서버 찾기: 생존 {0}개, 실제 지연 테스트 시작</value></data>
+  <data name="Log_PoolExpired" xml:space="preserve"><value>검색 풀 만료 또는 비어 있음. 모든 서버에서 다시 구성 중...</value></data>
+  <data name="Log_SearchPool" xml:space="preserve"><value>검색 풀: 단계적 검색을 위해 테스트되지 않은 서버 {0}개 저장</value></data>
+  <data name="Log_SmartFailedAll" xml:space="preserve"><value>스마트 연결: 모든 후보에 대한 실제 지연 테스트 실패</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>최신 Xray 릴리스에 자산 {0}을 찾을 수 없습니다.</value></data>
+  <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>프록시 초기화 실패: {0}</value></data>
+  <data name="Eng_ConnectedPorts" xml:space="preserve"><value>연결됨. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
+  <data name="Eng_ConnectingTo" xml:space="preserve"><value>{0}에 연결 중 {1} ...</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Xray-core 다운로드 다이제스트 불일치: 예상 {0}, 실제 {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Xray-core 다운로드 중 ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Xray 엔진이 예기치 않게 종료되었습니다.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Xray 엔진 무결성 확인에 실패했습니다.</value></data>
+  <data name="Eng_IntegrityRetry" xml:space="preserve"><value>엔진 무결성 확인 실패. 다시 다운로드 중 ...</value></data>
+  <data name="Eng_MirrorTrying" xml:space="preserve"><value>GitHub 직접 연결 불가, 미러 시도 중 ...</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>다중 테스트 Xray 엔진이 예기치 않게 종료되었습니다.</value></data>
+  <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>다중 테스트 포트가 시작되지 않았습니다.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>다중 테스트 Xray 엔진이 시작되었습니다.</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>GitHub 다이제스트 없이 미러를 통한 Xray-core 다운로드를 확인할 수 없습니다.</value></data>
+  <data name="Eng_NotFound" xml:space="preserve"><value>엔진을 찾을 수 없어 다운로드 중 ...</value></data>
+  <data name="Eng_PortNotUp" xml:space="preserve"><value>프록시 포트가 시작되지 않았습니다.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} 준비 완료.</value></data>
+  <data name="Eng_Stopped" xml:space="preserve"><value>엔진이 중지되었습니다.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>테스트 Xray 엔진이 예기치 않게 종료되었습니다.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray 테스트 포트가 시작되지 않았습니다.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>테스트 Xray 엔진이 시작되었습니다.</value></data>
+  <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN 어댑터가 정리되었습니다.</value></data>
+  <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>TUN 정리 실패: {0}</value></data>
+  <data name="Eng_TunFallback" xml:space="preserve"><value>TUN 모드에는 관리자 권한이 필요합니다. 프록시 모드로 전환합니다.</value></data>
+  <data name="Eng_UnsupportedOs" xml:space="preserve"><value>지원되지 않는 OS/아키텍처입니다.</value></data>
+  <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll을 사용할 수 없습니다. 프록시 모드로 전환합니다.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>https 구독 URL만 허용됩니다.</value></data>
 </root>

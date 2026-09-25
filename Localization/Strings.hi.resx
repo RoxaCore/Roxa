@@ -212,4 +212,181 @@
 लेटेंसी: {1}</value></data>
   <data name="Notify_ConnectFailed" xml:space="preserve"><value>कनेक्शन विफल</value></data>
   <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>स्मार्ट कनेक्ट: वास्तविक विलंबता परीक्षण विफल</value></data>
+  <data name="Dlg_ConfirmDeleteFromGroup" xml:space="preserve"><value>क्या आप वाकई समूह "{1}" से {0} सर्वर हटाना चाहते हैं?</value></data>
+  <data name="Dlg_ConfirmDeleteN" xml:space="preserve"><value>क्या आप वाकई {0} सर्वर हटाना चाहते हैं?</value></data>
+  <data name="Dlg_ConfirmDeleteSelected" xml:space="preserve"><value>क्या आप वाकई {0} चयनित सर्वर हटाना चाहते हैं?</value></data>
+  <data name="Dlg_ConfirmDeleteSub" xml:space="preserve"><value>क्या आप वाकई सदस्यता "{0}" और उसके सभी सर्वर हटाना चाहते हैं?</value></data>
+  <data name="Dlg_DNSExample" xml:space="preserve"><value>उदाहरण: {0}</value></data>
+  <data name="Ed_Flow" xml:space="preserve"><value>Flow</value></data>
+  <data name="Ed_Host" xml:space="preserve"><value>होस्ट</value></data>
+  <data name="Ed_Network" xml:space="preserve"><value>नेटवर्क</value></data>
+  <data name="Ed_Password" xml:space="preserve"><value>पासवर्ड</value></data>
+  <data name="Ed_Path" xml:space="preserve"><value>पाथ</value></data>
+  <data name="Ed_SNI" xml:space="preserve"><value>SNI</value></data>
+  <data name="Ed_Security" xml:space="preserve"><value>सुरक्षा</value></data>
+  <data name="Ed_UserId" xml:space="preserve"><value>उपयोगकर्ता आईडी</value></data>
+  <data name="Expire_DaysLeft" xml:space="preserve"><value>{0} दिन शेष</value></data>
+  <data name="Expire_Expired" xml:space="preserve"><value>समाप्त</value></data>
+  <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} घंटे शेष</value></data>
+  <data name="Group_Manual" xml:space="preserve"><value>📝 मैनुअल</value></data>
+  <data name="Home_NoServer" xml:space="preserve"><value>कोई सर्वर चयनित नहीं</value></data>
+  <data name="Home_NotConnected" xml:space="preserve"><value>कनेक्टेड नहीं है</value></data>
+  <data name="LastUpdate_DayAgo" xml:space="preserve"><value>अंतिम अपडेट: {0} दिन पहले</value></data>
+  <data name="LastUpdate_HourAgo" xml:space="preserve"><value>अंतिम अपडेट: {0} घंटे पहले</value></data>
+  <data name="LastUpdate_MinAgo" xml:space="preserve"><value>अंतिम अपडेट: {0} मिनट पहले</value></data>
+  <data name="LastUpdate_Never" xml:space="preserve"><value>अंतिम अपडेट: कभी नहीं</value></data>
+  <data name="Log_AllGroupSelected" xml:space="preserve"><value>समूह "{0}" के सभी सर्वर चयनित</value></data>
+  <data name="Log_AutoConnectNoServer" xml:space="preserve"><value>ऑटो-कनेक्ट: कोई सर्वर चयनित नहीं</value></data>
+  <data name="Log_FetchNoneKept" xml:space="preserve"><value>{0} में त्रुटि: कोई सर्वर प्राप्त नहीं — पिछले सर्वर बनाए रखे गए</value></data>
+  <data name="Log_FetchedCount" xml:space="preserve"><value>प्राप्त सर्वर: {0}</value></data>
+  <data name="Log_RemovedFromGroup" xml:space="preserve"><value>समूह "{1}" से {0} सर्वर हटाए गए</value></data>
+  <data name="Log_ServerEdited" xml:space="preserve"><value>"{0}" संपादित किया गया।</value></data>
+  <data name="Log_SubError" xml:space="preserve"><value>{0} में त्रुटि: {1}</value></data>
+  <data name="Log_SubInfo" xml:space="preserve"><value>ट्रैफ़िक: {0}/{1} | समाप्ति: {2}</value></data>
+  <data name="Log_SubInfoMissing" xml:space="preserve"><value>सदस्यता जानकारी (ट्रैफ़िक/समाप्ति) सर्वर से प्राप्त नहीं हुई</value></data>
+  <data name="Log_UpdateErrorIn" xml:space="preserve"><value>{0} अपडेट करने में त्रुटि: {1}</value></data>
+  <data name="Proxy_Off" xml:space="preserve"><value>सिस्टम प्रॉक्सी (बंद)</value></data>
+  <data name="Proxy_On" xml:space="preserve"><value>सिस्टम प्रॉक्सी (चालू)</value></data>
+  <data name="Status_ClipboardAdded" xml:space="preserve"><value>क्लिपबोर्ड से {0} सर्वर जोड़े गए</value></data>
+  <data name="Status_ClipboardEmpty" xml:space="preserve"><value>क्लिपबोर्ड खाली है</value></data>
+  <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>क्लिपबोर्ड तक पहुँच उपलब्ध नहीं है</value></data>
+  <data name="Status_ConnectError" xml:space="preserve"><value>कनेक्शन त्रुटि</value></data>
+  <data name="Status_ConnectedTo" xml:space="preserve"><value>{0} से कनेक्टेड</value></data>
+  <data name="Status_Connecting" xml:space="preserve"><value>कनेक्ट हो रहा है ...</value></data>
+  <data name="Status_DupCount" xml:space="preserve"><value>{0} सर्वर दोहराव वाले थे</value></data>
+  <data name="Status_DupServer" xml:space="preserve"><value>सर्वर "{0}" पहले से मौजूद है</value></data>
+  <data name="Status_FetchError" xml:space="preserve"><value>प्राप्ति में त्रुटि</value></data>
+  <data name="Status_FetchedFromSub" xml:space="preserve"><value>"{1}" से {0} सर्वर प्राप्त हुए</value></data>
+  <data name="Status_Fetching" xml:space="preserve"><value>{0} प्राप्त किया जा रहा है ...</value></data>
+  <data name="Status_FindBusy" xml:space="preserve"><value>बेहतर खोजें: कोई अन्य परीक्षण चल रहा है</value></data>
+  <data name="Status_FindCancelled" xml:space="preserve"><value>बेहतर खोज रद्द की गई</value></data>
+  <data name="Status_FindNoCandidate" xml:space="preserve"><value>बेहतर खोजें: किसी उम्मीदवार ने उत्तर नहीं दिया</value></data>
+  <data name="Status_FindNoServer" xml:space="preserve"><value>बेहतर खोजें: कोई सर्वर चयनित नहीं</value></data>
+  <data name="Status_FindNotConnected" xml:space="preserve"><value>बेहतर खोजें: पहले कनेक्ट करें</value></data>
+  <data name="Status_FindRealFailed" xml:space="preserve"><value>बेहतर खोजें: वास्तविक विलंब परीक्षण विफल</value></data>
+  <data name="Status_FindStillBest" xml:space="preserve"><value>बेहतर खोजें: वर्तमान सर्वर अभी भी सर्वोत्तम है ({0}ms)</value></data>
+  <data name="Status_FindTestingBatch" xml:space="preserve"><value>बेहतर खोजें: {0} सर्वर का परीक्षण ...</value></data>
+  <data name="Status_GroupPing" xml:space="preserve"><value>समूह "{0}" का पिंग ({1} सर्वर) ...</value></data>
+  <data name="Status_GroupPingDone" xml:space="preserve"><value>समूह पिंग पूरा ({0} सफल)</value></data>
+  <data name="Status_GroupReal" xml:space="preserve"><value>समूह "{0}" का वास्तविक विलंब परीक्षण ({1} सर्वर) ...</value></data>
+  <data name="Status_GroupRealDone" xml:space="preserve"><value>समूह वास्तविक विलंब परीक्षण पूरा ({0} सफल)</value></data>
+  <data name="Status_GroupSpeed" xml:space="preserve"><value>समूह "{0}" का स्पीड टेस्ट ({1} सर्वर) ...</value></data>
+  <data name="Status_GroupSpeedDone" xml:space="preserve"><value>समूह स्पीड टेस्ट पूरा ({0} सफल)</value></data>
+  <data name="Status_GroupUpdate" xml:space="preserve"><value>समूह "{0}" अपडेट हो रहा है ({1} सर्वर) ...</value></data>
+  <data name="Status_GroupUpdateDone" xml:space="preserve"><value>समूह अपडेट पूरा ({0} सफल)</value></data>
+  <data name="Status_NewServerName" xml:space="preserve"><value>नया सर्वर ({0})</value></data>
+  <data name="Status_NoServerFromSub" xml:space="preserve"><value>"{0}" से कोई सर्वर प्राप्त नहीं हुआ</value></data>
+  <data name="Status_NoServers" xml:space="preserve"><value>कोई सर्वर नहीं</value></data>
+  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>क्लिपबोर्ड में कोई वैध लिंक नहीं है</value></data>
+  <data name="Status_PingAll" xml:space="preserve"><value>{0} सर्वर को पिंग किया जा रहा है ...</value></data>
+  <data name="Status_PingDoneCount" xml:space="preserve"><value>पिंग पूरा: {1} में से {0} ने उत्तर दिया</value></data>
+  <data name="Status_PingSelDone" xml:space="preserve"><value>चयनितों का पिंग पूरा ({0} सफल)</value></data>
+  <data name="Status_PingSelected" xml:space="preserve"><value>{0} चयनित सर्वर को पिंग ...</value></data>
+  <data name="Status_RealAll" xml:space="preserve"><value>{0} सर्वर पर वास्तविक विलंब परीक्षण (धीमा लेकिन सटीक) ...</value></data>
+  <data name="Status_RealCount" xml:space="preserve"><value>{0} सर्वर पर वास्तविक विलंब परीक्षण ...</value></data>
+  <data name="Status_RealDone" xml:space="preserve"><value>वास्तविक विलंब परीक्षण पूरा ({0} सफल)</value></data>
+  <data name="Status_RealDoneCount" xml:space="preserve"><value>वास्तविक विलंब परीक्षण पूरा: {1} में से {0} सफल</value></data>
+  <data name="Status_RealSelDone" xml:space="preserve"><value>चयनितों का वास्तविक विलंब परीक्षण पूरा ({0} सफल)</value></data>
+  <data name="Status_RealSelected" xml:space="preserve"><value>{0} चयनित सर्वर पर वास्तविक विलंब परीक्षण ...</value></data>
+  <data name="Status_ServerAdded" xml:space="preserve"><value>सर्वर "{0}" जोड़ा गया</value></data>
+  <data name="Status_ServersAdded" xml:space="preserve"><value>{0} सर्वर जोड़े गए</value></data>
+  <data name="Status_SmartBest" xml:space="preserve"><value>स्मार्ट कनेक्ट: सर्वोत्तम सर्वर → {0} ({1})</value></data>
+  <data name="Status_SmartCancelled" xml:space="preserve"><value>स्मार्ट कनेक्ट रद्द किया गया</value></data>
+  <data name="Status_SmartNoResponse" xml:space="preserve"><value>स्मार्ट कनेक्ट: किसी सर्वर ने उत्तर नहीं दिया</value></data>
+  <data name="Status_SmartRealDelay" xml:space="preserve"><value>स्मार्ट कनेक्ट: {0} उम्मीदवारों पर वास्तविक विलंब ...</value></data>
+  <data name="Status_SmartRealFailed" xml:space="preserve"><value>स्मार्ट कनेक्ट: वास्तविक विलंब परीक्षण विफल</value></data>
+  <data name="Status_SmartStage1" xml:space="preserve"><value>स्मार्ट कनेक्ट: तेज़ पिंग ...</value></data>
+  <data name="Status_SpeedAll" xml:space="preserve"><value>{0} सर्वर पर स्पीड टेस्ट ...</value></data>
+  <data name="Status_SpeedAllProxy" xml:space="preserve"><value>{0} सर्वर पर स्पीड टेस्ट (प्रॉक्सी के माध्यम से) ...</value></data>
+  <data name="Status_SpeedDoneCount" xml:space="preserve"><value>स्पीड टेस्ट पूरा: {1} में से {0} सफल</value></data>
+  <data name="Status_SpeedSelDone" xml:space="preserve"><value>चयनितों का स्पीड टेस्ट पूरा ({0} सफल)</value></data>
+  <data name="Status_SpeedSelected" xml:space="preserve"><value>{0} चयनित सर्वर पर स्पीड टेस्ट ...</value></data>
+  <data name="Status_Stopped" xml:space="preserve"><value>रोका गया</value></data>
+  <data name="Status_SubAddedCount" xml:space="preserve"><value>"{0}" जोड़ा गया ({1} सर्वर)</value></data>
+  <data name="Status_SubUpdatedN" xml:space="preserve"><value>"{0}" अपडेट किया गया ({1} नए सर्वर)</value></data>
+  <data name="Status_TestSpeedOne" xml:space="preserve"><value>स्पीड टेस्ट: {0} ...</value></data>
+  <data name="Status_UpdateError" xml:space="preserve"><value>अपडेट त्रुटि</value></data>
+  <data name="Status_UpdateErrorIn" xml:space="preserve"><value>{0} अपडेट करने में त्रुटि</value></data>
+  <data name="Status_UpdateNoProxy" xml:space="preserve"><value>बिना प्रॉक्सी के अपडेट ...</value></data>
+  <data name="Status_UpdateWithProxy" xml:space="preserve"><value>प्रॉक्सी के माध्यम से अपडेट ...</value></data>
+  <data name="Sub_ServerCount" xml:space="preserve"><value>सर्वर: {0}</value></data>
+  <data name="Toast_AllChecked" xml:space="preserve"><value>सभी सर्वर पहले ही जाँचे जा चुके हैं</value></data>
+  <data name="Toast_AnotherTestRunning" xml:space="preserve"><value>कोई अन्य परीक्षण चल रहा है — कृपया प्रतीक्षा करें</value></data>
+  <data name="Toast_AutoConnectSelect" xml:space="preserve"><value>ऑटो-कनेक्ट: पहले एक सर्वर चुनें</value></data>
+  <data name="Toast_CheckingNew" xml:space="preserve"><value>{0} नए सर्वर की जाँच ...</value></data>
+  <data name="Toast_ConnectingTo" xml:space="preserve"><value>{0} ({1}) से कनेक्ट हो रहा है</value></data>
+  <data name="Toast_EnterLink" xml:space="preserve"><value>एक लिंक दर्ज करें</value></data>
+  <data name="Toast_FindingBest" xml:space="preserve"><value>सर्वोत्तम सर्वर खोजा जा रहा है ...</value></data>
+  <data name="Toast_FirstConnect" xml:space="preserve"><value>पहले किसी सर्वर से कनेक्ट करें</value></data>
+  <data name="Toast_NoServerForConnect" xml:space="preserve"><value>कनेक्ट करने के लिए कोई सर्वर उपलब्ध नहीं</value></data>
+  <data name="Toast_NoServerInBatch" xml:space="preserve"><value>इस बैच में किसी सर्वर ने उत्तर नहीं दिया</value></data>
+  <data name="Toast_NoServerResponded" xml:space="preserve"><value>किसी सर्वर ने उत्तर नहीं दिया</value></data>
+  <data name="Toast_RealDelayFailed" xml:space="preserve"><value>वास्तविक विलंब परीक्षण विफल रहा</value></data>
+  <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>वास्तविक विलंब परीक्षण ने किसी सर्वर की पुष्टि नहीं की</value></data>
+  <data name="Toast_SelectServerFirst" xml:space="preserve"><value>कोई सर्वर चयनित नहीं — पहले एक चुनें</value></data>
+  <data name="Toast_StillBest" xml:space="preserve"><value>वर्तमान सर्वर अभी भी सर्वोत्तम है ({0}ms)</value></data>
+  <data name="Toast_SubLinkCopied" xml:space="preserve"><value>सदस्यता लिंक कॉपी किया गया</value></data>
+  <data name="Toast_SwitchTo" xml:space="preserve"><value>{0} ({1}ms) पर स्विच हो रहा है</value></data>
+  <data name="Traffic_UsageDiff" xml:space="preserve"><value>उपयोग {0} {1} / {2} {3}</value></data>
+  <data name="Traffic_UsageSame" xml:space="preserve"><value>उपयोग {0} / {1} {2}</value></data>
+  <data name="Traffic_UsageZero" xml:space="preserve"><value>उपयोग 0 / {0} {1}</value></data>
+  <data name="Tun_AdapterCreated" xml:space="preserve"><value>TUN अडेप्टर बनाया गया।</value></data>
+  <data name="Tun_AdapterExists" xml:space="preserve"><value>TUN अडेप्टर पहले से मौजूद है।</value></data>
+  <data name="Tun_CleanError" xml:space="preserve"><value>सफाई में त्रुटि: {0}</value></data>
+  <data name="Tun_Cleaning" xml:space="preserve"><value>TUN अडेप्टर साफ किया जा रहा है...</value></data>
+  <data name="Tun_CreateError" xml:space="preserve"><value>अडेप्टर बनाने में त्रुटि: {0}</value></data>
+  <data name="Tun_CreatingAdapter" xml:space="preserve"><value>TUN अडेप्टर बनाया जा रहा है...</value></data>
+  <data name="Tun_DownloadError" xml:space="preserve"><value>wintun डाउनलोड करने में त्रुटि: {0}</value></data>
+  <data name="Tun_DownloadingDriver" xml:space="preserve"><value>wintun ड्राइवर डाउनलोड हो रहा है...</value></data>
+  <data name="Tun_DriverDownloaded" xml:space="preserve"><value>wintun ड्राइवर सफलतापूर्वक डाउनलोड हुआ</value></data>
+  <data name="Tun_HashBad" xml:space="preserve"><value>wintun फ़ाइल हैश गलत है — डाउनलोड रद्द</value></data>
+  <data name="Tun_NeedAdmin" xml:space="preserve"><value>TUN अडेप्टर बनाने के लिए व्यवस्थापक पहुँच आवश्यक है</value></data>
+  <data name="Unit_B" xml:space="preserve"><value>बाइट</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>गीगाबाइट</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>किलोबाइट</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>मेगाबाइट</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>टेराबाइट</value></data>
+  <data name="Url_InvalidSs" xml:space="preserve"><value>अमान्य Shadowsocks लिंक</value></data>
+  <data name="Url_InvalidTrojan" xml:space="preserve"><value>अमान्य Trojan लिंक</value></data>
+  <data name="Url_InvalidVless" xml:space="preserve"><value>अमान्य VLESS लिंक</value></data>
+  <data name="Url_Unsupported" xml:space="preserve"><value>केवल vmess / vless / ss / trojan समर्थित हैं</value></data>
+  <data name="Log_FindBusy" xml:space="preserve"><value>बेहतर खोजें: रोका गया — कोई अन्य परीक्षण चल रहा है</value></data>
+  <data name="Log_FindError" xml:space="preserve"><value>बेहतर खोजने में त्रुटि: {0}</value></data>
+  <data name="Log_FindNoMore" xml:space="preserve"><value>बेहतर खोजें: परीक्षण के लिए और सर्वर नहीं बचे</value></data>
+  <data name="Log_FindNoSelection" xml:space="preserve"><value>बेहतर खोजें: रोका गया — कोई सर्वर चयनित नहीं</value></data>
+  <data name="Log_FindNoSurvivors" xml:space="preserve"><value>बेहतर खोजें: TCP पिंग से कोई बचा नहीं</value></data>
+  <data name="Log_FindNotConnected" xml:space="preserve"><value>बेहतर खोजें: रोका गया — कनेक्टेड नहीं है</value></data>
+  <data name="Log_FindRealBatch" xml:space="preserve"><value>बेहतर खोजें: बैच मल्टी-आउटबाउंड से {0} बचों का परीक्षण</value></data>
+  <data name="Log_FindRealFailedAll" xml:space="preserve"><value>बेहतर खोजें: सभी वास्तविक विलंब परीक्षण विफल</value></data>
+  <data name="Log_FindSurvivors" xml:space="preserve"><value>बेहतर खोजें: {0} बचे, वास्तविक विलंब परीक्षण शुरू</value></data>
+  <data name="Log_PoolExpired" xml:space="preserve"><value>खोज पूल समाप्त या खाली है। सभी सर्वरों से पुनर्निर्माण...</value></data>
+  <data name="Log_SearchPool" xml:space="preserve"><value>खोज पूल: क्रमिक खोज के लिए {0} अपरीक्षित सर्वर सहेजे गए</value></data>
+  <data name="Log_SmartFailedAll" xml:space="preserve"><value>स्मार्ट कनेक्ट: सभी उम्मीदवारों के लिए वास्तविक विलंब परीक्षण विफल</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>{0} संसाधन नवीनतम Xray रिलीज़ में नहीं मिला।</value></data>
+  <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>प्रॉक्सी साफ करना विफल रहा: {0}</value></data>
+  <data name="Eng_ConnectedPorts" xml:space="preserve"><value>कनेक्टेड। HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
+  <data name="Eng_ConnectingTo" xml:space="preserve"><value>{0} से कनेक्ट हो रहा है {1} ...</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Xray-core डाउनलोड डाइजेस्ट मेल नहीं खाता: अपेक्षित {0}, प्राप्त {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Xray-core डाउनलोड हो रहा है ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Xray इंजन अप्रत्याशित रूप से बंद हो गया।</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Xray इंजन इंटीग्रिटी सत्यापन विफल रहा।</value></data>
+  <data name="Eng_IntegrityRetry" xml:space="preserve"><value>इंजन इंटीग्रिटी जाँच विफल रही। पुनः डाउनलोड हो रहा है ...</value></data>
+  <data name="Eng_MirrorTrying" xml:space="preserve"><value>सीधा GitHub उपलब्ध नहीं — मिरर से प्रयास ...</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>बहु-परीक्षण Xray इंजन अप्रत्याशित रूप से बंद हो गया।</value></data>
+  <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>बहु-परीक्षण पोर्ट चालू नहीं हुए।</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>बहु-परीक्षण Xray इंजन शुरू हुआ।</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>GitHub डाइजेस्ट के बिना मिरर से Xray-core डाउनलोड सत्यापित नहीं कर सकते।</value></data>
+  <data name="Eng_NotFound" xml:space="preserve"><value>इंजन नहीं मिला, डाउनलोड हो रहा है ...</value></data>
+  <data name="Eng_PortNotUp" xml:space="preserve"><value>प्रॉक्सी पोर्ट चालू नहीं हुआ।</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} तैयार है।</value></data>
+  <data name="Eng_Stopped" xml:space="preserve"><value>इंजन रोका गया।</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>परीक्षण Xray इंजन अप्रत्याशित रूप से बंद हो गया।</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray परीक्षण पोर्ट चालू नहीं हुआ।</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>परीक्षण Xray इंजन शुरू हुआ।</value></data>
+  <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN अडेप्टर साफ किया गया।</value></data>
+  <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>TUN सफाई विफल रही: {0}</value></data>
+  <data name="Eng_TunFallback" xml:space="preserve"><value>TUN मोड के लिए व्यवस्थापक आवश्यक है। प्रॉक्सी मोड पर वापस जा रहा है।</value></data>
+  <data name="Eng_UnsupportedOs" xml:space="preserve"><value>असमर्थित OS/आर्किटेक्चर।</value></data>
+  <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll उपलब्ध नहीं है। प्रॉक्सी मोड पर वापस जा रहा है।</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>केवल https सब्सक्रिप्शन URL की अनुमति है।</value></data>
 </root>

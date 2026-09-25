@@ -228,4 +228,181 @@
 زمن الاستجابة: {1}</value></data>
   <data name="Notify_ConnectFailed" xml:space="preserve"><value>فشل الاتصال</value></data>
   <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>الاتصال الذكي: فشل اختبار التأخير الحقيقي</value></data>
+  <data name="Dlg_ConfirmDeleteFromGroup" xml:space="preserve"><value>هل أنت متأكد من حذف {0} خادم من المجموعة «{1}»؟</value></data>
+  <data name="Dlg_ConfirmDeleteN" xml:space="preserve"><value>هل أنت متأكد من حذف {0} خادم؟</value></data>
+  <data name="Dlg_ConfirmDeleteSelected" xml:space="preserve"><value>هل أنت متأكد من حذف {0} خادم محدد؟</value></data>
+  <data name="Dlg_ConfirmDeleteSub" xml:space="preserve"><value>هل أنت متأكد من حذف الاشتراك «{0}» وكل خوادمه؟</value></data>
+  <data name="Dlg_DNSExample" xml:space="preserve"><value>مثال: {0}</value></data>
+  <data name="Ed_Flow" xml:space="preserve"><value>Flow</value></data>
+  <data name="Ed_Host" xml:space="preserve"><value>المضيف</value></data>
+  <data name="Ed_Network" xml:space="preserve"><value>الشبكة</value></data>
+  <data name="Ed_Password" xml:space="preserve"><value>كلمة المرور</value></data>
+  <data name="Ed_Path" xml:space="preserve"><value>المسار</value></data>
+  <data name="Ed_SNI" xml:space="preserve"><value>SNI</value></data>
+  <data name="Ed_Security" xml:space="preserve"><value>الأمان</value></data>
+  <data name="Ed_UserId" xml:space="preserve"><value>معرّف المستخدم</value></data>
+  <data name="Expire_DaysLeft" xml:space="preserve"><value>متبقي {0} يوم</value></data>
+  <data name="Expire_Expired" xml:space="preserve"><value>منتهي الصلاحية</value></data>
+  <data name="Expire_HoursLeft" xml:space="preserve"><value>متبقي {0} ساعة</value></data>
+  <data name="Group_Manual" xml:space="preserve"><value>📝 يدوي</value></data>
+  <data name="Home_NoServer" xml:space="preserve"><value>لم يتم اختيار خادم</value></data>
+  <data name="Home_NotConnected" xml:space="preserve"><value>لستَ متصلًا</value></data>
+  <data name="LastUpdate_DayAgo" xml:space="preserve"><value>آخر تحديث: منذ {0} يوم</value></data>
+  <data name="LastUpdate_HourAgo" xml:space="preserve"><value>آخر تحديث: منذ {0} ساعة</value></data>
+  <data name="LastUpdate_MinAgo" xml:space="preserve"><value>آخر تحديث: منذ {0} دقيقة</value></data>
+  <data name="LastUpdate_Never" xml:space="preserve"><value>آخر تحديث: أبدًا</value></data>
+  <data name="Log_AllGroupSelected" xml:space="preserve"><value>تم تحديد جميع خوادم المجموعة «{0}»</value></data>
+  <data name="Log_AutoConnectNoServer" xml:space="preserve"><value>الاتصال التلقائي: لم يتم اختيار خادم</value></data>
+  <data name="Log_FetchNoneKept" xml:space="preserve"><value>خطأ في {0}: لم يتم استلام خوادم — حُفظت الخوادم السابقة</value></data>
+  <data name="Log_FetchedCount" xml:space="preserve"><value>عدد الخوادم المستلمة: {0}</value></data>
+  <data name="Log_RemovedFromGroup" xml:space="preserve"><value>تمت إزالة {0} خادم من المجموعة «{1}»</value></data>
+  <data name="Log_ServerEdited" xml:space="preserve"><value>تم تعديل «{0}».</value></data>
+  <data name="Log_SubError" xml:space="preserve"><value>خطأ في {0}: {1}</value></data>
+  <data name="Log_SubInfo" xml:space="preserve"><value>الحجم: {0}/{1} | الانتهاء: {2}</value></data>
+  <data name="Log_SubInfoMissing" xml:space="preserve"><value>لم يتم استلام معلومات الاشتراك (الحجم/الانتهاء) من الخادم</value></data>
+  <data name="Log_UpdateErrorIn" xml:space="preserve"><value>خطأ في تحديث {0}: {1}</value></data>
+  <data name="Proxy_Off" xml:space="preserve"><value>الوكيل النظامي (معطّل)</value></data>
+  <data name="Proxy_On" xml:space="preserve"><value>الوكيل النظامي (مفعّل)</value></data>
+  <data name="Status_ClipboardAdded" xml:space="preserve"><value>تمت إضافة {0} خادم من الحافظة</value></data>
+  <data name="Status_ClipboardEmpty" xml:space="preserve"><value>الحافظة فارغة</value></data>
+  <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>الوصول إلى الحافظة غير متاح</value></data>
+  <data name="Status_ConnectError" xml:space="preserve"><value>خطأ في الاتصال</value></data>
+  <data name="Status_ConnectedTo" xml:space="preserve"><value>متصل بـ {0}</value></data>
+  <data name="Status_Connecting" xml:space="preserve"><value>جارٍ الاتصال ...</value></data>
+  <data name="Status_DupCount" xml:space="preserve"><value>كان {0} خادمًا مكررًا</value></data>
+  <data name="Status_DupServer" xml:space="preserve"><value>الخادم «{0}» مضاف بالفعل</value></data>
+  <data name="Status_FetchError" xml:space="preserve"><value>خطأ في الاستلام</value></data>
+  <data name="Status_FetchedFromSub" xml:space="preserve"><value>تم استلام {0} خادم من «{1}»</value></data>
+  <data name="Status_Fetching" xml:space="preserve"><value>جارٍ تنزيل {0} ...</value></data>
+  <data name="Status_FindBusy" xml:space="preserve"><value>البحث عن أفضل: يوجد اختبار آخر قيد التشغيل</value></data>
+  <data name="Status_FindCancelled" xml:space="preserve"><value>تم إلغاء البحث عن أفضل</value></data>
+  <data name="Status_FindNoCandidate" xml:space="preserve"><value>البحث عن أفضل: لم يستجب أي مرشح</value></data>
+  <data name="Status_FindNoServer" xml:space="preserve"><value>البحث عن أفضل: لم يتم اختيار خادم</value></data>
+  <data name="Status_FindNotConnected" xml:space="preserve"><value>البحث عن أفضل: اتصل أولًا</value></data>
+  <data name="Status_FindRealFailed" xml:space="preserve"><value>البحث عن أفضل: فشل اختبار التأخير الحقيقي</value></data>
+  <data name="Status_FindStillBest" xml:space="preserve"><value>البحث عن أفضل: الخادم الحالي ما يزال الأفضل ({0}ms)</value></data>
+  <data name="Status_FindTestingBatch" xml:space="preserve"><value>البحث عن أفضل: اختبار {0} خادم ...</value></data>
+  <data name="Status_GroupPing" xml:space="preserve"><value>بينج مجموعة «{0}» ({1} خادم) ...</value></data>
+  <data name="Status_GroupPingDone" xml:space="preserve"><value>انتهى بينج المجموعة ({0} ناجح)</value></data>
+  <data name="Status_GroupReal" xml:space="preserve"><value>اختبار التأخير الحقيقي للمجموعة «{0}» ({1} خادم) ...</value></data>
+  <data name="Status_GroupRealDone" xml:space="preserve"><value>انتهى اختبار التأخير الحقيقي للمجموعة ({0} ناجح)</value></data>
+  <data name="Status_GroupSpeed" xml:space="preserve"><value>اختبار سرعة المجموعة «{0}» ({1} خادم) ...</value></data>
+  <data name="Status_GroupSpeedDone" xml:space="preserve"><value>انتهى اختبار سرعة المجموعة ({0} ناجح)</value></data>
+  <data name="Status_GroupUpdate" xml:space="preserve"><value>تحديث المجموعة «{0}» ({1} خادم) ...</value></data>
+  <data name="Status_GroupUpdateDone" xml:space="preserve"><value>انتهى تحديث المجموعة ({0} ناجح)</value></data>
+  <data name="Status_NewServerName" xml:space="preserve"><value>خادم جديد ({0})</value></data>
+  <data name="Status_NoServerFromSub" xml:space="preserve"><value>لم يتم استلام خوادم من «{0}»</value></data>
+  <data name="Status_NoServers" xml:space="preserve"><value>لا توجد خوادم</value></data>
+  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>لا يوجد رابط صالح في الحافظة</value></data>
+  <data name="Status_PingAll" xml:space="preserve"><value>بينج {0} خادم ...</value></data>
+  <data name="Status_PingDoneCount" xml:space="preserve"><value>انتهى البينج: استجاب {0} من {1}</value></data>
+  <data name="Status_PingSelDone" xml:space="preserve"><value>انتهى بينج المحددين ({0} ناجح)</value></data>
+  <data name="Status_PingSelected" xml:space="preserve"><value>بينج {0} خادم محدد ...</value></data>
+  <data name="Status_RealAll" xml:space="preserve"><value>اختبار تأخير حقيقي لـ {0} خادم (بطيء لكن دقيق) ...</value></data>
+  <data name="Status_RealCount" xml:space="preserve"><value>اختبار تأخير حقيقي لـ {0} خادم ...</value></data>
+  <data name="Status_RealDone" xml:space="preserve"><value>انتهى اختبار التأخير الحقيقي ({0} ناجح)</value></data>
+  <data name="Status_RealDoneCount" xml:space="preserve"><value>انتهى اختبار التأخير الحقيقي: نجح {0} من {1}</value></data>
+  <data name="Status_RealSelDone" xml:space="preserve"><value>انتهى اختبار التأخير الحقيقي للمحددين ({0} ناجح)</value></data>
+  <data name="Status_RealSelected" xml:space="preserve"><value>اختبار تأخير حقيقي لـ {0} خادم محدد ...</value></data>
+  <data name="Status_ServerAdded" xml:space="preserve"><value>تمت إضافة الخادم «{0}»</value></data>
+  <data name="Status_ServersAdded" xml:space="preserve"><value>تمت إضافة {0} خادم</value></data>
+  <data name="Status_SmartBest" xml:space="preserve"><value>اتصال ذكي: أفضل خادم ← {0} ({1})</value></data>
+  <data name="Status_SmartCancelled" xml:space="preserve"><value>تم إلغاء الاتصال الذكي</value></data>
+  <data name="Status_SmartNoResponse" xml:space="preserve"><value>اتصال ذكي: لم يستجب أي خادم</value></data>
+  <data name="Status_SmartRealDelay" xml:space="preserve"><value>اتصال ذكي: تأخير حقيقي لـ {0} مرشح ...</value></data>
+  <data name="Status_SmartRealFailed" xml:space="preserve"><value>اتصال ذكي: فشل اختبار التأخير الحقيقي</value></data>
+  <data name="Status_SmartStage1" xml:space="preserve"><value>اتصال ذكي: بينج سريع ...</value></data>
+  <data name="Status_SpeedAll" xml:space="preserve"><value>اختبار سرعة {0} خادم ...</value></data>
+  <data name="Status_SpeedAllProxy" xml:space="preserve"><value>اختبار سرعة {0} خادم (عبر الوكيل) ...</value></data>
+  <data name="Status_SpeedDoneCount" xml:space="preserve"><value>انتهى اختبار السرعة: نجح {0} من {1}</value></data>
+  <data name="Status_SpeedSelDone" xml:space="preserve"><value>انتهى اختبار سرعة المحددين ({0} ناجح)</value></data>
+  <data name="Status_SpeedSelected" xml:space="preserve"><value>اختبار سرعة {0} خادم محدد ...</value></data>
+  <data name="Status_Stopped" xml:space="preserve"><value>توقّف</value></data>
+  <data name="Status_SubAddedCount" xml:space="preserve"><value>تمت إضافة «{0}» ({1} خادم)</value></data>
+  <data name="Status_SubUpdatedN" xml:space="preserve"><value>تم تحديث «{0}» ({1} خادم جديد)</value></data>
+  <data name="Status_TestSpeedOne" xml:space="preserve"><value>اختبار السرعة: {0} ...</value></data>
+  <data name="Status_UpdateError" xml:space="preserve"><value>خطأ في التحديث</value></data>
+  <data name="Status_UpdateErrorIn" xml:space="preserve"><value>خطأ في تحديث {0}</value></data>
+  <data name="Status_UpdateNoProxy" xml:space="preserve"><value>التحديث بدون وكيل ...</value></data>
+  <data name="Status_UpdateWithProxy" xml:space="preserve"><value>التحديث عبر الوكيل ...</value></data>
+  <data name="Sub_ServerCount" xml:space="preserve"><value>عدد الخوادم: {0}</value></data>
+  <data name="Toast_AllChecked" xml:space="preserve"><value>تمت مراجعة جميع الخوادم بالفعل</value></data>
+  <data name="Toast_AnotherTestRunning" xml:space="preserve"><value>يوجد اختبار آخر قيد التشغيل — انتظر</value></data>
+  <data name="Toast_AutoConnectSelect" xml:space="preserve"><value>الاتصال التلقائي: اختر خادمًا أولًا</value></data>
+  <data name="Toast_CheckingNew" xml:space="preserve"><value>مراجعة {0} خادم جديد ...</value></data>
+  <data name="Toast_ConnectingTo" xml:space="preserve"><value>الاتصال بـ {0} ({1})</value></data>
+  <data name="Toast_EnterLink" xml:space="preserve"><value>أدخل رابطًا</value></data>
+  <data name="Toast_FindingBest" xml:space="preserve"><value>جارٍ البحث عن أفضل خادم ...</value></data>
+  <data name="Toast_FirstConnect" xml:space="preserve"><value>اتصل بخادم أولًا</value></data>
+  <data name="Toast_NoServerForConnect" xml:space="preserve"><value>لا يوجد خادم للاتصال</value></data>
+  <data name="Toast_NoServerInBatch" xml:space="preserve"><value>لم يستجب أي خادم في هذه الدفعة</value></data>
+  <data name="Toast_NoServerResponded" xml:space="preserve"><value>لم يستجب أي خادم</value></data>
+  <data name="Toast_RealDelayFailed" xml:space="preserve"><value>فشل اختبار التأخير الحقيقي</value></data>
+  <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>لم يؤكّد اختبار التأخير الحقيقي أي خادم</value></data>
+  <data name="Toast_SelectServerFirst" xml:space="preserve"><value>لم يتم اختيار خادم — اختر واحدًا أولًا</value></data>
+  <data name="Toast_StillBest" xml:space="preserve"><value>الخادم الحالي ما يزال الأفضل ({0}ms)</value></data>
+  <data name="Toast_SubLinkCopied" xml:space="preserve"><value>تم نسخ رابط الاشتراك</value></data>
+  <data name="Toast_SwitchTo" xml:space="preserve"><value>التبديل إلى {0} ({1}ms)</value></data>
+  <data name="Traffic_UsageDiff" xml:space="preserve"><value>الاستهلاك {0} {1} من {2} {3}</value></data>
+  <data name="Traffic_UsageSame" xml:space="preserve"><value>الاستهلاك {0} من {1} {2}</value></data>
+  <data name="Traffic_UsageZero" xml:space="preserve"><value>الاستهلاك 0 من {0} {1}</value></data>
+  <data name="Tun_AdapterCreated" xml:space="preserve"><value>تم إنشاء محول TUN.</value></data>
+  <data name="Tun_AdapterExists" xml:space="preserve"><value>محول TUN موجود مسبقًا.</value></data>
+  <data name="Tun_CleanError" xml:space="preserve"><value>خطأ في التنظيف: {0}</value></data>
+  <data name="Tun_Cleaning" xml:space="preserve"><value>جارٍ تنظيف محول TUN...</value></data>
+  <data name="Tun_CreateError" xml:space="preserve"><value>خطأ في إنشاء المحول: {0}</value></data>
+  <data name="Tun_CreatingAdapter" xml:space="preserve"><value>جارٍ إنشاء محول TUN...</value></data>
+  <data name="Tun_DownloadError" xml:space="preserve"><value>خطأ في تنزيل wintun: {0}</value></data>
+  <data name="Tun_DownloadingDriver" xml:space="preserve"><value>تنزيل وحدة wintun...</value></data>
+  <data name="Tun_DriverDownloaded" xml:space="preserve"><value>تم تنزيل وحدة wintun بنجاح</value></data>
+  <data name="Tun_HashBad" xml:space="preserve"><value>تطابق الـ hash لملف wintun غير صحيح — تم إلغاء التنزيل</value></data>
+  <data name="Tun_NeedAdmin" xml:space="preserve"><value>يلزم صلاحية المسؤول لإنشاء محول TUN</value></data>
+  <data name="Unit_B" xml:space="preserve"><value>بايت</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>جيجابايت</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>كيلوبايت</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>ميغابايت</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>تيرابايت</value></data>
+  <data name="Url_InvalidSs" xml:space="preserve"><value>رابط Shadowsocks غير صالح</value></data>
+  <data name="Url_InvalidTrojan" xml:space="preserve"><value>رابط Trojan غير صالح</value></data>
+  <data name="Url_InvalidVless" xml:space="preserve"><value>رابط VLESS غير صالح</value></data>
+  <data name="Url_Unsupported" xml:space="preserve"><value>يُدعم فقط vmess / vless / ss / trojan</value></data>
+  <data name="Log_FindBusy" xml:space="preserve"><value>البحث عن أفضل: تم الحظر — يوجد اختبار آخر قيد التشغيل</value></data>
+  <data name="Log_FindError" xml:space="preserve"><value>خطأ في البحث عن أفضل: {0}</value></data>
+  <data name="Log_FindNoMore" xml:space="preserve"><value>البحث عن أفضل: لا يوجد خوادم أخرى للاختبار</value></data>
+  <data name="Log_FindNoSelection" xml:space="preserve"><value>البحث عن أفضل: تم الحظر — لم يتم اختيار خادم</value></data>
+  <data name="Log_FindNoSurvivors" xml:space="preserve"><value>البحث عن أفضل: لا يوجد ناجين من بينج TCP</value></data>
+  <data name="Log_FindNotConnected" xml:space="preserve"><value>البحث عن أفضل: تم الحظر — لست متصلًا</value></data>
+  <data name="Log_FindRealBatch" xml:space="preserve"><value>البحث عن أفضل: اختبار {0} ناجين عبر دفعة multi-outbound</value></data>
+  <data name="Log_FindRealFailedAll" xml:space="preserve"><value>البحث عن أفضل: فشلت جميع اختبارات التأخير الحقيقي</value></data>
+  <data name="Log_FindSurvivors" xml:space="preserve"><value>البحث عن أفضل: {0} ناجين — بدء اختبار التأخير الحقيقي</value></data>
+  <data name="Log_PoolExpired" xml:space="preserve"><value>انتهى مخزن البحث أو أنه فارغ — إعادة البناء من جميع الخوادم...</value></data>
+  <data name="Log_SearchPool" xml:space="preserve"><value>مخزن البحث: تم حفظ {0} خادم غير مختبر للبحث التدريجي</value></data>
+  <data name="Log_SmartFailedAll" xml:space="preserve"><value>اتصال ذكي: فشل اختبار التأخير الحقيقي لجميع المرشحين</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>الملف {0} غير موجود في آخر إصدار Xray.</value></data>
+  <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>فشل مسح البروكسي: {0}</value></data>
+  <data name="Eng_ConnectedPorts" xml:space="preserve"><value>تم الاتصال. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
+  <data name="Eng_ConnectingTo" xml:space="preserve"><value>الاتصال بـ {0} {1} ...</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>تطابق Digest لتنزيل Xray-core غير صحيح: المتوقع {0}، المستلم {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>جارٍ تنزيل Xray-core ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>خرج محرك Xray بشكل غير متوقع.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>فشل التحقق من سلامة محرك Xray.</value></data>
+  <data name="Eng_IntegrityRetry" xml:space="preserve"><value>فشل التحقق من سلامة المحرك — جارٍ إعادة التنزيل ...</value></data>
+  <data name="Eng_MirrorTrying" xml:space="preserve"><value>تعذر الوصول إلى GitHub مباشرة — جارٍ المحاولة عبر المرآة ...</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>خرج محرك اختبار Xray المتعدد بشكل غير متوقع.</value></data>
+  <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>لم تُفتح منافذ الاختبار المتعدد.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>تم تشغيل محرك اختبار Xray المتعدد.</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>لا يمكن التحقق من تنزيل Xray-core عبر المرآة بدون Digest من GitHub.</value></data>
+  <data name="Eng_NotFound" xml:space="preserve"><value>المحرك غير موجود — جارٍ التنزيل ...</value></data>
+  <data name="Eng_PortNotUp" xml:space="preserve"><value>لم تُفتح منفذ البروكسي.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} جاهز.</value></data>
+  <data name="Eng_Stopped" xml:space="preserve"><value>تم إيقاف المحرك.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>خرج محرك اختبار Xray بشكل غير متوقع.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>لم يُفتح منفذ اختبار Xray.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>تم تشغيل محرك اختبار Xray.</value></data>
+  <data name="Eng_TunCleaned" xml:space="preserve"><value>تم تنظيف محول TUN.</value></data>
+  <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>فشل تنظيف TUN: {0}</value></data>
+  <data name="Eng_TunFallback" xml:space="preserve"><value>وضع TUN يتطلب صلاحية المسؤول. العودة إلى وضع البروكسي.</value></data>
+  <data name="Eng_UnsupportedOs" xml:space="preserve"><value>نظام التشغيل/المعمارية غير مدعوم.</value></data>
+  <data name="Eng_WintunFallback" xml:space="preserve"><value>ملف wintun.dll غير متاح. العودة إلى وضع البروكسي.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>يُسمح فقط بروابط الاشتراك https.</value></data>
 </root>

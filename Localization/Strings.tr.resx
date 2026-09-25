@@ -577,4 +577,181 @@ Gecikme: {1}</value></data>
 Gecikme: {1}</value></data>
   <data name="Notify_ConnectFailed" xml:space="preserve"><value>Bağlantı başarısız</value></data>
   <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>Akıllı bağlantı: gerçek gecikme testi başarısız</value></data>
+  <data name="Dlg_ConfirmDeleteFromGroup" xml:space="preserve"><value>"{1}" grubundan {0} sunucuyu silmek istediğinize emin misiniz?</value></data>
+  <data name="Dlg_ConfirmDeleteN" xml:space="preserve"><value>{0} sunucuyu silmek istediğinize emin misiniz?</value></data>
+  <data name="Dlg_ConfirmDeleteSelected" xml:space="preserve"><value>Seçili {0} sunucuyu silmek istediğinize emin misiniz?</value></data>
+  <data name="Dlg_ConfirmDeleteSub" xml:space="preserve"><value>"{0}" aboneliğini ve tüm sunucularını silmek istediğinize emin misiniz?</value></data>
+  <data name="Dlg_DNSExample" xml:space="preserve"><value>Örnek: {0}</value></data>
+  <data name="Ed_Flow" xml:space="preserve"><value>Flow</value></data>
+  <data name="Ed_Host" xml:space="preserve"><value>Ana bilgisayar</value></data>
+  <data name="Ed_Network" xml:space="preserve"><value>Ağ</value></data>
+  <data name="Ed_Password" xml:space="preserve"><value>Şifre</value></data>
+  <data name="Ed_Path" xml:space="preserve"><value>Yol</value></data>
+  <data name="Ed_SNI" xml:space="preserve"><value>SNI</value></data>
+  <data name="Ed_Security" xml:space="preserve"><value>Güvenlik</value></data>
+  <data name="Ed_UserId" xml:space="preserve"><value>Kullanıcı kimliği</value></data>
+  <data name="Expire_DaysLeft" xml:space="preserve"><value>{0} gün kaldı</value></data>
+  <data name="Expire_Expired" xml:space="preserve"><value>Süresi doldu</value></data>
+  <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} saat kaldı</value></data>
+  <data name="Group_Manual" xml:space="preserve"><value>📝 El ile</value></data>
+  <data name="Home_NoServer" xml:space="preserve"><value>Sunucu seçilmedi</value></data>
+  <data name="Home_NotConnected" xml:space="preserve"><value>Bağlı değilsiniz</value></data>
+  <data name="LastUpdate_DayAgo" xml:space="preserve"><value>Son güncelleme: {0} gün önce</value></data>
+  <data name="LastUpdate_HourAgo" xml:space="preserve"><value>Son güncelleme: {0} sa önce</value></data>
+  <data name="LastUpdate_MinAgo" xml:space="preserve"><value>Son güncelleme: {0} dk önce</value></data>
+  <data name="LastUpdate_Never" xml:space="preserve"><value>Son güncelleme: asla</value></data>
+  <data name="Log_AllGroupSelected" xml:space="preserve"><value>"{0}" grubundaki tüm sunucular seçildi</value></data>
+  <data name="Log_AutoConnectNoServer" xml:space="preserve"><value>Otomatik bağlantı: sunucu seçilmedi</value></data>
+  <data name="Log_FetchNoneKept" xml:space="preserve"><value>{0} hatası: sunucu alınamadı — önceki sunucular korundu</value></data>
+  <data name="Log_FetchedCount" xml:space="preserve"><value>Alınan sunucu sayısı: {0}</value></data>
+  <data name="Log_RemovedFromGroup" xml:space="preserve"><value>"{1}" grubundan {0} sunucu kaldırıldı</value></data>
+  <data name="Log_ServerEdited" xml:space="preserve"><value>"{0}" düzenlendi.</value></data>
+  <data name="Log_SubError" xml:space="preserve"><value>{0} hatası: {1}</value></data>
+  <data name="Log_SubInfo" xml:space="preserve"><value>Trafik: {0}/{1} | Bitiş: {2}</value></data>
+  <data name="Log_SubInfoMissing" xml:space="preserve"><value>Abonelik bilgisi (trafiğ/süre) sunucudan alınamadı</value></data>
+  <data name="Log_UpdateErrorIn" xml:space="preserve"><value>{0} güncellenirken hata: {1}</value></data>
+  <data name="Proxy_Off" xml:space="preserve"><value>Sistem proxy (kapalı)</value></data>
+  <data name="Proxy_On" xml:space="preserve"><value>Sistem proxy (açık)</value></data>
+  <data name="Status_ClipboardAdded" xml:space="preserve"><value>Panodan {0} sunucu eklendi</value></data>
+  <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Pan boş</value></data>
+  <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Panoya erişilemiyor</value></data>
+  <data name="Status_ConnectError" xml:space="preserve"><value>Bağlantı hatası</value></data>
+  <data name="Status_ConnectedTo" xml:space="preserve"><value>{0} adresine bağlı</value></data>
+  <data name="Status_Connecting" xml:space="preserve"><value>Bağlanıyor ...</value></data>
+  <data name="Status_DupCount" xml:space="preserve"><value>{0} sunucu tekrardı</value></data>
+  <data name="Status_DupServer" xml:space="preserve"><value>"{0}" sunucusu zaten var</value></data>
+  <data name="Status_FetchError" xml:space="preserve"><value>Alma hatası</value></data>
+  <data name="Status_FetchedFromSub" xml:space="preserve"><value>"{1}" sunucusundan {0} sunucu alındı</value></data>
+  <data name="Status_Fetching" xml:space="preserve"><value>{0} alınıyor ...</value></data>
+  <data name="Status_FindBusy" xml:space="preserve"><value>Daha iyi bul: başka bir test çalışıyor</value></data>
+  <data name="Status_FindCancelled" xml:space="preserve"><value>Daha iyi bul iptal edildi</value></data>
+  <data name="Status_FindNoCandidate" xml:space="preserve"><value>Daha iyi bul: hiçbir aday yanıt vermedi</value></data>
+  <data name="Status_FindNoServer" xml:space="preserve"><value>Daha iyi bul: sunucu seçilmedi</value></data>
+  <data name="Status_FindNotConnected" xml:space="preserve"><value>Daha iyi bul: önce bağlan</value></data>
+  <data name="Status_FindRealFailed" xml:space="preserve"><value>Daha iyi bul: gerçek gecikme testi başarısız</value></data>
+  <data name="Status_FindStillBest" xml:space="preserve"><value>Daha iyi bul: mevcut sunucu hâlâ en iyisi ({0}ms)</value></data>
+  <data name="Status_FindTestingBatch" xml:space="preserve"><value>Daha iyi bul: {0} sunucu test ediliyor ...</value></data>
+  <data name="Status_GroupPing" xml:space="preserve"><value>"{0}" grubuna ping ({1} sunucu) ...</value></data>
+  <data name="Status_GroupPingDone" xml:space="preserve"><value>Grup pingi bitti ({0} başarılı)</value></data>
+  <data name="Status_GroupReal" xml:space="preserve"><value>"{0}" grubu için gerçek gecikme testi ({1} sunucu) ...</value></data>
+  <data name="Status_GroupRealDone" xml:space="preserve"><value>Grup gerçek gecikme testi bitti ({0} başarılı)</value></data>
+  <data name="Status_GroupSpeed" xml:space="preserve"><value>"{0}" grubu için hız testi ({1} sunucu) ...</value></data>
+  <data name="Status_GroupSpeedDone" xml:space="preserve"><value>Grup hız testi bitti ({0} başarılı)</value></data>
+  <data name="Status_GroupUpdate" xml:space="preserve"><value>"{0}" grubu güncelleniyor ({1} sunucu) ...</value></data>
+  <data name="Status_GroupUpdateDone" xml:space="preserve"><value>Grup güncellemesi bitti ({0} başarılı)</value></data>
+  <data name="Status_NewServerName" xml:space="preserve"><value>Yeni sunucu ({0})</value></data>
+  <data name="Status_NoServerFromSub" xml:space="preserve"><value>"{0}" sunucusundan sunucu alınamadı</value></data>
+  <data name="Status_NoServers" xml:space="preserve"><value>Sunucu yok</value></data>
+  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>Panoda geçerli bir bağlantı yok</value></data>
+  <data name="Status_PingAll" xml:space="preserve"><value>{0} sunucuya ping atılıyor ...</value></data>
+  <data name="Status_PingDoneCount" xml:space="preserve"><value>Ping bitti: {1} sunucudan {0} yanıt verdi</value></data>
+  <data name="Status_PingSelDone" xml:space="preserve"><value>Seçilenlerin pingi bitti ({0} başarılı)</value></data>
+  <data name="Status_PingSelected" xml:space="preserve"><value>Seçili {0} sunucuya ping atılıyor ...</value></data>
+  <data name="Status_RealAll" xml:space="preserve"><value>{0} sunucuda gerçek gecikme testi (yavaş ama doğru) ...</value></data>
+  <data name="Status_RealCount" xml:space="preserve"><value>{0} sunucuda gerçek gecikme testi ...</value></data>
+  <data name="Status_RealDone" xml:space="preserve"><value>Gerçek gecikme testi bitti ({0} başarılı)</value></data>
+  <data name="Status_RealDoneCount" xml:space="preserve"><value>Gerçek gecikme testi bitti: {1} sunucudan {0} başarılı</value></data>
+  <data name="Status_RealSelDone" xml:space="preserve"><value>Seçilenlerin gerçek gecikme testi bitti ({0} başarılı)</value></data>
+  <data name="Status_RealSelected" xml:space="preserve"><value>Seçili {0} sunucuda gerçek gecikme testi ...</value></data>
+  <data name="Status_ServerAdded" xml:space="preserve"><value>"{0}" sunucusu eklendi</value></data>
+  <data name="Status_ServersAdded" xml:space="preserve"><value>{0} sunucu eklendi</value></data>
+  <data name="Status_SmartBest" xml:space="preserve"><value>Akıllı bağlantı: en iyi sunucu → {0} ({1})</value></data>
+  <data name="Status_SmartCancelled" xml:space="preserve"><value>Akıllı bağlantı iptal edildi</value></data>
+  <data name="Status_SmartNoResponse" xml:space="preserve"><value>Akıllı bağlantı: hiçbir sunucu yanıt vermedi</value></data>
+  <data name="Status_SmartRealDelay" xml:space="preserve"><value>Akıllı bağlantı: {0} adayda gerçek gecikme ...</value></data>
+  <data name="Status_SmartRealFailed" xml:space="preserve"><value>Akıllı bağlantı: gerçek gecikme testi başarısız</value></data>
+  <data name="Status_SmartStage1" xml:space="preserve"><value>Akıllı bağlantı: hızlı ping ...</value></data>
+  <data name="Status_SpeedAll" xml:space="preserve"><value>{0} sunucuda hız testi ...</value></data>
+  <data name="Status_SpeedAllProxy" xml:space="preserve"><value>{0} sunucuda hız testi (proxy üzerinden) ...</value></data>
+  <data name="Status_SpeedDoneCount" xml:space="preserve"><value>Hız testi bitti: {1} sunucudan {0} başarılı</value></data>
+  <data name="Status_SpeedSelDone" xml:space="preserve"><value>Seçilenlerin hız testi bitti ({0} başarılı)</value></data>
+  <data name="Status_SpeedSelected" xml:space="preserve"><value>Seçili {0} sunucuda hız testi ...</value></data>
+  <data name="Status_Stopped" xml:space="preserve"><value>Duraklatıldı</value></data>
+  <data name="Status_SubAddedCount" xml:space="preserve"><value>"{0}" eklendi ({1} sunucu)</value></data>
+  <data name="Status_SubUpdatedN" xml:space="preserve"><value>"{0}" güncellendi ({1} yeni sunucu)</value></data>
+  <data name="Status_TestSpeedOne" xml:space="preserve"><value>Hız testi: {0} ...</value></data>
+  <data name="Status_UpdateError" xml:space="preserve"><value>Güncelleme hatası</value></data>
+  <data name="Status_UpdateErrorIn" xml:space="preserve"><value>{0} güncellenirken hata</value></data>
+  <data name="Status_UpdateNoProxy" xml:space="preserve"><value>Proxy olmadan güncelleniyor ...</value></data>
+  <data name="Status_UpdateWithProxy" xml:space="preserve"><value>Proxy üzerinden güncelleniyor ...</value></data>
+  <data name="Sub_ServerCount" xml:space="preserve"><value>Sunucu sayısı: {0}</value></data>
+  <data name="Toast_AllChecked" xml:space="preserve"><value>Tüm sunucular zaten kontrol edildi</value></data>
+  <data name="Toast_AnotherTestRunning" xml:space="preserve"><value>Başka bir test çalışıyor — lütfen bekleyin</value></data>
+  <data name="Toast_AutoConnectSelect" xml:space="preserve"><value>Otomatik bağlantı: önce bir sunucu seçin</value></data>
+  <data name="Toast_CheckingNew" xml:space="preserve"><value>{0} yeni sunucu kontrol ediliyor ...</value></data>
+  <data name="Toast_ConnectingTo" xml:space="preserve"><value>{0} ({1}) adresine bağlanılıyor</value></data>
+  <data name="Toast_EnterLink" xml:space="preserve"><value>Bir bağlantı girin</value></data>
+  <data name="Toast_FindingBest" xml:space="preserve"><value>En iyi sunucu aranıyor ...</value></data>
+  <data name="Toast_FirstConnect" xml:space="preserve"><value>Önce bir sunucuya bağlan</value></data>
+  <data name="Toast_NoServerForConnect" xml:space="preserve"><value>Bağlanılacak sunucu yok</value></data>
+  <data name="Toast_NoServerInBatch" xml:space="preserve"><value>Bu partideki hiçbir sunucu yanıt vermedi</value></data>
+  <data name="Toast_NoServerResponded" xml:space="preserve"><value>Hiçbir sunucu yanıt vermedi</value></data>
+  <data name="Toast_RealDelayFailed" xml:space="preserve"><value>Gerçek gecikme testi başarısız oldu</value></data>
+  <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>Gerçek gecikme testi hiçbir sunucuyu doğrulamadı</value></data>
+  <data name="Toast_SelectServerFirst" xml:space="preserve"><value>Sunucu seçilmedi — önce bir tane seçin</value></data>
+  <data name="Toast_StillBest" xml:space="preserve"><value>Mevcut sunucu hâlâ en iyisi ({0}ms)</value></data>
+  <data name="Toast_SubLinkCopied" xml:space="preserve"><value>Abonelik bağlantısı kopyalandı</value></data>
+  <data name="Toast_SwitchTo" xml:space="preserve"><value>{0} ({1}ms) adresine geçiliyor</value></data>
+  <data name="Traffic_UsageDiff" xml:space="preserve"><value>Kullanılan {0} {1} / {2} {3}</value></data>
+  <data name="Traffic_UsageSame" xml:space="preserve"><value>Kullanılan {0} / {1} {2}</value></data>
+  <data name="Traffic_UsageZero" xml:space="preserve"><value>Kullanılan 0 / {0} {1}</value></data>
+  <data name="Tun_AdapterCreated" xml:space="preserve"><value>TUN adaptörü oluşturuldu.</value></data>
+  <data name="Tun_AdapterExists" xml:space="preserve"><value>TUN adaptörü zaten var.</value></data>
+  <data name="Tun_CleanError" xml:space="preserve"><value>Temizleme hatası: {0}</value></data>
+  <data name="Tun_Cleaning" xml:space="preserve"><value>TUN adaptörü temizleniyor...</value></data>
+  <data name="Tun_CreateError" xml:space="preserve"><value>Adaptör oluşturma hatası: {0}</value></data>
+  <data name="Tun_CreatingAdapter" xml:space="preserve"><value>TUN adaptörü oluşturuluyor...</value></data>
+  <data name="Tun_DownloadError" xml:space="preserve"><value>wintun indirme hatası: {0}</value></data>
+  <data name="Tun_DownloadingDriver" xml:space="preserve"><value>wintun sürücüsü indiriliyor...</value></data>
+  <data name="Tun_DriverDownloaded" xml:space="preserve"><value>wintun sürücüsü başarıyla indirildi</value></data>
+  <data name="Tun_HashBad" xml:space="preserve"><value>wintun dosya hash'i uyuşmuyor — indirme iptal edildi</value></data>
+  <data name="Tun_NeedAdmin" xml:space="preserve"><value>TUN adaptörü oluşturmak için yönetici erişimi gerekir</value></data>
+  <data name="Unit_B" xml:space="preserve"><value>Bayt</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>Gigabayt</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>Kilobayt</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>Megabayt</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>Terabayt</value></data>
+  <data name="Url_InvalidSs" xml:space="preserve"><value>Geçersiz Shadowsocks bağlantısı</value></data>
+  <data name="Url_InvalidTrojan" xml:space="preserve"><value>Geçersiz Trojan bağlantısı</value></data>
+  <data name="Url_InvalidVless" xml:space="preserve"><value>Geçersiz VLESS bağlantısı</value></data>
+  <data name="Url_Unsupported" xml:space="preserve"><value>Yalnızca vmess / vless / ss / trojan desteklenir</value></data>
+  <data name="Log_FindBusy" xml:space="preserve"><value>Daha iyi bul: engellendi — başka bir test çalışıyor</value></data>
+  <data name="Log_FindError" xml:space="preserve"><value>Daha iyi bulma hatası: {0}</value></data>
+  <data name="Log_FindNoMore" xml:space="preserve"><value>Daha iyi bul: test edilecek sunucu kalmadı</value></data>
+  <data name="Log_FindNoSelection" xml:space="preserve"><value>Daha iyi bul: engellendi — sunucu seçilmedi</value></data>
+  <data name="Log_FindNoSurvivors" xml:space="preserve"><value>Daha iyi bul: TCP ping sonrası sağ kalan yok</value></data>
+  <data name="Log_FindNotConnected" xml:space="preserve"><value>Daha iyi bul: engellendi — bağlı değilsiniz</value></data>
+  <data name="Log_FindRealBatch" xml:space="preserve"><value>Daha iyi bul: {0} sağ kalan batch multi-outbound ile test ediliyor</value></data>
+  <data name="Log_FindRealFailedAll" xml:space="preserve"><value>Daha iyi bul: tüm gerçek gecikme testleri başarısız oldu</value></data>
+  <data name="Log_FindSurvivors" xml:space="preserve"><value>Daha iyi bul: {0} sağ kalan, gerçek gecikme testi başlıyor</value></data>
+  <data name="Log_PoolExpired" xml:space="preserve"><value>Arama havuzu süresi doldu veya boş. Tüm sunuculardan yeniden oluşturuluyor...</value></data>
+  <data name="Log_SearchPool" xml:space="preserve"><value>Arama havuzu: kademeli arama için test edilmemiş {0} sunucu kaydedildi</value></data>
+  <data name="Log_SmartFailedAll" xml:space="preserve"><value>Akıllı bağlantı: tüm adaylar için gerçek gecikme testi başarısız oldu</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>En son Xray sürümünde {0} varlığı bulunamadı.</value></data>
+  <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>Proxy temizleme başarısız: {0}</value></data>
+  <data name="Eng_ConnectedPorts" xml:space="preserve"><value>Bağlandı. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
+  <data name="Eng_ConnectingTo" xml:space="preserve"><value>{0} adresine bağlanılıyor {1} ...</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Xray-core indirme özeti eşleşmiyor: beklenen {0}, alınan {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Xray-core indiriliyor ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Xray motoru beklenmedik şekilde kapandı.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Xray motoru bütünlük doğrulamasında başarısız oldu.</value></data>
+  <data name="Eng_IntegrityRetry" xml:space="preserve"><value>Motor bütünlük kontrolü başarısız. Yeniden indiriliyor ...</value></data>
+  <data name="Eng_MirrorTrying" xml:space="preserve"><value>Doğrudan GitHub erişilemiyor, ayna deneniyor ...</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>Çoklu test Xray motoru beklenmedik şekilde kapandı.</value></data>
+  <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>Çoklu test portları açılmadı.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>Çoklu test Xray motoru başlatıldı.</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>GitHub özeti olmadan ayna üzerinden Xray-core indirmesi doğrulanamaz.</value></data>
+  <data name="Eng_NotFound" xml:space="preserve"><value>Motor bulunamadı, indiriliyor ...</value></data>
+  <data name="Eng_PortNotUp" xml:space="preserve"><value>Proxy portu açılmadı.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} hazır.</value></data>
+  <data name="Eng_Stopped" xml:space="preserve"><value>Motor durduruldu.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>Test Xray motoru beklenmedik şekilde kapandı.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray test portu açılmadı.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>Test Xray motoru başlatıldı.</value></data>
+  <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN adaptörü temizlendi.</value></data>
+  <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>TUN temizleme başarısız: {0}</value></data>
+  <data name="Eng_TunFallback" xml:space="preserve"><value>TUN modu yönetici yetkisi gerektirir. Proxy moduna dönülüyor.</value></data>
+  <data name="Eng_UnsupportedOs" xml:space="preserve"><value>Desteklenmeyen işletim sistemi/mimari.</value></data>
+  <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll kullanılamıyor. Proxy moduna dönülüyor.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Yalnızca https abonelik URL'lerine izin verilir.</value></data>
 </root>

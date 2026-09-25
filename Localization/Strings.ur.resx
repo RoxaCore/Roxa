@@ -212,4 +212,181 @@
 تاخیر: {1}</value></data>
   <data name="Notify_ConnectFailed" xml:space="preserve"><value>کنیکشن ناکام</value></data>
   <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>سمارٹ کنیکٹ: اصل تاخیر ٹیسٹ ناکام</value></data>
+  <data name="Dlg_ConfirmDeleteFromGroup" xml:space="preserve"><value>کیا آپ واقعی گروپ "{1}" سے {0} سرور حذف کرنا چاہتے ہیں؟</value></data>
+  <data name="Dlg_ConfirmDeleteN" xml:space="preserve"><value>کیا آپ واقعی {0} سرور حذف کرنا چاہتے ہیں؟</value></data>
+  <data name="Dlg_ConfirmDeleteSelected" xml:space="preserve"><value>کیا آپ واقعی {0} منتخب سرور حذف کرنا چاہتے ہیں؟</value></data>
+  <data name="Dlg_ConfirmDeleteSub" xml:space="preserve"><value>کیا آپ واقعی سبسکرپشن "{0}" اور اس کے تمام سرور حذف کرنا چاہتے ہیں؟</value></data>
+  <data name="Dlg_DNSExample" xml:space="preserve"><value>مثال: {0}</value></data>
+  <data name="Ed_Flow" xml:space="preserve"><value>Flow</value></data>
+  <data name="Ed_Host" xml:space="preserve"><value>میزبان</value></data>
+  <data name="Ed_Network" xml:space="preserve"><value>نیٹ ورک</value></data>
+  <data name="Ed_Password" xml:space="preserve"><value>پاس ورڈ</value></data>
+  <data name="Ed_Path" xml:space="preserve"><value>راستہ</value></data>
+  <data name="Ed_SNI" xml:space="preserve"><value>SNI</value></data>
+  <data name="Ed_Security" xml:space="preserve"><value>حفاظت</value></data>
+  <data name="Ed_UserId" xml:space="preserve"><value>صارف کی شناخت</value></data>
+  <data name="Expire_DaysLeft" xml:space="preserve"><value>{0} دن باقی</value></data>
+  <data name="Expire_Expired" xml:space="preserve"><value>میعاد ختم</value></data>
+  <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} گھنٹے باقی</value></data>
+  <data name="Group_Manual" xml:space="preserve"><value>📝 دستی</value></data>
+  <data name="Home_NoServer" xml:space="preserve"><value>کوئی سرور منتخب نہیں</value></data>
+  <data name="Home_NotConnected" xml:space="preserve"><value>منقطع ہے</value></data>
+  <data name="LastUpdate_DayAgo" xml:space="preserve"><value>آخری تازہ کاری: {0} دن پہلے</value></data>
+  <data name="LastUpdate_HourAgo" xml:space="preserve"><value>آخری تازہ کاری: {0} گھنٹہ پہلے</value></data>
+  <data name="LastUpdate_MinAgo" xml:space="preserve"><value>آخری تازہ کاری: {0} منٹ پہلے</value></data>
+  <data name="LastUpdate_Never" xml:space="preserve"><value>آخری تازہ کاری: کبھی نہیں</value></data>
+  <data name="Log_AllGroupSelected" xml:space="preserve"><value>گروپ "{0}" کے تمام سرورز منتخب ہوئے</value></data>
+  <data name="Log_AutoConnectNoServer" xml:space="preserve"><value>خودکار جڑنا: کوئی سرور منتخب نہیں</value></data>
+  <data name="Log_FetchNoneKept" xml:space="preserve"><value>{0} میں خرابی: کوئی سرور وصول نہیں — پچھلے سرورز برقرار</value></data>
+  <data name="Log_FetchedCount" xml:space="preserve"><value>وصول شدہ سرورز: {0}</value></data>
+  <data name="Log_RemovedFromGroup" xml:space="preserve"><value>گروپ "{1}" سے {0} سرورز حذف ہوئے</value></data>
+  <data name="Log_ServerEdited" xml:space="preserve"><value>"{0}" میں ترمیم کی گئی۔</value></data>
+  <data name="Log_SubError" xml:space="preserve"><value>{0} میں خرابی: {1}</value></data>
+  <data name="Log_SubInfo" xml:space="preserve"><value>ٹریفک: {0}/{1} | اختتام: {2}</value></data>
+  <data name="Log_SubInfoMissing" xml:space="preserve"><value>سبسکرپشن کی معلومات (ٹریفک/اختتام) سرور سے وصول نہیں ہوئی</value></data>
+  <data name="Log_UpdateErrorIn" xml:space="preserve"><value>{0} تازہ کاری میں خرابی: {1}</value></data>
+  <data name="Proxy_Off" xml:space="preserve"><value>سسٹم پراکسی (آف)</value></data>
+  <data name="Proxy_On" xml:space="preserve"><value>سسٹم پراکسی (آن)</value></data>
+  <data name="Status_ClipboardAdded" xml:space="preserve"><value>کلپ بورڈ سے {0} سرور شامل کیے گئے</value></data>
+  <data name="Status_ClipboardEmpty" xml:space="preserve"><value>کلپ بورڈ خالی ہے</value></data>
+  <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>کلپ بورڈ تک رسائی دستیاب نہیں</value></data>
+  <data name="Status_ConnectError" xml:space="preserve"><value>جڑنے میں خرابی</value></data>
+  <data name="Status_ConnectedTo" xml:space="preserve"><value>{0} سے جڑا ہوا</value></data>
+  <data name="Status_Connecting" xml:space="preserve"><value>جڑ رہا ہے ...</value></data>
+  <data name="Status_DupCount" xml:space="preserve"><value>{0} سرور تکراری تھے</value></data>
+  <data name="Status_DupServer" xml:space="preserve"><value>سرور "{0}" پہلے سے موجود ہے</value></data>
+  <data name="Status_FetchError" xml:space="preserve"><value>حاصل کرنے میں خرابی</value></data>
+  <data name="Status_FetchedFromSub" xml:space="preserve"><value>"{1}" سے {0} سرورز وصول ہوئے</value></data>
+  <data name="Status_Fetching" xml:space="preserve"><value>{0} حاصل کیا جا رہا ہے ...</value></data>
+  <data name="Status_FindBusy" xml:space="preserve"><value>بہترین تلاش: دوسرا ٹیسٹ چل رہا ہے</value></data>
+  <data name="Status_FindCancelled" xml:space="preserve"><value>بہترین تلاش منسوخ</value></data>
+  <data name="Status_FindNoCandidate" xml:space="preserve"><value>بہترین تلاش: کسی امیدوار نے جواب نہیں دیا</value></data>
+  <data name="Status_FindNoServer" xml:space="preserve"><value>بہترین تلاش: کوئی سرور منتخب نہیں</value></data>
+  <data name="Status_FindNotConnected" xml:space="preserve"><value>بہترین تلاش: پہلے جڑیں</value></data>
+  <data name="Status_FindRealFailed" xml:space="preserve"><value>بہترین تلاش: اصل تاخیر کا ٹیسٹ ناکام</value></data>
+  <data name="Status_FindStillBest" xml:space="preserve"><value>بہترین تلاش: موجودہ سرور اب بھی بہترین ہے ({0}ms)</value></data>
+  <data name="Status_FindTestingBatch" xml:space="preserve"><value>بہترین تلاش: {0} سرور کا ٹیسٹ ...</value></data>
+  <data name="Status_GroupPing" xml:space="preserve"><value>گروپ "{0}" کا پنگ ({1} سرور) ...</value></data>
+  <data name="Status_GroupPingDone" xml:space="preserve"><value>گروپ کا پنگ مکمل ({0} کامیاب)</value></data>
+  <data name="Status_GroupReal" xml:space="preserve"><value>گروپ "{0}" کا اصل تاخیر ٹیسٹ ({1} سرور) ...</value></data>
+  <data name="Status_GroupRealDone" xml:space="preserve"><value>گروپ کا اصل تاخیر ٹیسٹ مکمل ({0} کامیاب)</value></data>
+  <data name="Status_GroupSpeed" xml:space="preserve"><value>گروپ "{0}" کا رفتار ٹیسٹ ({1} سرور) ...</value></data>
+  <data name="Status_GroupSpeedDone" xml:space="preserve"><value>گروپ کا رفتار ٹیسٹ مکمل ({0} کامیاب)</value></data>
+  <data name="Status_GroupUpdate" xml:space="preserve"><value>گروپ "{0}" تازہ کاری ہو رہی ہے ({1} سرور) ...</value></data>
+  <data name="Status_GroupUpdateDone" xml:space="preserve"><value>گروپ تازہ کاری مکمل ({0} کامیاب)</value></data>
+  <data name="Status_NewServerName" xml:space="preserve"><value>نیا سرور ({0})</value></data>
+  <data name="Status_NoServerFromSub" xml:space="preserve"><value>"{0}" سے کوئی سرور وصول نہیں ہوا</value></data>
+  <data name="Status_NoServers" xml:space="preserve"><value>کوئی سرور نہیں</value></data>
+  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>کلپ بورڈ میں کوئی درست لنک نہیں</value></data>
+  <data name="Status_PingAll" xml:space="preserve"><value>{0} سروروں کو پنگ کیا جا رہا ہے ...</value></data>
+  <data name="Status_PingDoneCount" xml:space="preserve"><value>پنگ مکمل: {1} میں سے {0} نے جواب دیا</value></data>
+  <data name="Status_PingSelDone" xml:space="preserve"><value>منتخبوں کا پنگ مکمل ({0} کامیاب)</value></data>
+  <data name="Status_PingSelected" xml:space="preserve"><value>منتخب {0} سروروں کو پنگ ...</value></data>
+  <data name="Status_RealAll" xml:space="preserve"><value>{0} سروروں پر اصل تاخیر ٹیسٹ (سست لیکن درست) ...</value></data>
+  <data name="Status_RealCount" xml:space="preserve"><value>{0} سروروں پر اصل تاخیر ٹیسٹ ...</value></data>
+  <data name="Status_RealDone" xml:space="preserve"><value>اصل تاخیر ٹیسٹ مکمل ({0} کامیاب)</value></data>
+  <data name="Status_RealDoneCount" xml:space="preserve"><value>اصل تاخیر ٹیسٹ مکمل: {1} میں سے {0} کامیاب</value></data>
+  <data name="Status_RealSelDone" xml:space="preserve"><value>منتخبوں کا اصل تاخیر ٹیسٹ مکمل ({0} کامیاب)</value></data>
+  <data name="Status_RealSelected" xml:space="preserve"><value>منتخب {0} سروروں پر اصل تاخیر ٹیسٹ ...</value></data>
+  <data name="Status_ServerAdded" xml:space="preserve"><value>سرور "{0}" شامل کیا گیا</value></data>
+  <data name="Status_ServersAdded" xml:space="preserve"><value>{0} سرور شامل کیے گئے</value></data>
+  <data name="Status_SmartBest" xml:space="preserve"><value>سمارٹ جڑنا: بہترین سرور → {0} ({1})</value></data>
+  <data name="Status_SmartCancelled" xml:space="preserve"><value>سمارٹ جڑنا منسوخ</value></data>
+  <data name="Status_SmartNoResponse" xml:space="preserve"><value>سمارٹ جڑنا: کسی سرور نے جواب نہیں دیا</value></data>
+  <data name="Status_SmartRealDelay" xml:space="preserve"><value>سمارٹ جڑنا: {0} امیدواروں پر اصل تاخیر ...</value></data>
+  <data name="Status_SmartRealFailed" xml:space="preserve"><value>سمارٹ جڑنا: اصل تاخیر کا ٹیسٹ ناکام</value></data>
+  <data name="Status_SmartStage1" xml:space="preserve"><value>سمارٹ جڑنا: تیز پنگ ...</value></data>
+  <data name="Status_SpeedAll" xml:space="preserve"><value>{0} سروروں پر رفتار ٹیسٹ ...</value></data>
+  <data name="Status_SpeedAllProxy" xml:space="preserve"><value>{0} سروروں پر رفتار ٹیسٹ (پراکسی کے ذریعے) ...</value></data>
+  <data name="Status_SpeedDoneCount" xml:space="preserve"><value>رفتار ٹیسٹ مکمل: {1} میں سے {0} کامیاب</value></data>
+  <data name="Status_SpeedSelDone" xml:space="preserve"><value>منتخبوں کا رفتار ٹیسٹ مکمل ({0} کامیاب)</value></data>
+  <data name="Status_SpeedSelected" xml:space="preserve"><value>منتخب {0} سروروں پر رفتار ٹیسٹ ...</value></data>
+  <data name="Status_Stopped" xml:space="preserve"><value>روک دیا گیا</value></data>
+  <data name="Status_SubAddedCount" xml:space="preserve"><value>"{0}" شامل کیا گیا ({1} سرور)</value></data>
+  <data name="Status_SubUpdatedN" xml:space="preserve"><value>"{0}" تازہ کاری ہوئی ({1} نئے سرورز)</value></data>
+  <data name="Status_TestSpeedOne" xml:space="preserve"><value>رفتار ٹیسٹ: {0} ...</value></data>
+  <data name="Status_UpdateError" xml:space="preserve"><value>تازہ کاری میں خرابی</value></data>
+  <data name="Status_UpdateErrorIn" xml:space="preserve"><value>{0} تازہ کاری میں خرابی</value></data>
+  <data name="Status_UpdateNoProxy" xml:space="preserve"><value>بغیر پراکسی تازہ کاری ...</value></data>
+  <data name="Status_UpdateWithProxy" xml:space="preserve"><value>پراکسی کے ذریعے تازہ کاری ...</value></data>
+  <data name="Sub_ServerCount" xml:space="preserve"><value>سرورز کی تعداد: {0}</value></data>
+  <data name="Toast_AllChecked" xml:space="preserve"><value>تمام سرورز پہلے ہی چیک ہو چکے ہیں</value></data>
+  <data name="Toast_AnotherTestRunning" xml:space="preserve"><value>دوسرا ٹیسٹ چل رہا ہے — صبر کریں</value></data>
+  <data name="Toast_AutoConnectSelect" xml:space="preserve"><value>خودکار جڑنا: پہلے کوئی سرور منتخب کریں</value></data>
+  <data name="Toast_CheckingNew" xml:space="preserve"><value>{0} نئے سرور چیک ہو رہے ہیں ...</value></data>
+  <data name="Toast_ConnectingTo" xml:space="preserve"><value>{0} ({1}) سے جڑ رہا ہے</value></data>
+  <data name="Toast_EnterLink" xml:space="preserve"><value>لنک درج کریں</value></data>
+  <data name="Toast_FindingBest" xml:space="preserve"><value>بہترین سرور تلاشہو رہا ہے ...</value></data>
+  <data name="Toast_FirstConnect" xml:space="preserve"><value>پہلے کسی سرور سے جڑیں</value></data>
+  <data name="Toast_NoServerForConnect" xml:space="preserve"><value>جڑنے کے لیے کوئی سرور دستیاب نہیں</value></data>
+  <data name="Toast_NoServerInBatch" xml:space="preserve"><value>اس بیچ میں کسی سرور نے جواب نہیں دیا</value></data>
+  <data name="Toast_NoServerResponded" xml:space="preserve"><value>کسی سرور نے جواب نہیں دیا</value></data>
+  <data name="Toast_RealDelayFailed" xml:space="preserve"><value>اصل تاخیر کا ٹیسٹ ناکام رہا</value></data>
+  <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>اصل تاخیر کے ٹیسٹ نے کسی سرور کی تصدیق نہیں کی</value></data>
+  <data name="Toast_SelectServerFirst" xml:space="preserve"><value>کوئی سرور منتخب نہیں — پہلے ایک منتخب کریں</value></data>
+  <data name="Toast_StillBest" xml:space="preserve"><value>موجودہ سرور اب بھی بہترین ہے ({0}ms)</value></data>
+  <data name="Toast_SubLinkCopied" xml:space="preserve"><value>سبسکرپشن لنک کاپی ہو گیا</value></data>
+  <data name="Toast_SwitchTo" xml:space="preserve"><value>{0} ({1}ms) پر منتقل ہو رہا ہے</value></data>
+  <data name="Traffic_UsageDiff" xml:space="preserve"><value>استعمال {0} {1} از {2} {3}</value></data>
+  <data name="Traffic_UsageSame" xml:space="preserve"><value>استعمال {0} از {1} {2}</value></data>
+  <data name="Traffic_UsageZero" xml:space="preserve"><value>استعمال 0 از {0} {1}</value></data>
+  <data name="Tun_AdapterCreated" xml:space="preserve"><value>TUN ایڈاپٹر بن گیا۔</value></data>
+  <data name="Tun_AdapterExists" xml:space="preserve"><value>TUN ایڈاپٹر پہلے سے موجود ہے۔</value></data>
+  <data name="Tun_CleanError" xml:space="preserve"><value>صفائی میں خرابی: {0}</value></data>
+  <data name="Tun_Cleaning" xml:space="preserve"><value>TUN ایڈاپٹر صاف ہو رہا ہے...</value></data>
+  <data name="Tun_CreateError" xml:space="preserve"><value>ایڈاپٹر بنانے میں خرابی: {0}</value></data>
+  <data name="Tun_CreatingAdapter" xml:space="preserve"><value>TUN ایڈاپٹر بنایا جا رہا ہے...</value></data>
+  <data name="Tun_DownloadError" xml:space="preserve"><value>wintun ڈاؤن لوڈ میں خرابی: {0}</value></data>
+  <data name="Tun_DownloadingDriver" xml:space="preserve"><value>wintun ڈرائیور ڈاؤن لوڈ ہو رہا ہے...</value></data>
+  <data name="Tun_DriverDownloaded" xml:space="preserve"><value>wintun ڈرائیور کامیابی سے ڈاؤن لوڈ ہو گیا</value></data>
+  <data name="Tun_HashBad" xml:space="preserve"><value>wintun فائل کا ہیش غلط ہے — ڈاؤن لوڈ منسوخ</value></data>
+  <data name="Tun_NeedAdmin" xml:space="preserve"><value>TUN ایڈاپٹر بنانے کے لیے ایڈمنسٹریٹر رسائی درکار ہے</value></data>
+  <data name="Unit_B" xml:space="preserve"><value>بائٹ</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>گیگابائٹ</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>کلوبائٹ</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>میگابائٹ</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>ٹیرابائٹ</value></data>
+  <data name="Url_InvalidSs" xml:space="preserve"><value>ناموز لنک Shadowsocks</value></data>
+  <data name="Url_InvalidTrojan" xml:space="preserve"><value>ناموز لنک Trojan</value></data>
+  <data name="Url_InvalidVless" xml:space="preserve"><value>ناموز لنک VLESS</value></data>
+  <data name="Url_Unsupported" xml:space="preserve"><value>صرف vmess / vless / ss / trojan سپورٹ ہوتے ہیں</value></data>
+  <data name="Log_FindBusy" xml:space="preserve"><value>بہترین تلاش: روک دیا — دوسرا ٹیسٹ چل رہا ہے</value></data>
+  <data name="Log_FindError" xml:space="preserve"><value>بہترین تلاش میں خرابی: {0}</value></data>
+  <data name="Log_FindNoMore" xml:space="preserve"><value>بہترین تلاش: ٹیسٹ کے لیے مزید سرور نہیں بچے</value></data>
+  <data name="Log_FindNoSelection" xml:space="preserve"><value>بہترین تلاش: روک دیا — کوئی سرور منتخب نہیں</value></data>
+  <data name="Log_FindNoSurvivors" xml:space="preserve"><value>بہترین تلاش: TCP پنگ سے کوئی باقی نہیں رہا</value></data>
+  <data name="Log_FindNotConnected" xml:space="preserve"><value>بہترین تلاش: روک دیا — منقطع ہیں</value></data>
+  <data name="Log_FindRealBatch" xml:space="preserve"><value>بہترین تلاش: batch multi-outbound سے {0} باقی کا ٹیسٹ</value></data>
+  <data name="Log_FindRealFailedAll" xml:space="preserve"><value>بہترین تلاش: تمام اصل تاخیر ٹیسٹ ناکام</value></data>
+  <data name="Log_FindSurvivors" xml:space="preserve"><value>بہترین تلاش: {0} باقی — اصل تاخیر ٹیسٹ شروع</value></data>
+  <data name="Log_PoolExpired" xml:space="preserve"><value>تلاش کا پول ختم یا خالی ہے — تمام سروروں سے دوبارہ بنایا جا رہا ہے...</value></data>
+  <data name="Log_SearchPool" xml:space="preserve"><value>تلاش کا پول: کرمی تلاش کے لیے {0} غیر ٹیسٹ شدہ سرورز محفوظ</value></data>
+  <data name="Log_SmartFailedAll" xml:space="preserve"><value>سمارٹ جڑنا: تمام امیدواروں کے لیے اصل تاخیر ٹیسٹ ناکام رہا</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>اسٹ {0} آخری Xray ریلیز میں نہیں ملا۔</value></data>
+  <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>پراکسی صاف کرنا ناکام: {0}</value></data>
+  <data name="Eng_ConnectedPorts" xml:space="preserve"><value>جڑ گیا۔ HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
+  <data name="Eng_ConnectingTo" xml:space="preserve"><value>{0} سے جڑا جا رہا ہے {1} ...</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Xray-core ڈاؤن لوڈ ڈائجسٹ مماثل نہیں: متوقع {0}، وصول {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Xray-core ڈاؤن لوڈ ہو رہا ہے ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Xray انجن غیر متوقع طور پر بند ہو گیا۔</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Xray انجن کی سلامت کی تصدیق ناکام رہی۔</value></data>
+  <data name="Eng_IntegrityRetry" xml:space="preserve"><value>انجن کی سلامت کی تصدیق ناکام — دوبارہ ڈاؤن لوڈ ...</value></data>
+  <data name="Eng_MirrorTrying" xml:space="preserve"><value>براہ راست GitHub دستیاب نہیں — مررے سے کوشش ...</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>ملٹی ٹیسٹ Xray انجن غیر متوقع طور پر بند ہو گیا۔</value></data>
+  <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>ملٹی ٹیسٹ پورٹس شروع نہیں ہوئے۔</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>ملٹی ٹیسٹ Xray انجن شروع ہوا۔</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>GitHub ڈائجسٹ کے بغیر مررے سے Xray-core ڈاؤن لوڈ کی تصدیق نہیں کی جا سکتی۔</value></data>
+  <data name="Eng_NotFound" xml:space="preserve"><value>انجن نہیں ملا، ڈاؤن لوڈ ہو رہا ہے ...</value></data>
+  <data name="Eng_PortNotUp" xml:space="preserve"><value>پراکسی پورٹ شروع نہیں ہوا۔</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} تیار ہے۔</value></data>
+  <data name="Eng_Stopped" xml:space="preserve"><value>انجن بند ہو گیا۔</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>ٹیسٹ Xray انجن غیر متوقع طور پر بند ہو گیا۔</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray ٹیسٹ پورٹ شروع نہیں ہوا۔</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>ٹیسٹ Xray انجن شروع ہوا۔</value></data>
+  <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN ایڈاپٹر صاف ہو گیا۔</value></data>
+  <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>TUN صفائی ناکام: {0}</value></data>
+  <data name="Eng_TunFallback" xml:space="preserve"><value>TUN موڈ کو ایڈمنسٹریٹر کی ضرورت ہے۔ پراکسی موڈ پر واپس جا رہا ہے۔</value></data>
+  <data name="Eng_UnsupportedOs" xml:space="preserve"><value>غیر معاون نظام یا ڈھانچہ۔</value></data>
+  <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll دستیاب نہیں۔ پراکسی موڈ پر واپس جا رہا ہے۔</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>صرف https سبسکرپشن URL اجازت یافتہ ہیں۔</value></data>
 </root>

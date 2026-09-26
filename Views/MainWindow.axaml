@@ -387,9 +387,6 @@
                         <Style Selector="DataGridRow:pointerover /template/ ContentPresenter">
                           <Setter Property="Background" Value="#F0FDFA"/>
                         </Style>
-                        <Style Selector="DataGridRow:selected /template/ ContentPresenter">
-                          <Setter Property="Background" Value="#E0F2FE"/>
-                        </Style>
                         <Style Selector="DataGridCell">
                           <Style.Resources>
                             <SolidColorBrush x:Key="DataGridCellFocusVisualPrimaryBrush" Color="Transparent"/>

@@ -281,6 +281,7 @@ public partial class MainViewModel : ViewModelBase
         if (value != null)
             _settings.ActiveServerId = value.Id;
         SaveSettings();
+        RefreshConnectionFlags();
         foreach (var s in Servers)
             s.IsSelected = ReferenceEquals(s, value);
         OnPropertyChanged(nameof(HomeServerName));

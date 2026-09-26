@@ -117,13 +117,19 @@ public partial class MainWindow : Window
             foreach (var g in vm.Groups)
             {
                 int idx = g.Servers.IndexOf(server);
-                if (idx > 0) g.Servers.Move(idx, 0);
+                if (idx > 0)
+                {
+                    g.Servers.RemoveAt(idx);
+                    g.Servers.Insert(0, server);
+                }
                 if (g.Servers.Contains(server)) g.IsExpanded = true;
             }
             vm.SelectedServer = server;
 
             Dispatcher.UIThread.Post(() =>
             {
+                if (!ReferenceEquals(vm.SelectedServer, server))
+                    vm.SelectedServer = server;
                 var group = vm.Groups.FirstOrDefault(g => g.Servers.Count > 0 && ReferenceEquals(g.Servers[0], server))
                     ?? vm.Groups.FirstOrDefault(g => g.Servers.Contains(server));
                 if (group == null) return;

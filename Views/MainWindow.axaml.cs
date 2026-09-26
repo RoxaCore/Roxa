@@ -130,6 +130,17 @@ public partial class MainWindow : Window
             {
                 if (!ReferenceEquals(vm.SelectedServer, server))
                     vm.SelectedServer = server;
+
+                foreach (var g in vm.Groups)
+                {
+                    if (!g.Servers.Contains(server)) continue;
+                    var exp = this.GetVisualDescendants().OfType<Expander>()
+                        .FirstOrDefault(e => ReferenceEquals(e.DataContext, g));
+                    var dg = exp?.GetVisualDescendants().OfType<DataGrid>().FirstOrDefault();
+                    if (dg != null && !ReferenceEquals(dg.SelectedItem, server))
+                        dg.SelectedItem = server;
+                }
+
                 var group = vm.Groups.FirstOrDefault(g => g.Servers.Count > 0 && ReferenceEquals(g.Servers[0], server))
                     ?? vm.Groups.FirstOrDefault(g => g.Servers.Contains(server));
                 if (group == null) return;

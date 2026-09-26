@@ -5,3 +5,5 @@ obj/
 .vs/
 *.nupkg
 *.snupkg
+installer/publish/
+installer/output/

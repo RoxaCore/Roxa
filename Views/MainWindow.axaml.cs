@@ -109,6 +109,28 @@ public partial class MainWindow : Window
         DispatcherTimer.RunOnce(() => { ToastBorder.IsVisible = false; }, TimeSpan.FromMilliseconds(durationMs));
     }
 
+    private void ForceRowSelection(MainViewModel vm, ServerInfo server)
+    {
+        foreach (var g in vm.Groups)
+        {
+            if (!g.Servers.Contains(server)) continue;
+            var exp = this.GetVisualDescendants().OfType<Expander>()
+                .FirstOrDefault(e => ReferenceEquals(e.DataContext, g));
+            var dg = exp?.GetVisualDescendants().OfType<DataGrid>().FirstOrDefault();
+            if (dg != null && !ReferenceEquals(dg.SelectedItem, server))
+                dg.SelectedItem = server;
+        }
+    }
+
+    private void ReapplyRowSelection()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (DataContext is not MainViewModel vm || vm.SelectedServer == null) return;
+            ForceRowSelection(vm, vm.SelectedServer);
+        }, DispatcherPriority.Loaded);
+    }
+
     private void FocusServer(ServerInfo server)
     {
         Dispatcher.UIThread.Post(() =>
@@ -131,15 +153,7 @@ public partial class MainWindow : Window
                 if (!ReferenceEquals(vm.SelectedServer, server))
                     vm.SelectedServer = server;
 
-                foreach (var g in vm.Groups)
-                {
-                    if (!g.Servers.Contains(server)) continue;
-                    var exp = this.GetVisualDescendants().OfType<Expander>()
-                        .FirstOrDefault(e => ReferenceEquals(e.DataContext, g));
-                    var dg = exp?.GetVisualDescendants().OfType<DataGrid>().FirstOrDefault();
-                    if (dg != null && !ReferenceEquals(dg.SelectedItem, server))
-                        dg.SelectedItem = server;
-                }
+                ForceRowSelection(vm, server);
 
                 var group = vm.Groups.FirstOrDefault(g => g.Servers.Count > 0 && ReferenceEquals(g.Servers[0], server))
                     ?? vm.Groups.FirstOrDefault(g => g.Servers.Contains(server));
@@ -179,6 +193,7 @@ public partial class MainWindow : Window
         };
         vm.ToastHandler = message => ShowToast(message);
         vm.FocusServerHandler = FocusServer;
+        vm.SelectionRefreshHandler = ReapplyRowSelection;
         vm.RestartRequested += () =>
         {
             var app = Application.Current as App;

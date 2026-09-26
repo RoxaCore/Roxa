@@ -28,6 +28,7 @@ public partial class MainViewModel : ViewModelBase
      public Action<string>? ToastHandler { get; set; }
      public Action? OpenDnsSettingsHandler { get; set; }
      public Action<ServerInfo>? FocusServerHandler { get; set; }
+     public Action? SelectionRefreshHandler { get; set; }
 
     [ObservableProperty] private ObservableCollection<ServerInfo> _servers = new();
     [ObservableProperty] private ObservableCollection<SubscriptionInfo> _subscriptions = new();

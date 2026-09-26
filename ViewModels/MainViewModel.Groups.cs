@@ -198,6 +198,7 @@ public partial class MainViewModel : ViewModelBase
                     SelectedServer = current;
                 }
             }
+            SelectionRefreshHandler?.Invoke();
         }
     }
 

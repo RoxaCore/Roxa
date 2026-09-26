@@ -318,6 +318,7 @@
   <data name="Toast_EnterLink" xml:space="preserve"><value>एक लिंक दर्ज करें</value></data>
   <data name="Toast_FindingBest" xml:space="preserve"><value>सर्वोत्तम सर्वर खोजा जा रहा है ...</value></data>
   <data name="Toast_FirstConnect" xml:space="preserve"><value>पहले किसी सर्वर से कनेक्ट करें</value></data>
+  <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>सर्वर लिंक कॉपी हो गए</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>कनेक्ट करने के लिए कोई सर्वर उपलब्ध नहीं</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>इस बैच में किसी सर्वर ने उत्तर नहीं दिया</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>किसी सर्वर ने उत्तर नहीं दिया</value></data>

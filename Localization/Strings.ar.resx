@@ -334,6 +334,7 @@
   <data name="Toast_EnterLink" xml:space="preserve"><value>أدخل رابطًا</value></data>
   <data name="Toast_FindingBest" xml:space="preserve"><value>جارٍ البحث عن أفضل خادم ...</value></data>
   <data name="Toast_FirstConnect" xml:space="preserve"><value>اتصل بخادم أولًا</value></data>
+  <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>تم نسخ روابط الخوادم</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>لا يوجد خادم للاتصال</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>لم يستجب أي خادم في هذه الدفعة</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>لم يستجب أي خادم</value></data>

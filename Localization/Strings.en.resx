@@ -335,6 +335,7 @@ Latency: {1}</value></data>
   <data name="Toast_EnterLink" xml:space="preserve"><value>Enter a link</value></data>
   <data name="Toast_FindingBest" xml:space="preserve"><value>Finding the best server ...</value></data>
   <data name="Toast_FirstConnect" xml:space="preserve"><value>Connect to a server first</value></data>
+  <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>Server links copied</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>No server available to connect</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>No server in this batch responded</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>No server responded</value></data>

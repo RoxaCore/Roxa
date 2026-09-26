@@ -318,6 +318,7 @@ Latencia: {1}</value></data>
   <data name="Toast_EnterLink" xml:space="preserve"><value>Introduce un enlace</value></data>
   <data name="Toast_FindingBest" xml:space="preserve"><value>Buscando el mejor servidor ...</value></data>
   <data name="Toast_FirstConnect" xml:space="preserve"><value>Conéctate primero a un servidor</value></data>
+  <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>Enlaces de servidores copiados</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>No hay servidor disponible para conectar</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>Ningún servidor de este lote respondió</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>Ningún servidor respondió</value></data>

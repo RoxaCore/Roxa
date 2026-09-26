@@ -336,6 +336,7 @@ Latence : {1}</value></data>
   <data name="Toast_EnterLink" xml:space="preserve"><value>Saisissez un lien</value></data>
   <data name="Toast_FindingBest" xml:space="preserve"><value>Recherche du meilleur serveur ...</value></data>
   <data name="Toast_FirstConnect" xml:space="preserve"><value>Connectez-vous d'abord à un serveur</value></data>
+  <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>Liens des serveurs copiés</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>Aucun serveur disponible pour se connecter</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>Aucun serveur de ce lot n'a répondu</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>Aucun serveur n'a répondu</value></data>

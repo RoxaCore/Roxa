@@ -318,6 +318,7 @@
   <data name="Toast_EnterLink" xml:space="preserve"><value>링크를 입력하세요</value></data>
   <data name="Toast_FindingBest" xml:space="preserve"><value>최적의 서버를 찾는 중 ...</value></data>
   <data name="Toast_FirstConnect" xml:space="preserve"><value>먼저 서버에 연결하세요</value></data>
+  <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>서버 링크가 복사되었습니다</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>연결할 서버가 없습니다</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>이 배치의 서버가 응답하지 않았습니다</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>응답한 서버가 없음</value></data>

@@ -683,6 +683,7 @@ Gecikme: {1}</value></data>
   <data name="Toast_EnterLink" xml:space="preserve"><value>Bir bağlantı girin</value></data>
   <data name="Toast_FindingBest" xml:space="preserve"><value>En iyi sunucu aranıyor ...</value></data>
   <data name="Toast_FirstConnect" xml:space="preserve"><value>Önce bir sunucuya bağlan</value></data>
+  <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>Sunucu bağlantıları kopyalandı</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>Bağlanılacak sunucu yok</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>Bu partideki hiçbir sunucu yanıt vermedi</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>Hiçbir sunucu yanıt vermedi</value></data>

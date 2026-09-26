@@ -43,6 +43,8 @@ public partial class ServerGroup : ObservableObject
     public bool IsSubscription => Subscription != null;
     public bool IsAllGroup => Key == "__all__";
     public bool IsManualGroup => !IsSubscription && !IsAllGroup;
+    public bool IsNotSubscription => !IsSubscription;
+    public bool IsNotAllGroup => !IsAllGroup;
     public string CountText => string.Format(TranslationManager.Instance["ServerCount"], Servers.Count);
 
     public ServerGroup(MainViewModel owner, string key, string title, SubscriptionInfo? subscription, bool expanded)

@@ -2038,12 +2038,17 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task UpdateSubscriptions()
+    private Task UpdateSubscriptions() => UpdateSubscriptionsCore(false);
+
+    [RelayCommand]
+    private Task UpdateSubscriptionsNoProxy() => UpdateSubscriptionsCore(true);
+
+    private async Task UpdateSubscriptionsCore(bool forceNoProxy)
     {
         if (Subscriptions.Count == 0) { AppendLog(TranslationManager.Instance["Log_NoSub"]); return; }
         string? activeId = SelectedServer?.Id;
         int total = 0;
-        string? proxyAddress = UseProxyForSubscriptions && IsConnected && _engine.HttpPort > 0 ? $"127.0.0.1:{_engine.HttpPort}" : null;
+        string? proxyAddress = !forceNoProxy && UseProxyForSubscriptions && IsConnected && _engine.HttpPort > 0 ? $"127.0.0.1:{_engine.HttpPort}" : null;
         foreach (var sub in Subscriptions.ToList())
         {
             try
@@ -2192,6 +2197,16 @@ public partial class MainViewModel : ViewModelBase
          await Clipboard.SetTextAsync(sub.Url);
          ToastHandler?.Invoke(TranslationManager.Instance["Toast_SubLinkCopied"]);
      }
+
+    [RelayCommand]
+    private async Task CopyGroupLinks(ServerGroup? group)
+    {
+        if (group == null || Clipboard == null) return;
+        var links = string.Join(Environment.NewLine, group.Servers.Select(s => s.Link));
+        if (links.Length == 0) return;
+        await Clipboard.SetTextAsync(links);
+        ToastHandler?.Invoke(TranslationManager.Instance["Toast_GroupLinksCopied"]);
+    }
 
     [RelayCommand]
     private async Task UpdateSingleSubscriptionNoProxy(SubscriptionInfo? sub)

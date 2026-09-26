@@ -309,16 +309,21 @@
                         <!-- Hamburger + Sort (RTL: Column 1 = left) -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                           <ComboBox ItemsSource="{Binding SortOptions}" SelectedItem="{Binding GroupSortField, Mode=TwoWay}" Width="110" Padding="4,3" FontSize="10" VerticalAlignment="Center"/>
-                          <Button Padding="6,4" CornerRadius="6" Background="Transparent" Foreground="#888888" FontSize="16" BorderThickness="0" IsVisible="{Binding IsSubscription}">
+                          <Button Padding="6,4" CornerRadius="6" Background="Transparent" Foreground="#888888" FontSize="16" BorderThickness="0">
                             <Button.Flyout>
                             <MenuFlyout Placement="Bottom">
-                              <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_CopyUrl}" Command="{Binding Owner.CopySubscriptionUrlCommand}" CommandParameter="{Binding Subscription}"/>
-                              <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}" Command="{Binding Owner.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding Subscription}"/>
-                              <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateNoProxy}" Command="{Binding Owner.UpdateSingleSubscriptionNoProxyCommand}" CommandParameter="{Binding Subscription}"/>
+                              <MenuItem IsVisible="{Binding IsSubscription}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_CopyUrl}" Command="{Binding Owner.CopySubscriptionUrlCommand}" CommandParameter="{Binding Subscription}"/>
+                              <MenuItem IsVisible="{Binding IsNotSubscription}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_CopyUrl}" Command="{Binding Owner.CopyGroupLinksCommand}" CommandParameter="{Binding}"/>
+                              <MenuItem IsVisible="{Binding IsSubscription}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}" Command="{Binding Owner.UpdateSingleSubscriptionCommand}" CommandParameter="{Binding Subscription}"/>
+                              <MenuItem IsVisible="{Binding IsManualGroup}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Update}" Command="{Binding Owner.UpdateGroupServersCommand}" CommandParameter="{Binding}"/>
+                              <MenuItem IsVisible="{Binding IsAllGroup}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateAll}" Command="{Binding Owner.UpdateSubscriptionsCommand}"/>
+                              <MenuItem IsVisible="{Binding IsSubscription}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateNoProxy}" Command="{Binding Owner.UpdateSingleSubscriptionNoProxyCommand}" CommandParameter="{Binding Subscription}"/>
+                              <MenuItem IsVisible="{Binding IsAllGroup}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateNoProxy}" Command="{Binding Owner.UpdateSubscriptionsNoProxyCommand}"/>
                               <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Speed}" Command="{Binding Owner.TestGroupSpeedCommand}" CommandParameter="{Binding}"/>
                               <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Ping}" Command="{Binding Owner.TestGroupCommand}" CommandParameter="{Binding}"/>
-                              <Separator/>
-                              <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveSub}" Command="{Binding Owner.RemoveSubscriptionCommand}" CommandParameter="{Binding Subscription}" Foreground="#E53E3E"/>
+                              <Separator IsVisible="{Binding IsNotAllGroup}"/>
+                              <MenuItem IsVisible="{Binding IsSubscription}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveSub}" Command="{Binding Owner.RemoveSubscriptionCommand}" CommandParameter="{Binding Subscription}" Foreground="#E53E3E"/>
+                              <MenuItem IsVisible="{Binding IsManualGroup}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveAll}" Command="{Binding Owner.RemoveGroupServersCommand}" CommandParameter="{Binding}" Foreground="#E53E3E"/>
                             </MenuFlyout>
                             </Button.Flyout>
                             <TextBlock Text="☰" FontSize="16"/>

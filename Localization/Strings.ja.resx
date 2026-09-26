@@ -318,6 +318,7 @@
   <data name="Toast_EnterLink" xml:space="preserve"><value>リンクを入力してください</value></data>
   <data name="Toast_FindingBest" xml:space="preserve"><value>最良のサーバーを探しています ...</value></data>
   <data name="Toast_FirstConnect" xml:space="preserve"><value>まずサーバーに接続してください</value></data>
+  <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>サーバーのリンクをコピーしました</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>接続できるサーバーがありません</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>このバッチ内のサーバーは応答しませんでした</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>応答したサーバーがありません</value></data>

@@ -27,6 +27,7 @@ public partial class MainViewModel : ViewModelBase
      public Func<string, Task<bool>>? ConfirmDeleteHandler { get; set; }
      public Action<string>? ToastHandler { get; set; }
      public Action? OpenDnsSettingsHandler { get; set; }
+     public Action<ServerInfo>? FocusServerHandler { get; set; }
 
     [ObservableProperty] private ObservableCollection<ServerInfo> _servers = new();
     [ObservableProperty] private ObservableCollection<SubscriptionInfo> _subscriptions = new();
@@ -1225,6 +1226,7 @@ public partial class MainViewModel : ViewModelBase
             SelectedServer = finalBest;
             RefreshConnectionFlags();
             await Connect();
+            FocusServerHandler?.Invoke(finalBest);
         }
         catch (OperationCanceledException)
         {
@@ -1390,6 +1392,7 @@ public partial class MainViewModel : ViewModelBase
                     RefreshConnectionFlags();
                     await Connect();
                     AutoSortAfterTest("latency");
+                    FocusServerHandler?.Invoke(bestCandidate);
                 }
                 else
                 {

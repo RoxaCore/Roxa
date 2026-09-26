@@ -269,7 +269,7 @@
           </Border>
 
           <!-- Servers List -->
-          <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <ScrollViewer x:Name="GroupsScrollViewer" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Groups}">
               <ItemsControl.Styles>
                 <Style Selector="ContentPresenter">

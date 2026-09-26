@@ -109,6 +109,42 @@ public partial class MainWindow : Window
         DispatcherTimer.RunOnce(() => { ToastBorder.IsVisible = false; }, TimeSpan.FromMilliseconds(durationMs));
     }
 
+    private void FocusServer(ServerInfo server)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (DataContext is not MainViewModel vm) return;
+            foreach (var g in vm.Groups)
+            {
+                int idx = g.Servers.IndexOf(server);
+                if (idx > 0) g.Servers.Move(idx, 0);
+                if (g.Servers.Contains(server)) g.IsExpanded = true;
+            }
+            vm.SelectedServer = server;
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                var group = vm.Groups.FirstOrDefault(g => g.Servers.Count > 0 && ReferenceEquals(g.Servers[0], server))
+                    ?? vm.Groups.FirstOrDefault(g => g.Servers.Contains(server));
+                if (group == null) return;
+                var expander = this.GetVisualDescendants().OfType<Expander>()
+                    .FirstOrDefault(e => ReferenceEquals(e.DataContext, group));
+                var outer = this.FindControl<ScrollViewer>("GroupsScrollViewer");
+                if (expander == null || outer == null) return;
+
+                var pos = expander.TranslatePoint(new Point(0, 0), outer);
+                if (pos != null)
+                    outer.Offset = new Vector(outer.Offset.X, Math.Max(0, outer.Offset.Y + pos.Value.Y - 4));
+
+                var grid = expander.GetVisualDescendants().OfType<DataGrid>().FirstOrDefault();
+                if (grid == null) return;
+                grid.ScrollIntoView(server, null);
+                var inner = grid.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+                if (inner != null) inner.Offset = new Vector(inner.Offset.X, 0);
+            }, DispatcherPriority.Loaded);
+        });
+    }
+
     private async void OnOpened(object? sender, EventArgs e)
     {
         if (DataContext is not MainViewModel vm) return;
@@ -125,6 +161,7 @@ public partial class MainWindow : Window
             await dlg.ShowDialog(this);
         };
         vm.ToastHandler = message => ShowToast(message);
+        vm.FocusServerHandler = FocusServer;
         vm.RestartRequested += () =>
         {
             var app = Application.Current as App;

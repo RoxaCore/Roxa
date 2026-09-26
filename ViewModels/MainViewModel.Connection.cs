@@ -86,6 +86,7 @@ public partial class MainViewModel : ViewModelBase
             Status = TranslationManager.Instance["Status_ConnectError"];
             NotificationHelper.ShowError(TranslationManager.Get("Notify_ConnectFailed"));
             AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
+            FlushLog();
         }
         finally { ConnectCommand.NotifyCanExecuteChanged(); }
     }

@@ -363,7 +363,11 @@ public partial class MainViewModel : ViewModelBase
         lock (_logLock)
         {
             _logBuffer.Add(line);
-            if ((DateTime.Now - _lastLogFlush).TotalMilliseconds < 1000) return;
+            if ((DateTime.Now - _lastLogFlush).TotalMilliseconds < 1000)
+            {
+                DispatcherTimer.RunOnce(FlushLog, TimeSpan.FromMilliseconds(1100));
+                return;
+            }
             FlushLogUnsafe();
         }
     }

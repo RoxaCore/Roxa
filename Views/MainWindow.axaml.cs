@@ -109,6 +109,13 @@ public partial class MainWindow : Window
         DispatcherTimer.RunOnce(() => { ToastBorder.IsVisible = false; }, TimeSpan.FromMilliseconds(durationMs));
     }
 
+    private void ServerGrid_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (sender is DataGrid dg && DataContext is MainViewModel vm
+            && dg.SelectedItem is ServerInfo s && !ReferenceEquals(vm.SelectedServer, s))
+            vm.SelectedServer = s;
+    }
+
     private void ForceRowSelection(MainViewModel vm, ServerInfo server)
     {
         foreach (var g in vm.Groups)

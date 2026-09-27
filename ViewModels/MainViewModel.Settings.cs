@@ -94,6 +94,12 @@ public partial class MainViewModel : ViewModelBase
         }
         _settings.UseTunMode = value;
         SaveSettings();
+
+        if (IsConnected && !IsTesting)
+        {
+            Disconnect();
+            _ = Connect();
+        }
     }
 
     partial void OnUseProxyForSubscriptionsChanged(bool value)

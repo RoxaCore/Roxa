@@ -38,7 +38,19 @@ public sealed class XrayEngine : IDisposable
         get { lock (_lock) return _process is { HasExited: false }; }
     }
 
-    private void Log(string message) => Output?.Invoke(message);
+    private void Log(string message)
+    {
+        Output?.Invoke(message);
+        try
+        {
+            string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+            Directory.CreateDirectory(dir);
+            string file = Path.Combine(dir, "engine.log");
+            if (File.Exists(file) && new FileInfo(file).Length > 4_000_000) File.WriteAllText(file, "");
+            File.AppendAllText(file, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}{Environment.NewLine}");
+        }
+        catch { }
+    }
 
     public async Task EnsureEngineAsync(bool force = false, CancellationToken ct = default)
     {
@@ -159,6 +171,7 @@ public sealed class XrayEngine : IDisposable
 
     public async Task StartAsync(ServerInfo server, bool setSystemProxy, AppSettings? settings = null, CancellationToken ct = default, IEnumerable<string>? tunExclusionHosts = null)
     {
+        var perf = System.Diagnostics.Stopwatch.StartNew();
         Stop();
         _settings = settings;
         if (!File.Exists(EnginePath))
@@ -238,9 +251,21 @@ public sealed class XrayEngine : IDisposable
                 if (TryConnect(HttpPort)) { ready = true; break; }
             }
             if (!ready) throw new InvalidOperationException(TranslationManager.Get("Eng_PortNotUp"));
+            Log($"[perf] engine ready in {perf.ElapsedMilliseconds}ms");
+            TunManager.Log($"[perf] engine ready in {perf.ElapsedMilliseconds}ms");
+
+            if (useTun && settings?.UseTunMode == false)
+                useTun = false;
 
             if (useTun && !await SetupTunRoutesAsync(server, tunExclusionHosts))
             {
+                Log(TranslationManager.Get("Eng_TunFallback"));
+                useTun = false;
+            }
+
+            if (useTun && settings?.UseTunMode == false)
+            {
+                TunManager.RemoveCaptureRoutes();
                 Log(TranslationManager.Get("Eng_TunFallback"));
                 useTun = false;
             }
@@ -251,6 +276,8 @@ public sealed class XrayEngine : IDisposable
                 _proxyActive = true;
             }
             Log(string.Format(TranslationManager.Get("Eng_ConnectedPorts"), HttpPort, SocksPort, useTun ? "[TUN]" : ""));
+            Log($"[perf] start total {perf.ElapsedMilliseconds}ms tun={useTun}");
+            TunManager.Log($"[perf] start total {perf.ElapsedMilliseconds}ms tun={useTun}");
         }
         catch
         {
@@ -263,17 +290,11 @@ public sealed class XrayEngine : IDisposable
     {
         try
         {
-            if (!await TunManager.WaitTunAdapterAsync())
-            {
-                Log(TranslationManager.Get("Eng_TunAdapterMissing"));
-                return false;
-            }
-
             var hosts = new List<string> { server.Address };
             if (extraHosts != null)
                 hosts.AddRange(extraHosts);
 
-            if (!TunManager.AddCaptureRoutes(hosts, Log))
+            if (!await TunManager.AddCaptureRoutesAsync(hosts, Log))
             {
                 Log(string.Format(TranslationManager.Get("Eng_TunRoutesFailed"), "see tun.log"));
                 return false;

@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using XrayClient.Localization;
 
 namespace XrayClient.Core;
@@ -9,9 +10,18 @@ namespace XrayClient.Core;
 public static class TunManager
 {
     private const string TunAdapterName = "xray0";
+    private const int CaptureTimeoutMs = 15000;
+    private const int CaptureRetryDelayMs = 300;
+    private const int ResolveTimeoutMs = 2500;
 
     private static readonly object _routesLock = new();
     private static readonly List<string> _routeDeleteArgs = new();
+
+    private static readonly (string Prefix, string Delete)[] _capturePrefixes =
+    [
+        ("0.0.0.0/1", "delete 0.0.0.0 mask 128.0.0.0"),
+        ("128.0.0.0/1", "delete 128.0.0.0 mask 128.0.0.0"),
+    ];
 
     private static readonly string _wintunDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "engine");
     private static readonly string _wintunPath = Path.Combine(_wintunDirectory, "wintun.dll");
@@ -79,24 +89,9 @@ public static class TunManager
         }
     }
 
-    public static async Task<bool> WaitTunAdapterAsync(int timeoutMs = 15000)
+    public static async Task<bool> AddCaptureRoutesAsync(IEnumerable<string>? hosts, Action<string>? log = null)
     {
-        long deadline = Environment.TickCount64 + timeoutMs;
-        while (Environment.TickCount64 < deadline)
-        {
-            if (TryGetTunIndex(out _))
-            {
-                Log($"TUN adapter {TunAdapterName} is up.");
-                return true;
-            }
-            await Task.Delay(500);
-        }
-        Log($"TUN adapter {TunAdapterName} did not appear in time.");
-        return false;
-    }
-
-    public static bool AddCaptureRoutes(IEnumerable<string>? hosts, Action<string>? log = null)
-    {
+        long t0 = Environment.TickCount64;
         try
         {
             if (!AdminHelper.IsRunningAsAdmin())
@@ -104,50 +99,43 @@ public static class TunManager
                 log?.Invoke(TranslationManager.Get("Tun_NeedAdmin"));
                 return false;
             }
-            if (!TryGetTunIndex(out int tunIndex))
-            {
-                Log("TUN adapter index not found; capture routes skipped.");
-                return false;
-            }
 
-            var (gateway, gatewayIndex) = GetDefaultGateway();
-            if (gateway == null)
+            string? via = GetDefaultGatewayVia();
+            long tGateway = Environment.TickCount64;
+            if (via == null)
             {
                 Log("No default gateway found; capture routes skipped.");
                 return false;
             }
 
-            string via = gateway == "0.0.0.0" ? $"0.0.0.0 IF {gatewayIndex}" : gateway;
-            var serverIps = new List<string>();
-            foreach (var host in hosts ?? Enumerable.Empty<string>())
-            {
-                if (string.IsNullOrWhiteSpace(host)) continue;
-                if (IPAddress.TryParse(host, out var literal))
-                {
-                    if (literal.AddressFamily == AddressFamily.InterNetwork && !serverIps.Contains(host))
-                        serverIps.Add(host);
-                    continue;
-                }
-                try
-                {
-                    foreach (var addr in Dns.GetHostAddresses(host))
-                        if (addr.AddressFamily == AddressFamily.InterNetwork && !serverIps.Contains(addr.ToString()))
-                            serverIps.Add(addr.ToString());
-                }
-                catch (Exception ex) { Log($"Resolve failed for {host}: {ex.Message}"); }
-            }
+            string? currentHost = hosts?.FirstOrDefault(h => !string.IsNullOrWhiteSpace(h));
+            var serverIps = await ResolveServerIpsAsync(currentHost == null ? null : new[] { currentHost });
+            long tDns = Environment.TickCount64;
 
             foreach (var ip in serverIps)
+            {
                 AddRoute($"add {ip} mask 255.255.255.255 {via}");
-
+                string? net24 = Subnet24(ip);
+                if (net24 != null) AddRoute($"add {net24} mask 255.255.255.0 {via}");
+            }
             AddRoute($"add 10.0.0.0 mask 255.0.0.0 {via}");
             AddRoute($"add 172.16.0.0 mask 255.240.0.0 {via}");
             AddRoute($"add 192.168.0.0 mask 255.255.0.0 {via}");
+            long tExcl = Environment.TickCount64;
 
-            AddRoute($"add 0.0.0.0 mask 128.0.0.0 0.0.0.0 IF {tunIndex}");
-            AddRoute($"add 128.0.0.0 mask 128.0.0.0 0.0.0.0 IF {tunIndex}");
+            RunRoute("delete 0.0.0.0 mask 128.0.0.0");
+            RunRoute("delete 128.0.0.0 mask 128.0.0.0");
 
-            Log($"Capture routes added: {serverIps.Count} server ip(s) excluded, tun if={tunIndex}.");
+            if (!await WaitCaptureRoutesAsync())
+            {
+                Log($"TUN adapter {TunAdapterName} did not appear in time; capture routes skipped.");
+                RemoveCaptureRoutes();
+                return false;
+            }
+            long tCapture = Environment.TickCount64;
+
+            Log($"Route setup: via={via} gateway={tGateway - t0} resolve={tDns - tGateway} excl={tExcl - tDns} capture={tCapture - tExcl} total={tCapture - t0}ms excluded={serverIps.Count}");
+            Log($"Capture routes added: {serverIps.Count} server ip(s) excluded.");
             return true;
         }
         catch (Exception ex)
@@ -175,6 +163,119 @@ public static class TunManager
         }
     }
 
+    private static async Task<bool> WaitCaptureRoutesAsync()
+    {
+        long deadline = Environment.TickCount64 + CaptureTimeoutMs;
+        while (true)
+        {
+            bool allAdded = true;
+            foreach (var (prefix, delete) in _capturePrefixes)
+            {
+                if (RunNetsh($"interface ipv4 add route prefix={prefix} interface={TunAdapterName}") == 0)
+                {
+                    lock (_routesLock)
+                    {
+                        if (!_routeDeleteArgs.Contains(delete))
+                            _routeDeleteArgs.Add(delete);
+                    }
+                }
+                else allAdded = false;
+            }
+            if (allAdded) return true;
+            if (Environment.TickCount64 >= deadline) return false;
+            await Task.Delay(CaptureRetryDelayMs);
+        }
+    }
+
+    private static string? GetDefaultGatewayVia()
+    {
+        try
+        {
+            int code = RunTool("route.exe", "print -4 0.0.0.0", out string output);
+            if (code != 0) return null;
+            string? via = null;
+            int bestMetric = int.MaxValue;
+            foreach (var line in output.Split('\n'))
+            {
+                var parts = line.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 5 || parts[0] != "0.0.0.0" || parts[1] != "0.0.0.0") continue;
+                if (!int.TryParse(parts[^1], out int metric) || metric >= bestMetric) continue;
+                if (IPAddress.TryParse(parts[2], out _))
+                {
+                    bestMetric = metric;
+                    via = parts[2];
+                }
+                else if (IPAddress.TryParse(parts[3], out _))
+                {
+                    bestMetric = metric;
+                    via = parts[3];
+                }
+            }
+            if (via == null) return null;
+            Log($"Default gateway via={via} (metric={bestMetric})");
+            return via;
+        }
+        catch (Exception ex)
+        {
+            Log($"GetDefaultGatewayVia failed: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static string? Subnet24(string ip)
+    {
+        if (!IPAddress.TryParse(ip, out var addr) || addr.AddressFamily != AddressFamily.InterNetwork)
+            return null;
+        var b = addr.GetAddressBytes();
+        if (b[0] == 10 || b[0] == 127 || b[0] >= 224 ||
+            (b[0] == 172 && b[1] >= 16 && b[1] <= 31) ||
+            (b[0] == 192 && b[1] == 168) ||
+            (b[0] == 169 && b[1] == 254))
+            return null;
+        return $"{b[0]}.{b[1]}.{b[2]}.0";
+    }
+
+    private static async Task<List<string>> ResolveServerIpsAsync(IEnumerable<string>? hosts)
+    {
+        var ips = new List<string>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var pending = new List<(string Host, Task<string[]> Task)>();
+        foreach (var host in hosts ?? Enumerable.Empty<string>())
+        {
+            if (string.IsNullOrWhiteSpace(host)) continue;
+            if (IPAddress.TryParse(host, out var literal))
+            {
+                if (literal.AddressFamily == AddressFamily.InterNetwork && seen.Add(literal.ToString()))
+                    ips.Add(literal.ToString());
+                continue;
+            }
+            pending.Add((host, ResolveIPv4Async(host)));
+        }
+        if (pending.Count > 0)
+        {
+            var results = await Task.WhenAll(pending.Select(p => p.Task));
+            foreach (var result in results)
+                foreach (var addr in result)
+                    if (seen.Add(addr))
+                        ips.Add(addr);
+        }
+        return ips;
+    }
+
+    private static async Task<string[]> ResolveIPv4Async(string host)
+    {
+        try
+        {
+            var addrs = await Dns.GetHostAddressesAsync(host).WaitAsync(TimeSpan.FromMilliseconds(ResolveTimeoutMs));
+            return addrs.Where(a => a.AddressFamily == AddressFamily.InterNetwork).Select(a => a.ToString()).ToArray();
+        }
+        catch (Exception ex)
+        {
+            Log($"Resolve failed for {host}: {ex.Message}");
+            return Array.Empty<string>();
+        }
+    }
+
     private static void AddRoute(string addArgs)
     {
         var parts = addArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -187,20 +288,28 @@ public static class TunManager
         lock (_routesLock) _routeDeleteArgs.Add(deleteArgs);
     }
 
-    private static int RunRoute(string args)
+    private static int RunRoute(string args) => RunTool("route.exe", args, out _);
+
+    private static int RunNetsh(string args) => RunTool("netsh.exe", args, out _);
+
+    private static int RunTool(string fileName, string arguments, out string stdout)
     {
         var psi = new ProcessStartInfo
         {
-            FileName = "route.exe",
-            Arguments = args,
+            FileName = fileName,
+            Arguments = arguments,
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true
         };
         using var proc = Process.Start(psi);
-        if (proc == null) return -1;
-        proc.StandardOutput.ReadToEnd();
+        if (proc == null)
+        {
+            stdout = string.Empty;
+            return -1;
+        }
+        stdout = proc.StandardOutput.ReadToEnd();
         proc.StandardError.ReadToEnd();
         if (!proc.WaitForExit(5000))
         {
@@ -210,50 +319,7 @@ public static class TunManager
         return proc.ExitCode;
     }
 
-    private static bool TryGetTunIndex(out int ifIndex)
-    {
-        ifIndex = 0;
-        try
-        {
-            string output = RunPowerShell("Get-NetAdapter -Name xray0 -ErrorAction SilentlyContinue | Where-Object Status -eq Up | ForEach-Object { $_.InterfaceIndex }");
-            return int.TryParse(output, out ifIndex);
-        }
-        catch { return false; }
-    }
-
-    private static (string? Gateway, int IfIndex) GetDefaultGateway()
-    {
-        string output = RunPowerShell("Get-NetRoute -DestinationPrefix 0.0.0.0/0 -ErrorAction SilentlyContinue | Sort-Object RouteMetric | Select-Object -First 1 | ForEach-Object { $_.NextHop + '|' + $_.InterfaceIndex }");
-        var parts = output.Split('|', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length < 2) return (null, 0);
-        return (parts[0].Trim(), int.TryParse(parts[1].Trim(), out int idx) ? idx : 0);
-    }
-
-    private static string RunPowerShell(string command, int timeoutMs = 10000)
-    {
-        var psi = new ProcessStartInfo
-        {
-            FileName = "powershell.exe",
-            Arguments = "-NoProfile -NonInteractive -Command \"" + command + "\"",
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
-        };
-        using var proc = Process.Start(psi) ?? throw new InvalidOperationException("powershell failed to start");
-        string stdout = proc.StandardOutput.ReadToEnd();
-        string stderr = proc.StandardError.ReadToEnd();
-        if (!proc.WaitForExit(timeoutMs))
-        {
-            try { proc.Kill(); } catch { }
-            throw new TimeoutException("powershell timed out");
-        }
-        if (proc.ExitCode != 0 && string.IsNullOrWhiteSpace(stdout))
-            throw new InvalidOperationException(stderr.Trim());
-        return stdout.Trim();
-    }
-
-    private static void Log(string message)
+    public static void Log(string message)
     {
         try
         {

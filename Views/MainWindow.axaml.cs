@@ -244,6 +244,8 @@ public partial class MainWindow : Window
             btnRestart.Click += (_, _) => { Core.AdminHelper.RestartAsAdmin(); win.Close(); };
             win.ShowDialog(this);
         };
+        if (vm.TunDisabledNeedsAdmin)
+            Dispatcher.UIThread.Post(() => vm.ShowAdminWarningHandler?.Invoke(), DispatcherPriority.Loaded);
         vm.ConfirmDeleteHandler = async message =>
         {
             bool result = false;

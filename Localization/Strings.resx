@@ -409,9 +409,12 @@
   <data name="Eng_TestExited" xml:space="preserve"><value>موتور تست Xray به‌صورت غیرمنتظره خارج شد.</value></data>
   <data name="Eng_TestPortNotUp" xml:space="preserve"><value>پورت تست Xray بالا نیامد.</value></data>
   <data name="Eng_TestStarted" xml:space="preserve"><value>موتور تست Xray اجرا شد.</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>آداپتر TUN آماده نشد.</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN adapter پاکسازی شد.</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>پاکسازی TUN ناموفق بود: {0}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>حالت TUN نیاز به Administrator دارد. بازگشت به حالت پراکسی.</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>مسیرهای TUN اضافه شد.</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>افزودن مسیرهای TUN ناموفق بود: {0}</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>سیستم‌عامل/معماری پشتیبانی نمی‌شود.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>فایل wintun.dll در دسترس نیست. بازگشت به حالت پراکسی.</value></data>
   <data name="Sub_OnlyHttps" xml:space="preserve"><value>فقط لینک‌های اشتراک https مجاز هستند.</value></data>

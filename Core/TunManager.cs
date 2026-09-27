@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using XrayClient.Localization;
 
@@ -6,10 +8,13 @@ namespace XrayClient.Core;
 
 public static class TunManager
 {
-    private const string AdapterName = "RoxaTun";
+    private const string TunAdapterName = "xray0";
+
+    private static readonly object _routesLock = new();
+    private static readonly List<string> _routeDeleteArgs = new();
 
     private static readonly string _wintunDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "engine");
-    private static readonly string _wintunPath = Path.Combine(_wintunDirectory, RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "wintun-arm64.dll" : "wintun-x64.dll");
+    private static readonly string _wintunPath = Path.Combine(_wintunDirectory, "wintun.dll");
     private static readonly string _logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
 
     public static string WintunDirectory => _wintunDirectory;
@@ -54,6 +59,14 @@ public static class TunManager
             System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, WintunDirectory, true);
             File.Delete(zipPath);
 
+            if (!File.Exists(_wintunPath))
+            {
+                var extracted = Directory.GetFiles(WintunDirectory, "wintun*.dll")
+                    .FirstOrDefault(f => !Path.GetFileName(f).Equals("wintun.dll", StringComparison.OrdinalIgnoreCase));
+                if (extracted != null)
+                    File.Move(extracted, _wintunPath, true);
+            }
+
             Log("wintun driver downloaded successfully.");
             log?.Invoke(TranslationManager.Get("Tun_DriverDownloaded"));
             return true;
@@ -66,115 +79,178 @@ public static class TunManager
         }
     }
 
-    public static bool CreateTunAdapter(Action<string>? log = null)
+    public static async Task<bool> WaitTunAdapterAsync(int timeoutMs = 15000)
     {
-        if (!AdminHelper.IsRunningAsAdmin())
+        long deadline = Environment.TickCount64 + timeoutMs;
+        while (Environment.TickCount64 < deadline)
         {
-            log?.Invoke(TranslationManager.Get("Tun_NeedAdmin"));
-            return false;
+            if (TryGetTunIndex(out _))
+            {
+                Log($"TUN adapter {TunAdapterName} is up.");
+                return true;
+            }
+            await Task.Delay(500);
         }
+        Log($"TUN adapter {TunAdapterName} did not appear in time.");
+        return false;
+    }
 
-        Log("Creating TUN adapter...");
-        log?.Invoke(TranslationManager.Get("Tun_CreatingAdapter"));
-
+    public static bool AddCaptureRoutes(IEnumerable<string>? hosts, Action<string>? log = null)
+    {
         try
         {
-            var psi = new ProcessStartInfo
+            if (!AdminHelper.IsRunningAsAdmin())
             {
-                FileName = "netsh",
-                Arguments = $"interface add subinterface \"{AdapterName}\" mtu=1420 store=persistent",
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            var proc = Process.Start(psi);
-            if (proc != null)
-            {
-                string output = proc.StandardOutput.ReadToEnd();
-                string error = proc.StandardError.ReadToEnd();
-                proc.WaitForExit(5000);
-
-                if (proc.ExitCode == 0)
-                {
-                    Log("TUN adapter created.");
-                    log?.Invoke(TranslationManager.Get("Tun_AdapterCreated"));
-                    return true;
-                }
-
-                if (error.Contains("already exists") || output.Contains("already exists"))
-                {
-                    Log("TUN adapter already exists.");
-                    log?.Invoke(TranslationManager.Get("Tun_AdapterExists"));
-                    return true;
-                }
-
-                Log($"TUN adapter creation failed: {error}");
-                log?.Invoke(string.Format(TranslationManager.Get("Tun_CreateError"), error));
+                log?.Invoke(TranslationManager.Get("Tun_NeedAdmin"));
                 return false;
             }
-            return false;
-        }
-        catch (Exception ex)
-        {
-            Log($"TUN adapter error: {ex.Message}");
-            log?.Invoke(string.Format(TranslationManager.Get("Log_Error"), ex.Message));
-            return false;
-        }
-    }
-
-    public static void CleanupTunAdapter(Action<string>? log = null)
-    {
-        Log("Cleaning up TUN adapter...");
-        log?.Invoke(TranslationManager.Get("Tun_Cleaning"));
-
-        try
-        {
-            var psi = new ProcessStartInfo
+            if (!TryGetTunIndex(out int tunIndex))
             {
-                FileName = "netsh",
-                Arguments = $"interface delete subinterface \"{AdapterName}\"",
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            var proc = Process.Start(psi);
-            proc?.WaitForExit(5000);
-            Log("TUN adapter cleanup done.");
-        }
-        catch (Exception ex)
-        {
-            Log($"TUN cleanup error: {ex.Message}");
-            log?.Invoke(string.Format(TranslationManager.Get("Tun_CleanError"), ex.Message));
-        }
-    }
-
-    public static bool IsTunAdapterActive()
-    {
-        try
-        {
-            var psi = new ProcessStartInfo
-            {
-                FileName = "netsh",
-                Arguments = "interface show subinterface",
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true
-            };
-
-            var proc = Process.Start(psi);
-            if (proc != null)
-            {
-                string output = proc.StandardOutput.ReadToEnd();
-                proc.WaitForExit(3000);
-                return output.Contains(AdapterName);
+                Log("TUN adapter index not found; capture routes skipped.");
+                return false;
             }
+
+            var (gateway, gatewayIndex) = GetDefaultGateway();
+            if (gateway == null)
+            {
+                Log("No default gateway found; capture routes skipped.");
+                return false;
+            }
+
+            string via = gateway == "0.0.0.0" ? $"0.0.0.0 IF {gatewayIndex}" : gateway;
+            var serverIps = new List<string>();
+            foreach (var host in hosts ?? Enumerable.Empty<string>())
+            {
+                if (string.IsNullOrWhiteSpace(host)) continue;
+                if (IPAddress.TryParse(host, out var literal))
+                {
+                    if (literal.AddressFamily == AddressFamily.InterNetwork && !serverIps.Contains(host))
+                        serverIps.Add(host);
+                    continue;
+                }
+                try
+                {
+                    foreach (var addr in Dns.GetHostAddresses(host))
+                        if (addr.AddressFamily == AddressFamily.InterNetwork && !serverIps.Contains(addr.ToString()))
+                            serverIps.Add(addr.ToString());
+                }
+                catch (Exception ex) { Log($"Resolve failed for {host}: {ex.Message}"); }
+            }
+
+            foreach (var ip in serverIps)
+                AddRoute($"add {ip} mask 255.255.255.255 {via}");
+
+            AddRoute($"add 10.0.0.0 mask 255.0.0.0 {via}");
+            AddRoute($"add 172.16.0.0 mask 255.240.0.0 {via}");
+            AddRoute($"add 192.168.0.0 mask 255.255.0.0 {via}");
+
+            AddRoute($"add 0.0.0.0 mask 128.0.0.0 0.0.0.0 IF {tunIndex}");
+            AddRoute($"add 128.0.0.0 mask 128.0.0.0 0.0.0.0 IF {tunIndex}");
+
+            Log($"Capture routes added: {serverIps.Count} server ip(s) excluded, tun if={tunIndex}.");
+            return true;
         }
+        catch (Exception ex)
+        {
+            Log($"AddCaptureRoutes failed: {ex.Message}");
+            RemoveCaptureRoutes();
+            return false;
+        }
+    }
+
+    public static bool RemoveCaptureRoutes()
+    {
+        lock (_routesLock)
+        {
+            if (_routeDeleteArgs.Count == 0) return false;
+            int removed = _routeDeleteArgs.Count;
+            foreach (var args in _routeDeleteArgs)
+            {
+                try { RunRoute(args); }
+                catch { }
+            }
+            _routeDeleteArgs.Clear();
+            Log($"Removed {removed} tun route(s).");
+            return true;
+        }
+    }
+
+    private static void AddRoute(string addArgs)
+    {
+        var parts = addArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        string deleteArgs = $"delete {parts[1]} mask {parts[3]}";
+        try { RunRoute(deleteArgs); }
         catch { }
-        return false;
+        int code = RunRoute(addArgs);
+        if (code != 0)
+            throw new InvalidOperationException($"route {addArgs} exited with {code}");
+        lock (_routesLock) _routeDeleteArgs.Add(deleteArgs);
+    }
+
+    private static int RunRoute(string args)
+    {
+        var psi = new ProcessStartInfo
+        {
+            FileName = "route.exe",
+            Arguments = args,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+        using var proc = Process.Start(psi);
+        if (proc == null) return -1;
+        proc.StandardOutput.ReadToEnd();
+        proc.StandardError.ReadToEnd();
+        if (!proc.WaitForExit(5000))
+        {
+            try { proc.Kill(); } catch { }
+            return -1;
+        }
+        return proc.ExitCode;
+    }
+
+    private static bool TryGetTunIndex(out int ifIndex)
+    {
+        ifIndex = 0;
+        try
+        {
+            string output = RunPowerShell("Get-NetAdapter -Name xray0 -ErrorAction SilentlyContinue | Where-Object Status -eq Up | ForEach-Object { $_.InterfaceIndex }");
+            return int.TryParse(output, out ifIndex);
+        }
+        catch { return false; }
+    }
+
+    private static (string? Gateway, int IfIndex) GetDefaultGateway()
+    {
+        string output = RunPowerShell("Get-NetRoute -DestinationPrefix 0.0.0.0/0 -ErrorAction SilentlyContinue | Sort-Object RouteMetric | Select-Object -First 1 | ForEach-Object { $_.NextHop + '|' + $_.InterfaceIndex }");
+        var parts = output.Split('|', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length < 2) return (null, 0);
+        return (parts[0].Trim(), int.TryParse(parts[1].Trim(), out int idx) ? idx : 0);
+    }
+
+    private static string RunPowerShell(string command, int timeoutMs = 10000)
+    {
+        var psi = new ProcessStartInfo
+        {
+            FileName = "powershell.exe",
+            Arguments = "-NoProfile -NonInteractive -Command \"" + command + "\"",
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+        using var proc = Process.Start(psi) ?? throw new InvalidOperationException("powershell failed to start");
+        string stdout = proc.StandardOutput.ReadToEnd();
+        string stderr = proc.StandardError.ReadToEnd();
+        if (!proc.WaitForExit(timeoutMs))
+        {
+            try { proc.Kill(); } catch { }
+            throw new TimeoutException("powershell timed out");
+        }
+        if (proc.ExitCode != 0 && string.IsNullOrWhiteSpace(stdout))
+            throw new InvalidOperationException(stderr.Trim());
+        return stdout.Trim();
     }
 
     private static void Log(string message)

@@ -31,7 +31,7 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = TranslationManager.Instance["Status_Connecting"];
-            await _engine.StartAsync(server, SetSystemProxy, _settings);
+            await _engine.StartAsync(server, SetSystemProxy, _settings, tunExclusionHosts: Servers.Select(s => s.Address));
             IsConnected = true;
             LiveDownSpeed = "0 B/s";
             LiveUpSpeed = "0 B/s";
@@ -96,10 +96,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void Disconnect()
     {
-        if (UseTunMode)
-            _engine.StopAndCleanupTun();
-        else
-            _engine.Stop();
+        _engine.StopAndCleanupTun();
         IsConnected = false;
         RefreshConnectionFlags();
         AppendLog(TranslationManager.Instance["Log_Disconnected"]);

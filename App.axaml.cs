@@ -58,8 +58,7 @@ public partial class App : Application
                 DisposeTray();
                 try
                 {
-                    if (AdminHelper.IsRunningAsAdmin() && TunManager.IsTunAdapterActive())
-                        TunManager.CleanupTunAdapter();
+                    TunManager.RemoveCaptureRoutes();
                 }
                 catch { }
             };
@@ -223,10 +222,7 @@ public partial class App : Application
     {
         try
         {
-            if (AdminHelper.IsRunningAsAdmin() && TunManager.IsTunAdapterActive())
-            {
-                TunManager.CleanupTunAdapter();
-            }
+            TunManager.RemoveCaptureRoutes();
         }
         catch { }
     }

@@ -153,6 +153,7 @@ public partial class MainViewModel : ViewModelBase
         _useProxyForSubscriptions = _settings.UseProxyForSubscriptions;
         if (_settings.UseTunMode && !Core.AdminHelper.IsRunningAsAdmin())
         {
+            TunDisabledNeedsAdmin = true;
             _settings.UseTunMode = false;
             Core.Storage.SaveSettings(_settings);
             _useTunMode = false;
@@ -433,6 +434,7 @@ public partial class MainViewModel : ViewModelBase
 
 
     public Action? ShowAdminWarningHandler { get; set; }
+    public bool TunDisabledNeedsAdmin { get; private set; }
 
 
     private async Task CopyTextAsync(string text)

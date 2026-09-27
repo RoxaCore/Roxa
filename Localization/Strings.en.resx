@@ -401,9 +401,12 @@ Latency: {1}</value></data>
   <data name="Eng_TestExited" xml:space="preserve"><value>Xray test engine exited unexpectedly.</value></data>
   <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray test port did not come up.</value></data>
   <data name="Eng_TestStarted" xml:space="preserve"><value>Test Xray engine started.</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>TUN adapter is not ready.</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN adapter cleaned up.</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>TUN cleanup failed: {0}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN mode requires Administrator. Falling back to proxy mode.</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>TUN capture routes added.</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>Failed to add TUN routes: {0}</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>Unsupported OS/architecture.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll not available. Falling back to proxy mode.</value></data>
   <data name="Sub_OnlyHttps" xml:space="preserve"><value>Only https subscription URLs are allowed.</value></data>

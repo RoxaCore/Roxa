@@ -21,7 +21,7 @@ public static class XrayConfigBuilder
     private static JsonArray PrivateIpArray() =>
         new(PrivateIpCidrs.Select(c => (JsonNode)c).ToArray());
 
-    public static string Build(ServerInfo server, int socksPort, int httpPort, AppSettings? settings = null)
+    public static string Build(ServerInfo server, int socksPort, int httpPort, AppSettings? settings = null, bool? useTunOverride = null)
     {
         var config = new JsonObject
         {
@@ -50,7 +50,7 @@ public static class XrayConfigBuilder
 
         var inbounds = (JsonArray)config["inbounds"]!;
 
-        bool useTun = settings?.UseTunMode == true;
+        bool useTun = useTunOverride ?? settings?.UseTunMode == true;
         if (useTun)
         {
             inbounds.Add(new JsonObject
@@ -59,10 +59,8 @@ public static class XrayConfigBuilder
                 ["protocol"] = "tun",
                 ["settings"] = new JsonObject
                 {
-                    ["address"] = new JsonArray("172.19.0.1/30", "fdfe:dcba:9876::1/126"),
-                    ["mtu"] = 1420,
-                    ["autoRoute"] = false,
-                    ["stack"] = "system"
+                    ["name"] = "xray0",
+                    ["MTU"] = 1420
                 },
                 ["sniffing"] = new JsonObject
                 {

@@ -110,7 +110,7 @@ public static class RemoteConfig
         return await FetchCountryAsync("https://ipwho.is/", "country_code", ct);
     }
 
-    public static async Task<UpdateInfo?> CheckUpdateAsync(string lang, string country, int? proxyPort, CancellationToken ct = default)
+    public static async Task<UpdateInfo?> CheckUpdateAsync(string lang, string country, string clientId, int? proxyPort, CancellationToken ct = default)
     {
         try
         {
@@ -118,6 +118,8 @@ public static class RemoteConfig
             var url = $"{BaseUrl}/api/check.php?v={Uri.EscapeDataString(AppVersion)}&lang={Uri.EscapeDataString(lang)}";
             if (!string.IsNullOrWhiteSpace(country))
                 url += $"&country={Uri.EscapeDataString(country)}";
+            if (!string.IsNullOrWhiteSpace(clientId))
+                url += $"&id={Uri.EscapeDataString(clientId)}";
             using var resp = await http.GetAsync(url, ct);
             if (!resp.IsSuccessStatusCode) return null;
             var json = await resp.Content.ReadAsStringAsync(ct);

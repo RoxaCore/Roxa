@@ -124,4 +124,5 @@ public class AppSettings
     public int ShownAnnouncementId { get; set; }
     public int ShownAnnouncementCount { get; set; }
     public string Country { get; set; } = "";
+    public string ClientId { get; set; } = "";
 }

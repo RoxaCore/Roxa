@@ -104,6 +104,7 @@ public class AppSettings
     public bool SetSystemProxy { get; set; } = true;
     public bool AutoConnect { get; set; } = false;
     public bool AutoUpdateSubs { get; set; } = false;
+    public bool AutoUpdate { get; set; } = false;
     public int AutoUpdateIntervalHours { get; set; } = 12;
     public DateTime LastSubscriptionUpdate { get; set; } = DateTime.MinValue;
     public HashSet<string> CollapsedGroups { get; set; } = new();
@@ -119,4 +120,5 @@ public class AppSettings
     public bool UseProxyForSubscriptions { get; set; } = true;
     public string Language { get; set; } = "fa";
     public int LastSeenAnnouncementId { get; set; }
+    public string LastUpdateAttempt { get; set; } = "";
 }

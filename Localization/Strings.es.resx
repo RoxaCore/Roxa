@@ -258,6 +258,9 @@ Latencia: {1}</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>Debes instalar la nueva versión para continuar</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>Cerrar</value></data>
   <data name="Ann_View" xml:space="preserve"><value>Ver</value></data>
+  <data name="Set_AppUpdate" xml:space="preserve"><value>Actualización de la aplicación</value></data>
+  <data name="Set_AutoUpdateApp" xml:space="preserve"><value>Instalar automáticamente las nuevas versiones</value></data>
+  <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>Si se activa esta opción, la aplicación descarga e instala automáticamente las nuevas versiones; se cerrará y volverá a abrir para aplicar la actualización.</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servidores añadidos desde el portapapeles</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>El portapapeles está vacío</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>No se puede acceder al portapapeles</value></data>

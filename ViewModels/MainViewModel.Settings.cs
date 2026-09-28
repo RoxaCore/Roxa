@@ -57,6 +57,7 @@ public partial class MainViewModel : ViewModelBase
         SaveSettings();
     }
     partial void OnClearProxyOnDisconnectChanged(bool value) { _settings.ClearProxyOnDisconnect = value; SaveSettings(); }
+    partial void OnAutoUpdateChanged(bool value) { _settings.AutoUpdate = value; SaveSettings(); }
     partial void OnAutoUpdateIntervalHoursChanged(int value)
     {
         _settings.AutoUpdateIntervalHours = Math.Clamp(value, 1, 168);

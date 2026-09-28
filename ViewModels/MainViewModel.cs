@@ -45,6 +45,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private bool _leaveSystemProxyAsIs;
     [ObservableProperty] private bool _clearProxyOnDisconnect = true;
     [ObservableProperty] private bool _autoUpdateSubs;
+    [ObservableProperty] private bool _autoUpdate;
     [ObservableProperty] private int _autoUpdateIntervalHours = 12;
      [ObservableProperty] private PingType _selectedPingType = PingType.Ping;
      public PingType[] PingTypeOptions { get; } = (PingType[])Enum.GetValues(typeof(PingType));
@@ -145,6 +146,7 @@ public partial class MainViewModel : ViewModelBase
         SetSystemProxy = _settings.SetSystemProxy;
         AutoConnect = _settings.AutoConnect;
         AutoUpdateSubs = _settings.AutoUpdateSubs;
+        AutoUpdate = _settings.AutoUpdate;
         AutoUpdateIntervalHours = _settings.AutoUpdateIntervalHours <= 0 ? 12 : _settings.AutoUpdateIntervalHours;
         _sortField = _settings.SortField;
         _sortAscending = _settings.SortAscending;

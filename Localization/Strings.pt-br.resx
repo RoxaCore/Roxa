@@ -258,6 +258,9 @@ Latência: {1}</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>Você precisa instalar a nova versão para continuar</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>Fechar</value></data>
   <data name="Ann_View" xml:space="preserve"><value>Ver</value></data>
+  <data name="Set_AppUpdate" xml:space="preserve"><value>Atualização do aplicativo</value></data>
+  <data name="Set_AutoUpdateApp" xml:space="preserve"><value>Instalar novas versões automaticamente</value></data>
+  <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>Com esta opção ativada, o aplicativo baixa e instala automaticamente novas versões; ele será fechado e reaberto para aplicar a atualização.</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servidores adicionados da área de transferência</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>A área de transferência está vazia</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Acesso à área de transferência indisponível</value></data>

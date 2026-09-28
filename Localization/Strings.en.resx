@@ -277,6 +277,9 @@ Latency: {1}</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>You must install the new version to continue</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>Close</value></data>
   <data name="Ann_View" xml:space="preserve"><value>View</value></data>
+  <data name="Set_AppUpdate" xml:space="preserve"><value>App Update</value></data>
+  <data name="Set_AutoUpdateApp" xml:space="preserve"><value>Install new versions automatically</value></data>
+  <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>When enabled, the app downloads and installs new versions automatically; it closes and reopens to apply the update.</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servers added from clipboard</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Clipboard is empty</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Clipboard access is not available</value></data>

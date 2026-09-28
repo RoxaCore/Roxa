@@ -70,10 +70,14 @@ foreach (($ann['items'] ?? []) as $it) {
 }
 $dataWritable = is_writable(DATA_DIR);
 $dlWritable = is_writable(DL_DIR);
+$stats = stats_summary();
 
 page_head('داشبورد', 'dash');
 
 echo '<div class="grid">';
+echo '<div class="stat"><div class="k">تعداد نصب</div><div class="v" id="stat-installs">' . $stats['installs'] . '</div></div>';
+echo '<div class="stat"><div class="k">کاربر فعال (۲۴ ساعت)</div><div class="v" id="stat-active24">' . $stats['active24'] . '</div></div>';
+echo '<div class="stat"><div class="k">کاربر فعال (۷ روز)</div><div class="v" id="stat-active7">' . $stats['active7'] . '</div></div>';
 echo '<div class="stat"><div class="k">نسخه منتشرشده</div><div class="v">' . h((string)($ver['latest'] ?: '—')) . '</div></div>';
 echo '<div class="stat"><div class="k">وضعیت انتشار</div><div class="v"><span class="badge ' . (!empty($ver['active']) ? 'b-on">فعال' : 'b-off">غیرفعال') . '</span></div></div>';
 echo '<div class="stat"><div class="k">اعلان‌های فعال</div><div class="v">' . $activeCount . ' <small>از ' . count($ann['items'] ?? []) . '</small></div></div>';

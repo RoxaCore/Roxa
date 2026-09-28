@@ -2,6 +2,11 @@
 require_once __DIR__ . '/../lib.php';
 api_headers();
 
+$id = (string)($_GET['id'] ?? '');
+if ($id !== '') {
+    stats_touch($id);
+}
+
 $ver = jread(DATA_DIR . '/version.json', [
     'latest' => null,
     'notes' => '',

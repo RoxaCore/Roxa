@@ -281,6 +281,60 @@ function lang_picker(): string
     return $html;
 }
 
+function stats_touch(string $id): void
+{
+    if (!preg_match('/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/', $id)) {
+        return;
+    }
+    $id = strtolower($id);
+    $file = DATA_DIR . '/stats.json';
+    $lock = @fopen(DATA_DIR . '/stats.lock', 'c');
+    if ($lock) {
+        flock($lock, LOCK_EX);
+    }
+    try {
+        $st = jread($file, ['clients' => []]);
+        if (!is_array($st['clients'] ?? null)) {
+            $st['clients'] = [];
+        }
+        $now = date('c');
+        if (isset($st['clients'][$id])) {
+            $st['clients'][$id]['last'] = $now;
+        } else {
+            $st['clients'][$id] = ['first' => $now, 'last' => $now];
+        }
+        jwrite($file, $st);
+    } finally {
+        if ($lock) {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+        }
+    }
+}
+
+function stats_summary(): array
+{
+    $st = jread(DATA_DIR . '/stats.json', ['clients' => []]);
+    $now = time();
+    $installs = 0;
+    $a24 = 0;
+    $a7 = 0;
+    foreach (($st['clients'] ?? []) as $c) {
+        if (!is_array($c)) {
+            continue;
+        }
+        $installs++;
+        $t = strtotime((string)($c['last'] ?? '')) ?: 0;
+        if ($t > 0 && $now - $t <= 86400) {
+            $a24++;
+        }
+        if ($t > 0 && $now - $t <= 604800) {
+            $a7++;
+        }
+    }
+    return ['installs' => $installs, 'active24' => $a24, 'active7' => $a7];
+}
+
 function str_cut(string $s, int $len): string
 {
     if (function_exists('mb_substr')) {

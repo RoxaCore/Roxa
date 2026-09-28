@@ -16,10 +16,15 @@ namespace XrayClient.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
 
+    private bool _isConnecting;
+
     private void RefreshConnectionFlags()
     {
+        string? activeId = null;
+        if (IsConnected && _engine.CurrentServer != null)
+            activeId = _engine.CurrentServer.Id;
         foreach (var s in Servers)
-            s.IsActiveConnection = IsConnected && ReferenceEquals(s, SelectedServer);
+            s.IsActiveConnection = activeId != null && string.Equals(s.Id, activeId, StringComparison.Ordinal);
     }
 
 
@@ -28,6 +33,9 @@ public partial class MainViewModel : ViewModelBase
     {
         var server = SelectedServer;
         if (server == null || !Servers.Contains(server)) return;
+        if (_isConnecting) return;
+        _isConnecting = true;
+        ConnectCommand.NotifyCanExecuteChanged();
         try
         {
             Status = TranslationManager.Instance["Status_Connecting"];
@@ -88,10 +96,10 @@ public partial class MainViewModel : ViewModelBase
             AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
             FlushLog();
         }
-        finally { ConnectCommand.NotifyCanExecuteChanged(); }
+        finally { _isConnecting = false; ConnectCommand.NotifyCanExecuteChanged(); }
     }
 
-    private bool CanConnect() => SelectedServer != null && !IsConnected && !IsTesting;
+    private bool CanConnect() => SelectedServer != null && !IsConnected && !IsTesting && !_isConnecting;
 
     [RelayCommand]
     private void Disconnect()
@@ -117,8 +125,14 @@ public partial class MainViewModel : ViewModelBase
     {
         if (server != null) SelectedServer = server;
         RefreshConnectionFlags();
-        if (SelectedServer != null && !IsConnected && !IsTesting)
-            await Connect();
+        if (SelectedServer == null || IsTesting || _isConnecting) return;
+        if (IsConnected)
+        {
+            var active = _engine.CurrentServer;
+            if (active != null && string.Equals(active.Id, SelectedServer.Id, StringComparison.Ordinal)) return;
+            Disconnect();
+        }
+        await Connect();
     }
 
     // ---------- تست ----------

@@ -114,14 +114,16 @@ public partial class MainViewModel : ViewModelBase
 
     public event Action? RestartRequested;
 
-    public string HomeServerName => SelectedServer?.Name ?? TranslationManager.Instance["Home_NoServer"];
-    public string HomeShortName => SelectedServer?.ShortName ?? "";
-    public string HomeProtocol => SelectedServer != null ? SelectedServer.Protocol.ToString().ToLowerInvariant() : "";
-    public string HomeIp => SelectedServer?.Address ?? "";
-    public string HomeFlag => SelectedServer?.Flag ?? "🌐";
-    public string HomeAddress => SelectedServer != null ? $"{SelectedServer.Address}:{SelectedServer.Port}" : "";
-    public string HomeLatency => SelectedServer?.LatencyDisplay ?? "";
-    public string HomeSpeed => SelectedServer?.SpeedDisplay ?? "";
+    private ServerInfo? DisplayServer => IsConnected ? _engine.CurrentServer ?? SelectedServer : SelectedServer;
+
+    public string HomeServerName => DisplayServer?.Name ?? TranslationManager.Instance["Home_NoServer"];
+    public string HomeShortName => DisplayServer?.ShortName ?? "";
+    public string HomeProtocol => DisplayServer != null ? DisplayServer.Protocol.ToString().ToLowerInvariant() : "";
+    public string HomeIp => DisplayServer?.Address ?? "";
+    public string HomeFlag => DisplayServer?.Flag ?? "??";
+    public string HomeAddress => DisplayServer != null ? $"{DisplayServer.Address}:{DisplayServer.Port}" : "";
+    public string HomeLatency => DisplayServer?.LatencyDisplay ?? "";
+    public string HomeSpeed => DisplayServer?.SpeedDisplay ?? "";
     public string PortText => IsConnected ? $"HTTP {HttpPort} · SOCKS {SocksPort}" : "";
     public int HttpPort => _engine.HttpPort;
     public int SocksPort => _engine.SocksPort;
@@ -317,6 +319,14 @@ public partial class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(PortText));
         OnPropertyChanged(nameof(ShowSmartConnectButton));
         OnPropertyChanged(nameof(SmartConnectActionCommand));
+        OnPropertyChanged(nameof(HomeServerName));
+        OnPropertyChanged(nameof(HomeShortName));
+        OnPropertyChanged(nameof(HomeProtocol));
+        OnPropertyChanged(nameof(HomeIp));
+        OnPropertyChanged(nameof(HomeFlag));
+        OnPropertyChanged(nameof(HomeAddress));
+        OnPropertyChanged(nameof(HomeLatency));
+        OnPropertyChanged(nameof(HomeSpeed));
         RefreshConnectionFlags();
         if (!value)
         {

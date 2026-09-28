@@ -25,10 +25,17 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private string _bannerBody = "";
     [ObservableProperty] private IBrush _bannerBackground = new SolidColorBrush(Color.Parse("#EFF6FF"));
     [ObservableProperty] private IBrush _bannerForeground = new SolidColorBrush(Color.Parse("#1D4ED8"));
-    [ObservableProperty] private bool _isBannerUpdate;
     [ObservableProperty] private bool _isBannerBusy;
     [ObservableProperty] private bool _bannerHasAction;
     [ObservableProperty] private string _bannerActionText = "";
+
+    [ObservableProperty] private bool _isAnnBannerVisible;
+    [ObservableProperty] private string _annBannerTitle = "";
+    [ObservableProperty] private string _annBannerBody = "";
+    [ObservableProperty] private IBrush _annBannerBackground = new SolidColorBrush(Color.Parse("#EFF6FF"));
+    [ObservableProperty] private IBrush _annBannerForeground = new SolidColorBrush(Color.Parse("#1D4ED8"));
+    [ObservableProperty] private bool _annBannerHasAction;
+    [ObservableProperty] private string _annBannerActionText = "";
 
     public event Action? UpdateShutdownRequested;
 
@@ -101,7 +108,7 @@ public partial class MainViewModel : ViewModelBase
                 ShowUpdateRequiredHandler?.Invoke();
             }
         }
-        else if (freshAnnouncement != null)
+        if (freshAnnouncement != null)
         {
             ShowAnnouncementBanner(freshAnnouncement);
         }
@@ -132,7 +139,6 @@ public partial class MainViewModel : ViewModelBase
     private void ShowUpdateBanner(UpdateInfo update)
     {
         if (_dismissedUpdateVersion == update.Latest) return;
-        IsBannerUpdate = true;
         IsBannerBusy = false;
         BannerTitle = string.Format(TranslationManager.Instance["Upd_BannerTitle"], update.Latest);
         BannerBody = update.Notes;
@@ -146,61 +152,50 @@ public partial class MainViewModel : ViewModelBase
     private void ShowAnnouncementBanner(Announcement announcement)
     {
         _currentAnnouncement = announcement;
-        IsBannerUpdate = false;
-        IsBannerBusy = false;
-        BannerTitle = announcement.Title;
-        BannerBody = announcement.Body;
+        AnnBannerTitle = announcement.Title;
+        AnnBannerBody = announcement.Body;
         switch (announcement.Level)
         {
             case "warn":
-                BannerBackground = new SolidColorBrush(Color.Parse("#FEF2F2"));
-                BannerForeground = new SolidColorBrush(Color.Parse("#B91C1C"));
+                AnnBannerBackground = new SolidColorBrush(Color.Parse("#FEF2F2"));
+                AnnBannerForeground = new SolidColorBrush(Color.Parse("#B91C1C"));
                 break;
             case "update":
-                BannerBackground = new SolidColorBrush(Color.Parse("#F5F3FF"));
-                BannerForeground = new SolidColorBrush(Color.Parse("#6D28D9"));
+                AnnBannerBackground = new SolidColorBrush(Color.Parse("#F5F3FF"));
+                AnnBannerForeground = new SolidColorBrush(Color.Parse("#6D28D9"));
                 break;
             default:
-                BannerBackground = new SolidColorBrush(Color.Parse("#EFF6FF"));
-                BannerForeground = new SolidColorBrush(Color.Parse("#1D4ED8"));
+                AnnBannerBackground = new SolidColorBrush(Color.Parse("#EFF6FF"));
+                AnnBannerForeground = new SolidColorBrush(Color.Parse("#1D4ED8"));
                 break;
         }
-        BannerActionText = TranslationManager.Instance["Ann_View"];
-        BannerHasAction = !string.IsNullOrWhiteSpace(announcement.Url);
-        IsBannerVisible = true;
+        AnnBannerActionText = TranslationManager.Instance["Ann_View"];
+        AnnBannerHasAction = !string.IsNullOrWhiteSpace(announcement.Url);
+        IsAnnBannerVisible = true;
     }
 
     [RelayCommand]
     private void DismissBanner()
     {
-        if (IsBannerUpdate)
-        {
-            _dismissedUpdateVersion = _pendingUpdate?.Latest;
-            IsBannerVisible = false;
-            if (_currentAnnouncement != null)
-                ShowAnnouncementBanner(_currentAnnouncement);
-            return;
-        }
+        _dismissedUpdateVersion = _pendingUpdate?.Latest;
+        IsBannerVisible = false;
+    }
+
+    [RelayCommand]
+    private void AnnDismiss()
+    {
         if (_currentAnnouncement != null && _currentAnnouncement.Id > _settings.LastSeenAnnouncementId)
         {
             _settings.LastSeenAnnouncementId = _currentAnnouncement.Id;
             SaveSettings();
         }
         _currentAnnouncement = null;
-        if (_pendingUpdate is { UpdateAvailable: true })
-            ShowUpdateBanner(_pendingUpdate);
-        else
-            IsBannerVisible = false;
+        IsAnnBannerVisible = false;
     }
 
     [RelayCommand]
-    private async Task BannerAction()
+    private void AnnBannerAction()
     {
-        if (IsBannerUpdate)
-        {
-            await InstallUpdateAsync();
-            return;
-        }
         if (_currentAnnouncement is { } ann && !string.IsNullOrWhiteSpace(ann.Url))
         {
             try
@@ -210,8 +205,14 @@ public partial class MainViewModel : ViewModelBase
             catch
             {
             }
-            DismissBanner();
         }
+        AnnDismiss();
+    }
+
+    [RelayCommand]
+    private async Task BannerAction()
+    {
+        await InstallUpdateAsync();
     }
 
     [RelayCommand]

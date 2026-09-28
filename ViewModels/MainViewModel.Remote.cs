@@ -86,7 +86,12 @@ public partial class MainViewModel : ViewModelBase
                     TranslationManager.Instance["Upd_Notify"],
                     string.Format(TranslationManager.Instance["Upd_BannerTitle"], _pendingUpdate.Latest));
             }
-            if (_pendingUpdate.Force && !_forceDialogShown)
+            if (AutoUpdate && _dismissedUpdateVersion != _pendingUpdate.Latest && !IsBannerBusy
+                && _settings.LastUpdateAttempt != _pendingUpdate.Latest)
+            {
+                _ = InstallUpdateAsync();
+            }
+            else if (_pendingUpdate.Force && !_forceDialogShown)
             {
                 _forceDialogShown = true;
                 ShowUpdateRequiredHandler?.Invoke();
@@ -194,6 +199,8 @@ public partial class MainViewModel : ViewModelBase
             var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
             var info = _pendingUpdate;
             await Task.Run(() => UpdateInstaller.StageAsync(info, proxyPort));
+            _settings.LastUpdateAttempt = info.Latest;
+            SaveSettings();
             BannerBody = TranslationManager.Instance["Upd_Done"];
             UpdateInstaller.LaunchUpdater();
             UpdateShutdownRequested?.Invoke();

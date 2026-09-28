@@ -274,6 +274,9 @@
   <data name="Upd_ForceMsg" xml:space="preserve"><value>Для продолжения установите новую версию</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>Закрыть</value></data>
   <data name="Ann_View" xml:space="preserve"><value>Просмотр</value></data>
+  <data name="Set_AppUpdate" xml:space="preserve"><value>Обновление приложения</value></data>
+  <data name="Set_AutoUpdateApp" xml:space="preserve"><value>Автоматическая установка новых версий</value></data>
+  <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>При включении этой опции приложение автоматически загружает и устанавливает новые версии; оно закроется и перезапустится для применения обновления.</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>Добавлено серверов из буфера: {0}</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Буфер обмена пуст</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Нет доступа к буферу обмена</value></data>

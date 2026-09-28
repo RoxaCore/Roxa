@@ -258,6 +258,9 @@
   <data name="Upd_ForceMsg" xml:space="preserve"><value>続行するには新しいバージョンをインストールしてください</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>閉じる</value></data>
   <data name="Ann_View" xml:space="preserve"><value>表示</value></data>
+  <data name="Set_AppUpdate" xml:space="preserve"><value>アプリのアップデート</value></data>
+  <data name="Set_AutoUpdateApp" xml:space="preserve"><value>新しいバージョンを自動インストール</value></data>
+  <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>このオプションを有効にすると、アプリは新しいバージョンを自動的にダウンロードしてインストールします。更新を適用するためアプリは終了して再起動します。</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>クリップボードから {0} 件のサーバーを追加しました</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>クリップボードは空です</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>クリップボードにアクセスできません</value></data>

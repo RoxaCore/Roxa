@@ -29,6 +29,7 @@ public partial class MainViewModel : ViewModelBase
      public Action? OpenDnsSettingsHandler { get; set; }
      public Action<ServerInfo>? FocusServerHandler { get; set; }
      public Action? SelectionRefreshHandler { get; set; }
+     public Action? ShowUpdateRequiredHandler { get; set; }
 
     [ObservableProperty] private ObservableCollection<ServerInfo> _servers = new();
     [ObservableProperty] private ObservableCollection<SubscriptionInfo> _subscriptions = new();
@@ -348,6 +349,7 @@ public partial class MainViewModel : ViewModelBase
 
     public async Task OnStartedAsync()
     {
+        StartRemoteChecks();
         if (AutoUpdateSubs && Subscriptions.Count > 0)
         {
             var since = DateTime.Now - _settings.LastSubscriptionUpdate;

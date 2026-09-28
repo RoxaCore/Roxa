@@ -267,6 +267,15 @@ Latence : {1}</value></data>
   <data name="Proxy_On" xml:space="preserve"><value>Proxy système (activé)</value></data>
   <data name="Tun_Off" xml:space="preserve"><value>TUN (désactivé)</value></data>
   <data name="Tun_On" xml:space="preserve"><value>TUN (activé)</value></data>
+  <data name="Upd_Notify" xml:space="preserve"><value>Nouvelle mise à jour</value></data>
+  <data name="Upd_BannerTitle" xml:space="preserve"><value>La nouvelle version {0} est prête au téléchargement</value></data>
+  <data name="Upd_Btn_Install" xml:space="preserve"><value>Installer</value></data>
+  <data name="Upd_Downloading" xml:space="preserve"><value>Téléchargement de la mise à jour…</value></data>
+  <data name="Upd_Done" xml:space="preserve"><value>Téléchargement terminé ; l'application va se fermer pour l'installation</value></data>
+  <data name="Upd_Failed" xml:space="preserve"><value>Échec du téléchargement de la mise à jour</value></data>
+  <data name="Upd_ForceMsg" xml:space="preserve"><value>Vous devez installer la nouvelle version pour continuer</value></data>
+  <data name="Ann_Dismiss" xml:space="preserve"><value>Fermer</value></data>
+  <data name="Ann_View" xml:space="preserve"><value>Voir</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} serveurs ajoutés depuis le presse-papiers</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Le presse-papiers est vide</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Accès au presse-papiers indisponible</value></data>

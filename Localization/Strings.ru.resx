@@ -265,6 +265,15 @@
   <data name="Proxy_On" xml:space="preserve"><value>Системный прокси (вкл)</value></data>
   <data name="Tun_Off" xml:space="preserve"><value>TUN (выкл)</value></data>
   <data name="Tun_On" xml:space="preserve"><value>TUN (вкл)</value></data>
+  <data name="Upd_Notify" xml:space="preserve"><value>Новое обновление</value></data>
+  <data name="Upd_BannerTitle" xml:space="preserve"><value>Новая версия {0} готова к загрузке</value></data>
+  <data name="Upd_Btn_Install" xml:space="preserve"><value>Установить</value></data>
+  <data name="Upd_Downloading" xml:space="preserve"><value>Загрузка обновления…</value></data>
+  <data name="Upd_Done" xml:space="preserve"><value>Загрузка завершена; приложение закроется для установки</value></data>
+  <data name="Upd_Failed" xml:space="preserve"><value>Не удалось загрузить обновление</value></data>
+  <data name="Upd_ForceMsg" xml:space="preserve"><value>Для продолжения установите новую версию</value></data>
+  <data name="Ann_Dismiss" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Ann_View" xml:space="preserve"><value>Просмотр</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>Добавлено серверов из буфера: {0}</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Буфер обмена пуст</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Нет доступа к буферу обмена</value></data>

@@ -249,6 +249,15 @@
   <data name="Proxy_On" xml:space="preserve"><value>システムプロキシ (オン)</value></data>
   <data name="Tun_Off" xml:space="preserve"><value>TUN (オフ)</value></data>
   <data name="Tun_On" xml:space="preserve"><value>TUN (オン)</value></data>
+  <data name="Upd_Notify" xml:space="preserve"><value>新しいアップデート</value></data>
+  <data name="Upd_BannerTitle" xml:space="preserve"><value>新しいバージョン {0} をダウンロードできます</value></data>
+  <data name="Upd_Btn_Install" xml:space="preserve"><value>インストール</value></data>
+  <data name="Upd_Downloading" xml:space="preserve"><value>アップデートをダウンロード中…</value></data>
+  <data name="Upd_Done" xml:space="preserve"><value>ダウンロード完了。インストールのためアプリを終了します</value></data>
+  <data name="Upd_Failed" xml:space="preserve"><value>アップデートのダウンロードに失敗しました</value></data>
+  <data name="Upd_ForceMsg" xml:space="preserve"><value>続行するには新しいバージョンをインストールしてください</value></data>
+  <data name="Ann_Dismiss" xml:space="preserve"><value>閉じる</value></data>
+  <data name="Ann_View" xml:space="preserve"><value>表示</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>クリップボードから {0} 件のサーバーを追加しました</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>クリップボードは空です</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>クリップボードにアクセスできません</value></data>

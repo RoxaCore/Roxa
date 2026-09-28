@@ -265,6 +265,15 @@
   <data name="Proxy_On" xml:space="preserve"><value>الوكيل النظامي (مفعّل)</value></data>
   <data name="Tun_Off" xml:space="preserve"><value>TUN (معطّل)</value></data>
   <data name="Tun_On" xml:space="preserve"><value>TUN (مفعّل)</value></data>
+  <data name="Upd_Notify" xml:space="preserve"><value>تحديث جديد</value></data>
+  <data name="Upd_BannerTitle" xml:space="preserve"><value>الإصدار الجديد {0} جاهز للتنزيل</value></data>
+  <data name="Upd_Btn_Install" xml:space="preserve"><value>تثبيت</value></data>
+  <data name="Upd_Downloading" xml:space="preserve"><value>جارٍ تنزيل التحديث…</value></data>
+  <data name="Upd_Done" xml:space="preserve"><value>اكتمل التنزيل؛ سيتم إغلاق التطبيق للتثبيت</value></data>
+  <data name="Upd_Failed" xml:space="preserve"><value>فشل تنزيل التحديث</value></data>
+  <data name="Upd_ForceMsg" xml:space="preserve"><value>يجب تثبيت الإصدار الجديد للمتابعة</value></data>
+  <data name="Ann_Dismiss" xml:space="preserve"><value>إغلاق</value></data>
+  <data name="Ann_View" xml:space="preserve"><value>عرض</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>تمت إضافة {0} خادم من الحافظة</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>الحافظة فارغة</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>الوصول إلى الحافظة غير متاح</value></data>

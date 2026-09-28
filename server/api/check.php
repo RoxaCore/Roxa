@@ -11,10 +11,12 @@ $ver = jread(DATA_DIR . '/version.json', [
     'published' => null,
     'url' => null,
     'file' => null,
+    'countries' => '',
 ]);
 
 $current = isset($_GET['v']) ? ver_safe((string)$_GET['v']) : '';
 $lang = lang_ok(isset($_GET['lang']) ? (string)$_GET['lang'] : 'fa');
+$cc = country_client();
 
 if (empty($ver['active']) || empty($ver['latest'])) {
     echo json_encode(['ok' => true, 'latest' => null], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -26,7 +28,8 @@ if (empty($url) && !empty($ver['file'])) {
     $url = BASE_URL . '/dl/' . rawurlencode($ver['file']);
 }
 
-$updateAvailable = $current === '' ? true : version_compare((string)$ver['latest'], $current, '>');
+$updateAvailable = country_ok((string)($ver['countries'] ?? ''), $cc)
+    && ($current === '' ? true : version_compare((string)$ver['latest'], $current, '>'));
 
 echo json_encode([
     'ok' => true,

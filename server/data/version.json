@@ -1,11 +1,12 @@
-﻿{
-    "latest": null,
-    "notes": "",
+{
+    "latest": "9.9.9",
+    "notes": "release note",
     "sha256": "",
     "force": false,
-    "active": false,
-    "published": null,
-    "url": null,
+    "active": true,
+    "published": "2026-09-29T00:46:34+03:30",
+    "url": "https://example.com/roxa-test.zip",
     "file": null,
-    "size": 0
+    "size": 0,
+    "countries": "DE"
 }

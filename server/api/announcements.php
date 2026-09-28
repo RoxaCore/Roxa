@@ -5,6 +5,7 @@ api_headers();
 $store = jread(DATA_DIR . '/announcements.json', ['seq' => 0, 'items' => []]);
 $since = isset($_GET['since']) ? (int)$_GET['since'] : 0;
 $lang = lang_ok(isset($_GET['lang']) ? (string)$_GET['lang'] : 'fa');
+$cc = country_client();
 
 $items = [];
 foreach (($store['items'] ?? []) as $it) {
@@ -12,6 +13,9 @@ foreach (($store['items'] ?? []) as $it) {
         continue;
     }
     if ((int)$it['id'] <= $since) {
+        continue;
+    }
+    if (!country_ok((string)($it['countries'] ?? ''), $cc)) {
         continue;
     }
     $ilang = strtolower((string)($it['lang'] ?? '*'));

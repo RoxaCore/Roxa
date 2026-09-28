@@ -172,6 +172,41 @@ function lang_ok(?string $lang): string
     return preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $lang) ? $lang : 'fa';
 }
 
+function country_client(): string
+{
+    $c = strtoupper(preg_replace('/[^A-Za-z]/', '', (string)($_GET['country'] ?? '')) ?? '');
+    return preg_match('/^[A-Z]{2}$/', $c) ? $c : '';
+}
+
+function country_codes(string $s): array
+{
+    $out = [];
+    foreach (explode(',', $s) as $c) {
+        $c = strtoupper(trim($c));
+        if (preg_match('/^[A-Z]{2}$/', $c)) {
+            $out[] = $c;
+        }
+    }
+    return array_values(array_unique($out));
+}
+
+function country_field(): string
+{
+    return implode(',', country_codes((string)($_POST['countries'] ?? '')));
+}
+
+function country_ok(string $list, string $client): bool
+{
+    $codes = country_codes($list);
+    if (!$codes) {
+        return true;
+    }
+    if ($client === '') {
+        return false;
+    }
+    return in_array($client, $codes, true);
+}
+
 function str_cut(string $s, int $len): string
 {
     if (function_exists('mb_substr')) {

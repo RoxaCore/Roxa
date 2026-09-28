@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $level = in_array($_POST['level'] ?? '', ['info', 'warn', 'update'], true) ? $_POST['level'] : 'info';
         $url = trim((string)($_POST['url'] ?? ''));
         $lang = ($_POST['lang'] ?? '*') === '*' ? '*' : lang_ok((string)$_POST['lang']);
+        $countries = country_field();
         $active = isset($_POST['active']) ? true : false;
         if ($title === '' || $body === '') {
             flash('عنوان و متن اعلان اجباری است.', 'err');
@@ -25,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'level' => $level,
                 'url' => str_cut($url, 300),
                 'lang' => $lang,
+                'countries' => $countries,
                 'active' => $active,
                 'created' => date('c'),
             ];
@@ -75,7 +77,9 @@ echo '<div><label>زبان</label><select name="lang">';
 foreach ($langs as $k => $v) {
     echo '<option value="' . $k . '">' . h($v) . '</option>';
 }
-echo '</select></div></div>';
+echo '</select></div>';
+echo '<div><label>کشورهای هدف (اختیاری)</label><input type="text" name="countries" placeholder="IR,TR — خالی = همه"></div></div>';
+echo '<div class="hint">کدهای ISO دوحرفه‌ای که اعلان فقط به کاربران آن‌ها نمایش داده شود؛ خالی = همه کشورها.</div>';
 echo '<label>متن</label><textarea name="body" maxlength="2000" required></textarea>';
 echo '<label>لینک (اختیاری)</label><input type="text" name="url" placeholder="https://...">';
 echo '<div class="check"><input type="checkbox" name="active" id="active" checked><label for="active" style="margin:0">فعال (برای کاربران نمایش داده شود)</label></div>';
@@ -86,15 +90,17 @@ if (!$items) {
     echo '<div class="card"><div class="hint">هنوز اعلانی ثبت نشده است.</div></div>';
 } else {
     echo '<div class="card"><h2>لیست اعلان‌ها (' . count($items) . ')</h2><table>';
-    echo '<tr><th>#</th><th>عنوان</th><th>متن</th><th>سطح</th><th>زبان</th><th>تاریخ</th><th>وضعیت</th><th>عملیات</th></tr>';
+    echo '<tr><th>#</th><th>عنوان</th><th>متن</th><th>سطح</th><th>زبان</th><th>کشورها</th><th>تاریخ</th><th>وضعیت</th><th>عملیات</th></tr>';
     foreach ($items as $it) {
         $lv = $levels[$it['level']] ?? $levels['info'];
         $on = !empty($it['active']);
+        $ics = (string)($it['countries'] ?? '');
         echo '<tr><td>' . (int)$it['id'] . '</td>';
         echo '<td>' . h($it['title']) . ($it['url'] !== '' ? ' <a href="' . h($it['url']) . '" target="_blank">🔗</a>' : '') . '</td>';
         echo '<td style="max-width:280px;color:#9ca3af">' . h(str_cut((string)$it['body'], 90)) . (str_len((string)$it['body']) > 90 ? '…' : '') . '</td>';
         echo '<td><span class="badge ' . $lv[1] . '">' . h($lv[0]) . '</span></td>';
         echo '<td>' . h($langs[$it['lang']] ?? $it['lang']) . '</td>';
+        echo '<td>' . ($ics !== '' ? h($ics) : '<span style="color:#9ca3af">همه</span>') . '</td>';
         echo '<td style="white-space:nowrap">' . h(date('Y-m-d H:i', strtotime((string)$it['created']))) . '</td>';
         echo '<td><span class="badge ' . ($on ? 'b-on">فعال' : 'b-off">غیرفعال') . '</span></td>';
         echo '<td style="white-space:nowrap">';

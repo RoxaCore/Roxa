@@ -1,0 +1,35 @@
+<?php
+require_once __DIR__ . '/../lib.php';
+api_headers();
+
+$store = jread(DATA_DIR . '/announcements.json', ['seq' => 0, 'items' => []]);
+$since = isset($_GET['since']) ? (int)$_GET['since'] : 0;
+$lang = lang_ok(isset($_GET['lang']) ? (string)$_GET['lang'] : 'fa');
+
+$items = [];
+foreach (($store['items'] ?? []) as $it) {
+    if (empty($it['active'])) {
+        continue;
+    }
+    if ((int)$it['id'] <= $since) {
+        continue;
+    }
+    $ilang = strtolower((string)($it['lang'] ?? '*'));
+    if ($ilang !== '*' && $ilang !== $lang) {
+        continue;
+    }
+    $items[] = [
+        'id' => (int)$it['id'],
+        'title' => (string)($it['title'] ?? ''),
+        'body' => (string)($it['body'] ?? ''),
+        'level' => (string)($it['level'] ?? 'info'),
+        'url' => (string)($it['url'] ?? ''),
+        'created' => (string)($it['created'] ?? ''),
+    ];
+}
+
+usort($items, function ($a, $b) {
+    return $b['id'] <=> $a['id'];
+});
+
+echo json_encode(['ok' => true, 'items' => array_slice($items, 0, 50)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

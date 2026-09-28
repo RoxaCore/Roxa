@@ -1,0 +1,98 @@
+<?php
+require_once __DIR__ . '/_layout.php';
+
+sess_start();
+
+if (!is_file(auth_file())) {
+    $err = '';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        csrf_check();
+        $p1 = (string)($_POST['password'] ?? '');
+        $p2 = (string)($_POST['confirm'] ?? '');
+        if (strlen($p1) < 8) {
+            $err = 'رمز باید حداقل ۸ کاراکتر باشد.';
+        } elseif ($p1 !== $p2) {
+            $err = 'تکرار رمز مطابقت ندارد.';
+        } else {
+            jwrite(auth_file(), [
+                'hash' => password_hash($p1, PASSWORD_DEFAULT),
+                'created' => date('c'),
+            ]);
+            session_regenerate_id(true);
+            $_SESSION['auth'] = true;
+            $_SESSION['auth_at'] = time();
+            $_SESSION['username'] = 'admin';
+            flash('رمز مدیریت ساخته شد. خوش آمدید.');
+            header('Location: index.php');
+            exit;
+        }
+    }
+    echo '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">';
+    echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
+    echo '<title>راه‌اندازی — ' . h(APP_NAME) . '</title>';
+    echo '<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">';
+    echo '<style>
+:root{--bg:#0b0f1a;--card:#141a2a;--line:#1f2937;--tx:#e5e7eb;--mut:#9ca3af;--ac:#7c3aed}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:Vazirmatn,Tahoma,sans-serif;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px}
+h1{font-size:20px;margin-bottom:4px}
+.sub{color:var(--mut);font-size:12px;margin-bottom:10px}
+label{display:block;color:var(--mut);font-size:12px;margin:12px 0 5px}
+input[type=password]{width:100%;background:#0d1322;border:1px solid var(--line);color:var(--tx);border-radius:9px;padding:10px 12px;font-family:inherit;font-size:14px}
+input:focus{outline:none;border-color:var(--ac)}
+.btn{width:100%;background:var(--ac);color:#fff;border:none;border-radius:9px;padding:11px;font-family:inherit;font-size:15px;cursor:pointer;margin-top:18px}
+.btn:hover{background:#6d28d9}
+.msg{padding:10px 14px;border-radius:9px;margin-bottom:12px;font-size:13px;background:#2a0e0e;color:#f87171;border:1px solid #4a0d0d}
+.note{color:var(--mut);font-size:12px;line-height:2;margin-bottom:8px}
+</style></head><body><div class="login-box card">';
+    echo '<h1>راه‌اندازی پنل</h1><div class="sub">اولین ورود — رمز مدیریت را بسازید</div>';
+    echo '<div class="note">این رمز فقط همین‌جا (هاست شما) ذخیره می‌شود و به هیچ سرور دیگری نمی‌رود. حتماً آن را نگه دارید.</div>';
+    if ($err !== '') {
+        echo '<div class="msg">' . h($err) . '</div>';
+    }
+    echo '<form method="post">' . csrf_field();
+    echo '<label>رمز عبور (حداقل ۸ کاراکتر)</label><input type="password" name="password" required autofocus>';
+    echo '<label>تکرار رمز</label><input type="password" name="confirm" required>';
+    echo '<button class="btn" type="submit">ساخت رمز و ورود</button></form></div></body></html>';
+    exit;
+}
+
+require_auth();
+
+$ver = jread(DATA_DIR . '/version.json', ['latest' => null, 'active' => false]);
+$ann = jread(DATA_DIR . '/announcements.json', ['seq' => 0, 'items' => []]);
+$activeCount = 0;
+foreach (($ann['items'] ?? []) as $it) {
+    if (!empty($it['active'])) {
+        $activeCount++;
+    }
+}
+$dataWritable = is_writable(DATA_DIR);
+$dlWritable = is_writable(DL_DIR);
+
+page_head('داشبورد', 'dash');
+
+echo '<div class="grid">';
+echo '<div class="stat"><div class="k">نسخه منتشرشده</div><div class="v">' . h((string)($ver['latest'] ?: '—')) . '</div></div>';
+echo '<div class="stat"><div class="k">وضعیت انتشار</div><div class="v"><span class="badge ' . (!empty($ver['active']) ? 'b-on">فعال' : 'b-off">غیرفعال') . '</span></div></div>';
+echo '<div class="stat"><div class="k">اعلان‌های فعال</div><div class="v">' . $activeCount . ' <small>از ' . count($ann['items'] ?? []) . '</small></div></div>';
+echo '<div class="stat"><div class="k">نسخهٔ PHP</div><div class="v"><small>' . h(PHP_VERSION) . '</small></div></div>';
+echo '</div>';
+
+echo '<div class="card"><h2>وضعیت سرویس</h2>';
+echo '<div class="hint">';
+echo 'آدرس API نسخه: <code>' . h(BASE_URL) . '/api/check.php</code><br>';
+echo 'آدرس API اعلان‌ها: <code>' . h(BASE_URL) . '/api/announcements.php</code><br>';
+echo 'پوشهٔ داده‌ها (data): ' . ($dataWritable ? '<span style="color:#34d399">قابل نوشتن ✓</span>' : '<span style="color:#f87171">غیرقابل نوشتن ✗</span>') . ' — ';
+echo 'پوشهٔ دانلود (dl): ' . ($dlWritable ? '<span style="color:#34d399">قابل نوشتن ✓</span>' : '<span style="color:#f87171">غیرقابل نوشتن ✗</span>');
+echo '</div></div>';
+
+echo '<div class="card"><h2>دسترسی سریع</h2><div class="hint">';
+echo '<a href="announcements.php">→ نوشتن اعلان جدید</a><br>';
+echo '<a href="version.php">→ انتشار نسخه جدید آپدیت</a><br>';
+echo '<a href="../api/check.php" target="_blank">→ مشاهدهٔ پاسخ API نسخه</a> · ';
+echo '<a href="../api/announcements.php" target="_blank">→ پاسخ API اعلان‌ها</a>';
+echo '</div></div>';
+
+page_foot();

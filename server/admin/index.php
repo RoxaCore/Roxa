@@ -84,6 +84,23 @@ echo '<div class="stat"><div class="k">اعلان‌های فعال</div><div cl
 echo '<div class="stat"><div class="k">نسخهٔ PHP</div><div class="v"><small>' . h(PHP_VERSION) . '</small></div></div>';
 echo '</div>';
 
+$recent = array_slice(stats_sorted(), 0, 10);
+if ($recent) {
+    $rnow = time();
+    echo '<div class="card"><h2>کاربران اخیر <a href="users.php" style="font-size:12px;font-weight:400">→ مشاهده همه</a></h2><table>';
+    echo '<tr><th>شناسه</th><th>سیستم‌عامل</th><th>IP</th><th>آخرین فعالیت</th></tr>';
+    foreach ($recent as $c) {
+        $id = (string)$c['id'];
+        $t = strtotime((string)($c['last'] ?? '')) ?: 0;
+        $ip = (string)($c['ip'] ?? '') !== '' ? (string)$c['ip'] : (string)($c['ip_last'] ?? '');
+        echo '<tr><td><a class="mono" style="background:none;padding:0" href="user.php?id=' . h($id) . '">' . h(substr($id, 0, 8)) . '…</a></td>';
+        echo '<td>' . ((string)($c['os'] ?? '') !== '' ? h($c['os']) : '—') . '</td>';
+        echo '<td class="mono" style="background:none;padding:0">' . ($ip !== '' ? h($ip) : '—') . '</td>';
+        echo '<td style="white-space:nowrap">' . ($t > 0 ? h(date('Y-m-d H:i', $t)) : '—') . '</td></tr>';
+    }
+    echo '</table></div>';
+}
+
 echo '<div class="card"><h2>وضعیت سرویس</h2>';
 echo '<div class="hint">';
 echo 'آدرس API نسخه: <code>' . h(BASE_URL) . '/api/check.php</code><br>';
@@ -95,6 +112,7 @@ echo '</div></div>';
 echo '<div class="card"><h2>دسترسی سریع</h2><div class="hint">';
 echo '<a href="announcements.php">→ نوشتن اعلان جدید</a><br>';
 echo '<a href="version.php">→ انتشار نسخه جدید آپدیت</a><br>';
+echo '<a href="users.php">→ لیست کاربران و پروفایل‌ها</a><br>';
 echo '<a href="../api/check.php" target="_blank">→ مشاهدهٔ پاسخ API نسخه</a> · ';
 echo '<a href="../api/announcements.php" target="_blank">→ پاسخ API اعلان‌ها</a>';
 echo '</div></div>';

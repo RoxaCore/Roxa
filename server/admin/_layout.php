@@ -6,6 +6,7 @@ function page_head(string $title, string $active): void
     $flash = flash_pop();
     $nav = [
         'dash' => ['داشبورد', 'index.php'],
+        'users' => ['کاربران', 'users.php'],
         'ann' => ['اعلان‌ها', 'announcements.php'],
         'ver' => ['نسخه و آپدیت', 'version.php'],
         'pw' => ['تغییر رمز', 'password.php'],

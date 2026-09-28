@@ -281,7 +281,7 @@ function lang_picker(): string
     return $html;
 }
 
-function stats_touch(string $id): void
+function stats_touch(string $id, array $meta = []): void
 {
     if (!preg_match('/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/', $id)) {
         return;
@@ -298,10 +298,16 @@ function stats_touch(string $id): void
             $st['clients'] = [];
         }
         $now = date('c');
-        if (isset($st['clients'][$id])) {
+        if (isset($st['clients'][$id]) && is_array($st['clients'][$id])) {
             $st['clients'][$id]['last'] = $now;
         } else {
             $st['clients'][$id] = ['first' => $now, 'last' => $now];
+        }
+        foreach ($meta as $k => $v) {
+            if ($v === null || $v === '') {
+                continue;
+            }
+            $st['clients'][$id][$k] = $v;
         }
         jwrite($file, $st);
     } finally {
@@ -310,6 +316,38 @@ function stats_touch(string $id): void
             fclose($lock);
         }
     }
+}
+
+function stats_find(string $id): ?array
+{
+    $id = strtolower(trim($id));
+    if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $id)) {
+        return null;
+    }
+    $st = jread(DATA_DIR . '/stats.json', ['clients' => []]);
+    $c = $st['clients'][$id] ?? null;
+    if (!is_array($c)) {
+        return null;
+    }
+    $c['id'] = $id;
+    return $c;
+}
+
+function stats_sorted(): array
+{
+    $st = jread(DATA_DIR . '/stats.json', ['clients' => []]);
+    $out = [];
+    foreach (($st['clients'] ?? []) as $id => $c) {
+        if (!is_array($c)) {
+            continue;
+        }
+        $c['id'] = (string)$id;
+        $out[] = $c;
+    }
+    usort($out, function ($a, $b) {
+        return strcmp((string)($b['last'] ?? ''), (string)($a['last'] ?? ''));
+    });
+    return $out;
 }
 
 function stats_summary(): array

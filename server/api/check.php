@@ -2,11 +2,6 @@
 require_once __DIR__ . '/../lib.php';
 api_headers();
 
-$id = (string)($_GET['id'] ?? '');
-if ($id !== '') {
-    stats_touch($id);
-}
-
 $ver = jread(DATA_DIR . '/version.json', [
     'latest' => null,
     'notes' => '',
@@ -23,6 +18,22 @@ $ver = jread(DATA_DIR . '/version.json', [
 $current = isset($_GET['v']) ? ver_safe((string)$_GET['v']) : '';
 $lang = lang_ok(isset($_GET['lang']) ? (string)$_GET['lang'] : 'fa');
 $cc = country_client();
+
+$id = (string)($_GET['id'] ?? '');
+if ($id !== '') {
+    $ipRemote = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+    $ipOk = filter_var($ipRemote, FILTER_VALIDATE_IP) !== false ? $ipRemote : '';
+    $direct = isset($_GET['direct']) && $_GET['direct'] === '1';
+    $os = trim((string)($_GET['os'] ?? ''));
+    stats_touch($id, [
+        'ip_last' => $ipOk,
+        'ip' => $direct ? $ipOk : '',
+        'os' => $os !== '' ? str_cut($os, 120) : '',
+        'country' => $cc,
+        'lang' => $lang,
+        'ver' => $current,
+    ]);
+}
 
 if (empty($ver['active']) || empty($ver['latest'])) {
     echo json_encode(['ok' => true, 'latest' => null], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

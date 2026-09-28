@@ -118,4 +118,5 @@ public class AppSettings
     public bool ClearProxyOnDisconnect { get; set; } = true;
     public bool UseProxyForSubscriptions { get; set; } = true;
     public string Language { get; set; } = "fa";
+    public int LastSeenAnnouncementId { get; set; }
 }

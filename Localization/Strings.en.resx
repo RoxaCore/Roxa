@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -268,6 +268,15 @@ Latency: {1}</value></data>
   <data name="Proxy_On" xml:space="preserve"><value>System proxy (on)</value></data>
   <data name="Tun_Off" xml:space="preserve"><value>TUN (off)</value></data>
   <data name="Tun_On" xml:space="preserve"><value>TUN (on)</value></data>
+  <data name="Upd_Notify" xml:space="preserve"><value>New update</value></data>
+  <data name="Upd_BannerTitle" xml:space="preserve"><value>New version {0} is ready to download</value></data>
+  <data name="Upd_Btn_Install" xml:space="preserve"><value>Install</value></data>
+  <data name="Upd_Downloading" xml:space="preserve"><value>Downloading update…</value></data>
+  <data name="Upd_Done" xml:space="preserve"><value>Download complete; the app will close to install</value></data>
+  <data name="Upd_Failed" xml:space="preserve"><value>Update download failed</value></data>
+  <data name="Upd_ForceMsg" xml:space="preserve"><value>You must install the new version to continue</value></data>
+  <data name="Ann_Dismiss" xml:space="preserve"><value>Close</value></data>
+  <data name="Ann_View" xml:space="preserve"><value>View</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servers added from clipboard</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Clipboard is empty</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Clipboard access is not available</value></data>

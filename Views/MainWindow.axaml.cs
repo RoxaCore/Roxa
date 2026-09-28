@@ -244,6 +244,39 @@ public partial class MainWindow : Window
             btnRestart.Click += (_, _) => { Core.AdminHelper.RestartAsAdmin(); win.Close(); };
             win.ShowDialog(this);
         };
+        vm.UpdateShutdownRequested += () => (Application.Current as App)?.ExitApp();
+        vm.ShowUpdateRequiredHandler = () =>
+        {
+            var tr = Localization.TranslationManager.Instance;
+            var btnInstall = new Button { Content = tr["Upd_Btn_Install"], Width = 120 };
+            var win = new Window
+            {
+                Title = tr["Upd_Notify"],
+                Width = 420,
+                Height = 170,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Content = new StackPanel
+                {
+                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                    Spacing = 15,
+                    Margin = new Avalonia.Thickness(20),
+                    Children =
+                    {
+                        new TextBlock { Text = tr["Upd_ForceMsg"], TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                        new StackPanel
+                        {
+                            Orientation = Avalonia.Layout.Orientation.Horizontal,
+                            Spacing = 10,
+                            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                            Children = { btnInstall }
+                        }
+                    }
+                }
+            };
+            btnInstall.Click += (_, _) => { win.Close(); _ = vm.InstallUpdateCommand.ExecuteAsync(null); };
+            win.ShowDialog(this);
+        };
         if (vm.TunDisabledNeedsAdmin || Core.TunRecovery.LeftoverNeedsAdmin)
             Dispatcher.UIThread.Post(() => vm.ShowAdminWarningHandler?.Invoke(), DispatcherPriority.Loaded);
         vm.ConfirmDeleteHandler = async message =>

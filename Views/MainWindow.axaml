@@ -64,7 +64,7 @@
     </ContextMenu>
   </Window.Resources>
 
-  <Grid RowDefinitions="Auto,*" Background="#F7F8FA">
+  <Grid RowDefinitions="Auto,Auto,*" Background="#F7F8FA">
     <!-- Top Bar -->
     <Border Grid.Row="0" Padding="0" Background="#FFFFFF" BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
       <Border Background="#F9FAFB" CornerRadius="14" Padding="38,12" Margin="38,14,38,14" BorderBrush="#E5E7EB" BorderThickness="1">
@@ -186,8 +186,35 @@
       </Border>
     </Border>
 
+    <!-- Remote Banner -->
+    <Border Grid.Row="1" IsVisible="{Binding IsBannerVisible}" Margin="38,0,38,10"
+            Background="{Binding BannerBackground}" CornerRadius="10" Padding="16,10"
+            BorderBrush="{Binding BannerForeground}" BorderThickness="1">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Orientation="Vertical" Spacing="2" Grid.Column="0">
+          <TextBlock Text="{Binding BannerTitle}" FontWeight="SemiBold" FontSize="13"
+                     Foreground="{Binding BannerForeground}" TextTrimming="CharacterEllipsis"/>
+          <TextBlock Text="{Binding BannerBody}" FontSize="12" Foreground="{Binding BannerForeground}" Opacity="0.85"
+                     TextWrapping="Wrap" IsVisible="{Binding BannerBody, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="14,0,0,0">
+          <Button Content="{Binding BannerActionText}" IsVisible="{Binding BannerHasAction}"
+                  IsEnabled="{Binding IsBannerBusy, Converter={StaticResource Not}}"
+                  Command="{Binding BannerActionCommand}" Padding="14,6" CornerRadius="8" FontSize="12" FontWeight="SemiBold"
+                  Background="{Binding BannerForeground}" Foreground="White"/>
+          <Button Command="{Binding DismissBannerCommand}"
+                  IsEnabled="{Binding IsBannerBusy, Converter={StaticResource Not}}"
+                  Padding="14,6" CornerRadius="8" FontSize="12"
+                  Background="#FFFFFF" BorderBrush="#D1D5DB" BorderThickness="1"
+                  Foreground="{Binding BannerForeground}">
+            <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ann_Dismiss}"/>
+          </Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+
     <!-- Tabs -->
-    <TabControl x:Name="MainTabControl" Grid.Row="1" Margin="24,0,24,0" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <TabControl x:Name="MainTabControl" Grid.Row="2" Margin="24,0,24,0" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
       <TabControl.Styles>
         <Style Selector="TabControl">
           <Setter Property="Background" Value="Transparent"/>
@@ -739,7 +766,7 @@
       </TabItem>
     </TabControl>
     <!-- Toast Notification -->
-    <Border x:Name="ToastBorder" IsVisible="False" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" ZIndex="100"
+    <Border x:Name="ToastBorder" IsVisible="False" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" ZIndex="100"
             Background="#122A25" CornerRadius="10" Padding="20,12" MaxWidth="400">
       <TextBlock x:Name="ToastText" Text="" FontSize="13" Foreground="White" TextWrapping="Wrap" TextAlignment="Center"/>
     </Border>

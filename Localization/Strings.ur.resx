@@ -249,6 +249,15 @@
   <data name="Proxy_On" xml:space="preserve"><value>سسٹم پراکسی (آن)</value></data>
   <data name="Tun_Off" xml:space="preserve"><value>TUN (بند)</value></data>
   <data name="Tun_On" xml:space="preserve"><value>TUN (آن)</value></data>
+  <data name="Upd_Notify" xml:space="preserve"><value>نیا اپ ڈیٹ</value></data>
+  <data name="Upd_BannerTitle" xml:space="preserve"><value>نیا ورژن {0} ڈاؤن لوڈ کے لیے تیار ہے</value></data>
+  <data name="Upd_Btn_Install" xml:space="preserve"><value>انسٹال کریں</value></data>
+  <data name="Upd_Downloading" xml:space="preserve"><value>اپ ڈیٹ ڈاؤن لوڈ ہو رہی ہے…</value></data>
+  <data name="Upd_Done" xml:space="preserve"><value>ڈاؤن لوڈ مکمل؛ انسٹال کے لیے ایپ بند ہوگی</value></data>
+  <data name="Upd_Failed" xml:space="preserve"><value>اپ ڈیٹ ڈاؤن لوڈ ناکام</value></data>
+  <data name="Upd_ForceMsg" xml:space="preserve"><value>جاری رکھنے کے لیے نیا ورژن انسٹال کریں</value></data>
+  <data name="Ann_Dismiss" xml:space="preserve"><value>بند کریں</value></data>
+  <data name="Ann_View" xml:space="preserve"><value>دیکھیں</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>کلپ بورڈ سے {0} سرور شامل کیے گئے</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>کلپ بورڈ خالی ہے</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>کلپ بورڈ تک رسائی دستیاب نہیں</value></data>

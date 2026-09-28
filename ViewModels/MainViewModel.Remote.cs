@@ -56,9 +56,19 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             var lang = string.IsNullOrWhiteSpace(_settings.Language) ? "fa" : _settings.Language;
+            if (!IsConnected)
+            {
+                var cc = await Task.Run(() => RemoteConfig.DetectCountryAsync());
+                if (!string.IsNullOrEmpty(cc))
+                {
+                    _settings.Country = cc;
+                    SaveSettings();
+                }
+            }
+            var country = _settings.Country ?? "";
             var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
-            var update = await Task.Run(() => RemoteConfig.CheckUpdateAsync(lang, proxyPort));
-            var announcements = await Task.Run(() => RemoteConfig.FetchAnnouncementsAsync(_settings.LastSeenAnnouncementId, lang, proxyPort));
+            var update = await Task.Run(() => RemoteConfig.CheckUpdateAsync(lang, country, proxyPort));
+            var announcements = await Task.Run(() => RemoteConfig.FetchAnnouncementsAsync(_settings.LastSeenAnnouncementId, lang, country, proxyPort));
             Post(() => ApplyRemote(update, announcements));
         }
         catch

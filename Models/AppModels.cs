@@ -123,4 +123,5 @@ public class AppSettings
     public string LastUpdateAttempt { get; set; } = "";
     public int ShownAnnouncementId { get; set; }
     public int ShownAnnouncementCount { get; set; }
+    public string Country { get; set; } = "";
 }

@@ -83,12 +83,41 @@ public static class RemoteConfig
         return http;
     }
 
-    public static async Task<UpdateInfo?> CheckUpdateAsync(string lang, int? proxyPort, CancellationToken ct = default)
+    private static async Task<string?> FetchCountryAsync(string url, string propName, CancellationToken ct)
+    {
+        try
+        {
+            using var http = CreateClient(null);
+            http.Timeout = TimeSpan.FromSeconds(6);
+            using var resp = await http.GetAsync(url, ct);
+            if (!resp.IsSuccessStatusCode) return null;
+            var json = await resp.Content.ReadAsStringAsync(ct);
+            using var doc = JsonDocument.Parse(json);
+            var code = doc.RootElement.TryGetProperty(propName, out var v) ? v.GetString() : null;
+            code = (code ?? "").Trim().ToUpperInvariant();
+            return code.Length == 2 && code.All(char.IsLetter) ? code : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static async Task<string?> DetectCountryAsync(CancellationToken ct = default)
+    {
+        var code = await FetchCountryAsync("https://get.geojs.io/v1/ip/country.json", "country", ct);
+        if (code != null) return code;
+        return await FetchCountryAsync("https://ipwho.is/", "country_code", ct);
+    }
+
+    public static async Task<UpdateInfo?> CheckUpdateAsync(string lang, string country, int? proxyPort, CancellationToken ct = default)
     {
         try
         {
             using var http = CreateClient(proxyPort);
             var url = $"{BaseUrl}/api/check.php?v={Uri.EscapeDataString(AppVersion)}&lang={Uri.EscapeDataString(lang)}";
+            if (!string.IsNullOrWhiteSpace(country))
+                url += $"&country={Uri.EscapeDataString(country)}";
             using var resp = await http.GetAsync(url, ct);
             if (!resp.IsSuccessStatusCode) return null;
             var json = await resp.Content.ReadAsStringAsync(ct);
@@ -111,12 +140,14 @@ public static class RemoteConfig
         }
     }
 
-    public static async Task<List<Announcement>?> FetchAnnouncementsAsync(int since, string lang, int? proxyPort, CancellationToken ct = default)
+    public static async Task<List<Announcement>?> FetchAnnouncementsAsync(int since, string lang, string country, int? proxyPort, CancellationToken ct = default)
     {
         try
         {
             using var http = CreateClient(proxyPort);
             var url = $"{BaseUrl}/api/announcements.php?since={since}&lang={Uri.EscapeDataString(lang)}";
+            if (!string.IsNullOrWhiteSpace(country))
+                url += $"&country={Uri.EscapeDataString(country)}";
             using var resp = await http.GetAsync(url, ct);
             if (!resp.IsSuccessStatusCode) return null;
             var json = await resp.Content.ReadAsStringAsync(ct);

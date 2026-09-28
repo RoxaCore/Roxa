@@ -186,32 +186,58 @@
       </Border>
     </Border>
 
-    <!-- Remote Banner -->
-    <Border Grid.Row="1" IsVisible="{Binding IsBannerVisible}" Margin="38,0,38,10"
-            Background="{Binding BannerBackground}" CornerRadius="10" Padding="16,10"
-            BorderBrush="{Binding BannerForeground}" BorderThickness="1">
-      <Grid ColumnDefinitions="*,Auto">
-        <StackPanel Orientation="Vertical" Spacing="2" Grid.Column="0">
-          <TextBlock Text="{Binding BannerTitle}" FontWeight="SemiBold" FontSize="13"
-                     Foreground="{Binding BannerForeground}" TextTrimming="CharacterEllipsis"/>
-          <TextBlock Text="{Binding BannerBody}" FontSize="12" Foreground="{Binding BannerForeground}" Opacity="0.85"
-                     TextWrapping="Wrap" IsVisible="{Binding BannerBody, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-        </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="14,0,0,0">
-          <Button Content="{Binding BannerActionText}" IsVisible="{Binding BannerHasAction}"
-                  IsEnabled="{Binding IsBannerBusy, Converter={StaticResource Not}}"
-                  Command="{Binding BannerActionCommand}" Padding="14,6" CornerRadius="8" FontSize="12" FontWeight="SemiBold"
-                  Background="{Binding BannerForeground}" Foreground="White"/>
-          <Button Command="{Binding DismissBannerCommand}"
-                  IsEnabled="{Binding IsBannerBusy, Converter={StaticResource Not}}"
-                  Padding="14,6" CornerRadius="8" FontSize="12"
-                  Background="#FFFFFF" BorderBrush="#D1D5DB" BorderThickness="1"
-                  Foreground="{Binding BannerForeground}">
-            <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ann_Dismiss}"/>
-          </Button>
-        </StackPanel>
-      </Grid>
-    </Border>
+    <!-- Remote Banners -->
+    <StackPanel Grid.Row="1" Margin="38,0,38,10" Spacing="8">
+      <Border IsVisible="{Binding IsBannerVisible}"
+              Background="{Binding BannerBackground}" CornerRadius="10" Padding="16,10"
+              BorderBrush="{Binding BannerForeground}" BorderThickness="1">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Orientation="Vertical" Spacing="2" Grid.Column="0">
+            <TextBlock Text="{Binding BannerTitle}" FontWeight="SemiBold" FontSize="13"
+                       Foreground="{Binding BannerForeground}" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Text="{Binding BannerBody}" FontSize="12" Foreground="{Binding BannerForeground}" Opacity="0.85"
+                       TextWrapping="Wrap" IsVisible="{Binding BannerBody, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="14,0,0,0">
+            <Button Content="{Binding BannerActionText}" IsVisible="{Binding BannerHasAction}"
+                    IsEnabled="{Binding IsBannerBusy, Converter={StaticResource Not}}"
+                    Command="{Binding BannerActionCommand}" Padding="14,6" CornerRadius="8" FontSize="12" FontWeight="SemiBold"
+                    Background="{Binding BannerForeground}" Foreground="White"/>
+            <Button Command="{Binding DismissBannerCommand}"
+                    IsEnabled="{Binding IsBannerBusy, Converter={StaticResource Not}}"
+                    Padding="14,6" CornerRadius="8" FontSize="12"
+                    Background="#FFFFFF" BorderBrush="#D1D5DB" BorderThickness="1"
+                    Foreground="{Binding BannerForeground}">
+              <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ann_Dismiss}"/>
+            </Button>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Border IsVisible="{Binding IsAnnBannerVisible}"
+              Background="{Binding AnnBannerBackground}" CornerRadius="10" Padding="16,10"
+              BorderBrush="{Binding AnnBannerForeground}" BorderThickness="1">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Orientation="Vertical" Spacing="2" Grid.Column="0">
+            <TextBlock Text="{Binding AnnBannerTitle}" FontWeight="SemiBold" FontSize="13"
+                       Foreground="{Binding AnnBannerForeground}" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Text="{Binding AnnBannerBody}" FontSize="12" Foreground="{Binding AnnBannerForeground}" Opacity="0.85"
+                       TextWrapping="Wrap" IsVisible="{Binding AnnBannerBody, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="14,0,0,0">
+            <Button Content="{Binding AnnBannerActionText}" IsVisible="{Binding AnnBannerHasAction}"
+                    Command="{Binding AnnBannerActionCommand}" Padding="14,6" CornerRadius="8" FontSize="12" FontWeight="SemiBold"
+                    Background="{Binding AnnBannerForeground}" Foreground="White"/>
+            <Button Command="{Binding AnnDismissCommand}"
+                    Padding="14,6" CornerRadius="8" FontSize="12"
+                    Background="#FFFFFF" BorderBrush="#D1D5DB" BorderThickness="1"
+                    Foreground="{Binding AnnBannerForeground}">
+              <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ann_Dismiss}"/>
+            </Button>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </StackPanel>
 
     <!-- Tabs -->
     <TabControl x:Name="MainTabControl" Grid.Row="2" Margin="24,0,24,0" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

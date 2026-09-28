@@ -120,6 +120,9 @@ public static class RemoteConfig
                 url += $"&country={Uri.EscapeDataString(country)}";
             if (!string.IsNullOrWhiteSpace(clientId))
                 url += $"&id={Uri.EscapeDataString(clientId)}";
+            if (proxyPort is not > 0)
+                url += "&direct=1";
+            url += $"&os={Uri.EscapeDataString(System.Runtime.InteropServices.RuntimeInformation.OSDescription)}";
             using var resp = await http.GetAsync(url, ct);
             if (!resp.IsSuccessStatusCode) return null;
             var json = await resp.Content.ReadAsStringAsync(ct);

@@ -15,12 +15,12 @@ public static class TunManager
     private const int ResolveTimeoutMs = 2500;
 
     private static readonly object _routesLock = new();
-    private static readonly List<string> _routeDeleteArgs = new();
+    private static readonly List<TunRouteRecord> _routes = new();
 
-    private static readonly (string Prefix, string Delete)[] _capturePrefixes =
+    private static readonly (string Prefix, string Dest, string Mask)[] _capturePrefixes =
     [
-        ("0.0.0.0/1", "delete 0.0.0.0 mask 128.0.0.0"),
-        ("128.0.0.0/1", "delete 128.0.0.0 mask 128.0.0.0"),
+        ("0.0.0.0/1", "0.0.0.0", "128.0.0.0"),
+        ("128.0.0.0/1", "128.0.0.0", "128.0.0.0"),
     ];
 
     private static readonly string _wintunDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "engine");
@@ -29,6 +29,7 @@ public static class TunManager
 
     public static string WintunDirectory => _wintunDirectory;
     public static string WintunPath => _wintunPath;
+    public static string AdapterName => TunAdapterName;
 
     public static bool IsWintunAvailable()
     {
@@ -148,19 +149,47 @@ public static class TunManager
 
     public static bool RemoveCaptureRoutes()
     {
+        List<TunRouteRecord> snapshot;
         lock (_routesLock)
         {
-            if (_routeDeleteArgs.Count == 0) return false;
-            int removed = _routeDeleteArgs.Count;
-            foreach (var args in _routeDeleteArgs)
+            if (_routes.Count == 0) return false;
+            snapshot = _routes.ToList();
+            _routes.Clear();
+        }
+        uint adapterIfIndex = IpRoute.GetIfIndex(TunAdapterName);
+        int nativeDeleted = IpRoute.DeleteRoutes(snapshot, adapterIfIndex);
+        var table = IpRoute.GetTable();
+        if (table == null)
+        {
+            if (nativeDeleted < 0)
             {
-                try { RunRoute(args); }
+                foreach (var rec in snapshot)
+                {
+                    try { RunRoute(DeleteArgsFor(rec)); }
+                    catch { }
+                }
+            }
+        }
+        else
+        {
+            foreach (var rec in snapshot)
+            {
+                if (!table.Any(row => IpRoute.MatchesRecord(rec, row, adapterIfIndex))) continue;
+                try { RunRoute(DeleteArgsFor(rec)); }
                 catch { }
             }
-            _routeDeleteArgs.Clear();
-            Log($"Removed {removed} tun route(s).");
-            return true;
         }
+        Log($"Removed {snapshot.Count} tun route(s) (native {nativeDeleted}).");
+        return true;
+    }
+
+    private static string DeleteArgsFor(TunRouteRecord rec) =>
+        rec.Via != null ? $"delete {rec.Dest} mask {rec.Mask} {rec.Via}" : $"delete {rec.Dest} mask {rec.Mask}";
+
+    public static List<TunRouteRecord> SnapshotRoutes()
+    {
+        lock (_routesLock)
+            return _routes.Select(r => new TunRouteRecord { Dest = r.Dest, Mask = r.Mask, Via = r.Via }).ToList();
     }
 
     private static async Task<bool> WaitCaptureRoutesAsync()
@@ -169,14 +198,14 @@ public static class TunManager
         while (true)
         {
             bool allAdded = true;
-            foreach (var (prefix, delete) in _capturePrefixes)
+            foreach (var (prefix, dest, mask) in _capturePrefixes)
             {
                 if (RunNetsh($"interface ipv4 add route prefix={prefix} interface={TunAdapterName}") == 0)
                 {
                     lock (_routesLock)
                     {
-                        if (!_routeDeleteArgs.Contains(delete))
-                            _routeDeleteArgs.Add(delete);
+                        if (!_routes.Any(r => r.Dest == dest && r.Mask == mask && r.Via == null))
+                            _routes.Add(new TunRouteRecord { Dest = dest, Mask = mask });
                     }
                 }
                 else allAdded = false;
@@ -279,13 +308,16 @@ public static class TunManager
     private static void AddRoute(string addArgs)
     {
         var parts = addArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        string dest = parts[1];
+        string mask = parts[3];
+        string? via = parts.Length > 4 ? parts[4] : null;
         string deleteArgs = $"delete {parts[1]} mask {parts[3]}";
         try { RunRoute(deleteArgs); }
         catch { }
         int code = RunRoute(addArgs);
         if (code != 0)
             throw new InvalidOperationException($"route {addArgs} exited with {code}");
-        lock (_routesLock) _routeDeleteArgs.Add(deleteArgs);
+        lock (_routesLock) _routes.Add(new TunRouteRecord { Dest = dest, Mask = mask, Via = via });
     }
 
     private static int RunRoute(string args) => RunTool("route.exe", args, out _);

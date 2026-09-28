@@ -24,6 +24,39 @@ public static class SystemProxy
         NotifyChange();
     }
 
+    public static bool GetCurrent(out bool enable, out string server, out string proxyOverride)
+    {
+        enable = false;
+        server = "";
+        proxyOverride = "";
+        if (!OperatingSystem.IsWindows()) return false;
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Internet Settings");
+            if (key == null) return false;
+            enable = Convert.ToInt32(key.GetValue("ProxyEnable", 0) ?? 0) == 1;
+            server = key.GetValue("ProxyServer") as string ?? "";
+            proxyOverride = key.GetValue("ProxyOverride") as string ?? "";
+            return true;
+        }
+        catch { return false; }
+    }
+
+    public static void Apply(bool enable, string? server, string? proxyOverride)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Internet Settings");
+            if (key == null) return;
+            key.SetValue("ProxyEnable", enable ? 1 : 0, RegistryValueKind.DWord);
+            if (server != null) key.SetValue("ProxyServer", server, RegistryValueKind.String);
+            if (proxyOverride != null) key.SetValue("ProxyOverride", proxyOverride, RegistryValueKind.String);
+            NotifyChange();
+        }
+        catch { }
+    }
+
     [DllImport("wininet.dll", SetLastError = true, CharSet = CharSet.Auto)]
     private static extern bool InternetSetOption(IntPtr hInternet, int dwOption, IntPtr lpBuffer, int dwBufferLength);
 

@@ -13,6 +13,7 @@ namespace XrayClient.Core;
 public sealed class XrayEngine : IDisposable
 {
     private Process? _process;
+    private JobObject? _job;
     private bool _proxyActive;
     private string? _tempConfigPath;
     private AppSettings? _settings;
@@ -20,6 +21,8 @@ public sealed class XrayEngine : IDisposable
 
     public event Action<string>? Output;
     public event Action? Stopped;
+
+    public bool LastExitExpected { get; private set; }
 
     public ServerInfo? CurrentServer { get; private set; }
     public int HttpPort { get; private set; }
@@ -213,28 +216,8 @@ public sealed class XrayEngine : IDisposable
 
         try
         {
-            var psi = new ProcessStartInfo(EnginePath)
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-            psi.ArgumentList.Add("run");
-            psi.ArgumentList.Add("-c");
-            psi.ArgumentList.Add(configPath);
-
-            Process process;
-            lock (_lock)
-            {
-                _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
-                process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-                process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-                process.Exited += (_, _) => OnExited();
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-            }
+            var process = LaunchEngine(configPath);
+            UpdateState(process, null);
 
             CurrentServer = server;
             Log(string.Format(TranslationManager.Get("Eng_ConnectingTo"), server.Name, useTun ? "[TUN Mode]" : ""));
@@ -272,16 +255,30 @@ public sealed class XrayEngine : IDisposable
 
             if (!useTun && setSystemProxy && IsWindows && settings?.LeaveSystemProxyAsIs != true)
             {
-                SystemProxy.Set($"127.0.0.1:{HttpPort}");
+                SystemProxy.GetCurrent(out bool prevEnable, out string prevServer, out string prevOverride);
+                string proxyValue = $"127.0.0.1:{HttpPort}";
+                SystemProxy.Set(proxyValue);
                 _proxyActive = true;
+                UpdateState(process, st =>
+                {
+                    st.ProxySet = proxyValue;
+                    st.ProxyPrevEnable = prevEnable;
+                    st.ProxyPrevServer = prevServer;
+                    st.ProxyPrevOverride = prevOverride;
+                });
             }
+
+            var routeSnapshot = TunManager.SnapshotRoutes();
+            if (routeSnapshot.Count > 0)
+                UpdateState(process, st => st.Routes = routeSnapshot);
+
             Log(string.Format(TranslationManager.Get("Eng_ConnectedPorts"), HttpPort, SocksPort, useTun ? "[TUN]" : ""));
             Log($"[perf] start total {perf.ElapsedMilliseconds}ms tun={useTun}");
             TunManager.Log($"[perf] start total {perf.ElapsedMilliseconds}ms tun={useTun}");
         }
         catch
         {
-            // keep config on failure for diagnosis
+            Stop();
             throw;
         }
     }
@@ -332,28 +329,7 @@ public sealed class XrayEngine : IDisposable
 
         try
         {
-            var psi = new ProcessStartInfo(EnginePath)
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-            psi.ArgumentList.Add("run");
-            psi.ArgumentList.Add("-c");
-            psi.ArgumentList.Add(configPath);
-
-            Process process;
-            lock (_lock)
-            {
-                _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
-                process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-                process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-                process.Exited += (_, _) => OnExited();
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-            }
+            LaunchEngine(configPath);
 
             HttpPort = httpPort;
 
@@ -393,17 +369,28 @@ public sealed class XrayEngine : IDisposable
     {
         TunManager.RemoveCaptureRoutes();
         Process? process;
+        JobObject? job;
         lock (_lock)
         {
             process = _process;
             _process = null;
+            job = _job;
+            _job = null;
         }
         if (process != null)
         {
+            int pid = process.Id;
             try { if (!process.HasExited) process.Kill(entireProcessTree: true); }
             catch { /* already exited */ }
-            process.Dispose();
+            try { process.Dispose(); } catch { }
+            try
+            {
+                var st = TunState.Load();
+                if (st != null && st.EnginePid == pid) TunState.Delete();
+            }
+            catch { }
         }
+        job?.Dispose();
         if (_proxyActive)
         {
             _proxyActive = false;
@@ -443,28 +430,7 @@ public sealed class XrayEngine : IDisposable
 
         try
         {
-            var psi = new ProcessStartInfo(EnginePath)
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-            psi.ArgumentList.Add("run");
-            psi.ArgumentList.Add("-c");
-            psi.ArgumentList.Add(configPath);
-
-            Process process;
-            lock (_lock)
-            {
-                _process = process = new Process { StartInfo = psi, EnableRaisingEvents = true };
-                process.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-                process.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
-                process.Exited += (_, _) => OnExited();
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-            }
+            LaunchEngine(configPath);
 
             // Wait for ports to be ready
             bool allReady = false;
@@ -492,10 +458,13 @@ public sealed class XrayEngine : IDisposable
         }
     }
 
-    private void OnExited()
+    private void OnExited(Process process)
     {
+        bool expected;
         lock (_lock)
         {
+            expected = !ReferenceEquals(_process, process);
+            if (!expected) _process = null;
             if (_proxyActive)
             {
                 _proxyActive = false;
@@ -505,8 +474,110 @@ public sealed class XrayEngine : IDisposable
             HttpPort = 0;
             SocksPort = 0;
         }
+        if (!expected)
+        {
+            TunManager.RemoveCaptureRoutes();
+            try
+            {
+                var st = TunState.Load();
+                if (st != null && st.EnginePid == process.Id) TunState.Delete();
+            }
+            catch { }
+            try { process.Dispose(); } catch { }
+        }
+        LastExitExpected = expected;
         Log(TranslationManager.Get("Eng_Stopped"));
         Stopped?.Invoke();
+    }
+
+    private Process LaunchEngine(string configPath)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            JobObject? job = JobObject.Create();
+            Process process;
+            try
+            {
+                process = ProcessStarter.StartSuspendedInJob(
+                    EnginePath, new[] { "run", "-c", configPath }, job, Log);
+            }
+            catch
+            {
+                job?.Dispose();
+                throw;
+            }
+            lock (_lock)
+            {
+                _job = job;
+                _process = process;
+            }
+            process.Exited += (_, _) => OnExited(process);
+            process.EnableRaisingEvents = true;
+            return process;
+        }
+
+        var psi = new ProcessStartInfo(EnginePath)
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+        psi.ArgumentList.Add("run");
+        psi.ArgumentList.Add("-c");
+        psi.ArgumentList.Add(configPath);
+        Process proc;
+        lock (_lock)
+        {
+            _process = proc = new Process { StartInfo = psi, EnableRaisingEvents = true };
+            proc.OutputDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+            proc.ErrorDataReceived += (_, e) => { if (!string.IsNullOrWhiteSpace(e.Data)) Log(e.Data); };
+            proc.Exited += (_, _) => OnExited(proc);
+            proc.Start();
+            proc.BeginOutputReadLine();
+            proc.BeginErrorReadLine();
+        }
+        return proc;
+    }
+
+    private void UpdateState(Process process, Action<TunState>? mutate)
+    {
+        try
+        {
+            var st = TunState.Load();
+            if (st == null || st.EnginePid != process.Id)
+            {
+                var fresh = CreateState(process);
+                if (st != null)
+                {
+                    if (st.Routes.Count > 0) fresh.Routes = st.Routes;
+                    if (st.ProxySet != null)
+                    {
+                        fresh.ProxySet = st.ProxySet;
+                        fresh.ProxyPrevEnable = st.ProxyPrevEnable;
+                        fresh.ProxyPrevServer = st.ProxyPrevServer;
+                        fresh.ProxyPrevOverride = st.ProxyPrevOverride;
+                    }
+                }
+                st = fresh;
+            }
+            mutate?.Invoke(st);
+            TunState.Save(st);
+        }
+        catch { }
+    }
+
+    private static TunState CreateState(Process process)
+    {
+        long ticks = 0;
+        try { ticks = process.StartTime.ToFileTimeUtc(); } catch { }
+        return new TunState
+        {
+            EnginePid = process.Id,
+            EngineStartTicks = ticks,
+            EngineExePath = EnginePath,
+            AdapterName = TunManager.AdapterName
+        };
     }
 
     public void Dispose()

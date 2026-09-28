@@ -229,7 +229,7 @@ public partial class MainWindow : Window
                     Margin = new Avalonia.Thickness(20),
                     Children =
                     {
-                        new TextBlock { Text = tr["Dlg_TUNAdminMsg"], TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                        new TextBlock { Text = tr[Core.TunRecovery.LeftoverNeedsAdmin ? "Dlg_LeftoverAdminMsg" : "Dlg_TUNAdminMsg"], TextWrapping = Avalonia.Media.TextWrapping.Wrap },
                         new StackPanel
                         {
                             Orientation = Avalonia.Layout.Orientation.Horizontal,
@@ -244,7 +244,7 @@ public partial class MainWindow : Window
             btnRestart.Click += (_, _) => { Core.AdminHelper.RestartAsAdmin(); win.Close(); };
             win.ShowDialog(this);
         };
-        if (vm.TunDisabledNeedsAdmin)
+        if (vm.TunDisabledNeedsAdmin || Core.TunRecovery.LeftoverNeedsAdmin)
             Dispatcher.UIThread.Post(() => vm.ShowAdminWarningHandler?.Invoke(), DispatcherPriority.Loaded);
         vm.ConfirmDeleteHandler = async message =>
         {

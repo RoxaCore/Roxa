@@ -123,6 +123,7 @@
   <data name="Dlg_RestartAdmin" xml:space="preserve"><value>اجرای مجدد به عنوان ادمین</value></data>
   <data name="Dlg_NeedsAdmin" xml:space="preserve"><value>نیاز به دسترسی Administrator</value></data>
   <data name="Dlg_TUNAdminMsg" xml:space="preserve"><value>حالت TUN نیاز به دسترسی Administrator دارد.&#10;برای فعال کردن، برنامه باید مجدداً با دسترسی ادمین اجرا شود.</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>اتصال باقی‌مانده از اجرای قبلی پیدا شد.&#10;برای پاکسازی کامل، برنامه باید مجدداً با دسترسی ادمین اجرا شود.</value></data>
   <data name="Dlg_Yes" xml:space="preserve"><value>بله</value></data>
   <data name="Dlg_No" xml:space="preserve"><value>خیر</value></data>
   <data name="Dlg_ConfirmDelete" xml:space="preserve"><value>تأیید حذف</value></data>
@@ -237,6 +238,7 @@
 تأخیر: {1}</value></data>
   <data name="Notify_ConnectFailed" xml:space="preserve"><value>اتصال ناموفق</value></data>
   <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>اتصال هوشمند: تست تأخیر واقعی ناموفق</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>موتور اتصال به‌طور غیرمنتظره متوقف شد</value></data>
   <data name="Dlg_ConfirmDeleteFromGroup" xml:space="preserve"><value>آیا از حذف {0} سرور از گروه «{1}» مطمئن هستید؟</value></data>
   <data name="Dlg_ConfirmDeleteN" xml:space="preserve"><value>آیا از حذف {0} سرور مطمئن هستید؟</value></data>
   <data name="Dlg_ConfirmDeleteSelected" xml:space="preserve"><value>آیا از حذف {0} سرور منتخب مطمئن هستید؟</value></data>

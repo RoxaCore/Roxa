@@ -187,7 +187,21 @@ public partial class MainViewModel : ViewModelBase
         RefreshGroups();
 
         _engine.Output += line => Post(() => AppendLog(line));
-        _engine.Stopped += () => Post(() => IsConnected = false);
+        _engine.Stopped += () =>
+        {
+            bool expected = _engine.LastExitExpected;
+            Post(() =>
+            {
+                bool wasConnected = IsConnected;
+                IsConnected = false;
+                if (!expected && wasConnected)
+                {
+                    string msg = TranslationManager.Instance["Notify_EngineDied"];
+                    AppendLog(msg);
+                    Core.NotificationHelper.ShowError(msg);
+                }
+            });
+        };
         AppendLog(string.Format(TranslationManager.Instance["Log_ServersLoaded"], Servers.Count, Subscriptions.Count));
 
         _speedTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };

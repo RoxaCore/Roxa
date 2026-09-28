@@ -30,7 +30,9 @@ public partial class App : Application
         var settings = Storage.LoadSettings();
         var lang = settings.Language ?? "fa";
         TranslationManager.Instance.SetCulture(lang);
-        FailSafeCleanup();
+        TunRecovery.RecoverOnStartup();
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => TunRecovery.EmergencyCleanup();
+        AppDomain.CurrentDomain.UnhandledException += (_, _) => TunRecovery.EmergencyCleanup();
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -56,11 +58,7 @@ public partial class App : Application
             desktop.ShutdownRequested += (_, _) =>
             {
                 DisposeTray();
-                try
-                {
-                    TunManager.RemoveCaptureRoutes();
-                }
-                catch { }
+                TunRecovery.EmergencyCleanup();
             };
         }
 
@@ -216,14 +214,5 @@ public partial class App : Application
         _traySyncTimer = null;
         _trayIcon?.Dispose();
         _trayIcon = null;
-    }
-
-    private static void FailSafeCleanup()
-    {
-        try
-        {
-            TunManager.RemoveCaptureRoutes();
-        }
-        catch { }
     }
 }

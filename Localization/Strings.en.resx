@@ -115,6 +115,7 @@
   <data name="Dlg_RestartAdmin" xml:space="preserve"><value>Restart as Admin</value></data>
   <data name="Dlg_NeedsAdmin" xml:space="preserve"><value>Administrator Access Required</value></data>
   <data name="Dlg_TUNAdminMsg" xml:space="preserve"><value>TUN mode requires Administrator access.&#10;To enable it, the app must be restarted with admin privileges.</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>Leftover connection from a previous run was found.&#10;To clean it up completely, the app must be restarted with admin privileges.</value></data>
   <data name="Dlg_Yes" xml:space="preserve"><value>Yes</value></data>
   <data name="Dlg_No" xml:space="preserve"><value>No</value></data>
   <data name="Dlg_ConfirmDelete" xml:space="preserve"><value>Confirm Delete</value></data>
@@ -229,6 +230,7 @@ Latency: {1}</value></data>
 Latency: {1}</value></data>
   <data name="Notify_ConnectFailed" xml:space="preserve"><value>Connection failed</value></data>
   <data name="Notify_SmartRealDelayFailed" xml:space="preserve"><value>Smart connect: real delay test failed</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>The connection engine stopped unexpectedly</value></data>
   <data name="Dlg_ConfirmDeleteFromGroup" xml:space="preserve"><value>Are you sure you want to delete {0} servers from group "{1}"?</value></data>
   <data name="Dlg_ConfirmDeleteN" xml:space="preserve"><value>Are you sure you want to delete {0} servers?</value></data>
   <data name="Dlg_ConfirmDeleteSelected" xml:space="preserve"><value>Are you sure you want to delete {0} selected servers?</value></data>

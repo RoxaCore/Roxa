@@ -18,8 +18,7 @@ foreach (($store['items'] ?? []) as $it) {
     if (!country_ok((string)($it['countries'] ?? ''), $cc)) {
         continue;
     }
-    $ilang = strtolower((string)($it['lang'] ?? '*'));
-    if ($ilang !== '*' && $ilang !== $lang) {
+    if (!lang_matches(item_langs($it), $lang)) {
         continue;
     }
     $items[] = [

@@ -14,6 +14,7 @@ $ver = jread($storeFile, [
     'file' => null,
     'size' => 0,
     'countries' => '',
+    'langs' => '*',
 ]);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -24,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $active = isset($_POST['active']);
     $mode = ($_POST['mode'] ?? 'upload') === 'url' ? 'url' : 'upload';
     $countries = country_field();
+    $langs = langs_field();
 
     if ($latest === '') {
         flash('شمارهٔ نسخه اجباری است.', 'err');
@@ -92,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'file' => $file,
         'size' => $size,
         'countries' => $countries,
+        'langs' => $langs,
     ]);
     flash($active ? 'نسخه ' . $latest . ' منتشر شد.' : 'نسخه ' . $latest . ' ذخیره شد (غیرفعال — برای انتشار تیک فعال را بزنید).');
     header('Location: version.php');
@@ -122,6 +125,8 @@ if (!empty($ver['latest'])) {
         echo 'SHA-256: <span class="mono">' . h($ver['sha256']) . '</span><br>';
     }
     $ics = (string)($ver['countries'] ?? '');
+    $ivl = langs_parse((string)($ver['langs'] ?? ''));
+    echo 'زبان‌های هدف: <code>' . ($ivl ? h(implode(',', $ivl)) : 'همه') . '</code><br>';
     echo 'کشورهای هدف: <code>' . ($ics !== '' ? h($ics) : 'همه') . '</code>';
     echo '</div></div>';
 }
@@ -138,6 +143,7 @@ echo '<label>هش SHA-256 فایل (اختیاری، برای اعتبارسنج
 echo '<label>یادداشت انتشار (برای کاربر نمایش داده می‌شود)</label><textarea name="notes" placeholder="مثلاً: بهبود پایداری اتصال و رفع باگ TUN"></textarea>';
 echo '<label>کشورهای هدف (اختیاری)</label><input type="text" name="countries" placeholder="IR,TR — خالی = همه کشورها">';
 echo '<div class="hint">کدهای ISO دوحرفه‌ای که آپدیت فقط به کاربران آن‌ها نمایش داده شود؛ خالی = همه کشورها.</div>';
+echo lang_picker();
 echo '<div class="check"><input type="checkbox" name="force" id="force"><label for="force" style="margin:0">آپدیت اجباری (کاربر مجبور به نصب باشد)</label></div>';
 echo '<div class="check"><input type="checkbox" name="active" id="active" checked><label for="active" style="margin:0">فعال — بلافاصله برای کاربران قابل دریافت</label></div>';
 echo '<button class="btn" type="submit">انتشار / ذخیره نسخه</button></form></div>';

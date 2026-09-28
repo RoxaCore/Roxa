@@ -12,6 +12,7 @@ $ver = jread(DATA_DIR . '/version.json', [
     'url' => null,
     'file' => null,
     'countries' => '',
+    'langs' => '*',
 ]);
 
 $current = isset($_GET['v']) ? ver_safe((string)$_GET['v']) : '';
@@ -29,6 +30,7 @@ if (empty($url) && !empty($ver['file'])) {
 }
 
 $updateAvailable = country_ok((string)($ver['countries'] ?? ''), $cc)
+    && lang_matches(langs_parse((string)($ver['langs'] ?? '')), $lang)
     && ($current === '' ? true : version_compare((string)$ver['latest'], $current, '>'));
 
 echo json_encode([

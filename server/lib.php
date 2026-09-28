@@ -207,6 +207,80 @@ function country_ok(string $list, string $client): bool
     return in_array($client, $codes, true);
 }
 
+function langs_all(): array
+{
+    return ['fa', 'en', 'ar', 'de', 'es', 'fr', 'hi', 'ja', 'ko', 'pt-br', 'ru', 'tr', 'ur', 'zh'];
+}
+
+function langs_parse(string $s): array
+{
+    $out = [];
+    foreach (explode(',', $s) as $c) {
+        $c = strtolower(trim($c));
+        if (in_array($c, langs_all(), true)) {
+            $out[] = $c;
+        }
+    }
+    return array_values(array_unique($out));
+}
+
+function langs_field(): string
+{
+    if (isset($_POST['lang_all'])) {
+        return '*';
+    }
+    $sel = $_POST['langs'] ?? [];
+    if (!is_array($sel)) {
+        $sel = [(string)$sel];
+    }
+    $codes = [];
+    foreach ($sel as $c) {
+        $c = strtolower(trim((string)$c));
+        if (in_array($c, langs_all(), true)) {
+            $codes[] = $c;
+        }
+    }
+    $codes = array_values(array_unique($codes));
+    return $codes ? implode(',', $codes) : '*';
+}
+
+function item_langs(array $it): array
+{
+    if (!empty($it['langs'])) {
+        $s = (string)$it['langs'];
+        return $s === '*' ? [] : langs_parse($s);
+    }
+    $old = strtolower((string)($it['lang'] ?? '*'));
+    return ($old === '*' || $old === '') ? [] : [$old];
+}
+
+function lang_matches(array $allowed, string $client): bool
+{
+    if (!$allowed) {
+        return true;
+    }
+    return in_array(strtolower($client), $allowed, true);
+}
+
+function lang_picker(): string
+{
+    $list = [
+        'fa' => 'فارسی', 'en' => 'انگلیسی', 'ar' => 'عربی', 'de' => 'آلمانی',
+        'es' => 'اسپانیایی', 'fr' => 'فرانسوی', 'hi' => 'هندی', 'ja' => 'ژاپنی',
+        'ko' => 'کره‌ای', 'pt-br' => 'پرتغالی برزیل', 'ru' => 'روسی', 'tr' => 'ترکی',
+        'ur' => 'اردو', 'zh' => 'چینی',
+    ];
+    $html = '<label>زبان‌های هدف (زبان‌های برنامه)</label>';
+    $html .= '<div class="check"><input type="checkbox" name="lang_all" id="lang_all" checked onchange="if(this.checked){document.querySelectorAll(\'.langcb\').forEach(function(c){c.checked=false;})}"><label for="lang_all" style="margin:0">همه زبان‌ها</label></div>';
+    $html .= '<div style="display:flex;flex-wrap:wrap;gap:4px 16px;margin:4px 0 8px">';
+    foreach ($list as $k => $v) {
+        $id = 'lg_' . str_replace('-', '_', $k);
+        $html .= '<span style="white-space:nowrap"><input type="checkbox" class="langcb" name="langs[]" value="' . $k . '" id="' . $id . '" onchange="if(this.checked){document.getElementById(\'lang_all\').checked=false;}"><label for="' . $id . '" style="margin:0">' . $v . '</label></span>';
+    }
+    $html .= '</div>';
+    return $html;
+}
+
 function str_cut(string $s, int $len): string
 {
     if (function_exists('mb_substr')) {

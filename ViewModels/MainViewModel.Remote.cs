@@ -56,6 +56,11 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             var lang = string.IsNullOrWhiteSpace(_settings.Language) ? "fa" : _settings.Language;
+            if (string.IsNullOrWhiteSpace(_settings.ClientId))
+            {
+                _settings.ClientId = Guid.NewGuid().ToString("D");
+                SaveSettings();
+            }
             if (!IsConnected)
             {
                 var cc = await Task.Run(() => RemoteConfig.DetectCountryAsync());
@@ -67,7 +72,7 @@ public partial class MainViewModel : ViewModelBase
             }
             var country = _settings.Country ?? "";
             var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
-            var update = await Task.Run(() => RemoteConfig.CheckUpdateAsync(lang, country, proxyPort));
+            var update = await Task.Run(() => RemoteConfig.CheckUpdateAsync(lang, country, _settings.ClientId, proxyPort));
             var announcements = await Task.Run(() => RemoteConfig.FetchAnnouncementsAsync(_settings.LastSeenAnnouncementId, lang, country, proxyPort));
             Post(() => ApplyRemote(update, announcements));
         }

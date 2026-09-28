@@ -1,27 +1,4 @@
 {
-    "seq": 2,
-    "items": [
-        {
-            "id": 1,
-            "title": "TEST-ANN-1",
-            "body": "hello body",
-            "level": "info",
-            "url": "",
-            "lang": "*",
-            "countries": "",
-            "active": false,
-            "created": "2026-09-29T00:46:34+03:30"
-        },
-        {
-            "id": 2,
-            "title": "TEST-COUNTRY-ANN",
-            "body": "cc body",
-            "level": "info",
-            "url": "",
-            "lang": "*",
-            "countries": "IR,TR",
-            "active": true,
-            "created": "2026-09-29T00:46:34+03:30"
-        }
-    ]
+    "seq": 0,
+    "items": []
 }

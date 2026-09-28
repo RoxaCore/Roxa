@@ -274,6 +274,8 @@
   <data name="Log_UpdateErrorIn" xml:space="preserve"><value>خطا در بروزرسانی {0}: {1}</value></data>
   <data name="Proxy_Off" xml:space="preserve"><value>پراکسی سیستم (غیرفعال)</value></data>
   <data name="Proxy_On" xml:space="preserve"><value>پراکسی سیستم (فعال)</value></data>
+  <data name="Tun_Off" xml:space="preserve"><value>TUN (غیرفعال)</value></data>
+  <data name="Tun_On" xml:space="preserve"><value>TUN (فعال)</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} سرور از کلیپبورد اضافه شد</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>کلیپبورد خالی است</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>دسترسی به کلیپبورد ممکن نیست</value></data>

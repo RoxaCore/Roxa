@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -265,6 +265,8 @@ Latence : {1}</value></data>
   <data name="Log_UpdateErrorIn" xml:space="preserve"><value>Erreur lors de la mise à jour de {0} : {1}</value></data>
   <data name="Proxy_Off" xml:space="preserve"><value>Proxy système (désactivé)</value></data>
   <data name="Proxy_On" xml:space="preserve"><value>Proxy système (activé)</value></data>
+  <data name="Tun_Off" xml:space="preserve"><value>TUN (désactivé)</value></data>
+  <data name="Tun_On" xml:space="preserve"><value>TUN (activé)</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} serveurs ajoutés depuis le presse-papiers</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Le presse-papiers est vide</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Accès au presse-papiers indisponible</value></data>

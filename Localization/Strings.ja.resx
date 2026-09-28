@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -247,6 +247,8 @@
   <data name="Log_UpdateErrorIn" xml:space="preserve"><value>{0} の更新エラー: {1}</value></data>
   <data name="Proxy_Off" xml:space="preserve"><value>システムプロキシ (オフ)</value></data>
   <data name="Proxy_On" xml:space="preserve"><value>システムプロキシ (オン)</value></data>
+  <data name="Tun_Off" xml:space="preserve"><value>TUN (オフ)</value></data>
+  <data name="Tun_On" xml:space="preserve"><value>TUN (オン)</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>クリップボードから {0} 件のサーバーを追加しました</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>クリップボードは空です</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>クリップボードにアクセスできません</value></data>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -247,6 +247,8 @@ Latência: {1}</value></data>
   <data name="Log_UpdateErrorIn" xml:space="preserve"><value>Erro ao atualizar {0}: {1}</value></data>
   <data name="Proxy_Off" xml:space="preserve"><value>Proxy do sistema (desativado)</value></data>
   <data name="Proxy_On" xml:space="preserve"><value>Proxy do sistema (ativado)</value></data>
+  <data name="Tun_Off" xml:space="preserve"><value>TUN (desativado)</value></data>
+  <data name="Tun_On" xml:space="preserve"><value>TUN (ativado)</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servidores adicionados da área de transferência</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>A área de transferência está vazia</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Acesso à área de transferência indisponível</value></data>

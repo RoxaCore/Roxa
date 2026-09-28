@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -263,6 +263,8 @@
   <data name="Log_UpdateErrorIn" xml:space="preserve"><value>Ошибка обновления {0}: {1}</value></data>
   <data name="Proxy_Off" xml:space="preserve"><value>Системный прокси (выкл)</value></data>
   <data name="Proxy_On" xml:space="preserve"><value>Системный прокси (вкл)</value></data>
+  <data name="Tun_Off" xml:space="preserve"><value>TUN (выкл)</value></data>
+  <data name="Tun_On" xml:space="preserve"><value>TUN (вкл)</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>Добавлено серверов из буфера: {0}</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Буфер обмена пуст</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Нет доступа к буферу обмена</value></data>

@@ -121,4 +121,6 @@ public class AppSettings
     public string Language { get; set; } = "fa";
     public int LastSeenAnnouncementId { get; set; }
     public string LastUpdateAttempt { get; set; } = "";
+    public int ShownAnnouncementId { get; set; }
+    public int ShownAnnouncementCount { get; set; }
 }

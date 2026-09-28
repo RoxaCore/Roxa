@@ -71,9 +71,13 @@ public partial class MainViewModel : ViewModelBase
         Announcement? freshAnnouncement = null;
         if (announcements is { Count: > 0 })
         {
-            freshAnnouncement = announcements[0];
-            if (_toastedAnnouncements.Add(freshAnnouncement.Id))
-                NotificationHelper.Show(freshAnnouncement.Title, freshAnnouncement.Body);
+            var announcement = announcements[0];
+            if (AgeAnnouncement(announcement))
+            {
+                freshAnnouncement = announcement;
+                if (_toastedAnnouncements.Add(announcement.Id))
+                    NotificationHelper.Show(announcement.Title, announcement.Body);
+            }
         }
 
         if (_pendingUpdate is { UpdateAvailable: true })
@@ -101,6 +105,28 @@ public partial class MainViewModel : ViewModelBase
         {
             ShowAnnouncementBanner(freshAnnouncement);
         }
+    }
+
+    private bool AgeAnnouncement(Announcement announcement)
+    {
+        if (_settings.ShownAnnouncementId != announcement.Id)
+        {
+            _settings.ShownAnnouncementId = announcement.Id;
+            _settings.ShownAnnouncementCount = 1;
+            SaveSettings();
+            return true;
+        }
+        if (_settings.ShownAnnouncementCount < 2)
+        {
+            _settings.ShownAnnouncementCount++;
+            SaveSettings();
+            return true;
+        }
+        _settings.LastSeenAnnouncementId = announcement.Id;
+        _settings.ShownAnnouncementId = 0;
+        _settings.ShownAnnouncementCount = 0;
+        SaveSettings();
+        return false;
     }
 
     private void ShowUpdateBanner(UpdateInfo update)

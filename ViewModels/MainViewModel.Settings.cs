@@ -155,57 +155,23 @@ public partial class MainViewModel : ViewModelBase
         SaveSettings();
         TunExcludedEmpty = TunExcludedApps.Count == 0;
         TunExclusion.SetExcluded(_settings.TunExcludedApps);
+        TunKillSwitch.Configure(KillSwitchEnabled, _settings.TunExcludedApps, 0);
     }
 
     [ObservableProperty] private bool _killSwitchEnabled;
     [ObservableProperty] private bool _killSwitchEngaged;
     [ObservableProperty] private string _killSwitchStatus = "";
-    [ObservableProperty] private bool _killSwitchEmpty = true;
-    public ObservableCollection<KillSwitchItem> KillSwitchApps { get; } = new();
 
     partial void OnKillSwitchEnabledChanged(bool value)
     {
         _settings.KillSwitchEnabled = value;
         SaveSettings();
-        TunKillSwitch.Configure(value, _settings.KillSwitchApps, 0);
+        TunKillSwitch.Configure(value, _settings.TunExcludedApps, 0);
         if (!value)
         {
             KillSwitchEngaged = false;
             KillSwitchStatus = "";
         }
-    }
-
-    [RelayCommand]
-    private async Task AddKillSwitchApp()
-    {
-        if (PickTunExcludedAppHandler == null) return;
-        string? path = await PickTunExcludedAppHandler();
-        if (string.IsNullOrWhiteSpace(path)) return;
-        if (KillSwitchApps.Any(a => string.Equals(a.Path, path, StringComparison.OrdinalIgnoreCase))) return;
-        var existing = TunExcludedApps.FirstOrDefault(a => string.Equals(a.Path, path, StringComparison.OrdinalIgnoreCase));
-        if (existing != null)
-        {
-            TunExcludedApps.Remove(existing);
-            PersistTunExcluded();
-        }
-        KillSwitchApps.Add(new KillSwitchItem { Path = path, Name = Path.GetFileName(path) });
-        PersistKillSwitch();
-    }
-
-    [RelayCommand]
-    private void RemoveKillSwitchApp(KillSwitchItem? item)
-    {
-        if (item == null) return;
-        KillSwitchApps.Remove(item);
-        PersistKillSwitch();
-    }
-
-    private void PersistKillSwitch()
-    {
-        _settings.KillSwitchApps = KillSwitchApps.Select(i => i.Path).ToList();
-        KillSwitchEmpty = KillSwitchApps.Count == 0;
-        SaveSettings();
-        TunKillSwitch.Configure(KillSwitchEnabled, _settings.KillSwitchApps, 0);
     }
 
     private void OnKillSwitchStateChanged(bool engaged, int count)

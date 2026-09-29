@@ -181,13 +181,8 @@ public partial class MainViewModel : ViewModelBase
                     TunExcludedApps.Add(new TunExcludedItem { Path = app, Name = Path.GetFileName(app), IsEnabled = false });
         TunExcludedEmpty = TunExcludedApps.Count == 0;
         KillSwitchEnabled = _settings.KillSwitchEnabled;
-        if (_settings.KillSwitchApps != null)
-            foreach (var app in _settings.KillSwitchApps)
-                if (!string.IsNullOrWhiteSpace(app))
-                    KillSwitchApps.Add(new KillSwitchItem { Path = app, Name = Path.GetFileName(app) });
-        KillSwitchEmpty = KillSwitchApps.Count == 0;
         TunKillSwitch.StateChanged += OnKillSwitchStateChanged;
-        TunKillSwitch.Configure(_settings.KillSwitchEnabled, _settings.KillSwitchApps, 0);
+        TunKillSwitch.Configure(_settings.KillSwitchEnabled, _settings.TunExcludedApps, 0);
         foreach (var s in Storage.LoadSubscriptions())
             Subscriptions.Add(s);
         foreach (var server in Storage.LoadServers())

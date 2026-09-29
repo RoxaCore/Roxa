@@ -128,5 +128,4 @@ public class AppSettings
     public List<string> TunExcludedApps { get; set; } = new();
     public List<string> TunExcludedAppsDisabled { get; set; } = new();
     public bool KillSwitchEnabled { get; set; }
-    public List<string> KillSwitchApps { get; set; } = new();
 }

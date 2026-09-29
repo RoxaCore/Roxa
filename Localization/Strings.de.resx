@@ -266,6 +266,7 @@ Latenz: {1}</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>App hinzufügen...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Entfernen</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Noch keine Apps hinzugefügt</value></data>
+  <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>Ausschluss dieser App umschalten</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} Server aus der Zwischenablage hinzugefügt</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Zwischenablage ist leer</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Zwischenablage nicht zugänglich</value></data>

@@ -282,6 +282,7 @@
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>Добавить приложение...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Удалить</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Приложения пока не добавлены</value></data>
+  <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>Переключить исключение для этого приложения</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>Добавлено серверов из буфера: {0}</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Буфер обмена пуст</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Нет доступа к буферу обмена</value></data>

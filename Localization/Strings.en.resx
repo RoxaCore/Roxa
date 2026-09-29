@@ -285,6 +285,7 @@ Latency: {1}</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>Add app...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Remove</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>No apps added yet</value></data>
+  <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>Toggle exclusion for this app</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servers added from clipboard</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Clipboard is empty</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Clipboard access is not available</value></data>

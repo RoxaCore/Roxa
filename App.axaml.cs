@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
+using System.Linq;
 using XrayClient.Core;
 using XrayClient.Localization;
 using XrayClient.ViewModels;
@@ -31,8 +32,16 @@ public partial class App : Application
         var lang = settings.Language ?? "fa";
         TranslationManager.Instance.SetCulture(lang);
         TunRecovery.RecoverOnStartup();
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => TunRecovery.EmergencyCleanup();
-        AppDomain.CurrentDomain.UnhandledException += (_, _) => TunRecovery.EmergencyCleanup();
+        AppDomain.CurrentDomain.ProcessExit += (_, _) =>
+        {
+            try { NotificationHelper.Cleanup(); DisposeTray(); } catch { }
+            TunRecovery.EmergencyCleanup();
+        };
+        AppDomain.CurrentDomain.UnhandledException += (_, _) =>
+        {
+            try { NotificationHelper.Cleanup(); DisposeTray(); } catch { }
+            TunRecovery.EmergencyCleanup();
+        };
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -61,7 +70,6 @@ public partial class App : Application
                 TunRecovery.EmergencyCleanup();
             };
         }
-
         base.OnFrameworkInitializationCompleted();
     }
 
@@ -156,6 +164,78 @@ public partial class App : Application
             Menu = menu,
         };
         _trayIcon.Clicked += (_, _) => ShowMainWindow();
+        TrayIcon.SetIcons(this, new TrayIcons { _trayIcon });
+        LogTray("setup");
+        var trayLogTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+        int trayLogTicks = 0;
+        trayLogTimer.Tick += (_, _) =>
+        {
+            LogTray("t+" + (++trayLogTicks * 3) + "s");
+            if (trayLogTicks >= 2) trayLogTimer.Stop();
+        };
+        trayLogTimer.Start();
+    }
+
+    private void LogTray(string tag)
+    {
+        try
+        {
+            string dir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+            System.IO.Directory.CreateDirectory(dir);
+            var icons = TrayIcon.GetIcons(this);
+            string implType = "null";
+            string iconAdded = "-";
+            string handle = "-";
+            if (_trayIcon != null)
+            {
+                var implProp = typeof(TrayIcon).GetProperty("Impl", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var impl = implProp?.GetValue(_trayIcon);
+                implType = impl?.GetType().FullName ?? "NULL";
+                if (impl != null)
+                {
+                    var addedField = impl.GetType().GetField("_iconAdded", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    iconAdded = addedField?.GetValue(impl)?.ToString() ?? "-";
+                }
+            }
+            try
+            {
+                var win32Type = AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(a => a.GetType("Avalonia.Win32.Win32Platform"))
+                    .FirstOrDefault(t => t != null);
+                var instProp = win32Type?.GetProperty("Instance", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+                var inst = instProp?.GetValue(null);
+                var hProp = inst?.GetType().GetProperty("Handle", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                var h = hProp?.GetValue(inst);
+                handle = h?.ToString() ?? "null";
+            }
+            catch (Exception hex) { handle = "err:" + hex.Message; }
+            string pm = "n/a";
+            try
+            {
+                var pmType = AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(a => a.GetType("Avalonia.Platform.PlatformManager"))
+                    .FirstOrDefault(t => t != null);
+                var m = pmType?.GetMethod("CreateTrayIcon", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                if (m != null)
+                {
+                    var r = m.Invoke(null, null);
+                    pm = r?.GetType().FullName ?? "NULL";
+                }
+                else pm = "method-not-found";
+            }
+            catch (Exception pex) { pm = "err:" + (pex.InnerException?.Message ?? pex.Message); }
+            System.IO.File.AppendAllText(System.IO.Path.Combine(dir, "tray.log"),
+                $"[{DateTime.Now:HH:mm:ss.fff}] {tag} icons={(icons == null ? "null" : icons.Count.ToString())} impl={implType} iconAdded={iconAdded} win32Handle={handle} pmCreate={pm}\n");
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                string dir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+                System.IO.File.AppendAllText(System.IO.Path.Combine(dir, "tray.log"), "LOGERR " + ex.Message + "\n");
+            }
+            catch { }
+        }
     }
 
     private void StartTraySync()
@@ -186,7 +266,7 @@ public partial class App : Application
         _traySyncTimer.Start();
     }
 
-    private void ShowMainWindow()
+    internal void ShowMainWindow()
     {
         if (MainWindow == null) return;
         Dispatcher.UIThread.Post(() =>
@@ -214,5 +294,6 @@ public partial class App : Application
         _traySyncTimer = null;
         _trayIcon?.Dispose();
         _trayIcon = null;
+        try { NotificationHelper.Cleanup(); } catch { }
     }
 }

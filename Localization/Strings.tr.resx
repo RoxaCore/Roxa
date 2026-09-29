@@ -631,6 +631,7 @@ Gecikme: {1}</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>Uygulama ekle...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Kaldır</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Henüz uygulama eklenmedi</value></data>
+  <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>Bu uygulamanın hariç tutulmasını değiştir</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>Panodan {0} sunucu eklendi</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Pan boş</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Panoya erişilemiyor</value></data>

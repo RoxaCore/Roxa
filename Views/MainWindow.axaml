@@ -768,9 +768,15 @@
                 <ListBox ItemsSource="{Binding TunExcludedApps}" MaxHeight="150" Background="Transparent" BorderThickness="0" Padding="0">
                   <ListBox.ItemTemplate>
                     <DataTemplate>
-                      <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Text="{Binding}" ToolTip.Tip="{Binding}" TextTrimming="CharacterEllipsis" FontSize="12" VerticalAlignment="Center"/>
-                        <Button Grid.Column="1" Content="✕" FontSize="12" Padding="8,2" Margin="8,0,0,0" Background="Transparent" BorderThickness="0" Foreground="#DC2626" Command="{Binding #RootWindow.DataContext.RemoveTunExcludedAppCommand}" CommandParameter="{Binding}" ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TunExclude_Remove}"/>
+                      <Grid ColumnDefinitions="Auto,*,Auto">
+                        <ToggleSwitch Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0"
+                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                      Command="{Binding #RootWindow.DataContext.ToggleTunExcludedAppCommand}"
+                                      CommandParameter="{Binding}"
+                                      AutomationProperties.Name="{Binding Name}"
+                                      ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TunExclude_Toggle}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Name}" ToolTip.Tip="{Binding Path}" TextTrimming="CharacterEllipsis" FontSize="12" VerticalAlignment="Center" IsEnabled="{Binding IsEnabled}"/>
+                        <Button Grid.Column="2" Content="✕" FontSize="12" Padding="8,2" Margin="8,0,0,0" Background="Transparent" BorderThickness="0" Foreground="#DC2626" Command="{Binding #RootWindow.DataContext.RemoveTunExcludedAppCommand}" CommandParameter="{Binding}" ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TunExclude_Remove}"/>
                       </Grid>
                     </DataTemplate>
                   </ListBox.ItemTemplate>

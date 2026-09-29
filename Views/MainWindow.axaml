@@ -73,6 +73,7 @@
           <!-- Power Button (not connected) - Red outline -->
           <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
                   Command="{Binding ConnectCommand}" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}"
+                  AutomationProperties.Name="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Connect}"
                   Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#E53E3E">
             <Button.Effect>
               <DropShadowEffect Color="#E53E3E" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
@@ -87,6 +88,7 @@
           <!-- Power Button (connected) - Green outline -->
           <Button Grid.Column="0" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,12,0"
                   Command="{Binding DisconnectCommand}" IsVisible="{Binding IsConnected}"
+                  AutomationProperties.Name="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Disconnect}"
                   Background="#FFFFFF" BorderThickness="2.5" BorderBrush="#0E7C6B">
             <Button.Effect>
               <DropShadowEffect Color="#0E7C6B" BlurRadius="12" Opacity="0.3" OffsetX="0" OffsetY="0"/>
@@ -138,6 +140,7 @@
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
             <!-- Smart Connect / Find Better (unified) -->
             <Button Command="{Binding SmartConnectActionCommand}" IsEnabled="{Binding IsFindingBetter, Converter={StaticResource Not}}"
+                    AutomationProperties.Name="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_SmartConnect}"
                     Padding="16,10" CornerRadius="10" Background="#7C3AED" Foreground="White" FontSize="13" FontWeight="SemiBold" BorderThickness="0">
               <Grid ClipToBounds="True">
                 <Border Background="#5B21B6" HorizontalAlignment="Left" RenderTransformOrigin="0,0.5" IsVisible="{Binding IsSmartConnecting}">

@@ -13,6 +13,8 @@ public static class TunKillSwitch
     private const int HttpProbeEvery = 5;
     private const int MaxHttpFails = 2;
     private const int MaxBadTicks = 6;
+    private const int GoodTicksToRecover = 5;
+    private const int GoodTicksToResetBad = 3;
     private const int MaxExesPerApp = 30;
 
     private static readonly object _lock = new();
@@ -26,6 +28,7 @@ public static class TunKillSwitch
     private static int _probeTick;
     private static int _httpFails;
     private static int _badTicks;
+    private static int _goodStreak;
     private static int _scanning;
     private static int _gen;
     private static int _appliedGen;
@@ -51,6 +54,7 @@ public static class TunKillSwitch
             if (enabled && _timer == null)
             {
                 _badTicks = 0;
+                _goodStreak = 0;
                 _httpFails = 0;
                 _probeTick = 0;
                 _timer = new Timer(_ => Probe(), null, ProbeIntervalMs, ProbeIntervalMs);
@@ -64,6 +68,11 @@ public static class TunKillSwitch
             }
             timerOn = _timer != null;
         }
+        if (enabled)
+        {
+            int fw = TunManager.RunNetsh("advfirewall set allprofiles state on");
+            if (fw != 0) TunManager.Log($"kill-switch: firewall profiles enable failed ({fw})");
+        }
         TunManager.Log($"kill-switch configure enabled={enabled} paths={n} timer={timerOn} gen={gen}");
         Apply(gen);
     }
@@ -76,7 +85,10 @@ public static class TunKillSwitch
         {
             if (probePort > 0) _probePort = probePort;
             _tunnelUp = up;
-            if (up) { _httpFails = 0; _badTicks = 0; _probeTick = 0; }
+            _httpFails = 0;
+            _badTicks = 0;
+            _goodStreak = 0;
+            _probeTick = 0;
             gen = ++_gen;
             portNow = _probePort;
         }
@@ -91,7 +103,7 @@ public static class TunKillSwitch
             var names = ReadRulesFile();
             if (names.Count == 0) return;
             foreach (var name in names)
-                TunManager.RunNetsh($"advfirewall firewall delete rule name=\"{name}\"");
+                RemoveFirewallRule(name);
             DeleteRulesFile();
             TunManager.Log($"kill-switch leftovers removed ({names.Count})");
         }
@@ -189,7 +201,7 @@ public static class TunKillSwitch
                     foreach (var exe in exes)
                     {
                         string name = RuleNameFor(exe);
-                        int code = TunManager.RunNetsh($"advfirewall firewall add rule name=\"{name}\" dir=out action=block program=\"{exe}\"");
+                        int code = AddFirewallRule(name, exe);
                         if (code == 0) added++;
                         else TunManager.Log($"kill-switch add failed ({code}) {exe}");
                     }
@@ -201,7 +213,7 @@ public static class TunKillSwitch
                 {
                     var names = ReadRulesFile();
                     foreach (var name in names)
-                        TunManager.RunNetsh($"advfirewall firewall delete rule name=\"{name}\"");
+                        RemoveFirewallRule(name);
                     DeleteRulesFile();
                     _appliedEngaged = 0;
                     TunManager.Log("kill-switch released");
@@ -229,9 +241,10 @@ public static class TunKillSwitch
             bool enabled, up;
             int port;
             lock (_lock) { enabled = _enabled; up = _tunnelUp; port = _probePort; }
-            if (!enabled || !up) return;
+            if (!enabled) return;
 
             string? fail = ProbeEngineFail(port);
+            bool critical = fail is "no-routes" or "pid-dead" or "pid-exited" or "no-state-no-port";
             if (fail == null && port > 0)
             {
                 int tick = Interlocked.Increment(ref _probeTick);
@@ -247,9 +260,35 @@ public static class TunKillSwitch
                 }
             }
             if (fail == null && _httpFails >= MaxHttpFails) fail = "http-stale";
-            if (fail == null) { _badTicks = 0; return; }
+            if (fail == null)
+            {
+                _goodStreak++;
+                if (!up && _goodStreak >= GoodTicksToRecover)
+                {
+                    int g;
+                    lock (_lock)
+                    {
+                        _tunnelUp = true;
+                        _goodStreak = 0;
+                        _badTicks = 0;
+                        _httpFails = 0;
+                        _probeTick = 0;
+                        g = ++_gen;
+                    }
+                    TunManager.Log("kill-switch: tunnel healthy again, recovering");
+                    Apply(g);
+                }
+                else if (up && _goodStreak == GoodTicksToResetBad)
+                {
+                    _badTicks = 0;
+                }
+                return;
+            }
 
-            _badTicks++;
+            _goodStreak = 0;
+            if (!up) return;
+
+            _badTicks += fail == "http-stale" ? 1 : fail.StartsWith("http:") ? 2 : critical ? 2 : 1;
             TunManager.Log($"kill-switch probe ({_badTicks}/{MaxBadTicks}): {fail} port={port}");
             if (_badTicks < MaxBadTicks) return;
 
@@ -260,6 +299,7 @@ public static class TunKillSwitch
                 _tunnelUp = false;
                 _httpFails = 0;
                 _badTicks = 0;
+                _goodStreak = 0;
                 gen = ++_gen;
             }
             Apply(gen);
@@ -276,20 +316,6 @@ public static class TunKillSwitch
 
     private static string? ProbeEngineFail(int port)
     {
-        if (port > 0)
-        {
-            try
-            {
-                using var client = new TcpClient();
-                var ar = client.BeginConnect("127.0.0.1", port, null, null);
-                bool waited = ar.AsyncWaitHandle.WaitOne(400);
-                if (!waited) { ar.AsyncWaitHandle.Close(); return "tcp-timeout"; }
-                try { client.EndConnect(ar); }
-                finally { ar.AsyncWaitHandle.Close(); }
-                if (!client.Connected) return "tcp-disconnected";
-            }
-            catch (Exception ex) { return "tcp:" + ex.GetType().Name; }
-        }
         try
         {
             var state = TunState.Load();
@@ -309,6 +335,21 @@ public static class TunKillSwitch
             else if (port <= 0) return "no-state-no-port";
         }
         catch (Exception ex) { return "state:" + ex.GetType().Name; }
+
+        if (port > 0)
+        {
+            try
+            {
+                using var client = new TcpClient();
+                var ar = client.BeginConnect("127.0.0.1", port, null, null);
+                bool waited = ar.AsyncWaitHandle.WaitOne(400);
+                if (!waited) { ar.AsyncWaitHandle.Close(); return "tcp-timeout"; }
+                try { client.EndConnect(ar); }
+                finally { ar.AsyncWaitHandle.Close(); }
+                if (!client.Connected) return "tcp-disconnected";
+            }
+            catch (Exception ex) { return "tcp:" + ex.GetType().Name; }
+        }
         return null;
     }
 
@@ -331,6 +372,49 @@ public static class TunKillSwitch
         using var md5 = MD5.Create();
         byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(path.Trim().ToLowerInvariant()));
         return RulePrefix + Convert.ToHexString(hash.AsSpan(0, 8));
+    }
+
+    private static int AddFirewallRule(string name, string exe)
+    {
+        try
+        {
+            var policyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
+            var ruleType = Type.GetTypeFromProgID("HNetCfg.FwRule");
+            if (policyType == null || ruleType == null) throw new InvalidOperationException("no fw com");
+            dynamic policy = Activator.CreateInstance(policyType)!;
+            dynamic rule = Activator.CreateInstance(ruleType)!;
+            rule.Name = name;
+            rule.Description = "Roxa kill switch";
+            rule.ApplicationName = exe;
+            rule.Direction = 2;
+            rule.Action = 2;
+            rule.Enabled = true;
+            rule.Protocol = 256;
+            rule.Profiles = 0x7FFFFFFF;
+            try { policy.Rules.Remove(name); } catch { }
+            policy.Rules.Add(rule);
+            return 0;
+        }
+        catch
+        {
+            return TunManager.RunNetsh($"advfirewall firewall add rule name=\"{name}\" dir=out action=block program=\"{exe}\"");
+        }
+    }
+
+    private static int RemoveFirewallRule(string name)
+    {
+        try
+        {
+            var policyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
+            if (policyType == null) throw new InvalidOperationException("no fw com");
+            dynamic policy = Activator.CreateInstance(policyType)!;
+            try { policy.Rules.Remove(name); } catch { }
+            return 0;
+        }
+        catch
+        {
+            return TunManager.RunNetsh($"advfirewall firewall delete rule name=\"{name}\"");
+        }
     }
 
     private static HashSet<string> ReadRulesFile()

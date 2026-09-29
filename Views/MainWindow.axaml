@@ -806,6 +806,7 @@
                     </StackPanel>
                     <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_KillSwitch_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
                     <TextBlock Text="{Binding KillSwitchStatus}" FontSize="11" Foreground="#F59E0B" TextWrapping="Wrap" IsVisible="{Binding KillSwitchEngaged}"/>
+                    <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_KillSwitch_Emergency}" Command="{Binding EmergencyReleaseCommand}" IsVisible="{Binding KillSwitchEngaged}" Padding="12,6" CornerRadius="6" Background="#B91C1C" Foreground="White" FontSize="11" HorizontalAlignment="Left"/>
                   </StackPanel>
                 </Border>
               </StackPanel>

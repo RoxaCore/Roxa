@@ -304,6 +304,7 @@
   <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>اینترنت تا برقراری مجدد VPN مسدود است ({0} برنامه معاف)</value></data>
   <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>اتصال VPN برقرار شد</value></data>
   <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>اینترنت دوباره برقرار شد</value></data>
+  <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>آزادسازی اضطراری اینترنت</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} سرور از کلیپبورد اضافه شد</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>کلیپبورد خالی است</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>دسترسی به کلیپبورد ممکن نیست</value></data>

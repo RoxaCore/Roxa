@@ -27,6 +27,7 @@ public sealed class XrayEngine : IDisposable
     public ServerInfo? CurrentServer { get; private set; }
     public int HttpPort { get; private set; }
     public int SocksPort { get; private set; }
+    public bool IsTunActive { get; private set; }
 
     public static bool IsWindows => OperatingSystem.IsWindows();
 
@@ -253,6 +254,8 @@ public sealed class XrayEngine : IDisposable
                 useTun = false;
             }
 
+            IsTunActive = useTun;
+
             if (!useTun && setSystemProxy && IsWindows && settings?.LeaveSystemProxyAsIs != true)
             {
                 SystemProxy.GetCurrent(out bool prevEnable, out string prevServer, out string prevOverride);
@@ -367,6 +370,8 @@ public sealed class XrayEngine : IDisposable
 
     public void Stop()
     {
+        IsTunActive = false;
+        TunExclusion.Stop();
         TunManager.RemoveCaptureRoutes();
         Process? process;
         JobObject? job;
@@ -476,6 +481,8 @@ public sealed class XrayEngine : IDisposable
         }
         if (!expected)
         {
+            IsTunActive = false;
+            TunExclusion.Stop();
             TunManager.RemoveCaptureRoutes();
             try
             {

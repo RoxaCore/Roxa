@@ -261,6 +261,11 @@
   <data name="Set_AppUpdate" xml:space="preserve"><value>アプリのアップデート</value></data>
   <data name="Set_AutoUpdateApp" xml:space="preserve"><value>新しいバージョンを自動インストール</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>このオプションを有効にすると、アプリは新しいバージョンを自動的にダウンロードしてインストールします。更新を適用するためアプリは終了して再起動します。</value></data>
+  <data name="Set_TunExclude" xml:space="preserve"><value>TUN から除外するアプリ</value></data>
+  <data name="Set_TunExclude_Desc" xml:space="preserve"><value>これらのアプリのトラフィックは VPN サーバーを経由せず、実際の IP アドレスを使用します。TUN モード有効時のみ適用されます。</value></data>
+  <data name="Set_TunExclude_Add" xml:space="preserve"><value>アプリを追加...</value></data>
+  <data name="Set_TunExclude_Remove" xml:space="preserve"><value>削除</value></data>
+  <data name="Set_TunExclude_Empty" xml:space="preserve"><value>まだアプリが追加されていません</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>クリップボードから {0} 件のサーバーを追加しました</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>クリップボードは空です</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>クリップボードにアクセスできません</value></data>

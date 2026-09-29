@@ -113,4 +113,39 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void OpenDnsSettings() => OpenDnsSettingsHandler?.Invoke();
 
+    [ObservableProperty] private ObservableCollection<string> _tunExcludedApps = new();
+    [ObservableProperty] private bool _tunExcludedEmpty = true;
+
+    [RelayCommand]
+    private async Task AddTunExcludedApp()
+    {
+        if (PickTunExcludedAppHandler == null) return;
+        string? path = await PickTunExcludedAppHandler();
+        if (string.IsNullOrWhiteSpace(path)) return;
+        string name = Path.GetFileName(path);
+        if (TunExcludedApps.Any(a => string.Equals(Path.GetFileName(a), name, StringComparison.OrdinalIgnoreCase)))
+            return;
+        TunExcludedApps.Add(path);
+        PersistTunExcluded();
+    }
+
+    [RelayCommand]
+    private void RemoveTunExcludedApp(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return;
+        var item = TunExcludedApps.FirstOrDefault(a => string.Equals(a, path, StringComparison.OrdinalIgnoreCase))
+                ?? TunExcludedApps.FirstOrDefault(a => string.Equals(Path.GetFileName(a), Path.GetFileName(path), StringComparison.OrdinalIgnoreCase));
+        if (item == null) return;
+        TunExcludedApps.Remove(item);
+        PersistTunExcluded();
+    }
+
+    private void PersistTunExcluded()
+    {
+        _settings.TunExcludedApps = TunExcludedApps.ToList();
+        SaveSettings();
+        TunExcludedEmpty = TunExcludedApps.Count == 0;
+        TunExclusion.SetExcluded(_settings.TunExcludedApps);
+    }
+
 }

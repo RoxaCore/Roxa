@@ -288,6 +288,11 @@
   <data name="Set_AppUpdate" xml:space="preserve"><value>به‌روزرسانی برنامه</value></data>
   <data name="Set_AutoUpdateApp" xml:space="preserve"><value>نصب خودکار نسخه جدید</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>با فعال بودن این گزینه، برنامه هنگام اجرا نسخه جدید را دانلود و خودکار نصب می‌کند؛ برای اعمال، برنامه بسته و دوباره باز می‌شود.</value></data>
+  <data name="Set_TunExclude" xml:space="preserve"><value>برنامه‌های معاف از TUN</value></data>
+  <data name="Set_TunExclude_Desc" xml:space="preserve"><value>ترافیک این برنامه‌ها از سرور VPN عبور نمی‌کند و با IP واقعی اینترنت می‌روند. این گزینه فقط زمانی که حالت TUN فعال است اثر دارد.</value></data>
+  <data name="Set_TunExclude_Add" xml:space="preserve"><value>افزودن برنامه...</value></data>
+  <data name="Set_TunExclude_Remove" xml:space="preserve"><value>حذف</value></data>
+  <data name="Set_TunExclude_Empty" xml:space="preserve"><value>هنوز برنامه‌ای اضافه نشده است</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} سرور از کلیپبورد اضافه شد</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>کلیپبورد خالی است</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>دسترسی به کلیپبورد ممکن نیست</value></data>

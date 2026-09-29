@@ -279,6 +279,11 @@ Latence : {1}</value></data>
   <data name="Set_AppUpdate" xml:space="preserve"><value>Mise à jour de l'application</value></data>
   <data name="Set_AutoUpdateApp" xml:space="preserve"><value>Installer automatiquement les nouvelles versions</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>Lorsque cette option est activée, l'application télécharge et installe automatiquement les nouvelles versions ; elle se fermera et se rouvrira pour appliquer la mise à jour.</value></data>
+  <data name="Set_TunExclude" xml:space="preserve"><value>Applications exclues de TUN</value></data>
+  <data name="Set_TunExclude_Desc" xml:space="preserve"><value>Le trafic de ces applications contourne le serveur VPN et utilise votre IP réelle. S'applique uniquement lorsque le mode TUN est actif.</value></data>
+  <data name="Set_TunExclude_Add" xml:space="preserve"><value>Ajouter une application...</value></data>
+  <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Aucune application ajoutée pour l'instant</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} serveurs ajoutés depuis le presse-papiers</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Le presse-papiers est vide</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Accès au presse-papiers indisponible</value></data>

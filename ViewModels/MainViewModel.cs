@@ -30,6 +30,7 @@ public partial class MainViewModel : ViewModelBase
      public Action<ServerInfo>? FocusServerHandler { get; set; }
      public Action? SelectionRefreshHandler { get; set; }
      public Action? ShowUpdateRequiredHandler { get; set; }
+     public Func<Task<string?>>? PickTunExcludedAppHandler { get; set; }
 
     [ObservableProperty] private ObservableCollection<ServerInfo> _servers = new();
     [ObservableProperty] private ObservableCollection<SubscriptionInfo> _subscriptions = new();
@@ -170,6 +171,10 @@ public partial class MainViewModel : ViewModelBase
         _selectedLanguage = savedLang.name ?? "فارسی";
         Localization.TranslationManager.Instance.SetCulture(_settings.Language ?? "fa");
         }
+        if (_settings.TunExcludedApps != null)
+            foreach (var app in _settings.TunExcludedApps)
+                if (!string.IsNullOrWhiteSpace(app)) TunExcludedApps.Add(app);
+        TunExcludedEmpty = TunExcludedApps.Count == 0;
         foreach (var s in Storage.LoadSubscriptions())
             Subscriptions.Add(s);
         foreach (var server in Storage.LoadServers())

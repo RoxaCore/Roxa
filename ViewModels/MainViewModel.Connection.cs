@@ -41,6 +41,8 @@ public partial class MainViewModel : ViewModelBase
             Status = TranslationManager.Instance["Status_Connecting"];
             await _engine.StartAsync(server, SetSystemProxy, _settings, tunExclusionHosts: Servers.Select(s => s.Address));
             IsConnected = true;
+            if (_engine.IsTunActive)
+                TunExclusion.Start(_settings.TunExcludedApps);
             LiveDownSpeed = "0 B/s";
             LiveUpSpeed = "0 B/s";
             SpeedBlinkOpacity = 1.0;

@@ -280,6 +280,11 @@ Latency: {1}</value></data>
   <data name="Set_AppUpdate" xml:space="preserve"><value>App Update</value></data>
   <data name="Set_AutoUpdateApp" xml:space="preserve"><value>Install new versions automatically</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>When enabled, the app downloads and installs new versions automatically; it closes and reopens to apply the update.</value></data>
+  <data name="Set_TunExclude" xml:space="preserve"><value>Apps excluded from TUN</value></data>
+  <data name="Set_TunExclude_Desc" xml:space="preserve"><value>Traffic from these apps bypasses the VPN server and uses your real IP. Only applies while TUN mode is active.</value></data>
+  <data name="Set_TunExclude_Add" xml:space="preserve"><value>Add app...</value></data>
+  <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Set_TunExclude_Empty" xml:space="preserve"><value>No apps added yet</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servers added from clipboard</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Clipboard is empty</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Clipboard access is not available</value></data>

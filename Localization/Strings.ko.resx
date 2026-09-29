@@ -261,6 +261,11 @@
   <data name="Set_AppUpdate" xml:space="preserve"><value>앱 업데이트</value></data>
   <data name="Set_AutoUpdateApp" xml:space="preserve"><value>새 버전 자동 설치</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>이 옵션을 켜면 앱이 새 버전을 자동으로 다운로드하여 설치합니다. 업데이트를 적용하려면 앱이 종료 후 다시 시작됩니다.</value></data>
+  <data name="Set_TunExclude" xml:space="preserve"><value>TUN 제외 앱</value></data>
+  <data name="Set_TunExclude_Desc" xml:space="preserve"><value>이 앱의 트래픽은 VPN 서버를 거치지 않고 실제 IP를 사용합니다. TUN 모드가 활성일 때만 적용됩니다.</value></data>
+  <data name="Set_TunExclude_Add" xml:space="preserve"><value>앱 추가</value></data>
+  <data name="Set_TunExclude_Remove" xml:space="preserve"><value>삭제</value></data>
+  <data name="Set_TunExclude_Empty" xml:space="preserve"><value>아직 추가된 앱이 없습니다</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>클립보드에서 서버 {0}개 추가됨</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>클립보드가 비어 있습니다</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>클립보드에 접근할 수 없습니다</value></data>

@@ -125,4 +125,5 @@ public class AppSettings
     public int ShownAnnouncementCount { get; set; }
     public string Country { get; set; } = "";
     public string ClientId { get; set; } = "";
+    public List<string> TunExcludedApps { get; set; } = new();
 }

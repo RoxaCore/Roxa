@@ -216,7 +216,7 @@ public static class TunManager
         }
     }
 
-    private static string? GetDefaultGatewayVia()
+    public static string? GetDefaultGatewayVia()
     {
         try
         {
@@ -320,9 +320,9 @@ public static class TunManager
         lock (_routesLock) _routes.Add(new TunRouteRecord { Dest = dest, Mask = mask, Via = via });
     }
 
-    private static int RunRoute(string args) => RunTool("route.exe", args, out _);
+    public static int RunRoute(string args) => RunTool("route.exe", args, out _);
 
-    private static int RunNetsh(string args) => RunTool("netsh.exe", args, out _);
+    public static int RunNetsh(string args) => RunTool("netsh.exe", args, out _);
 
     private static int RunTool(string fileName, string arguments, out string stdout)
     {

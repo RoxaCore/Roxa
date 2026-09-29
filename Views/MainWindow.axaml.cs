@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using XrayClient.Core;
@@ -210,6 +211,19 @@ public partial class MainWindow : Window
             Environment.Exit(0);
         };
         vm.OpenDnsSettingsHandler = () => OpenDnsDialog();
+        vm.PickTunExcludedAppHandler = async () =>
+        {
+            var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                AllowMultiple = false,
+                FileTypeFilter = new[]
+                {
+                    new FilePickerFileType("*.exe") { Patterns = new[] { "*.exe" } },
+                    FilePickerFileTypes.All
+                }
+            });
+            return files != null && files.Count > 0 ? files[0].TryGetLocalPath() : null;
+        };
         vm.ShowAdminWarningHandler = () =>
         {
             var tr = Localization.TranslationManager.Instance;

@@ -261,6 +261,11 @@ Latenz: {1}</value></data>
   <data name="Set_AppUpdate" xml:space="preserve"><value>App-Update</value></data>
   <data name="Set_AutoUpdateApp" xml:space="preserve"><value>Neue Versionen automatisch installieren</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>Wenn diese Option aktiviert ist, lädt die App neue Versionen automatisch herunter und installiert sie; die App wird geschlossen und neu gestartet, um die Aktualisierung zu übernehmen.</value></data>
+  <data name="Set_TunExclude" xml:space="preserve"><value>Von TUN ausgeschlossene Apps</value></data>
+  <data name="Set_TunExclude_Desc" xml:space="preserve"><value>Der Datenverkehr dieser Apps umgeht den VPN-Server und nutzt deine echte IP. Gilt nur, wenn der TUN-Modus aktiv ist.</value></data>
+  <data name="Set_TunExclude_Add" xml:space="preserve"><value>App hinzufügen...</value></data>
+  <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Entfernen</value></data>
+  <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Noch keine Apps hinzugefügt</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} Server aus der Zwischenablage hinzugefügt</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Zwischenablage ist leer</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Zwischenablage nicht zugänglich</value></data>

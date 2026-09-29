@@ -277,6 +277,11 @@
   <data name="Set_AppUpdate" xml:space="preserve"><value>应用更新</value></data>
   <data name="Set_AutoUpdateApp" xml:space="preserve"><value>自动安装新版本</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>启用此选项后，应用会自动下载并安装新版本；将关闭并重新打开应用以应用更新。</value></data>
+  <data name="Set_TunExclude" xml:space="preserve"><value>从 TUN 中豁免的应用</value></data>
+  <data name="Set_TunExclude_Desc" xml:space="preserve"><value>这些应用的流量不经过 VPN 服务器，使用你的真实 IP。仅在 TUN 模式激活时生效。</value></data>
+  <data name="Set_TunExclude_Add" xml:space="preserve"><value>添加应用...</value></data>
+  <data name="Set_TunExclude_Remove" xml:space="preserve"><value>删除</value></data>
+  <data name="Set_TunExclude_Empty" xml:space="preserve"><value>尚未添加任何应用</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>从剪贴板添加了 {0} 个服务器</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>剪贴板为空</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>无法访问剪贴板</value></data>

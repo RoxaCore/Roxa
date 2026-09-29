@@ -41,6 +41,7 @@ public partial class MainViewModel : ViewModelBase
             Status = TranslationManager.Instance["Status_Connecting"];
             await _engine.StartAsync(server, SetSystemProxy, _settings, tunExclusionHosts: Servers.Select(s => s.Address));
             IsConnected = true;
+            TunKillSwitch.SetTunnelUp(true, _engine.HttpPort);
             if (_engine.IsTunActive)
                 TunExclusion.Start(_settings.TunExcludedApps);
             LiveDownSpeed = "0 B/s";
@@ -107,6 +108,7 @@ public partial class MainViewModel : ViewModelBase
     private void Disconnect()
     {
         _engine.StopAndCleanupTun();
+        TunKillSwitch.SetTunnelUp(false, 0);
         IsConnected = false;
         RefreshConnectionFlags();
         AppendLog(TranslationManager.Instance["Log_Disconnected"]);

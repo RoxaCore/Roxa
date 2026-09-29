@@ -113,7 +113,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void OpenDnsSettings() => OpenDnsSettingsHandler?.Invoke();
 
-    [ObservableProperty] private ObservableCollection<string> _tunExcludedApps = new();
+    [ObservableProperty] private ObservableCollection<TunExcludedItem> _tunExcludedApps = new();
     [ObservableProperty] private bool _tunExcludedEmpty = true;
 
     [RelayCommand]
@@ -123,26 +123,35 @@ public partial class MainViewModel : ViewModelBase
         string? path = await PickTunExcludedAppHandler();
         if (string.IsNullOrWhiteSpace(path)) return;
         string name = Path.GetFileName(path);
-        if (TunExcludedApps.Any(a => string.Equals(Path.GetFileName(a), name, StringComparison.OrdinalIgnoreCase)))
+        if (TunExcludedApps.Any(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase)))
             return;
-        TunExcludedApps.Add(path);
+        TunExcludedApps.Add(new TunExcludedItem { Path = path, Name = name, IsEnabled = true });
         PersistTunExcluded();
     }
 
     [RelayCommand]
-    private void RemoveTunExcludedApp(string? path)
+    private void RemoveTunExcludedApp(TunExcludedItem? item)
     {
-        if (string.IsNullOrWhiteSpace(path)) return;
-        var item = TunExcludedApps.FirstOrDefault(a => string.Equals(a, path, StringComparison.OrdinalIgnoreCase))
-                ?? TunExcludedApps.FirstOrDefault(a => string.Equals(Path.GetFileName(a), Path.GetFileName(path), StringComparison.OrdinalIgnoreCase));
         if (item == null) return;
-        TunExcludedApps.Remove(item);
+        var match = TunExcludedApps.FirstOrDefault(a => ReferenceEquals(a, item))
+                ?? TunExcludedApps.FirstOrDefault(a => string.Equals(a.Path, item.Path, StringComparison.OrdinalIgnoreCase))
+                ?? TunExcludedApps.FirstOrDefault(a => string.Equals(a.Name, item.Name, StringComparison.OrdinalIgnoreCase));
+        if (match == null) return;
+        TunExcludedApps.Remove(match);
+        PersistTunExcluded();
+    }
+
+    [RelayCommand]
+    private void ToggleTunExcludedApp(TunExcludedItem? item)
+    {
+        if (item == null || string.IsNullOrWhiteSpace(item.Path)) return;
         PersistTunExcluded();
     }
 
     private void PersistTunExcluded()
     {
-        _settings.TunExcludedApps = TunExcludedApps.ToList();
+        _settings.TunExcludedApps = TunExcludedApps.Where(i => i.IsEnabled).Select(i => i.Path).ToList();
+        _settings.TunExcludedAppsDisabled = TunExcludedApps.Where(i => !i.IsEnabled).Select(i => i.Path).ToList();
         SaveSettings();
         TunExcludedEmpty = TunExcludedApps.Count == 0;
         TunExclusion.SetExcluded(_settings.TunExcludedApps);

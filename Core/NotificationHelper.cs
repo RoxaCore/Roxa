@@ -41,12 +41,14 @@ public static class NotificationHelper
 
     private static readonly IntPtr _hWnd = IntPtr.Zero;
     private static readonly uint _uId = 1;
+    private static readonly object _lock = new();
 
     private static bool _visible;
+    private static int _generation;
+    private const int RemoveDelayMs = 5000;
 
-    private static void EnsureVisible()
+    private static bool AddIcon()
     {
-        if (_visible) return;
         var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "roxa-icon.ico");
         var nid = new NOTIFYICONDATA
         {
@@ -57,8 +59,22 @@ public static class NotificationHelper
             hIcon = LoadIcon(iconPath),
             szTip = "Roxa"
         };
-        Shell_NotifyIcon(NIM_ADD, ref nid);
-        _visible = true;
+        bool ok = Shell_NotifyIcon(NIM_ADD, ref nid);
+        if (ok) _visible = true;
+        return ok;
+    }
+
+    private static void RemoveIcon()
+    {
+        if (!_visible) return;
+        var nid = new NOTIFYICONDATA
+        {
+            cbSize = Marshal.SizeOf<NOTIFYICONDATA>(),
+            hWnd = _hWnd,
+            uID = _uId
+        };
+        Shell_NotifyIcon(NIM_DELETE, ref nid);
+        _visible = false;
     }
 
     private static IntPtr LoadIcon(string path)
@@ -71,22 +87,56 @@ public static class NotificationHelper
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr LoadImage(IntPtr hInst, string name, uint type, int cx, int cy, uint fuLoad);
 
+    public static void Cleanup()
+    {
+        lock (_lock)
+        {
+            _generation++;
+            RemoveIcon();
+        }
+    }
+
+    private static bool EnsureIcon()
+    {
+        if (_visible) return true;
+        return AddIcon();
+    }
+
+    private static void ScheduleAutoRemove(int generation)
+    {
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(RemoveDelayMs);
+            lock (_lock)
+            {
+                if (_generation == generation)
+                    RemoveIcon();
+            }
+        });
+    }
+
     public static void Show(string title, string message)
     {
         try
         {
-            EnsureVisible();
-            var nid = new NOTIFYICONDATA
+            lock (_lock)
             {
-                cbSize = Marshal.SizeOf<NOTIFYICONDATA>(),
-                hWnd = _hWnd,
-                uID = _uId,
-                uFlags = NIF_INFO,
-                szInfoTitle = title,
-                szInfo = message,
-                dwInfoFlags = NIIF_INFO
-            };
-            Shell_NotifyIcon(NIM_MODIFY, ref nid);
+                if (!EnsureIcon()) return;
+                _generation++;
+                int generation = _generation;
+                var nid = new NOTIFYICONDATA
+                {
+                    cbSize = Marshal.SizeOf<NOTIFYICONDATA>(),
+                    hWnd = _hWnd,
+                    uID = _uId,
+                    uFlags = NIF_INFO,
+                    szInfoTitle = title,
+                    szInfo = message,
+                    dwInfoFlags = NIIF_INFO
+                };
+                Shell_NotifyIcon(NIM_MODIFY, ref nid);
+                ScheduleAutoRemove(generation);
+            }
         }
         catch { }
     }
@@ -110,18 +160,24 @@ public static class NotificationHelper
     {
         try
         {
-            EnsureVisible();
-            var nid = new NOTIFYICONDATA
+            lock (_lock)
             {
-                cbSize = Marshal.SizeOf<NOTIFYICONDATA>(),
-                hWnd = _hWnd,
-                uID = _uId,
-                uFlags = NIF_INFO,
-                szInfoTitle = "Roxa",
-                szInfo = message,
-                dwInfoFlags = NIIF_ERROR
-            };
-            Shell_NotifyIcon(NIM_MODIFY, ref nid);
+                if (!EnsureIcon()) return;
+                _generation++;
+                int generation = _generation;
+                var nid = new NOTIFYICONDATA
+                {
+                    cbSize = Marshal.SizeOf<NOTIFYICONDATA>(),
+                    hWnd = _hWnd,
+                    uID = _uId,
+                    uFlags = NIF_INFO,
+                    szInfoTitle = "Roxa",
+                    szInfo = message,
+                    dwInfoFlags = NIIF_ERROR
+                };
+                Shell_NotifyIcon(NIM_MODIFY, ref nid);
+                ScheduleAutoRemove(generation);
+            }
         }
         catch { }
     }

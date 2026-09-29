@@ -167,13 +167,18 @@ public partial class MainViewModel : ViewModelBase
         else
         {
             _useTunMode = _settings.UseTunMode;
+        }
         var savedLang = _languages.FirstOrDefault(l => l.code == _settings.Language);
         _selectedLanguage = savedLang.name ?? "فارسی";
         Localization.TranslationManager.Instance.SetCulture(_settings.Language ?? "fa");
-        }
         if (_settings.TunExcludedApps != null)
             foreach (var app in _settings.TunExcludedApps)
-                if (!string.IsNullOrWhiteSpace(app)) TunExcludedApps.Add(app);
+                if (!string.IsNullOrWhiteSpace(app))
+                    TunExcludedApps.Add(new TunExcludedItem { Path = app, Name = Path.GetFileName(app), IsEnabled = true });
+        if (_settings.TunExcludedAppsDisabled != null)
+            foreach (var app in _settings.TunExcludedAppsDisabled)
+                if (!string.IsNullOrWhiteSpace(app) && !TunExcludedApps.Any(a => string.Equals(a.Path, app, StringComparison.OrdinalIgnoreCase)))
+                    TunExcludedApps.Add(new TunExcludedItem { Path = app, Name = Path.GetFileName(app), IsEnabled = false });
         TunExcludedEmpty = TunExcludedApps.Count == 0;
         foreach (var s in Storage.LoadSubscriptions())
             Subscriptions.Add(s);
@@ -363,7 +368,8 @@ public partial class MainViewModel : ViewModelBase
             if (since.TotalHours >= AutoUpdateIntervalHours)
                 await UpdateSubscriptions();
         }
-        if (AutoConnect && !IsConnected)
+        bool restartReconnect = Program.StartupArgs.Length > 0 && Array.Exists(Program.StartupArgs, a => a == "--reconnect");
+        if ((AutoConnect || restartReconnect) && !IsConnected)
         {
             if (SelectedServer != null)
                 await Connect();

@@ -16,6 +16,7 @@ public static class AdminHelper
         var psi = new System.Diagnostics.ProcessStartInfo
         {
             FileName = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "",
+            Arguments = "--wait-exit",
             Verb = "runas",
             UseShellExecute = true
         };

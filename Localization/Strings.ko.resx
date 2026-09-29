@@ -266,6 +266,7 @@
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>앱 추가</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>삭제</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>아직 추가된 앱이 없습니다</value></data>
+  <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>이 앱의 제외 전환</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>클립보드에서 서버 {0}개 추가됨</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>클립보드가 비어 있습니다</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>클립보드에 접근할 수 없습니다</value></data>

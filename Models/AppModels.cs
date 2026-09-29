@@ -126,4 +126,5 @@ public class AppSettings
     public string Country { get; set; } = "";
     public string ClientId { get; set; } = "";
     public List<string> TunExcludedApps { get; set; } = new();
+    public List<string> TunExcludedAppsDisabled { get; set; } = new();
 }

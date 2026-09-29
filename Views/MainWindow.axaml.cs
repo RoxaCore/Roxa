@@ -204,10 +204,23 @@ public partial class MainWindow : Window
         vm.SelectionRefreshHandler = ReapplyRowSelection;
         vm.RestartRequested += () =>
         {
-            var app = Application.Current as App;
-            app?.DisposeTray();
-            var exe = Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "";
-            System.Diagnostics.Process.Start(exe);
+            try
+            {
+                var app = Application.Current as App;
+                app?.DisposeTray();
+                bool wasConnected = vm.IsConnected;
+                var exe = Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "";
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = exe,
+                    Arguments = "--wait-exit" + (wasConnected ? " --reconnect" : ""),
+                    UseShellExecute = true
+                };
+                if (Core.AdminHelper.IsRunningAsAdmin())
+                    psi.Verb = "runas";
+                System.Diagnostics.Process.Start(psi);
+            }
+            catch { }
             Environment.Exit(0);
         };
         vm.OpenDnsSettingsHandler = () => OpenDnsDialog();

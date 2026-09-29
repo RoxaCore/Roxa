@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Sockets;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace XrayClient.Core;
 
@@ -21,6 +19,20 @@ public static class TunKillSwitch
     private static readonly object _ruleLock = new();
     private static readonly List<string> _primaryPaths = new();
     private static readonly HashSet<string> _exePaths = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly List<string> _corePaths = new();
+    private static readonly ushort[] PermitPorts = { 53, 67, 68, 123, 546, 547 };
+    private static readonly uint[][] Ranges4 =
+    {
+        new uint[] { 0x7F000000, 0x7FFFFFFF },
+        new uint[] { 0x0A000000, 0x0AFFFFFF },
+        new uint[] { 0xAC100000, 0xAC1FFFFF },
+        new uint[] { 0xC0A80000, 0xC0A8FFFF },
+        new uint[] { 0xA9FE0000, 0xA9FEFFFF },
+        new uint[] { 0xE0000000, 0xEFFFFFFF },
+        new uint[] { 0xF0000000, 0xFFFFFFFF },
+    };
+    private static readonly (byte[] Low, byte[] High)[] Ranges6 = BuildRanges6();
+    private static IntPtr _engine;
     private static Timer? _timer;
     private static bool _enabled;
     private static bool _tunnelUp;
@@ -58,7 +70,7 @@ public static class TunKillSwitch
                 _httpFails = 0;
                 _probeTick = 0;
                 _timer = new Timer(_ => Probe(), null, ProbeIntervalMs, ProbeIntervalMs);
-                TunManager.Log($"kill-switch armed ({_primaryPaths.Count} app(s), {_exePaths.Count} exe(s))");
+                TunManager.Log($"kill-switch armed ({_primaryPaths.Count} exempt app(s), {_exePaths.Count} exe(s))");
             }
             else if (!enabled && _timer != null)
             {
@@ -126,12 +138,18 @@ public static class TunKillSwitch
             gen = ++_gen;
         }
         ApplyRules(gen, false, 0);
+        lock (_ruleLock) WfpNative.CloseSession(ref _engine);
     }
 
     private static void RebuildListsLocked(IEnumerable<string>? paths)
     {
         _primaryPaths.Clear();
         _exePaths.Clear();
+        _corePaths.Clear();
+        string? self = Environment.ProcessPath;
+        if (!string.IsNullOrEmpty(self)) _corePaths.Add(self);
+        string xray = XrayEngine.EnginePath;
+        if (!_corePaths.Any(x => string.Equals(x, xray, StringComparison.OrdinalIgnoreCase))) _corePaths.Add(xray);
         if (paths == null) return;
         foreach (var raw in paths)
         {
@@ -177,7 +195,7 @@ public static class TunKillSwitch
         int count;
         lock (_lock)
         {
-            want = _enabled && !_tunnelUp && _primaryPaths.Count > 0;
+            want = _enabled && !_tunnelUp;
             count = _primaryPaths.Count;
         }
         Task.Run(() => ApplyRules(gen, want, count));
@@ -191,30 +209,27 @@ public static class TunKillSwitch
             _appliedGen = gen;
             try
             {
-                if (want && _appliedEngaged == 0)
+                if (want)
                 {
-                    List<string> exes;
-                    lock (_lock) exes = _exePaths.ToList();
-                    if (exes.Count == 0) return;
-                    WriteRulesFile(exes.Select(RuleNameFor).Distinct().ToList());
-                    int added = 0;
-                    foreach (var exe in exes)
+                    if (_appliedEngaged == 1) WfpNative.CloseSession(ref _engine);
+                    bool fresh = _appliedEngaged == 0;
+                    if (EngageWfp() < 0)
                     {
-                        string name = RuleNameFor(exe);
-                        int code = AddFirewallRule(name, exe);
-                        if (code == 0) added++;
-                        else TunManager.Log($"kill-switch add failed ({code}) {exe}");
+                        _appliedEngaged = 0;
+                        TunManager.Log("kill-switch engage failed");
+                        RaiseState(false, count);
+                        return;
                     }
                     _appliedEngaged = 1;
-                    TunManager.Log($"kill-switch engaged: {added}/{exes.Count} rule(s), {count} app(s) waiting");
-                    RaiseState(true, count);
+                    if (fresh)
+                    {
+                        TunManager.Log($"kill-switch engaged: {count} app(s) exempt");
+                        RaiseState(true, count);
+                    }
                 }
-                else if (!want && _appliedEngaged == 1)
+                else if (_appliedEngaged == 1)
                 {
-                    var names = ReadRulesFile();
-                    foreach (var name in names)
-                        RemoveFirewallRule(name);
-                    DeleteRulesFile();
+                    WfpNative.CloseSession(ref _engine);
                     _appliedEngaged = 0;
                     TunManager.Log("kill-switch released");
                     RaiseState(false, count);
@@ -225,6 +240,115 @@ public static class TunKillSwitch
                 TunManager.Log($"kill-switch sync failed: {ex.Message}");
             }
         }
+    }
+
+    private static int EngageWfp()
+    {
+        uint rc = WfpNative.OpenSession(out IntPtr engine);
+        if (rc != 0)
+        {
+            TunManager.Log($"kill-switch wfp open failed rc=0x{rc:X8}");
+            return -1;
+        }
+        rc = WfpNative.AddSubLayer(engine);
+        if (rc != 0)
+        {
+            TunManager.Log($"kill-switch wfp sublayer failed rc=0x{rc:X8}");
+            WfpNative.CloseSession(ref engine);
+            return -1;
+        }
+        foreach (var layer in new[] { WfpNative.ConnectLayerV4, WfpNative.ConnectLayerV6 })
+        {
+            rc = WfpNative.AddBlock(engine, layer);
+            if (rc != 0)
+            {
+                TunManager.Log($"kill-switch wfp block failed rc=0x{rc:X8}");
+                WfpNative.CloseSession(ref engine);
+                return -1;
+            }
+        }
+        List<string> exes;
+        lock (_lock) exes = _corePaths.Concat(_exePaths).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        int permits = 0, failed = 0;
+        foreach (var layer in new[] { WfpNative.ConnectLayerV4, WfpNative.ConnectLayerV6 })
+        {
+            foreach (var exe in exes)
+            {
+                rc = WfpNative.AddPermitApp(engine, layer, exe);
+                if (rc == 0) permits++;
+                else
+                {
+                    failed++;
+                    TunManager.Log($"kill-switch wfp app permit failed rc=0x{rc:X8} {exe}");
+                }
+            }
+            foreach (var port in PermitPorts)
+            {
+                rc = WfpNative.AddPermitPort(engine, layer, port);
+                if (rc == 0) permits++;
+                else
+                {
+                    failed++;
+                    TunManager.Log($"kill-switch wfp port permit failed rc=0x{rc:X8} {port}");
+                }
+            }
+        }
+        foreach (var range in Ranges4)
+        {
+            rc = WfpNative.AddPermitRange4(engine, range[0], range[1]);
+            if (rc == 0) permits++;
+            else
+            {
+                failed++;
+                TunManager.Log($"kill-switch wfp net4 permit failed rc=0x{rc:X8}");
+            }
+        }
+        foreach (var range in Ranges6)
+        {
+            rc = WfpNative.AddPermitRange6(engine, range.Low, range.High);
+            if (rc == 0) permits++;
+            else
+            {
+                failed++;
+                TunManager.Log($"kill-switch wfp net6 permit failed rc=0x{rc:X8}");
+            }
+        }
+        _engine = engine;
+        TunManager.Log($"kill-switch wfp ready: {permits} permit(s), {failed} failed, {exes.Count} exe(s)");
+        return 1;
+    }
+
+    private static (byte[] Low, byte[] High)[] BuildRanges6()
+    {
+        var loop = new byte[16];
+        loop[15] = 1;
+        var ulaLow = new byte[16];
+        ulaLow[0] = 0xFC;
+        var ulaHigh = new byte[16];
+        ulaHigh[0] = 0xFD;
+        var llLow = new byte[16];
+        llLow[0] = 0xFE;
+        llLow[1] = 0x80;
+        var llHigh = new byte[16];
+        llHigh[0] = 0xFE;
+        llHigh[1] = 0xBF;
+        var mcLow = new byte[16];
+        mcLow[0] = 0xFF;
+        var mcHigh = new byte[16];
+        mcHigh[0] = 0xFF;
+        for (int i = 1; i < 16; i++)
+        {
+            ulaHigh[i] = 0xFF;
+            mcHigh[i] = 0xFF;
+        }
+        for (int i = 2; i < 16; i++) llHigh[i] = 0xFF;
+        return new[]
+        {
+            (loop, loop),
+            (ulaLow, ulaHigh),
+            (llLow, llHigh),
+            (mcLow, mcHigh),
+        };
     }
 
     private static void RaiseState(bool engaged, int count)
@@ -367,40 +491,6 @@ public static class TunKillSwitch
         catch (Exception ex) { return ex.GetType().Name; }
     }
 
-    private static string RuleNameFor(string path)
-    {
-        using var md5 = MD5.Create();
-        byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(path.Trim().ToLowerInvariant()));
-        return RulePrefix + Convert.ToHexString(hash.AsSpan(0, 8));
-    }
-
-    private static int AddFirewallRule(string name, string exe)
-    {
-        try
-        {
-            var policyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
-            var ruleType = Type.GetTypeFromProgID("HNetCfg.FwRule");
-            if (policyType == null || ruleType == null) throw new InvalidOperationException("no fw com");
-            dynamic policy = Activator.CreateInstance(policyType)!;
-            dynamic rule = Activator.CreateInstance(ruleType)!;
-            rule.Name = name;
-            rule.Description = "Roxa kill switch";
-            rule.ApplicationName = exe;
-            rule.Direction = 2;
-            rule.Action = 2;
-            rule.Enabled = true;
-            rule.Protocol = 256;
-            rule.Profiles = 0x7FFFFFFF;
-            try { policy.Rules.Remove(name); } catch { }
-            policy.Rules.Add(rule);
-            return 0;
-        }
-        catch
-        {
-            return TunManager.RunNetsh($"advfirewall firewall add rule name=\"{name}\" dir=out action=block program=\"{exe}\"");
-        }
-    }
-
     private static int RemoveFirewallRule(string name)
     {
         try
@@ -427,16 +517,6 @@ public static class TunKillSwitch
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
         }
         catch { return new HashSet<string>(StringComparer.OrdinalIgnoreCase); }
-    }
-
-    private static void WriteRulesFile(List<string> names)
-    {
-        try
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(RulesFile)!);
-            File.WriteAllLines(RulesFile, names);
-        }
-        catch { }
     }
 
     private static void DeleteRulesFile()

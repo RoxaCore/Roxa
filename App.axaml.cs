@@ -32,13 +32,16 @@ public partial class App : Application
         var lang = settings.Language ?? "fa";
         TranslationManager.Instance.SetCulture(lang);
         TunRecovery.RecoverOnStartup();
+        TunKillSwitch.CleanupLeftovers();
         AppDomain.CurrentDomain.ProcessExit += (_, _) =>
         {
+            try { TunKillSwitch.Shutdown(); } catch { }
             try { NotificationHelper.Cleanup(); DisposeTray(); } catch { }
             TunRecovery.EmergencyCleanup();
         };
         AppDomain.CurrentDomain.UnhandledException += (_, _) =>
         {
+            try { TunKillSwitch.Shutdown(); } catch { }
             try { NotificationHelper.Cleanup(); DisposeTray(); } catch { }
             TunRecovery.EmergencyCleanup();
         };
@@ -66,6 +69,7 @@ public partial class App : Application
 
             desktop.ShutdownRequested += (_, _) =>
             {
+                try { TunKillSwitch.Shutdown(); } catch { }
                 DisposeTray();
                 TunRecovery.EmergencyCleanup();
             };

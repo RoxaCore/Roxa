@@ -294,6 +294,16 @@
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>حذف</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>هنوز برنامه‌ای اضافه نشده است</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>روشن/خاموش کردن معافیت این برنامه</value></data>
+  <data name="Set_KillSwitch" xml:space="preserve"><value>کیل‌سوییچ انتخابی</value></data>
+  <data name="Set_KillSwitch_Desc" xml:space="preserve"><value>برنامه‌های این فهرست هرگز بدون VPN به اینترنت نمی‌روند: اگر اتصال قطع شود، تا برقراری مجدد موقتاً متوقف می‌شوند تا آدرس واقعی شما لو نرود. یک برنامه را نمی‌توان هم‌زمان معاف و محافظت‌شده کرد.</value></data>
+  <data name="Set_KillSwitch_Add" xml:space="preserve"><value>افزودن برنامه برای محافظت...</value></data>
+  <data name="Set_KillSwitch_Remove" xml:space="preserve"><value>حذف از فهرست محافظت</value></data>
+  <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>هنوز برنامه‌ای برای محافظت اضافه نشده است</value></data>
+  <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>اتصال برقرار نیست — {0} برنامه در انتظار VPN</value></data>
+  <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>اتصال VPN قطع شد</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>{0} برنامه تا برقراری مجدد VPN متوقف شد</value></data>
+  <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>اتصال VPN برقرار شد</value></data>
+  <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>برنامه‌های محافظت‌شده دوباره متصل شدند</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} سرور از کلیپبورد اضافه شد</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>کلیپبورد خالی است</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>دسترسی به کلیپبورد ممکن نیست</value></data>

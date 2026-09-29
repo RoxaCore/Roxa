@@ -174,6 +174,13 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private void EmergencyRelease()
+    {
+        TunKillSwitch.EmergencyRelease();
+        KillSwitchEnabled = false;
+    }
+
     private void OnKillSwitchStateChanged(bool engaged, int count)
     {
         Post(() =>

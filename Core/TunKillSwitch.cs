@@ -141,6 +141,23 @@ public static class TunKillSwitch
         lock (_ruleLock) WfpNative.CloseSession(ref _engine);
     }
 
+    public static void EmergencyRelease()
+    {
+        int gen;
+        lock (_lock)
+        {
+            if (_timer != null)
+            {
+                _timer.Dispose();
+                _timer = null;
+            }
+            _enabled = false;
+            gen = ++_gen;
+        }
+        TunManager.Log("kill-switch: EMERGENCY RELEASE requested");
+        ApplyRules(gen, false, 0);
+    }
+
     private static void RebuildListsLocked(IEnumerable<string>? paths)
     {
         _primaryPaths.Clear();
@@ -362,6 +379,19 @@ public static class TunKillSwitch
         if (Interlocked.Exchange(ref _scanning, 1) == 1) return;
         try
         {
+            try
+            {
+                string flag = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Roxa", "ks-emergency.flag");
+                if (File.Exists(flag))
+                {
+                    File.Delete(flag);
+                    TunManager.Log("kill-switch: emergency flag received");
+                    EmergencyRelease();
+                    return;
+                }
+            }
+            catch { }
+
             bool enabled, up;
             int port;
             lock (_lock) { enabled = _enabled; up = _tunnelUp; port = _probePort; }

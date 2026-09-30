@@ -56,7 +56,6 @@ public partial class MainViewModel : ViewModelBase
         {
             foreach (var s in targets)
                 if (s.RealDelayMs == -1) s.RecordRealDelay(-2);
-            throw;
         }
 
         foreach (var s in targets)

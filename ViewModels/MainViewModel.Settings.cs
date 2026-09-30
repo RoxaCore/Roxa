@@ -126,9 +126,16 @@ public partial class MainViewModel : ViewModelBase
         string? path = await PickTunExcludedAppHandler();
         if (string.IsNullOrWhiteSpace(path)) return;
         string name = Path.GetFileName(path);
-        if (TunExcludedApps.Any(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase)))
-            return;
-        TunExcludedApps.Add(new TunExcludedItem { Path = path, Name = name, IsEnabled = true });
+        var existing = TunExcludedApps.FirstOrDefault(a => string.Equals(a.Path, path, StringComparison.OrdinalIgnoreCase))
+                ?? TunExcludedApps.FirstOrDefault(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (existing != null)
+        {
+            existing.Path = path;
+            existing.Name = name;
+            existing.IsEnabled = true;
+        }
+        else
+            TunExcludedApps.Add(new TunExcludedItem { Path = path, Name = name, IsEnabled = true });
         PersistTunExcluded();
     }
 
@@ -157,6 +164,7 @@ public partial class MainViewModel : ViewModelBase
         _settings.TunExcludedAppsDisabled = TunExcludedApps.Where(i => !i.IsEnabled).Select(i => i.Path).ToList();
         SaveSettings();
         TunExcludedEmpty = TunExcludedApps.Count == 0;
+        TunManager.Log($"exclusion persist: enabled={_settings.TunExcludedApps.Count} disabled={_settings.TunExcludedAppsDisabled.Count} [{string.Join(", ", TunExcludedApps.Select(i => i.Name + "=" + (i.IsEnabled ? "on" : "off")))}]");
         TunExclusion.SetExcluded(_settings.TunExcludedApps);
         TunKillSwitch.Configure(KillSwitchEnabled, _settings.TunExcludedApps, 0);
         if (IsConnected && !_settings.UseTunMode && !LeaveSystemProxyAsIs && SetSystemProxy && !IsTesting)

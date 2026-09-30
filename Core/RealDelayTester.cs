@@ -179,7 +179,14 @@ public static class RealDelayTester
             using var sem = new SemaphoreSlim(BatchHttpConcurrency);
             var tasks = servers.Select(async s =>
             {
-                await sem.WaitAsync(ct);
+                try { await sem.WaitAsync(ct); }
+                catch (OperationCanceledException)
+                {
+                    var cancelled = TestResult.Cancelled();
+                    lock (results) results[s.Id] = cancelled;
+                    onResult?.Invoke(s, cancelled);
+                    return;
+                }
                 try
                 {
                     TestResult result;
@@ -224,7 +231,8 @@ public static class RealDelayTester
                 }
             });
 
-            await Task.WhenAll(tasks);
+            try { await Task.WhenAll(tasks); }
+            catch (OperationCanceledException) { }
         }
         finally
         {
@@ -262,7 +270,14 @@ public static class RealDelayTester
         var tasks = servers.Select(async s =>
         {
             if (results.ContainsKey(s.Id)) return;
-            await sem.WaitAsync(ct);
+            try { await sem.WaitAsync(ct); }
+            catch (OperationCanceledException)
+            {
+                var cancelled = TestResult.Cancelled();
+                lock (results) results[s.Id] = cancelled;
+                onResult?.Invoke(s, cancelled);
+                return;
+            }
             try
             {
                 if (ct.IsCancellationRequested)
@@ -297,7 +312,8 @@ public static class RealDelayTester
                 try { sem.Release(); } catch { }
             }
         });
-        await Task.WhenAll(tasks);
+        try { await Task.WhenAll(tasks); }
+        catch (OperationCanceledException) { }
     }
 
     private static async Task<TestResult> MeasureOnPortAsync(

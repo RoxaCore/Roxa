@@ -85,7 +85,8 @@ public static class SpeedRunner
         using var sem = new SemaphoreSlim(concurrency);
         var tasks = picked.Select(async s =>
         {
-            await sem.WaitAsync(ct);
+            try { await sem.WaitAsync(ct); }
+            catch (OperationCanceledException) { return; }
             try
             {
                 var r = await SpeedTester.TestAsync(s, ct);
@@ -110,7 +111,8 @@ public static class SpeedRunner
             }
             finally { sem.Release(); }
         });
-        await Task.WhenAll(tasks);
+        try { await Task.WhenAll(tasks); }
+        catch (OperationCanceledException) { }
         sw.Stop();
 
         report.WallMs = (int)sw.ElapsedMilliseconds;

@@ -157,6 +157,7 @@ public partial class MainViewModel : ViewModelBase
         _leaveSystemProxyAsIs = _settings.LeaveSystemProxyAsIs;
         _clearProxyOnDisconnect = _settings.ClearProxyOnDisconnect;
         _useProxyForSubscriptions = _settings.UseProxyForSubscriptions;
+        _bypassVpnWithoutTun = _settings.BypassVpnWithoutTun;
         if (_settings.UseTunMode && !Core.AdminHelper.IsRunningAsAdmin())
         {
             TunDisabledNeedsAdmin = true;

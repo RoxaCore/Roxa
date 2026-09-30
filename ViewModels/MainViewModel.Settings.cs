@@ -44,9 +44,12 @@ public partial class MainViewModel : ViewModelBase
         if (IsConnected && !(_settings.UseTunMode) && !LeaveSystemProxyAsIs)
         {
             if (value)
-                Core.SystemProxy.Set($"127.0.0.1:{_engine.HttpPort}");
+                ApplySystemProxyEndpoint();
             else
+            {
+                Core.ProxyRouter.Stop();
                 Core.SystemProxy.Clear();
+            }
         }
     }
 
@@ -156,6 +159,30 @@ public partial class MainViewModel : ViewModelBase
         TunExcludedEmpty = TunExcludedApps.Count == 0;
         TunExclusion.SetExcluded(_settings.TunExcludedApps);
         TunKillSwitch.Configure(KillSwitchEnabled, _settings.TunExcludedApps, 0);
+        if (IsConnected && !_settings.UseTunMode && !LeaveSystemProxyAsIs && SetSystemProxy && !IsTesting)
+            ApplySystemProxyEndpoint();
+    }
+
+    [ObservableProperty] private bool _bypassVpnWithoutTun;
+
+    partial void OnBypassVpnWithoutTunChanged(bool value)
+    {
+        _settings.BypassVpnWithoutTun = value;
+        SaveSettings();
+        if (IsConnected && !_settings.UseTunMode && !LeaveSystemProxyAsIs && SetSystemProxy && !IsTesting)
+            ApplySystemProxyEndpoint();
+    }
+
+    private void ApplySystemProxyEndpoint()
+    {
+        bool on = _settings.BypassVpnWithoutTun && _settings.TunExcludedApps is { Count: > 0 };
+        if (on && Core.ProxyRouter.Start(_settings.TunExcludedApps, _engine.HttpPort))
+            Core.SystemProxy.Set($"127.0.0.1:{Core.ProxyRouter.Port}");
+        else
+        {
+            Core.ProxyRouter.Stop();
+            Core.SystemProxy.Set($"127.0.0.1:{_engine.HttpPort}");
+        }
     }
 
     [ObservableProperty] private bool _killSwitchEnabled;

@@ -127,5 +127,6 @@ public class AppSettings
     public string ClientId { get; set; } = "";
     public List<string> TunExcludedApps { get; set; } = new();
     public List<string> TunExcludedAppsDisabled { get; set; } = new();
+    public bool BypassVpnWithoutTun { get; set; }
     public bool KillSwitchEnabled { get; set; }
 }

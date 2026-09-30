@@ -292,6 +292,8 @@
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>ترافیک این برنامه‌ها از سرور VPN عبور نمی‌کند و با IP واقعی اینترنت می‌روند. این گزینه فقط زمانی که حالت TUN فعال است اثر دارد.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>افزودن برنامه...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>حذف</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>عبور از VPN حتی بدون TUN</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>وقتی روشن باشد، برنامه‌های فعالِ این لیست حتی وقتی VPN با پروکسی سیستم (بدون TUN) وصل است، از اینترنت مستقیم خود سیستم استفاده می‌کنند نه از VPN.</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>هنوز برنامه‌ای اضافه نشده است</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>روشن/خاموش کردن معافیت این برنامه</value></data>
   <data name="Set_KillSwitch" xml:space="preserve"><value>کیل‌سوییچ سراسری</value></data>

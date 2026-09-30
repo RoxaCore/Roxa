@@ -284,6 +284,8 @@ Latency: {1}</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>Traffic from these apps bypasses the VPN server and uses your real IP. Only applies while TUN mode is active.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>Add app...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>Bypass VPN even without TUN</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>When on, active apps in this list use the computer's direct internet even when the VPN is connected through the system proxy (without TUN), not the VPN.</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>No apps added yet</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>Toggle exclusion for this app</value></data>
   <data name="Set_KillSwitch" xml:space="preserve"><value>Kill Switch</value></data>

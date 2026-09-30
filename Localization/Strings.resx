@@ -301,10 +301,11 @@
   <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>هنوز برنامه‌ای برای محافظت اضافه نشده است</value></data>
   <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>اتصال برقرار نیست — همه‌ی ترافیک مسدود است ({0} برنامه معاف)</value></data>
   <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>اتصال VPN قطع شد</value></data>
-  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>اینترنت تا برقراری مجدد VPN مسدود است ({0} برنامه معاف)</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>اینترنت تا برقراری مجدد VPN مسدود است ({0} برنامه معاف). اگر برنگشت، دکمهٔ آزادسازی اضطراری را بزنید.</value></data>
   <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>اتصال VPN برقرار شد</value></data>
   <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>اینترنت دوباره برقرار شد</value></data>
   <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>آزادسازی اضطراری اینترنت</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>اگر با دکمهٔ آزادسازی هم اینترنت برنگشت، مشکل از کیل‌سوییچ نیست — وای‌فای/شبکه ویندوز را بررسی یا سیستم را ری‌استارت کنید.</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} سرور از کلیپبورد اضافه شد</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>کلیپبورد خالی است</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>دسترسی به کلیپبورد ممکن نیست</value></data>

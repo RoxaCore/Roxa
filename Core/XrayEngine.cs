@@ -259,7 +259,12 @@ public sealed class XrayEngine : IDisposable
             if (!useTun && setSystemProxy && IsWindows && settings?.LeaveSystemProxyAsIs != true)
             {
                 SystemProxy.GetCurrent(out bool prevEnable, out string prevServer, out string prevOverride);
-                string proxyValue = $"127.0.0.1:{HttpPort}";
+                string proxyValue;
+                if (settings is { BypassVpnWithoutTun: true } && settings.TunExcludedApps is { Count: > 0 }
+                    && ProxyRouter.Start(settings.TunExcludedApps, HttpPort))
+                    proxyValue = $"127.0.0.1:{ProxyRouter.Port}";
+                else
+                    proxyValue = $"127.0.0.1:{HttpPort}";
                 SystemProxy.Set(proxyValue);
                 _proxyActive = true;
                 UpdateState(process, st =>
@@ -396,6 +401,7 @@ public sealed class XrayEngine : IDisposable
             catch { }
         }
         job?.Dispose();
+        try { ProxyRouter.StopForUpstream(HttpPort); } catch { }
         if (_proxyActive)
         {
             _proxyActive = false;
@@ -475,6 +481,7 @@ public sealed class XrayEngine : IDisposable
                 _proxyActive = false;
                 try { SystemProxy.Clear(); } catch { }
             }
+            try { ProxyRouter.StopForUpstream(HttpPort); } catch { }
             CurrentServer = null;
             HttpPort = 0;
             SocksPort = 0;

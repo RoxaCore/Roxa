@@ -762,6 +762,11 @@
               <StackPanel Spacing="12">
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TunExclude}" FontWeight="Bold" FontSize="13"/>
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TunExclude_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <CheckBox IsChecked="{Binding BypassVpnWithoutTun}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Bypass}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Bypass_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TunExclude_Add}" Padding="14,8" CornerRadius="8" Background="#0E7C6B" Foreground="White" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right" Command="{Binding AddTunExcludedAppCommand}"/>
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TunExclude_Empty}" FontSize="11" Foreground="#AAAAAA" IsVisible="{Binding TunExcludedEmpty}"/>
                 <ListBox ItemsSource="{Binding TunExcludedApps}" MaxHeight="150" Background="Transparent" BorderThickness="0" Padding="0">

@@ -322,6 +322,8 @@ public static class TunManager
 
     public static int RunRoute(string args) => RunTool("route.exe", args, out _);
 
+    public static int RunRoute(string args, out string stdout) => RunTool("route.exe", args, out stdout);
+
     public static int RunNetsh(string args) => RunTool("netsh.exe", args, out _);
 
     private static int RunTool(string fileName, string arguments, out string stdout)

@@ -21,20 +21,23 @@ public static class TunRecovery
             int swept = IpRoute.SweepOrphanRoutes(state);
             if (swept > 0) TunManager.Log($"Recovery removed {swept} leftover route(s).");
 
+            TunExclusion.SweepPersistedPins(GuardedDests(state));
+            bool pinsLeft = TunExclusion.HasPersistedPins();
+
             bool engineLeft = state != null && IsOurEngineAlive(state);
             bool routesLeft = IpRoute.HasLeftoverRoutes(state);
 
-            if (!engineLeft && !routesLeft)
+            if (!engineLeft && !routesLeft && !pinsLeft)
             {
                 TunState.Delete();
                 TunManager.Log("Recovery clean.");
             }
             else
             {
-                TunManager.Log($"Recovery incomplete: engineAlive={engineLeft} routesLeft={routesLeft} admin={admin}");
+                TunManager.Log($"Recovery incomplete: engineAlive={engineLeft} routesLeft={routesLeft} pinsLeft={pinsLeft} admin={admin}");
             }
 
-            LeftoverNeedsAdmin = !admin && (engineLeft || routesLeft);
+            LeftoverNeedsAdmin = !admin && (engineLeft || routesLeft || pinsLeft);
         }
         catch (Exception ex)
         {
@@ -77,9 +80,20 @@ public static class TunRecovery
                 RestoreProxyIfOurs(state);
                 IpRoute.SweepOrphanRoutes(state);
             }
+            TunExclusion.SweepPersistedPins(GuardedDests(state));
             TunState.Delete();
         }
         catch { }
+    }
+
+    private static HashSet<string> GuardedDests(TunState? state)
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (state?.Routes == null) return set;
+        foreach (var r in state.Routes)
+            if (string.Equals(r.Mask, "255.255.255.255", StringComparison.Ordinal) && r.Dest.Length > 0)
+                set.Add(r.Dest);
+        return set;
     }
 
     private static void KillOrphanEngine(TunState? state)

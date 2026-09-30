@@ -61,12 +61,16 @@ public static class TunExclusion
     private static string RulesFile =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Roxa", "tunexcl-rules.txt");
 
+    private static string PinsFile =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Roxa", "tunexcl-pins.txt");
+
     public static void Start(IEnumerable<string>? excludedPaths)
     {
         List<string> snapshot;
         int gen;
         lock (_lock)
         {
+            if (_pinned.Count == 0) SweepPersistedPins(null);
             ApplyExcludedLocked(excludedPaths);
             snapshot = _excludedPaths.ToList();
             gen = ++_rulesGen;
@@ -86,17 +90,12 @@ public static class TunExclusion
         lock (_lock)
         {
             if (!ApplyExcludedLocked(excludedPaths)) return;
-            bool active = _excluded.Count > 0 && _timer != null;
-            if (!active && _timer != null)
-            {
+            if (_excluded.Count == 0)
                 TunManager.Log("exclusion list cleared");
-                _timer.Dispose();
-                _timer = null;
-            }
-            else if (active)
-            {
+            else if (_timer != null)
                 TunManager.Log($"exclusion list updated ({_excluded.Count} app(s)); rescanning");
-            }
+            else
+                TunManager.Log($"exclusion list updated ({_excluded.Count} app(s)); scanner idle");
             snapshot = _excludedPaths.ToList();
             gen = ++_rulesGen;
         }
@@ -251,6 +250,7 @@ public static class TunExclusion
                 if (!PinRouteLocked(row.RemoteIp)) continue;
                 _pinned.Add(row.RemoteIp);
                 newPins++;
+                PersistPinsLocked();
                 TunManager.Log($"exclusion pin {IpText(row.RemoteIp)} via {_gateway}");
             }
             if (_rstPairs.Add((row.Pid, row.RemoteIp)))
@@ -271,14 +271,123 @@ public static class TunExclusion
 
     private static void ClearPinnedLocked()
     {
-        foreach (var ip in _pinned)
+        int total = _pinned.Count;
+        if (total > 0)
         {
-            try { TunManager.RunRoute($"delete {IpText(ip)} mask 255.255.255.255"); }
-            catch { }
+            var ips = _pinned.Select(IpText).ToList();
+            foreach (var ip in ips) TryDeletePin(ip);
+            var still = FilterPresent(ips);
+            if (still.Count > 0)
+            {
+                foreach (var ip in still) TryDeletePin(ip);
+                still = FilterPresent(still);
+            }
+            if (still.Count > 0)
+                TunManager.Log($"exclusion removed {total - still.Count}/{total} pinned route(s); {still.Count} still present");
+            else
+                TunManager.Log($"exclusion removed {total} pinned route(s)");
         }
-        if (_pinned.Count > 0) TunManager.Log($"exclusion removed {_pinned.Count} pinned route(s)");
         _pinned.Clear();
         _rstPairs.Clear();
+        PersistPinsLocked();
+    }
+
+    private static void TryDeletePin(string ip)
+    {
+        try { TunManager.RunRoute($"delete {ip} mask 255.255.255.255"); }
+        catch { }
+    }
+
+    private static HashSet<string> FilterPresent(IEnumerable<string> ips)
+    {
+        var want = ips.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (want.Count == 0) return want;
+        var present = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            TunManager.RunRoute("print -4", out string output);
+            foreach (var line in output.Split('\n'))
+            {
+                var parts = line.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 3 || parts[1] != "255.255.255.255") continue;
+                if (want.Contains(parts[0])) present.Add(parts[0]);
+            }
+        }
+        catch
+        {
+            return want;
+        }
+        return present;
+    }
+
+    private static void PersistPinsLocked()
+    {
+        try
+        {
+            if (_pinned.Count == 0)
+            {
+                if (File.Exists(PinsFile)) File.Delete(PinsFile);
+                return;
+            }
+            Directory.CreateDirectory(Path.GetDirectoryName(PinsFile)!);
+            string tmp = PinsFile + ".tmp";
+            File.WriteAllLines(tmp, _pinned.Select(IpText));
+            File.Move(tmp, PinsFile, true);
+        }
+        catch (Exception ex) { TunManager.Log($"exclusion pins persist failed: {ex.Message}"); }
+    }
+
+    public static bool HasPersistedPins()
+    {
+        try { return File.Exists(PinsFile) && new FileInfo(PinsFile).Length > 0; }
+        catch { return false; }
+    }
+
+    public static int SweepPersistedPins(HashSet<string>? protectedDests)
+    {
+        string[] lines;
+        try
+        {
+            if (!File.Exists(PinsFile)) return 0;
+            lines = File.ReadAllLines(PinsFile);
+        }
+        catch (Exception ex)
+        {
+            TunManager.Log($"exclusion pins sweep read failed: {ex.Message}");
+            return 0;
+        }
+
+        var pending = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var raw in lines)
+        {
+            string s = raw.Trim();
+            if (s.Length == 0) continue;
+            if (!IPAddress.TryParse(s, out var addr) || addr.AddressFamily != AddressFamily.InterNetwork) continue;
+            if (protectedDests != null && protectedDests.Contains(s)) continue;
+            pending.Add(s);
+        }
+
+        int removed = 0;
+        foreach (var ip in pending)
+        {
+            try { if (TunManager.RunRoute($"delete {ip} mask 255.255.255.255") == 0) removed++; }
+            catch { }
+        }
+
+        var still = FilterPresent(pending);
+        try
+        {
+            if (still.Count == 0)
+            {
+                if (File.Exists(PinsFile)) File.Delete(PinsFile);
+            }
+            else File.WriteAllLines(PinsFile, still);
+        }
+        catch { }
+
+        if (removed > 0 || still.Count > 0)
+            TunManager.Log($"exclusion sweep removed {removed} leftover pin(s); {still.Count} still present");
+        return removed;
     }
 
     private static void ResetTcp(TcpRow row)

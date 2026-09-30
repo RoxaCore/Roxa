@@ -190,7 +190,8 @@ public static class BaselineRunner
         var probed = new List<(ServerInfo S, int Ms)>();
         var tasks = all.Select(async s =>
         {
-            await sem.WaitAsync(ct);
+            try { await sem.WaitAsync(ct); }
+            catch (OperationCanceledException) { return; }
             try
             {
                 var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 2500);
@@ -198,7 +199,8 @@ public static class BaselineRunner
             }
             finally { sem.Release(); }
         });
-        await Task.WhenAll(tasks);
+        try { await Task.WhenAll(tasks); }
+        catch (OperationCanceledException) { }
 
         var okList = probed.Where(p => p.Ms < int.MaxValue).OrderBy(p => p.Ms).ToList();
         if (okList.Count == 0) return all.Take(take).ToList();

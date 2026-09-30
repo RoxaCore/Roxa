@@ -484,7 +484,7 @@ public static class TunKillSwitch
                     }
                     catch { return "pid-dead"; }
                 }
-                if (TunManager.SnapshotRoutes().Count == 0) return "no-routes";
+                if (state.TunActive && TunManager.SnapshotRoutes().Count == 0) return "no-routes";
             }
             else if (port <= 0) return "no-state-no-port";
         }

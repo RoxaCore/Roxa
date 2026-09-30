@@ -727,22 +727,6 @@
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_ClearProxy}" VerticalAlignment="Center"/>
                 </StackPanel>
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_ClearProxy_Desc}" FontSize="11" Foreground="#888888" Margin="24,0,0,0"/>
-              </StackPanel>
-            </Border>
-            
-            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
-              <StackPanel Spacing="12">
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_SubscriptionUpdate}" FontWeight="Bold" FontSize="13"/>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <CheckBox IsChecked="{Binding AutoUpdateSubs}" VerticalAlignment="Center"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdate}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding AutoUpdateSubs}">
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Every}" VerticalAlignment="Center"/>
-                  <TextBox Text="{Binding AutoUpdateIntervalHours}" Width="60" Padding="6,4" HorizontalContentAlignment="Center"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Hours}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <TextBlock Text="{Binding LastUpdateDisplay}" FontSize="11" Foreground="{StaticResource TextSecondary}" IsVisible="{Binding AutoUpdateSubs}"/>
                 <StackPanel Orientation="Horizontal" Spacing="8">
                   <CheckBox IsChecked="{Binding AutoConnect}" VerticalAlignment="Center"/>
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoConnect}" VerticalAlignment="Center"/>
@@ -752,13 +736,25 @@
             </Border>
 
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
-              <StackPanel Spacing="12">
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AppUpdate}" FontWeight="Bold" FontSize="13"/>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <CheckBox IsChecked="{Binding AutoUpdate}" VerticalAlignment="Center"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdateApp}" VerticalAlignment="Center"/>
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <ToggleSwitch IsChecked="{Binding UseTunMode}"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TUN}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
                 </StackPanel>
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdateApp_Desc}" FontSize="11" Foreground="#888888" Margin="24,0,0,0"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TUN_Desc}" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <ToggleSwitch IsChecked="{Binding KillSwitchEnabled}"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_KillSwitch}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_KillSwitch_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding KillSwitchStatus}" FontSize="11" Foreground="#F59E0B" TextWrapping="Wrap" IsVisible="{Binding KillSwitchEngaged}"/>
+                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_KillSwitch_Emergency}" Command="{Binding EmergencyReleaseCommand}" IsVisible="{Binding KillSwitchEngaged}" Padding="12,6" CornerRadius="6" Background="#B91C1C" Foreground="White" FontSize="11" HorizontalAlignment="Left"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_KillSwitch_Hint}" FontSize="11" Foreground="#888888" TextWrapping="Wrap" IsVisible="{Binding KillSwitchEngaged}"/>
               </StackPanel>
             </Border>
 
@@ -789,6 +785,40 @@
 
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_DNS}" FontWeight="Bold" FontSize="13"/>
+                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_DNSBtn}" Padding="16,10" CornerRadius="8" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold" Command="{Binding OpenDnsSettingsCommand}"/>
+              </StackPanel>
+            </Border>
+
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_SubscriptionUpdate}" FontWeight="Bold" FontSize="13"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <CheckBox IsChecked="{Binding AutoUpdateSubs}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdate}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding AutoUpdateSubs}">
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Every}" VerticalAlignment="Center"/>
+                  <TextBox Text="{Binding AutoUpdateIntervalHours}" Width="60" Padding="6,4" HorizontalContentAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Hours}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding LastUpdateDisplay}" FontSize="11" Foreground="{StaticResource TextSecondary}" IsVisible="{Binding AutoUpdateSubs}"/>
+              </StackPanel>
+            </Border>
+
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AppUpdate}" FontWeight="Bold" FontSize="13"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <CheckBox IsChecked="{Binding AutoUpdate}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdateApp}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdateApp_Desc}" FontSize="11" Foreground="#888888" Margin="24,0,0,0"/>
+              </StackPanel>
+            </Border>
+
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="12">
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Advanced}" FontWeight="Bold" FontSize="13"/>
                 <StackPanel Orientation="Horizontal" Spacing="8">
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_PingType}" VerticalAlignment="Center"/>
@@ -798,34 +828,6 @@
                   <CheckBox IsChecked="{Binding GlobalSort}" VerticalAlignment="Center"/>
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_GlobalSort}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                 </StackPanel>
-                <Border BorderThickness="0,1,0,0" BorderBrush="{StaticResource BorderLight}" Padding="0,10,0,0">
-                  <StackPanel Spacing="8">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                      <ToggleSwitch IsChecked="{Binding KillSwitchEnabled}"/>
-                      <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_KillSwitch}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_KillSwitch_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
-                    <TextBlock Text="{Binding KillSwitchStatus}" FontSize="11" Foreground="#F59E0B" TextWrapping="Wrap" IsVisible="{Binding KillSwitchEngaged}"/>
-                    <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_KillSwitch_Emergency}" Command="{Binding EmergencyReleaseCommand}" IsVisible="{Binding KillSwitchEngaged}" Padding="12,6" CornerRadius="6" Background="#B91C1C" Foreground="White" FontSize="11" HorizontalAlignment="Left"/>
-                  </StackPanel>
-                </Border>
-              </StackPanel>
-            </Border>
-
-            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
-              <StackPanel Spacing="12">
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_DNS}" FontWeight="Bold" FontSize="13"/>
-                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_DNSBtn}" Padding="16,10" CornerRadius="8" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold" Command="{Binding OpenDnsSettingsCommand}"/>
-              </StackPanel>
-            </Border>
-
-            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
-              <StackPanel Spacing="8">
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                  <ToggleSwitch IsChecked="{Binding UseTunMode}"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TUN}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
-                </StackPanel>
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TUN_Desc}" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
               </StackPanel>
             </Border>
 

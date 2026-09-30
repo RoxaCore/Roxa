@@ -293,10 +293,11 @@ Latency: {1}</value></data>
   <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>No protected apps yet</value></data>
   <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>Tunnel is down — all internet traffic is blocked ({0} app(s) exempt)</value></data>
   <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>VPN disconnected</value></data>
-  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>Internet is blocked until the VPN returns ({0} app(s) exempt)</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>Internet is blocked until the VPN returns ({0} app(s) exempt). If it does not come back, press the emergency release button.</value></data>
   <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>VPN connected</value></data>
   <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>Internet is back online</value></data>
   <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>Emergency internet release</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>If the emergency button does not restore internet, the kill switch is not the problem — check Wi-Fi/Windows network or restart the PC.</value></data>
   <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servers added from clipboard</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Clipboard is empty</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Clipboard access is not available</value></data>

@@ -255,6 +255,7 @@ public sealed class XrayEngine : IDisposable
             }
 
             IsTunActive = useTun;
+            UpdateState(process, st => st.TunActive = useTun);
 
             if (!useTun && setSystemProxy && IsWindows && settings?.LeaveSystemProxyAsIs != true)
             {

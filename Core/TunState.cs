@@ -19,6 +19,7 @@ public sealed class TunState
     public string EngineExePath { get; set; } = "";
     public string AdapterName { get; set; } = TunManager.AdapterName;
     public List<TunRouteRecord> Routes { get; set; } = new();
+    public bool TunActive { get; set; }
     public string? ProxySet { get; set; }
     public bool ProxyPrevEnable { get; set; }
     public string? ProxyPrevServer { get; set; }

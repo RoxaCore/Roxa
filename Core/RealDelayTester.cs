@@ -62,6 +62,7 @@ public static class RealDelayTester
 
     public static async Task<TestResult> TestAsync(ServerInfo server, CancellationToken ct = default)
     {
+        using var bypass = await TestRouteBypass.BeginAsync(new[] { server.Address });
         var extra = new Dictionary<string, string>();
         var rawLog = new List<string>();
         var engine = new XrayEngine();
@@ -128,6 +129,7 @@ public static class RealDelayTester
     {
         var results = new Dictionary<string, TestResult>();
         if (servers.Count == 0) return results;
+        using var bypass = await TestRouteBypass.BeginAsync(servers.Select(s => s.Address));
 
         if (servers.Count == 1)
         {

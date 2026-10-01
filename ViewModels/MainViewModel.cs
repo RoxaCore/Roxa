@@ -158,6 +158,8 @@ public partial class MainViewModel : ViewModelBase
         _clearProxyOnDisconnect = _settings.ClearProxyOnDisconnect;
         _useProxyForSubscriptions = _settings.UseProxyForSubscriptions;
         _bypassVpnWithoutTun = _settings.BypassVpnWithoutTun;
+        _testsViaTun = _settings.TestsViaTun;
+        Core.TestRouteBypass.TestsViaTun = _settings.TestsViaTun;
         if (_settings.UseTunMode && !Core.AdminHelper.IsRunningAsAdmin())
         {
             TunDisabledNeedsAdmin = true;
@@ -345,6 +347,7 @@ public partial class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(HomeLatency));
         OnPropertyChanged(nameof(HomeSpeed));
         RefreshConnectionFlags();
+        RefreshTestsBypassingTun();
         if (!value)
         {
             LiveDownSpeed = "0 B/s";

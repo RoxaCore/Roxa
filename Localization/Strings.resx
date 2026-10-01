@@ -454,4 +454,7 @@
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>سیستم‌عامل/معماری پشتیبانی نمی‌شود.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>فایل wintun.dll در دسترس نیست. بازگشت به حالت پراکسی.</value></data>
   <data name="Sub_OnlyHttps" xml:space="preserve"><value>فقط لینک‌های اشتراک https مجاز هستند.</value></data>
+  <data name="Set_TestsViaTun" xml:space="preserve"><value>انجام پینگ و تست‌ها از داخل TUN</value></data>
+  <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>به‌صورت پیش‌فرض خاموش است و پینگ، تاخیر واقعی و سرعت از مسیر مستقیم اتصال اینترنت کامپیوتر اندازه‌گیری می‌شود تا عدد به‌دست‌آمده درست باشد. با روشن کردن این گزینه، تست‌ها از درون تونل TUN انجام می‌شوند.</value></data>
+  <data name="Test_BypassTun" xml:space="preserve"><value>تست بدون اعمال TUN</value></data>
 </root>

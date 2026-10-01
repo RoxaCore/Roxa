@@ -410,4 +410,7 @@
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>غیر معاون نظام یا ڈھانچہ۔</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll دستیاب نہیں۔ پراکسی موڈ پر واپس جا رہا ہے۔</value></data>
   <data name="Sub_OnlyHttps" xml:space="preserve"><value>صرف https سبسکرپشن URL اجازت یافتہ ہیں۔</value></data>
+  <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
+  <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
+  <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
 </root>

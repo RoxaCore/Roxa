@@ -20,6 +20,7 @@ public partial class MainViewModel : ViewModelBase
     {
         TestTotalCount = total;
         TestTestedCount = 0;
+        RefreshTestsBypassingTun();
     }
 
     private void TickTestProgress()
@@ -33,10 +34,14 @@ public partial class MainViewModel : ViewModelBase
 
     private void EndTestProgress()
     {
+        RefreshTestsBypassingTun();
         Post(() =>
         {
             if (TestTotalCount > 0)
                 TestTestedCount = TestTotalCount;
+            if (Core.TestRouteBypass.IsBypassing && !string.IsNullOrEmpty(Status)
+                && !Status.Contains(TranslationManager.Instance["Test_BypassTun"]))
+                Status += " — " + TranslationManager.Instance["Test_BypassTun"];
         });
     }
 

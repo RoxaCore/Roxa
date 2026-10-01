@@ -9,6 +9,7 @@ public static class LatencyTester
 {
     public static async Task<(bool Ok, int Ms)> TcpAsync(string host, int port, int timeoutMs = 3000)
     {
+        using var bypass = await TestRouteBypass.BeginAsync(new[] { host });
         using var socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
         using var cts = new CancellationTokenSource(timeoutMs);
         var sw = Stopwatch.StartNew();
@@ -23,6 +24,7 @@ public static class LatencyTester
 
     public static async Task<(bool Ok, int Ms)> HttpAsync(string host, int port, int timeoutMs = 3000)
     {
+        using var bypass = await TestRouteBypass.BeginAsync(new[] { host });
         try
         {
             using var http = new HttpClient { Timeout = TimeSpan.FromMilliseconds(timeoutMs) };

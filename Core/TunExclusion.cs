@@ -343,6 +343,14 @@ public static class TunExclusion
         catch { return false; }
     }
 
+    public static bool IsPinned(string ip)
+    {
+        if (!IPAddress.TryParse(ip, out var addr) || addr.AddressFamily != AddressFamily.InterNetwork) return false;
+        var b = addr.GetAddressBytes();
+        uint v = (uint)(b[0] | (b[1] << 8) | (b[2] << 16) | (b[3] << 24));
+        lock (_lock) return _pinned.Contains(v);
+    }
+
     public static int SweepPersistedPins(HashSet<string>? protectedDests)
     {
         string[] lines;

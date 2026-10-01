@@ -42,6 +42,8 @@ public partial class MainViewModel : ViewModelBase
             await _engine.StartAsync(server, SetSystemProxy, _settings, tunExclusionHosts: Servers.Select(s => s.Address));
             IsConnected = true;
             TunKillSwitch.SetTunnelUp(true, _engine.HttpPort);
+            if (!IsTesting && SetSystemProxy && !LeaveSystemProxyAsIs && !_engine.IsTunActive)
+                ApplySystemProxyEndpoint();
             if (_engine.IsTunActive)
                 TunExclusion.Start(_settings.TunExcludedApps);
             LiveDownSpeed = "0 B/s";

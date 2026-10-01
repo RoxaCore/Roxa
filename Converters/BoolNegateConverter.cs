@@ -1,7 +1,7 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
 
-namespace XrayClient.Converters;
+namespace Roxa.Converters;
 
 public class BoolNegateConverter : IValueConverter
 {

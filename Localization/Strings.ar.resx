@@ -399,27 +399,27 @@
   <data name="Log_PoolExpired" xml:space="preserve"><value>انتهى مخزن البحث أو أنه فارغ — إعادة البناء من جميع الخوادم...</value></data>
   <data name="Log_SearchPool" xml:space="preserve"><value>مخزن البحث: تم حفظ {0} خادم غير مختبر للبحث التدريجي</value></data>
   <data name="Log_SmartFailedAll" xml:space="preserve"><value>اتصال ذكي: فشل اختبار التأخير الحقيقي لجميع المرشحين</value></data>
-  <data name="Eng_AssetMissing" xml:space="preserve"><value>الملف {0} غير موجود في آخر إصدار Xray.</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>الملف {0} غير موجود في آخر إصدار Roxa.</value></data>
   <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>فشل مسح البروكسي: {0}</value></data>
   <data name="Eng_ConnectedPorts" xml:space="preserve"><value>تم الاتصال. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>الاتصال بـ {0} {1} ...</value></data>
-  <data name="Eng_DigestMismatch" xml:space="preserve"><value>تطابق Digest لتنزيل Xray-core غير صحيح: المتوقع {0}، المستلم {1}.</value></data>
-  <data name="Eng_Downloading" xml:space="preserve"><value>جارٍ تنزيل Xray-core ...</value></data>
-  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>خرج محرك Xray بشكل غير متوقع.</value></data>
-  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>فشل التحقق من سلامة محرك Xray.</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>تطابق Digest لتنزيل Roxa غير صحيح: المتوقع {0}، المستلم {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>جارٍ تنزيل Roxa ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>خرج محرك Roxa بشكل غير متوقع.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>فشل التحقق من سلامة محرك Roxa.</value></data>
   <data name="Eng_IntegrityRetry" xml:space="preserve"><value>فشل التحقق من سلامة المحرك — جارٍ إعادة التنزيل ...</value></data>
   <data name="Eng_MirrorTrying" xml:space="preserve"><value>تعذر الوصول إلى GitHub مباشرة — جارٍ المحاولة عبر المرآة ...</value></data>
-  <data name="Eng_MultiExited" xml:space="preserve"><value>خرج محرك اختبار Xray المتعدد بشكل غير متوقع.</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>خرج محرك اختبار Roxa المتعدد بشكل غير متوقع.</value></data>
   <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>لم تُفتح منافذ الاختبار المتعدد.</value></data>
-  <data name="Eng_MultiStarted" xml:space="preserve"><value>تم تشغيل محرك اختبار Xray المتعدد.</value></data>
-  <data name="Eng_NoDigest" xml:space="preserve"><value>لا يمكن التحقق من تنزيل Xray-core عبر المرآة بدون Digest من GitHub.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>تم تشغيل محرك اختبار Roxa المتعدد.</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>لا يمكن التحقق من تنزيل Roxa عبر المرآة بدون Digest من GitHub.</value></data>
   <data name="Eng_NotFound" xml:space="preserve"><value>المحرك غير موجود — جارٍ التنزيل ...</value></data>
   <data name="Eng_PortNotUp" xml:space="preserve"><value>لم تُفتح منفذ البروكسي.</value></data>
-  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} جاهز.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Roxa {0} جاهز.</value></data>
   <data name="Eng_Stopped" xml:space="preserve"><value>تم إيقاف المحرك.</value></data>
-  <data name="Eng_TestExited" xml:space="preserve"><value>خرج محرك اختبار Xray بشكل غير متوقع.</value></data>
-  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>لم يُفتح منفذ اختبار Xray.</value></data>
-  <data name="Eng_TestStarted" xml:space="preserve"><value>تم تشغيل محرك اختبار Xray.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>خرج محرك اختبار Roxa بشكل غير متوقع.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>لم يُفتح منفذ اختبار Roxa.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>تم تشغيل محرك اختبار Roxa.</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>تم تنظيف محول TUN.</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>فشل تنظيف TUN: {0}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>وضع TUN يتطلب صلاحية المسؤول. العودة إلى وضع البروكسي.</value></data>

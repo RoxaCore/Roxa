@@ -4,9 +4,9 @@ echo ============================================
 echo  Roxa emergency unblock
 echo ============================================
 echo.
-echo [1/3] Stopping XrayClient (clears dynamic WFP kill-switch filters)...
-taskkill /F /IM XrayClient.exe >nul 2>&1
-if %errorlevel%==0 (echo        XrayClient stopped.) else (echo        XrayClient was not running.)
+echo [1/3] Stopping Roxa (clears dynamic WFP kill-switch filters)...
+taskkill /F /IM Roxa.exe >nul 2>&1
+if %errorlevel%==0 (echo        Roxa stopped.) else (echo        Roxa was not running.)
 
 echo [2/3] Removing legacy firewall rules (if any)...
 set "RULES=%APPDATA%\Roxa\killsw-rules.txt"
@@ -24,8 +24,8 @@ echo [3/3] Clearing emergency flag...
 if exist "%APPDATA%\Roxa\ks-emergency.flag" del /f "%APPDATA%\Roxa\ks-emergency.flag" >nul 2>&1
 
 echo.
-echo Done. Kill-switch filters live in XrayClient's WFP session and are
+echo Done. Kill-switch filters live in Roxa's WFP session and are
 echo removed automatically the moment the process closes, so your internet
-echo should be fully restored now. Start XrayClient again when ready.
+echo should be fully restored now. Start Roxa again when ready.
 echo.
 pause

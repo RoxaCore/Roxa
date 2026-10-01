@@ -3,13 +3,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using XrayClient.Localization;
+using Roxa.Localization;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public static class TunManager
 {
-    private const string TunAdapterName = "xray0";
+    private const string TunAdapterName = "roxa0";
     private const int CaptureTimeoutMs = 15000;
     private const int CaptureRetryDelayMs = 300;
     private const int ResolveTimeoutMs = 2500;

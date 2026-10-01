@@ -3,10 +3,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text.Json;
-using XrayClient.Localization;
-using XrayClient.Models;
+using Roxa.Localization;
+using Roxa.Models;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>دریافت و پارس سابسکریپشن: plain-links / base64 / JSON.</summary>
 public static class SubscriptionManager

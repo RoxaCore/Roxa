@@ -2,14 +2,14 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Resources;
 
-namespace XrayClient.Localization;
+namespace Roxa.Localization;
 
 public sealed class TranslationManager : INotifyPropertyChanged
 {
     public static TranslationManager Instance { get; } = new();
 
     private static readonly ResourceManager _rm = new(
-        "XrayClient.Localization.Strings",
+        "Roxa.Localization.Strings",
         typeof(TranslationManager).Assembly);
 
     private CultureInfo _culture = CultureInfo.GetCultureInfo("fa");

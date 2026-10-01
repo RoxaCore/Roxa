@@ -1,6 +1,6 @@
-﻿using XrayClient.Localization;
+﻿using Roxa.Localization;
 
-namespace XrayClient.Models;
+namespace Roxa.Models;
 
 public class SubscriptionInfo : System.ComponentModel.INotifyPropertyChanged
 {

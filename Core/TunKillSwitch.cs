@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Sockets;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public static class TunKillSwitch
 {
@@ -199,7 +199,7 @@ public static class TunKillSwitch
     {
         string name = Path.GetFileNameWithoutExtension(path);
         if (name.Equals("xray", StringComparison.OrdinalIgnoreCase) ||
-            name.Equals("XrayClient", StringComparison.OrdinalIgnoreCase)) return;
+            name.Equals("Roxa", StringComparison.OrdinalIgnoreCase)) return;
         string? self = Environment.ProcessPath;
         if (!string.IsNullOrEmpty(self) &&
             string.Equals(Path.GetFullPath(path), Path.GetFullPath(self), StringComparison.OrdinalIgnoreCase)) return;

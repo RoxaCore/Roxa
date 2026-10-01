@@ -5,12 +5,12 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
 using System.Linq;
-using XrayClient.Core;
-using XrayClient.Localization;
-using XrayClient.ViewModels;
-using XrayClient.Views;
+using Roxa.Core;
+using Roxa.Localization;
+using Roxa.ViewModels;
+using Roxa.Views;
 
-namespace XrayClient;
+namespace Roxa;
 
 public partial class App : Application
 {

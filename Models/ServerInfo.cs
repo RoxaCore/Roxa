@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace XrayClient.Models;
+namespace Roxa.Models;
 
 public enum ProxyProtocol { VMess, VLESS, Shadowsocks, Trojan }
 

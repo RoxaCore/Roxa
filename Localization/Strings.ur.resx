@@ -383,27 +383,27 @@
   <data name="Log_PoolExpired" xml:space="preserve"><value>تلاش کا پول ختم یا خالی ہے — تمام سروروں سے دوبارہ بنایا جا رہا ہے...</value></data>
   <data name="Log_SearchPool" xml:space="preserve"><value>تلاش کا پول: کرمی تلاش کے لیے {0} غیر ٹیسٹ شدہ سرورز محفوظ</value></data>
   <data name="Log_SmartFailedAll" xml:space="preserve"><value>سمارٹ جڑنا: تمام امیدواروں کے لیے اصل تاخیر ٹیسٹ ناکام رہا</value></data>
-  <data name="Eng_AssetMissing" xml:space="preserve"><value>اسٹ {0} آخری Xray ریلیز میں نہیں ملا۔</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>اسٹ {0} آخری Roxa ریلیز میں نہیں ملا۔</value></data>
   <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>پراکسی صاف کرنا ناکام: {0}</value></data>
   <data name="Eng_ConnectedPorts" xml:space="preserve"><value>جڑ گیا۔ HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>{0} سے جڑا جا رہا ہے {1} ...</value></data>
-  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Xray-core ڈاؤن لوڈ ڈائجسٹ مماثل نہیں: متوقع {0}، وصول {1}.</value></data>
-  <data name="Eng_Downloading" xml:space="preserve"><value>Xray-core ڈاؤن لوڈ ہو رہا ہے ...</value></data>
-  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Xray انجن غیر متوقع طور پر بند ہو گیا۔</value></data>
-  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Xray انجن کی سلامت کی تصدیق ناکام رہی۔</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Roxa ڈاؤن لوڈ ڈائجسٹ مماثل نہیں: متوقع {0}، وصول {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Roxa ڈاؤن لوڈ ہو رہا ہے ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Roxa انجن غیر متوقع طور پر بند ہو گیا۔</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Roxa انجن کی سلامت کی تصدیق ناکام رہی۔</value></data>
   <data name="Eng_IntegrityRetry" xml:space="preserve"><value>انجن کی سلامت کی تصدیق ناکام — دوبارہ ڈاؤن لوڈ ...</value></data>
   <data name="Eng_MirrorTrying" xml:space="preserve"><value>براہ راست GitHub دستیاب نہیں — مررے سے کوشش ...</value></data>
-  <data name="Eng_MultiExited" xml:space="preserve"><value>ملٹی ٹیسٹ Xray انجن غیر متوقع طور پر بند ہو گیا۔</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>ملٹی ٹیسٹ Roxa انجن غیر متوقع طور پر بند ہو گیا۔</value></data>
   <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>ملٹی ٹیسٹ پورٹس شروع نہیں ہوئے۔</value></data>
-  <data name="Eng_MultiStarted" xml:space="preserve"><value>ملٹی ٹیسٹ Xray انجن شروع ہوا۔</value></data>
-  <data name="Eng_NoDigest" xml:space="preserve"><value>GitHub ڈائجسٹ کے بغیر مررے سے Xray-core ڈاؤن لوڈ کی تصدیق نہیں کی جا سکتی۔</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>ملٹی ٹیسٹ Roxa انجن شروع ہوا۔</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>GitHub ڈائجسٹ کے بغیر مررے سے Roxa ڈاؤن لوڈ کی تصدیق نہیں کی جا سکتی۔</value></data>
   <data name="Eng_NotFound" xml:space="preserve"><value>انجن نہیں ملا، ڈاؤن لوڈ ہو رہا ہے ...</value></data>
   <data name="Eng_PortNotUp" xml:space="preserve"><value>پراکسی پورٹ شروع نہیں ہوا۔</value></data>
-  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} تیار ہے۔</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Roxa {0} تیار ہے۔</value></data>
   <data name="Eng_Stopped" xml:space="preserve"><value>انجن بند ہو گیا۔</value></data>
-  <data name="Eng_TestExited" xml:space="preserve"><value>ٹیسٹ Xray انجن غیر متوقع طور پر بند ہو گیا۔</value></data>
-  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray ٹیسٹ پورٹ شروع نہیں ہوا۔</value></data>
-  <data name="Eng_TestStarted" xml:space="preserve"><value>ٹیسٹ Xray انجن شروع ہوا۔</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>ٹیسٹ Roxa انجن غیر متوقع طور پر بند ہو گیا۔</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Roxa ٹیسٹ پورٹ شروع نہیں ہوا۔</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>ٹیسٹ Roxa انجن شروع ہوا۔</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN ایڈاپٹر صاف ہو گیا۔</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>TUN صفائی ناکام: {0}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN موڈ کو ایڈمنسٹریٹر کی ضرورت ہے۔ پراکسی موڈ پر واپس جا رہا ہے۔</value></data>

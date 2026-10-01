@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
-using XrayClient.Models;
+using Roxa.Models;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>تست سرعت تخمینی دانلود از طریق پروکسی Xray (برای مرتب‌سازی نسبی).</summary>
 public static class SpeedTester

@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
-using XrayClient.Localization;
-using XrayClient.Models;
+using Roxa.Localization;
+using Roxa.Models;
 
-namespace XrayClient.ViewModels;
+namespace Roxa.ViewModels;
 
 public partial class ServerGroup : ObservableObject
 {

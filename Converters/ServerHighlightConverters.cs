@@ -2,7 +2,7 @@ using System.Globalization;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 
-namespace XrayClient.Converters;
+namespace Roxa.Converters;
 
 public class ServerBgConverter : IMultiValueConverter
 {

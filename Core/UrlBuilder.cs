@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.Json.Nodes;
-using XrayClient.Models;
+using Roxa.Models;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>ساخت لینک اشتراک‌گذاری از روی ServerInfo (معکوس UrlParser).</summary>
 public static class UrlBuilder

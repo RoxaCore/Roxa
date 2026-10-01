@@ -3,7 +3,7 @@ using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public static class UpdateInstaller
 {
@@ -81,7 +81,7 @@ public static class UpdateInstaller
             throw new InvalidOperationException("updater script missing");
 
         var target = AppContext.BaseDirectory.TrimEnd('\\', '/');
-        var exe = Path.GetFileName(Environment.ProcessPath ?? "XrayClient.exe");
+        var exe = Path.GetFileName(Environment.ProcessPath ?? "Roxa.exe");
         var pid = Environment.ProcessId;
 
         var psi = new ProcessStartInfo

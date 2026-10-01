@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using XrayClient.Models;
+using Roxa.Models;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public static class SpeedRunner
 {

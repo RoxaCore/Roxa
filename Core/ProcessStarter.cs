@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public static class ProcessStarter
 {
@@ -136,7 +136,7 @@ public static class ProcessStarter
             try { process = Process.GetProcessById(pi.dwProcessId); }
             catch (ArgumentException)
             {
-                throw new InvalidOperationException(XrayClient.Localization.TranslationManager.Get("Eng_ExitedUnexpectedly"));
+                throw new InvalidOperationException(Roxa.Localization.TranslationManager.Get("Eng_ExitedUnexpectedly"));
             }
 
             IntPtr stdoutRead = hStdoutRead; hStdoutRead = IntPtr.Zero;

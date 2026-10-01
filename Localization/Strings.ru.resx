@@ -399,27 +399,27 @@
   <data name="Log_PoolExpired" xml:space="preserve"><value>Пул поиска устарел или пуст. Перестроение из всех серверов...</value></data>
   <data name="Log_SearchPool" xml:space="preserve"><value>Пул поиска: сохранено нетестированных серверов: {0} (для пошагового поиска)</value></data>
   <data name="Log_SmartFailedAll" xml:space="preserve"><value>Умное подключение: тест реальной задержки не пройден ни для одного кандидата</value></data>
-  <data name="Eng_AssetMissing" xml:space="preserve"><value>Ресурс {0} не найден в последнем релизе Xray.</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>Ресурс {0} не найден в последнем релизе Roxa.</value></data>
   <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>Не удалось сбросить прокси: {0}</value></data>
   <data name="Eng_ConnectedPorts" xml:space="preserve"><value>Подключено. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>Подключение к {0} {1} ...</value></data>
-  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Несовпадение суммы Xray-core при загрузке: ожидалось {0}, получено {1}.</value></data>
-  <data name="Eng_Downloading" xml:space="preserve"><value>Загрузка Xray-core ...</value></data>
-  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Движок Xray неожиданно завершился.</value></data>
-  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Проверка целостности движка Xray не пройдена.</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Несовпадение суммы Roxa при загрузке: ожидалось {0}, получено {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Загрузка Roxa ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Движок Roxa неожиданно завершился.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Проверка целостности движка Roxa не пройдена.</value></data>
   <data name="Eng_IntegrityRetry" xml:space="preserve"><value>Проверка целостности движка не пройдена. Повторная загрузка ...</value></data>
   <data name="Eng_MirrorTrying" xml:space="preserve"><value>Прямой доступ к GitHub недоступен, пробуем зеркало ...</value></data>
-  <data name="Eng_MultiExited" xml:space="preserve"><value>Многотестовый движок Xray неожиданно завершился.</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>Многотестовый движок Roxa неожиданно завершился.</value></data>
   <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>Порты многотестового режима не были запущены.</value></data>
-  <data name="Eng_MultiStarted" xml:space="preserve"><value>Многотестовый движок Xray запущен.</value></data>
-  <data name="Eng_NoDigest" xml:space="preserve"><value>Невозможно проверить загрузку Xray-core через зеркало без суммы GitHub.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>Многотестовый движок Roxa запущен.</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>Невозможно проверить загрузку Roxa через зеркало без суммы GitHub.</value></data>
   <data name="Eng_NotFound" xml:space="preserve"><value>Движок не найден, загрузка ...</value></data>
   <data name="Eng_PortNotUp" xml:space="preserve"><value>Порт прокси не был запущен.</value></data>
-  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} готов.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Roxa {0} готов.</value></data>
   <data name="Eng_Stopped" xml:space="preserve"><value>Движок остановлен.</value></data>
-  <data name="Eng_TestExited" xml:space="preserve"><value>Тестовый движок Xray неожиданно завершился.</value></data>
-  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Тестовый порт Xray не был запущен.</value></data>
-  <data name="Eng_TestStarted" xml:space="preserve"><value>Тестовый движок Xray запущен.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>Тестовый движок Roxa неожиданно завершился.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Тестовый порт Roxa не был запущен.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>Тестовый движок Roxa запущен.</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN-адаптер очищен.</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>Не удалось очистить TUN: {0}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>Режим TUN требует прав администратора. Возврат в режим прокси.</value></data>

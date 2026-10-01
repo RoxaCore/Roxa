@@ -4,10 +4,10 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using XrayClient.Localization;
-using XrayClient.Models;
+using Roxa.Localization;
+using Roxa.Models;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>مدیریت پروسس موتور xray: دانلود خودکار، اجرا، توقف. کراس‌پلتفرم.</summary>
 public sealed class XrayEngine : IDisposable
@@ -124,7 +124,7 @@ public sealed class XrayEngine : IDisposable
             throw new InvalidDataException(TranslationManager.Get("Eng_NoDigest"));
         }
 
-        string zipPath = Path.Combine(Path.GetTempPath(), "xray-core-download.zip");
+        string zipPath = Path.Combine(Path.GetTempPath(), "roxa-core-download.zip");
         await File.WriteAllBytesAsync(zipPath, data, ct);
         try
         {
@@ -211,7 +211,7 @@ public sealed class XrayEngine : IDisposable
         HttpPort = FindFreePort();
         string configJson = XrayConfigBuilder.Build(server, SocksPort, HttpPort, settings, useTun);
         // Keep temp config for diagnosis (diff vs external client configs)
-        string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-config-{server.Id}.json");
+        string configPath = Path.Combine(Path.GetTempPath(), $"roxa-config-{server.Id}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
         RestrictTempFile(configPath);
 
@@ -332,7 +332,7 @@ public sealed class XrayEngine : IDisposable
             await EnsureEngineAsync(false, ct);
         }
 
-        string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-test-{Guid.NewGuid():N}.json");
+        string configPath = Path.Combine(Path.GetTempPath(), $"roxa-test-{Guid.NewGuid():N}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
         RestrictTempFile(configPath);
 
@@ -436,7 +436,7 @@ public sealed class XrayEngine : IDisposable
             await EnsureEngineAsync(false, ct);
         }
 
-        string configPath = Path.Combine(Path.GetTempPath(), $"xrayclient-multi-{Guid.NewGuid():N}.json");
+        string configPath = Path.Combine(Path.GetTempPath(), $"roxa-multi-{Guid.NewGuid():N}.json");
         await File.WriteAllTextAsync(configPath, configJson, ct);
         RestrictTempFile(configPath);
 

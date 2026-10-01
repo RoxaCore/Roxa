@@ -1,6 +1,6 @@
 using System.Security.Principal;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public static class AdminHelper
 {

@@ -1,19 +1,19 @@
 # AGENTS.md
 
 ## Project Overview
-XrayClient (branded as Roxa) is a desktop VPN/proxy client built with Avalonia UI 12.1.2 targeting .NET 8. The UI is in Persian (Farsi) with RTL layout.
+Roxa (project file `Roxa.csproj`, source folder still named `XrayClient`) is a desktop VPN/proxy client built with Avalonia UI 12.1.2 targeting .NET 8. The UI is in Persian (Farsi) with RTL layout. The product, assembly and process name is `Roxa`.
 
 ## Build & Run
 ```powershell
 # Kill existing instance first
-Stop-Process -Name XrayClient -Force -ErrorAction SilentlyContinue
+Stop-Process -Name Roxa -Force -ErrorAction SilentlyContinue
 
 # Build
 cd "D:\ai project freebuff\hiku\XrayClient"
-& "C:\Program Files\dotnet\dotnet.exe" build -c Release
+& "C:\Program Files\dotnet\dotnet.exe" build Roxa.csproj -c Release
 
 # Run (verify it doesn't crash)
-$p = Start-Process -FilePath "D:\ai project freebuff\hiku\XrayClient\bin\Release\net8.0\XrayClient.exe" -PassThru
+$p = Start-Process -FilePath "D:\ai project freebuff\hiku\XrayClient\bin\Release\net8.0\Roxa.exe" -PassThru
 Start-Sleep -Seconds 3
 if ($p.HasExited) { "CRASHED: exit code $($p.ExitCode)" } else { "RUNNING (PID $($p.Id))" }
 ```

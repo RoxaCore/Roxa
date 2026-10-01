@@ -1,4 +1,4 @@
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public sealed class TestRouteScope : IDisposable
 {

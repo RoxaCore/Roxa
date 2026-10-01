@@ -1,4 +1,4 @@
-namespace XrayClient.Models;
+namespace Roxa.Models;
 
 public enum TestStatus { Ok, Timeout, Error, Cancelled }
 

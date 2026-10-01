@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public sealed class UpdateInfo
 {

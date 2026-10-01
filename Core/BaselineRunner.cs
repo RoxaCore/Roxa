@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using XrayClient.Models;
+using Roxa.Models;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>اجرای چندباره تست تأخیر واقعی روی ۱۰ سرور با تأخیر پخش‌شده و ذخیره نتایج برای مقایسه.</summary>
 public static class BaselineRunner

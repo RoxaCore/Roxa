@@ -7,11 +7,11 @@ using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using XrayClient.Core;
-using XrayClient.Localization;
-using XrayClient.Models;
+using Roxa.Core;
+using Roxa.Localization;
+using Roxa.Models;
 
-namespace XrayClient.ViewModels;
+namespace Roxa.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {

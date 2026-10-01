@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace XrayClient.ViewModels;
+namespace Roxa.ViewModels;
 
 public abstract class ViewModelBase : ObservableObject
 {

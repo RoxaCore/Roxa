@@ -15,6 +15,10 @@ public sealed class XrayEngine : IDisposable
     private Process? _process;
     private JobObject? _job;
     private bool _proxyActive;
+    private bool _prevProxyEnable;
+    private string _prevProxyServer = "";
+    private string _prevProxyOverride = "";
+    private string _proxyValue = "";
     private string? _tempConfigPath;
     private AppSettings? _settings;
     private readonly object _lock = new();
@@ -266,6 +270,13 @@ public sealed class XrayEngine : IDisposable
                     proxyValue = $"127.0.0.1:{ProxyRouter.Port}";
                 else
                     proxyValue = $"127.0.0.1:{HttpPort}";
+                if (!_proxyActive)
+                {
+                    _prevProxyEnable = prevEnable;
+                    _prevProxyServer = prevServer;
+                    _prevProxyOverride = prevOverride;
+                    _proxyValue = proxyValue;
+                }
                 SystemProxy.Set(proxyValue);
                 _proxyActive = true;
                 UpdateState(process, st =>
@@ -403,20 +414,32 @@ public sealed class XrayEngine : IDisposable
         }
         job?.Dispose();
         try { ProxyRouter.StopForUpstream(HttpPort); } catch { }
-        if (_proxyActive)
-        {
-            _proxyActive = false;
-            if (_settings?.LeaveSystemProxyAsIs != true && _settings?.ClearProxyOnDisconnect == true)
-            {
-                try { SystemProxy.Clear(); }
-                catch (Exception ex) { Log(string.Format(TranslationManager.Get("Eng_ClearProxyFailed"), ex.Message)); }
-            }
-        }
+        ReleaseSystemProxy();
         CurrentServer = null;
         HttpPort = 0;
         SocksPort = 0;
         CleanupTempConfig(_tempConfigPath);
         _tempConfigPath = null;
+    }
+
+    private void ReleaseSystemProxy()
+    {
+        bool restore;
+        lock (_lock)
+        {
+            if (!_proxyActive) return;
+            _proxyActive = false;
+            restore = _settings?.LeaveSystemProxyAsIs != true && _settings?.ClearProxyOnDisconnect == true;
+        }
+        if (!restore) return;
+        try
+        {
+            if (!SystemProxy.GetCurrent(out bool enable, out string server, out _)) return;
+            if (!enable || !string.Equals(server, _proxyValue, StringComparison.OrdinalIgnoreCase)) return;
+            SystemProxy.Apply(_prevProxyEnable, _prevProxyServer, _prevProxyOverride);
+            TunManager.Log($"system proxy restored to previous value (was {_proxyValue})");
+        }
+        catch (Exception ex) { Log(string.Format(TranslationManager.Get("Eng_ClearProxyFailed"), ex.Message)); }
     }
 
     public void StopAndCleanupTun()
@@ -477,16 +500,12 @@ public sealed class XrayEngine : IDisposable
         {
             expected = !ReferenceEquals(_process, process);
             if (!expected) _process = null;
-            if (_proxyActive)
-            {
-                _proxyActive = false;
-                try { SystemProxy.Clear(); } catch { }
-            }
             try { ProxyRouter.StopForUpstream(HttpPort); } catch { }
             CurrentServer = null;
             HttpPort = 0;
             SocksPort = 0;
         }
+        ReleaseSystemProxy();
         if (!expected)
         {
             IsTunActive = false;

@@ -26,6 +26,7 @@ public static class SpeedTester
 
     public static async Task<TestResult> TestAsync(ServerInfo server, CancellationToken ct = default)
     {
+        using var bypass = await TestRouteBypass.BeginAsync(new[] { server.Address });
         var extra = new Dictionary<string, string>();
         var engine = new XrayEngine();
         try
@@ -82,6 +83,7 @@ public static class SpeedTester
     {
         var results = new Dictionary<string, TestResult>();
         if (servers.Count == 0) return results;
+        using var bypass = await TestRouteBypass.BeginAsync(servers.Select(s => s.Address));
 
         if (servers.Count == 1)
         {

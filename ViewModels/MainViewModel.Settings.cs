@@ -112,6 +112,19 @@ public partial class MainViewModel : ViewModelBase
         SaveSettings();
     }
 
+    [ObservableProperty] private bool _testsViaTun;
+    [ObservableProperty] private bool _testsBypassingTun;
+
+    partial void OnTestsViaTunChanged(bool value)
+    {
+        _settings.TestsViaTun = value;
+        SaveSettings();
+        Core.TestRouteBypass.TestsViaTun = value;
+        RefreshTestsBypassingTun();
+    }
+
+    public void RefreshTestsBypassingTun() => TestsBypassingTun = Core.TestRouteBypass.IsBypassing;
+
 
     [RelayCommand]
     private void OpenDnsSettings() => OpenDnsSettingsHandler?.Invoke();

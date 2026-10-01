@@ -129,4 +129,5 @@ public class AppSettings
     public List<string> TunExcludedAppsDisabled { get; set; } = new();
     public bool BypassVpnWithoutTun { get; set; }
     public bool KillSwitchEnabled { get; set; }
+    public bool TestsViaTun { get; set; }
 }

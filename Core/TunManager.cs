@@ -324,6 +324,23 @@ public static class TunManager
 
     public static int RunRoute(string args, out string stdout) => RunTool("route.exe", args, out stdout);
 
+    public static bool IsCaptureActive
+    {
+        get { lock (_routesLock) return _routes.Count > 0; }
+    }
+
+    public static HashSet<string> CaptureHostRoutes()
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        lock (_routesLock)
+            foreach (var r in _routes)
+                if (string.Equals(r.Mask, "255.255.255.255", StringComparison.Ordinal) && r.Dest.Length > 0)
+                    set.Add(r.Dest);
+        return set;
+    }
+
+    public static Task<List<string>> ResolveIpsAsync(IEnumerable<string>? hosts) => ResolveServerIpsAsync(hosts);
+
     public static int RunNetsh(string args) => RunTool("netsh.exe", args, out _);
 
     private static int RunTool(string fileName, string arguments, out string stdout)

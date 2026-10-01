@@ -322,6 +322,9 @@
                 </StackPanel>
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Real}" Command="{Binding TestRealDelayAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_PingAll}" Command="{Binding TestAllCommand}" IsVisible="{Binding IsTesting, Converter={StaticResource Not}}" Padding="12,8" CornerRadius="8" Background="#F5F5F5" Foreground="#555555" FontSize="12" BorderThickness="0"/>
+                <Border CornerRadius="8" Padding="10,7" Background="#0E7C6B" VerticalAlignment="Center" IsVisible="{Binding TestsBypassingTun}">
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Test_BypassTun}" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                </Border>
                 <Button Command="{Binding RemoveDuplicatesCommand}" IsVisible="{Binding HasDuplicates}" Padding="12,8" CornerRadius="8" Background="#FFF5F5" Foreground="#E53E3E" FontSize="12" BorderThickness="0">
                   <StackPanel Orientation="Horizontal" Spacing="4">
                     <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_RemoveDupes}"/>
@@ -742,6 +745,11 @@
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TUN}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
                 </StackPanel>
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TUN_Desc}" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <CheckBox IsChecked="{Binding TestsViaTun}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TestsViaTun}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TestsViaTun_Desc}" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
               </StackPanel>
             </Border>
 

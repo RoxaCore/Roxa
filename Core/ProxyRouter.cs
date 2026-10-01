@@ -14,10 +14,10 @@ public static class ProxyRouter
     private const int ConnectTimeoutMs = 15000;
     private const long PidCacheTtlMs = 15000;
     private const uint ProcessQueryLimitedInformation = 0x1000;
-    private const int TcpTableOwnerPidAll = 3;
+    private const int TcpTableOwnerPidAll = 5;
     private const int AfInet = 2;
     private const uint ErrorInsufficientBuffer = 122;
-    private const uint LoopbackNet = 0x7F000001;
+    private const uint LoopbackNet = 0x0100007F;
 
     [StructLayout(LayoutKind.Sequential)]
     private struct MibTcpRowOwnerPid
@@ -51,7 +51,7 @@ public static class ProxyRouter
     }
 
     private static readonly object _lock = new();
-    private static readonly ConcurrentDictionary<int, TcpClient> _clients = new();
+    private static readonly ConcurrentDictionary<int, (TcpClient Client, string Exe)> _clients = new();
     private static readonly Dictionary<int, (string Name, long Ticks)> _pidCache = new();
     private static string[] _bypass = Array.Empty<string>();
     private static TcpListener? _listener;
@@ -72,7 +72,7 @@ public static class ProxyRouter
             {
                 if (_upstreamPort == upstreamPort)
                 {
-                    _bypass = Normalize(bypassPaths);
+                    ApplyBypassLocked(Normalize(bypassPaths));
                     return true;
                 }
                 StopLocked();
@@ -126,10 +126,27 @@ public static class ProxyRouter
         try { listener?.Stop(); } catch { }
         try { cts?.Cancel(); } catch { }
         try { cts?.Dispose(); } catch { }
-        foreach (var kv in _clients) { try { kv.Value.Close(); } catch { } }
+        foreach (var kv in _clients) { try { kv.Value.Client.Close(); } catch { } }
         _clients.Clear();
         lock (_pidCache) _pidCache.Clear();
         if (was) TunManager.Log("proxy-router stopped");
+    }
+
+    private static void ApplyBypassLocked(string[] next)
+    {
+        var prev = _bypass;
+        _bypass = next;
+        foreach (var kv in _clients)
+        {
+            string exe = kv.Value.Exe;
+            bool was = exe.Length > 0 && Array.IndexOf(prev, exe) >= 0;
+            bool now = exe.Length > 0 && Array.IndexOf(next, exe) >= 0;
+            if (exe.Length == 0 || was != now)
+            {
+                try { kv.Value.Client.Close(); } catch { }
+                TunManager.Log($"proxy-router bypass change closed {exe} conn");
+            }
+        }
     }
 
     private static string[] Normalize(IEnumerable<string>? paths)
@@ -153,7 +170,7 @@ public static class ProxyRouter
             try { client = await listener.AcceptTcpClientAsync(token); }
             catch { break; }
             int id = Interlocked.Increment(ref _clientSeq);
-            _clients[id] = client;
+            _clients[id] = (client, "");
             _ = Task.Run(() => HandleClientAsync(client, id, token));
         }
     }
@@ -171,12 +188,17 @@ public static class ProxyRouter
             lock (_lock) { bypass = _bypass; upstream = _upstreamPort; routerPort = _port; }
 
             bool direct = false;
+            string exe = "";
+            int pid = 0;
             if (bypass.Length > 0 && clientPort > 0)
             {
-                int pid = ResolvePid(clientPort, routerPort);
-                string exe = ResolveExeName(pid);
-                if (exe.Length > 0) direct = Array.IndexOf(bypass, exe.ToLowerInvariant()) >= 0;
+                pid = ResolvePid(clientPort, routerPort);
+                exe = ResolveExeName(pid).ToLowerInvariant();
+                if (exe.Length > 0 && Array.IndexOf(bypass, exe) >= 0) direct = true;
             }
+            if (_clients.ContainsKey(id)) _clients[id] = (client, exe);
+            if (bypass.Length > 0 && pid == 0)
+                TunManager.Log($"proxy-router resolve miss port={clientPort} router={routerPort}");
 
             var stream = client.GetStream();
             var reader = new BufReader(stream);
@@ -204,7 +226,7 @@ public static class ProxyRouter
                 await DirectHttpAsync(reader, stream, req, token);
                 return;
             }
-            await ForwardAsync(reader, stream, upstream, token);
+            await ForwardAsync(reader, stream, upstream, headText, token);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
@@ -218,7 +240,7 @@ public static class ProxyRouter
         }
     }
 
-    private static async Task ForwardAsync(BufReader reader, Stream client, int upstream, CancellationToken token)
+    private static async Task ForwardAsync(BufReader reader, Stream client, int upstream, string head, CancellationToken token)
     {
         if (upstream <= 0) return;
         using var server = new TcpClient();
@@ -226,6 +248,8 @@ public static class ProxyRouter
             .WaitAsync(TimeSpan.FromMilliseconds(ConnectTimeoutMs), token);
         server.NoDelay = true;
         var ss = server.GetStream();
+        if (head.Length > 0)
+            await ss.WriteAsync(Encoding.Latin1.GetBytes(head), token);
         await PumpPairAsync(reader, client, ss, token);
     }
 

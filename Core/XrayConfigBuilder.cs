@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization.Metadata;
-using XrayClient.Models;
+using Roxa.Models;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>ساخت کانفیگ JSON موتور xray از روی یک سرور.</summary>
 public static class XrayConfigBuilder
@@ -59,7 +59,7 @@ public static class XrayConfigBuilder
                 ["protocol"] = "tun",
                 ["settings"] = new JsonObject
                 {
-                    ["name"] = "xray0",
+                    ["name"] = "roxa0",
                     ["MTU"] = 1420
                 },
                 ["sniffing"] = new JsonObject

@@ -748,27 +748,27 @@ Gecikme: {1}</value></data>
   <data name="Log_PoolExpired" xml:space="preserve"><value>Arama havuzu süresi doldu veya boş. Tüm sunuculardan yeniden oluşturuluyor...</value></data>
   <data name="Log_SearchPool" xml:space="preserve"><value>Arama havuzu: kademeli arama için test edilmemiş {0} sunucu kaydedildi</value></data>
   <data name="Log_SmartFailedAll" xml:space="preserve"><value>Akıllı bağlantı: tüm adaylar için gerçek gecikme testi başarısız oldu</value></data>
-  <data name="Eng_AssetMissing" xml:space="preserve"><value>En son Xray sürümünde {0} varlığı bulunamadı.</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>En son Roxa sürümünde {0} varlığı bulunamadı.</value></data>
   <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>Proxy temizleme başarısız: {0}</value></data>
   <data name="Eng_ConnectedPorts" xml:space="preserve"><value>Bağlandı. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>{0} adresine bağlanılıyor {1} ...</value></data>
-  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Xray-core indirme özeti eşleşmiyor: beklenen {0}, alınan {1}.</value></data>
-  <data name="Eng_Downloading" xml:space="preserve"><value>Xray-core indiriliyor ...</value></data>
-  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Xray motoru beklenmedik şekilde kapandı.</value></data>
-  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Xray motoru bütünlük doğrulamasında başarısız oldu.</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Roxa indirme özeti eşleşmiyor: beklenen {0}, alınan {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Roxa indiriliyor ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Roxa motoru beklenmedik şekilde kapandı.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Roxa motoru bütünlük doğrulamasında başarısız oldu.</value></data>
   <data name="Eng_IntegrityRetry" xml:space="preserve"><value>Motor bütünlük kontrolü başarısız. Yeniden indiriliyor ...</value></data>
   <data name="Eng_MirrorTrying" xml:space="preserve"><value>Doğrudan GitHub erişilemiyor, ayna deneniyor ...</value></data>
-  <data name="Eng_MultiExited" xml:space="preserve"><value>Çoklu test Xray motoru beklenmedik şekilde kapandı.</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>Çoklu test Roxa motoru beklenmedik şekilde kapandı.</value></data>
   <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>Çoklu test portları açılmadı.</value></data>
-  <data name="Eng_MultiStarted" xml:space="preserve"><value>Çoklu test Xray motoru başlatıldı.</value></data>
-  <data name="Eng_NoDigest" xml:space="preserve"><value>GitHub özeti olmadan ayna üzerinden Xray-core indirmesi doğrulanamaz.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>Çoklu test Roxa motoru başlatıldı.</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>GitHub özeti olmadan ayna üzerinden Roxa indirmesi doğrulanamaz.</value></data>
   <data name="Eng_NotFound" xml:space="preserve"><value>Motor bulunamadı, indiriliyor ...</value></data>
   <data name="Eng_PortNotUp" xml:space="preserve"><value>Proxy portu açılmadı.</value></data>
-  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} hazır.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Roxa {0} hazır.</value></data>
   <data name="Eng_Stopped" xml:space="preserve"><value>Motor durduruldu.</value></data>
-  <data name="Eng_TestExited" xml:space="preserve"><value>Test Xray motoru beklenmedik şekilde kapandı.</value></data>
-  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray test portu açılmadı.</value></data>
-  <data name="Eng_TestStarted" xml:space="preserve"><value>Test Xray motoru başlatıldı.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>Test Roxa motoru beklenmedik şekilde kapandı.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Roxa test portu açılmadı.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>Test Roxa motoru başlatıldı.</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN adaptörü temizlendi.</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>TUN temizleme başarısız: {0}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN modu yönetici yetkisi gerektirir. Proxy moduna dönülüyor.</value></data>

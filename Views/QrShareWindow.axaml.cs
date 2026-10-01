@@ -5,7 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using QRCoder;
 
-namespace XrayClient.Views;
+namespace Roxa.Views;
 
 public partial class QrShareWindow : Window
 {

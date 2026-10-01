@@ -1,6 +1,6 @@
 ﻿#define MyAppName "Roxa"
 #define MyAppVersion "1.0.0"
-#define MyAppExeName "XrayClient.exe"
+#define MyAppExeName "Roxa.exe"
 #define DotNetUrl "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.31/windowsdesktop-runtime-8.0.31-win-x64.exe"
 #define DotNetSha256 "c375dfd80a967405cfeff634912c1fccc56261ce3d9209ea473f60a21184d1cc"
 

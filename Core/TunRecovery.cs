@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public static class TunRecovery
 {

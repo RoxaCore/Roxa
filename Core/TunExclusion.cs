@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public static class TunExclusion
 {

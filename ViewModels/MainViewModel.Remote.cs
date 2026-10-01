@@ -3,10 +3,10 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using XrayClient.Core;
-using XrayClient.Localization;
+using Roxa.Core;
+using Roxa.Localization;
 
-namespace XrayClient.ViewModels;
+namespace Roxa.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {

@@ -4,7 +4,7 @@ using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
-namespace XrayClient.Converters;
+namespace Roxa.Converters;
 
 public class FlagToImageConverter : IValueConverter
 {
@@ -22,7 +22,7 @@ public class FlagToImageConverter : IValueConverter
 
         try
         {
-            var uri = new Uri($"avares://XrayClient/Assets/Flags/{code}.png");
+            var uri = new Uri($"avares://Roxa/Assets/Flags/{code}.png");
             var stream = AssetLoader.Open(uri);
             var bmp = new Bitmap(stream);
             Cache[code] = bmp;
@@ -42,7 +42,7 @@ public class FlagToImageConverter : IValueConverter
         if (_fallback != null) return _fallback;
         try
         {
-            var uri = new Uri("avares://XrayClient/Assets/Flags/_unknown.png");
+            var uri = new Uri("avares://Roxa/Assets/Flags/_unknown.png");
             _fallback = new Bitmap(AssetLoader.Open(uri));
         }
         catch

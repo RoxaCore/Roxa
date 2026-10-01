@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace XrayClient.ViewModels;
+namespace Roxa.ViewModels;
 
 public partial class TunExcludedItem : ObservableObject
 {

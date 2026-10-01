@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 using Avalonia.Data.Converters;
-using XrayClient.Localization;
+using Roxa.Localization;
 
-namespace XrayClient.Converters;
+namespace Roxa.Converters;
 
 public class BoolToStatusTextConverter : IValueConverter
 {

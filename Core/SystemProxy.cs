@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>تنظیم پروکسی سیستم. فقط ویندوز؛ بقیه پلتفرم‌ها no-op.</summary>
 public static class SystemProxy

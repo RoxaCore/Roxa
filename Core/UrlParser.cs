@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using System.Text.Json;
-using XrayClient.Localization;
-using XrayClient.Models;
+using Roxa.Localization;
+using Roxa.Models;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>پارس لینک‌های اشتراک‌گذاری به ServerInfo. پشتیبانی: vmess/vless/ss/trojan.</summary>
 public static class UrlParser

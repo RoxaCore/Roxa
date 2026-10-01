@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>تشخیص کشور از روی اسم/آدرس + ایموجی پرچم.</summary>
 public static class GeoFlags

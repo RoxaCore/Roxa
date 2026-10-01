@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Sockets;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>تست TCP/HTTP مستقیم (بدون پروکسی) — برای مرتب‌سازی اولیه.</summary>
 public static class LatencyTester

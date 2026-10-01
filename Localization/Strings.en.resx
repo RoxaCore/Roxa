@@ -416,27 +416,27 @@ Latency: {1}</value></data>
   <data name="Log_PoolExpired" xml:space="preserve"><value>Search pool expired or empty. Rebuilding from all servers...</value></data>
   <data name="Log_SearchPool" xml:space="preserve"><value>Search pool: {0} untested servers saved for incremental search</value></data>
   <data name="Log_SmartFailedAll" xml:space="preserve"><value>Smart connect: real delay test failed for all candidates</value></data>
-  <data name="Eng_AssetMissing" xml:space="preserve"><value>Asset {0} not found in latest Xray release.</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>Asset {0} not found in latest Roxa release.</value></data>
   <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>Clear proxy failed: {0}</value></data>
   <data name="Eng_ConnectedPorts" xml:space="preserve"><value>Connected. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>Connecting to {0} {1} ...</value></data>
-  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Xray-core download digest mismatch: expected {0}, got {1}.</value></data>
-  <data name="Eng_Downloading" xml:space="preserve"><value>Downloading Xray-core engine ...</value></data>
-  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Xray engine exited unexpectedly.</value></data>
-  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Xray engine failed integrity verification.</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Roxa download digest mismatch: expected {0}, got {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Downloading Roxa engine ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Roxa engine exited unexpectedly.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Roxa engine failed integrity verification.</value></data>
   <data name="Eng_IntegrityRetry" xml:space="preserve"><value>Engine integrity check failed. Re-downloading ...</value></data>
   <data name="Eng_MirrorTrying" xml:space="preserve"><value>Direct GitHub unreachable, trying mirror ...</value></data>
-  <data name="Eng_MultiExited" xml:space="preserve"><value>Xray multi-test engine exited unexpectedly.</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>Roxa multi-test engine exited unexpectedly.</value></data>
   <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>Multi-test ports did not come up.</value></data>
-  <data name="Eng_MultiStarted" xml:space="preserve"><value>Multi-test Xray engine started.</value></data>
-  <data name="Eng_NoDigest" xml:space="preserve"><value>Cannot verify Xray-core download via mirror without GitHub digest.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>Multi-test Roxa engine started.</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>Cannot verify Roxa download via mirror without GitHub digest.</value></data>
   <data name="Eng_NotFound" xml:space="preserve"><value>Engine not found, downloading ...</value></data>
   <data name="Eng_PortNotUp" xml:space="preserve"><value>Proxy port did not come up.</value></data>
-  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} ready.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Roxa {0} ready.</value></data>
   <data name="Eng_Stopped" xml:space="preserve"><value>Engine stopped.</value></data>
-  <data name="Eng_TestExited" xml:space="preserve"><value>Xray test engine exited unexpectedly.</value></data>
-  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray test port did not come up.</value></data>
-  <data name="Eng_TestStarted" xml:space="preserve"><value>Test Xray engine started.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>Roxa test engine exited unexpectedly.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Roxa test port did not come up.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>Test Roxa engine started.</value></data>
   <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>TUN adapter is not ready.</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN adapter cleaned up.</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>TUN cleanup failed: {0}</value></data>

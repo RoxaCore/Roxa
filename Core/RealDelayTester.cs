@@ -2,9 +2,9 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
-using XrayClient.Models;
+using Roxa.Models;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>تست Real Delay: انجین (تکی یا multi-outbound) + warmup موازی + ۳ نمونه median روی پروکسی محلی.</summary>
 public static class RealDelayTester

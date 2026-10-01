@@ -5,11 +5,11 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using XrayClient.Core;
-using XrayClient.Models;
-using XrayClient.ViewModels;
+using Roxa.Core;
+using Roxa.Models;
+using Roxa.ViewModels;
 
-namespace XrayClient.Views;
+namespace Roxa.Views;
 
 public partial class MainWindow : Window
 {

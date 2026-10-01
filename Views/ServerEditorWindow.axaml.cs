@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using XrayClient.Core;
-using XrayClient.Models;
+using Roxa.Core;
+using Roxa.Models;
 
-namespace XrayClient.Views;
+namespace Roxa.Views;
 
 public partial class ServerEditorWindow : Window
 {

@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public sealed class TunRouteRecord
 {

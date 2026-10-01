@@ -1,8 +1,8 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="XrayClient.App"
-             xmlns:local="using:XrayClient"
-             xmlns:conv="using:XrayClient.Converters"
+             x:Class="Roxa.App"
+             xmlns:local="using:Roxa"
+             xmlns:conv="using:Roxa.Converters"
              RequestedThemeVariant="Default">
 
     <Application.DataTemplates>
@@ -15,7 +15,7 @@
     </Application.Styles>
 
     <Application.Resources>
-        <FontFamily x:Key="Vazirmatn">avares://XrayClient/Assets/Fonts/Vazirmatn-Regular.ttf#Vazirmatn</FontFamily>
+        <FontFamily x:Key="Vazirmatn">avares://Roxa/Assets/Fonts/Vazirmatn-Regular.ttf#Vazirmatn</FontFamily>
         <conv:BoolToOpacityConverter x:Key="BoolToOpacity"/>
     </Application.Resources>
 </Application>

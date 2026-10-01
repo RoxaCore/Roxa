@@ -1,9 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using XrayClient.Models;
+using Roxa.Models;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 /// <summary>ذخیره‌سازی JSON در پوشه AppData/Roxa. servers.json با DPAPI (CurrentUser) رمزنگاری می‌شود.</summary>
 public static class Storage

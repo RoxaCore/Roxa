@@ -424,27 +424,27 @@
   <data name="Log_PoolExpired" xml:space="preserve"><value>استخر جستجو منقضی یا خالی است — بازسازی از همه سرورها...</value></data>
   <data name="Log_SearchPool" xml:space="preserve"><value>استخر جستجو: {0} سرور آزمایش‌نشده برای جستجوی تدریجی ذخیره شد</value></data>
   <data name="Log_SmartFailedAll" xml:space="preserve"><value>اتصال هوشمند: تست تأخیر واقعی برای همه کاندیدها ناموفق بود</value></data>
-  <data name="Eng_AssetMissing" xml:space="preserve"><value>فایل {0} در آخرین نسخه Xray پیدا نشد.</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>فایل {0} در آخرین نسخه Roxa پیدا نشد.</value></data>
   <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>پاک کردن پراکسی ناموفق بود: {0}</value></data>
   <data name="Eng_ConnectedPorts" xml:space="preserve"><value>متصل شد. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>اتصال به {0} {1} ...</value></data>
-  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Digest دانلود Xray-core نادرست است: انتظار {0}، دریافت {1}.</value></data>
-  <data name="Eng_Downloading" xml:space="preserve"><value>دانلود Xray-core ...</value></data>
-  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>موتور Xray به‌صورت غیرمنتظره خارج شد.</value></data>
-  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>بررسی سالم‌بودن موتور Xray ناموفق بود.</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Digest دانلود Roxa نادرست است: انتظار {0}، دریافت {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>دانلود Roxa ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>موتور Roxa به‌صورت غیرمنتظره خارج شد.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>بررسی سالم‌بودن موتور Roxa ناموفق بود.</value></data>
   <data name="Eng_IntegrityRetry" xml:space="preserve"><value>بررسی سالم‌بودن موتور ناموفق بود — دانلود مجدد ...</value></data>
   <data name="Eng_MirrorTrying" xml:space="preserve"><value>دسترسی مستقیم به GitHub ممکن نشد — تلاش از طریق میرور ...</value></data>
-  <data name="Eng_MultiExited" xml:space="preserve"><value>موتور تست چندگانه Xray به‌صورت غیرمنتظره خارج شد.</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>موتور تست چندگانه Roxa به‌صورت غیرمنتظره خارج شد.</value></data>
   <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>پورت‌های تست چندگانه بالا نیامدند.</value></data>
-  <data name="Eng_MultiStarted" xml:space="preserve"><value>موتور تست چندگانه Xray اجرا شد.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>موتور تست چندگانه Roxa اجرا شد.</value></data>
   <data name="Eng_NoDigest" xml:space="preserve"><value>بدون Digest از GitHub نمی‌توان دانلود از میرور را بررسی کرد.</value></data>
   <data name="Eng_NotFound" xml:space="preserve"><value>موتور پیدا نشد — در حال دانلود ...</value></data>
   <data name="Eng_PortNotUp" xml:space="preserve"><value>پورت پراکسی بالا نیامد.</value></data>
-  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} آماده است.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Roxa {0} آماده است.</value></data>
   <data name="Eng_Stopped" xml:space="preserve"><value>موتور متوقف شد.</value></data>
-  <data name="Eng_TestExited" xml:space="preserve"><value>موتور تست Xray به‌صورت غیرمنتظره خارج شد.</value></data>
-  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>پورت تست Xray بالا نیامد.</value></data>
-  <data name="Eng_TestStarted" xml:space="preserve"><value>موتور تست Xray اجرا شد.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>موتور تست Roxa به‌صورت غیرمنتظره خارج شد.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>پورت تست Roxa بالا نیامد.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>موتور تست Roxa اجرا شد.</value></data>
   <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>آداپتر TUN آماده نشد.</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN adapter پاکسازی شد.</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>پاکسازی TUN ناموفق بود: {0}</value></data>

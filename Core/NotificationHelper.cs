@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public static class NotificationHelper
 {

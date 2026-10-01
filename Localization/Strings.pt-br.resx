@@ -383,27 +383,27 @@ Latência: {1}</value></data>
   <data name="Log_PoolExpired" xml:space="preserve"><value>Pool de busca expirado ou vazio. Reconstruindo a partir de todos os servidores...</value></data>
   <data name="Log_SearchPool" xml:space="preserve"><value>Pool de busca: {0} servidores não testados salvos para busca incremental</value></data>
   <data name="Log_SmartFailedAll" xml:space="preserve"><value>Conexão inteligente: teste de latência real falhou para todos os candidatos</value></data>
-  <data name="Eng_AssetMissing" xml:space="preserve"><value>Recurso {0} não encontrado na versão mais recente do Xray.</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>Recurso {0} não encontrado na versão mais recente do Roxa.</value></data>
   <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>Falha ao limpar o proxy: {0}</value></data>
   <data name="Eng_ConnectedPorts" xml:space="preserve"><value>Conectado. HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>Conectando a {0} {1} ...</value></data>
-  <data name="Eng_DigestMismatch" xml:space="preserve"><value>O digest da download do Xray-core não corresponde: esperado {0}, obtido {1}.</value></data>
-  <data name="Eng_Downloading" xml:space="preserve"><value>Baixando Xray-core ...</value></data>
-  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>O motor Xray saiu inesperadamente.</value></data>
-  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Falha na verificação de integridade do motor Xray.</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>O digest da download do Roxa não corresponde: esperado {0}, obtido {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Baixando Roxa ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>O motor Roxa saiu inesperadamente.</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Falha na verificação de integridade do motor Roxa.</value></data>
   <data name="Eng_IntegrityRetry" xml:space="preserve"><value>Falha na verificação de integridade do motor. Baixando novamente ...</value></data>
   <data name="Eng_MirrorTrying" xml:space="preserve"><value>GitHub direto inacessível, tentando mirror ...</value></data>
-  <data name="Eng_MultiExited" xml:space="preserve"><value>O motor de testes múltiplos do Xray saiu inesperadamente.</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>O motor de testes múltiplos do Roxa saiu inesperadamente.</value></data>
   <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>As portas de testes múltiplos não subiram.</value></data>
-  <data name="Eng_MultiStarted" xml:space="preserve"><value>Motor de testes múltiplos do Xray iniciado.</value></data>
-  <data name="Eng_NoDigest" xml:space="preserve"><value>Não é possível verificar o download do Xray-core via mirror sem o digest do GitHub.</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>Motor de testes múltiplos do Roxa iniciado.</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>Não é possível verificar o download do Roxa via mirror sem o digest do GitHub.</value></data>
   <data name="Eng_NotFound" xml:space="preserve"><value>Motor não encontrado, baixando ...</value></data>
   <data name="Eng_PortNotUp" xml:space="preserve"><value>A porta do proxy não subiu.</value></data>
-  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} pronto.</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Roxa {0} pronto.</value></data>
   <data name="Eng_Stopped" xml:space="preserve"><value>Motor parado.</value></data>
-  <data name="Eng_TestExited" xml:space="preserve"><value>O motor de testes do Xray saiu inesperadamente.</value></data>
-  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>A porta de testes do Xray não subiu.</value></data>
-  <data name="Eng_TestStarted" xml:space="preserve"><value>Motor de teste do Xray iniciado.</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>O motor de testes do Roxa saiu inesperadamente.</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>A porta de testes do Roxa não subiu.</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>Motor de teste do Roxa iniciado.</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>Adaptador TUN limpo.</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>Falha na limpeza do TUN: {0}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>O modo TUN requer administrador. Voltando ao modo proxy.</value></data>

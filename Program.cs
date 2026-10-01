@@ -2,7 +2,7 @@
 using System;
 using System.Threading;
 
-namespace XrayClient;
+namespace Roxa;
 
 sealed class Program
 {

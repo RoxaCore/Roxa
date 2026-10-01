@@ -4,6 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Roxa</AssemblyName>
+    <RootNamespace>Roxa</RootNamespace>
+    <Product>Roxa</Product>
+    <AssemblyTitle>Roxa</AssemblyTitle>
+    <Company>Roxa</Company>
     <Version>3.0.1</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\roxa-icon.ico</ApplicationIcon>

@@ -1,7 +1,7 @@
 using Avalonia.Data.Converters;
 using System.Globalization;
 
-namespace XrayClient.Localization;
+namespace Roxa.Localization;
 
 public class TranslateConverter : IValueConverter
 {

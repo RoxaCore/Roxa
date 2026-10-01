@@ -399,27 +399,27 @@
   <data name="Log_PoolExpired" xml:space="preserve"><value>搜索池已过期或为空，正在从所有服务器重建...</value></data>
   <data name="Log_SearchPool" xml:space="preserve"><value>搜索池：已保存 {0} 个未测试服务器用于增量搜索</value></data>
   <data name="Log_SmartFailedAll" xml:space="preserve"><value>智能连接：所有候选的真实延迟测试均失败</value></data>
-  <data name="Eng_AssetMissing" xml:space="preserve"><value>在最新 Xray 版本中找不到资源 {0}。</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>在最新 Roxa 版本中找不到资源 {0}。</value></data>
   <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>清除代理失败：{0}</value></data>
   <data name="Eng_ConnectedPorts" xml:space="preserve"><value>已连接。HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>正在连接 {0} {1} ...</value></data>
-  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Xray-core 下载摘要不匹配：期望 {0}，得到 {1}。</value></data>
-  <data name="Eng_Downloading" xml:space="preserve"><value>正在下载 Xray-core ...</value></data>
-  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Xray 引擎意外退出。</value></data>
-  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Xray 引擎完整性验证失败。</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Roxa 下载摘要不匹配：期望 {0}，得到 {1}。</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>正在下载 Roxa ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Roxa 引擎意外退出。</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Roxa 引擎完整性验证失败。</value></data>
   <data name="Eng_IntegrityRetry" xml:space="preserve"><value>引擎完整性检查失败，正在重新下载 ...</value></data>
   <data name="Eng_MirrorTrying" xml:space="preserve"><value>无法直连 GitHub，正在尝试镜像 ...</value></data>
-  <data name="Eng_MultiExited" xml:space="preserve"><value>多测试 Xray 引擎意外退出。</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>多测试 Roxa 引擎意外退出。</value></data>
   <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>多测试端口未启动。</value></data>
-  <data name="Eng_MultiStarted" xml:space="preserve"><value>多测试 Xray 引擎已启动。</value></data>
-  <data name="Eng_NoDigest" xml:space="preserve"><value>没有 GitHub 摘要，无法通过镜像验证 Xray-core 下载。</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>多测试 Roxa 引擎已启动。</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>没有 GitHub 摘要，无法通过镜像验证 Roxa 下载。</value></data>
   <data name="Eng_NotFound" xml:space="preserve"><value>未找到引擎，正在下载 ...</value></data>
   <data name="Eng_PortNotUp" xml:space="preserve"><value>代理端口未启动。</value></data>
-  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} 已就绪。</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Roxa {0} 已就绪。</value></data>
   <data name="Eng_Stopped" xml:space="preserve"><value>引擎已停止。</value></data>
-  <data name="Eng_TestExited" xml:space="preserve"><value>测试 Xray 引擎意外退出。</value></data>
-  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray 测试端口未启动。</value></data>
-  <data name="Eng_TestStarted" xml:space="preserve"><value>测试 Xray 引擎已启动。</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>测试 Roxa 引擎意外退出。</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Roxa 测试端口未启动。</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>测试 Roxa 引擎已启动。</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN 适配器已清理。</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>清理 TUN 失败：{0}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN 模式需要管理员权限，正在回退到代理模式。</value></data>

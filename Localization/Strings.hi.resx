@@ -383,27 +383,27 @@
   <data name="Log_PoolExpired" xml:space="preserve"><value>खोज पूल समाप्त या खाली है। सभी सर्वरों से पुनर्निर्माण...</value></data>
   <data name="Log_SearchPool" xml:space="preserve"><value>खोज पूल: क्रमिक खोज के लिए {0} अपरीक्षित सर्वर सहेजे गए</value></data>
   <data name="Log_SmartFailedAll" xml:space="preserve"><value>स्मार्ट कनेक्ट: सभी उम्मीदवारों के लिए वास्तविक विलंब परीक्षण विफल</value></data>
-  <data name="Eng_AssetMissing" xml:space="preserve"><value>{0} संसाधन नवीनतम Xray रिलीज़ में नहीं मिला।</value></data>
+  <data name="Eng_AssetMissing" xml:space="preserve"><value>{0} संसाधन नवीनतम Roxa रिलीज़ में नहीं मिला।</value></data>
   <data name="Eng_ClearProxyFailed" xml:space="preserve"><value>प्रॉक्सी साफ करना विफल रहा: {0}</value></data>
   <data name="Eng_ConnectedPorts" xml:space="preserve"><value>कनेक्टेड। HTTP 127.0.0.1:{0}  SOCKS 127.0.0.1:{1} {2}</value></data>
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>{0} से कनेक्ट हो रहा है {1} ...</value></data>
-  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Xray-core डाउनलोड डाइजेस्ट मेल नहीं खाता: अपेक्षित {0}, प्राप्त {1}.</value></data>
-  <data name="Eng_Downloading" xml:space="preserve"><value>Xray-core डाउनलोड हो रहा है ...</value></data>
-  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Xray इंजन अप्रत्याशित रूप से बंद हो गया।</value></data>
-  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Xray इंजन इंटीग्रिटी सत्यापन विफल रहा।</value></data>
+  <data name="Eng_DigestMismatch" xml:space="preserve"><value>Roxa डाउनलोड डाइजेस्ट मेल नहीं खाता: अपेक्षित {0}, प्राप्त {1}.</value></data>
+  <data name="Eng_Downloading" xml:space="preserve"><value>Roxa डाउनलोड हो रहा है ...</value></data>
+  <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Roxa इंजन अप्रत्याशित रूप से बंद हो गया।</value></data>
+  <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Roxa इंजन इंटीग्रिटी सत्यापन विफल रहा।</value></data>
   <data name="Eng_IntegrityRetry" xml:space="preserve"><value>इंजन इंटीग्रिटी जाँच विफल रही। पुनः डाउनलोड हो रहा है ...</value></data>
   <data name="Eng_MirrorTrying" xml:space="preserve"><value>सीधा GitHub उपलब्ध नहीं — मिरर से प्रयास ...</value></data>
-  <data name="Eng_MultiExited" xml:space="preserve"><value>बहु-परीक्षण Xray इंजन अप्रत्याशित रूप से बंद हो गया।</value></data>
+  <data name="Eng_MultiExited" xml:space="preserve"><value>बहु-परीक्षण Roxa इंजन अप्रत्याशित रूप से बंद हो गया।</value></data>
   <data name="Eng_MultiPortsNotUp" xml:space="preserve"><value>बहु-परीक्षण पोर्ट चालू नहीं हुए।</value></data>
-  <data name="Eng_MultiStarted" xml:space="preserve"><value>बहु-परीक्षण Xray इंजन शुरू हुआ।</value></data>
-  <data name="Eng_NoDigest" xml:space="preserve"><value>GitHub डाइजेस्ट के बिना मिरर से Xray-core डाउनलोड सत्यापित नहीं कर सकते।</value></data>
+  <data name="Eng_MultiStarted" xml:space="preserve"><value>बहु-परीक्षण Roxa इंजन शुरू हुआ।</value></data>
+  <data name="Eng_NoDigest" xml:space="preserve"><value>GitHub डाइजेस्ट के बिना मिरर से Roxa डाउनलोड सत्यापित नहीं कर सकते।</value></data>
   <data name="Eng_NotFound" xml:space="preserve"><value>इंजन नहीं मिला, डाउनलोड हो रहा है ...</value></data>
   <data name="Eng_PortNotUp" xml:space="preserve"><value>प्रॉक्सी पोर्ट चालू नहीं हुआ।</value></data>
-  <data name="Eng_Ready" xml:space="preserve"><value>Xray-core {0} तैयार है।</value></data>
+  <data name="Eng_Ready" xml:space="preserve"><value>Roxa {0} तैयार है।</value></data>
   <data name="Eng_Stopped" xml:space="preserve"><value>इंजन रोका गया।</value></data>
-  <data name="Eng_TestExited" xml:space="preserve"><value>परीक्षण Xray इंजन अप्रत्याशित रूप से बंद हो गया।</value></data>
-  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Xray परीक्षण पोर्ट चालू नहीं हुआ।</value></data>
-  <data name="Eng_TestStarted" xml:space="preserve"><value>परीक्षण Xray इंजन शुरू हुआ।</value></data>
+  <data name="Eng_TestExited" xml:space="preserve"><value>परीक्षण Roxa इंजन अप्रत्याशित रूप से बंद हो गया।</value></data>
+  <data name="Eng_TestPortNotUp" xml:space="preserve"><value>Roxa परीक्षण पोर्ट चालू नहीं हुआ।</value></data>
+  <data name="Eng_TestStarted" xml:space="preserve"><value>परीक्षण Roxa इंजन शुरू हुआ।</value></data>
   <data name="Eng_TunCleaned" xml:space="preserve"><value>TUN अडेप्टर साफ किया गया।</value></data>
   <data name="Eng_TunCleanupFailed" xml:space="preserve"><value>TUN सफाई विफल रही: {0}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN मोड के लिए व्यवस्थापक आवश्यक है। प्रॉक्सी मोड पर वापस जा रहा है।</value></data>

@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace XrayClient.Core;
+namespace Roxa.Core;
 
 public static class ProxyRouter
 {

@@ -283,6 +283,7 @@ public static class SubscriptionManager
     public static List<ServerInfo> ParseSubscriptionJson(string content)
     {
         var list = new List<ServerInfo>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
         using var doc = JsonDocument.Parse(content);
         if (doc.RootElement.ValueKind == JsonValueKind.Array)
         {
@@ -292,7 +293,7 @@ public static class SubscriptionManager
                 try
                 {
                     var server = FromConfigObject(item);
-                    if (server != null) list.Add(server);
+                    if (server != null && seen.Add(DupeKey(server))) list.Add(server);
                 }
                 catch (FormatException) { }
             }
@@ -308,6 +309,10 @@ public static class SubscriptionManager
         }
         return list;
     }
+
+    /// <summary>کلید واحد تکراری: آدرس+پورت+پروتکل+ترنسپورت؛ نام داخل کلید نیست.</summary>
+    private static string DupeKey(ServerInfo s) =>
+        $"{s.Address}:{s.Port}|{s.Protocol}|{s.Network}".ToLowerInvariant();
 
     private static ServerInfo? FromConfigObject(JsonElement item)
     {
@@ -442,6 +447,7 @@ public static class SubscriptionManager
     private static List<ServerInfo> ParseLines(string text)
     {
         var result = new List<ServerInfo>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
         foreach (var line in text.Split('\n'))
         {
             string trimmed = line.Trim().TrimStart('\uFEFF');
@@ -449,7 +455,7 @@ public static class SubscriptionManager
             try
             {
                 var server = UrlParser.Parse(trimmed);
-                if (!result.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal)))
+                if (seen.Add(DupeKey(server)))
                     result.Add(server);
             }
             catch (FormatException) { }

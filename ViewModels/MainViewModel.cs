@@ -88,6 +88,15 @@ public partial class MainViewModel : ViewModelBase
      [ObservableProperty] private int _duplicateCount;
 
      public bool HasDuplicates => DuplicateCount > 0;
+
+     /// <summary>
+     /// مبنای واحد تشخیص تکراری برای شمارش، حذف و افزودن:
+     /// آدرس + پورت + پروتکل + ترنسپورت. نام سرور در کلید نیست تا دو نسخهٔ
+     /// یک گره با نام‌های متفاوت تکراری حساب شوند و شمارش دقیقاً با حذف یکی باشد.
+     /// </summary>
+     public static string DupeKey(ServerInfo s) =>
+         $"{s.Address}:{s.Port}|{s.Protocol}|{s.Network}".ToLowerInvariant();
+
       [ObservableProperty] private string _selectedSubscriptionName = "";
       [ObservableProperty] private string _sortField = TranslationManager.Instance["Sort_None"];
       [ObservableProperty] private bool _globalSort;

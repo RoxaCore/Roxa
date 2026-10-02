@@ -443,4 +443,5 @@
 <data name="Sub_EmptyBody" xml:space="preserve"><value>سرور کا جواب خالی ہے۔</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>خبردار: یہ سبسکرپشن لنک بغیر تعمیری http استعمال کرتا ہے۔</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>انجن کا ورژن ({0}) جانچے گئے ورژن ({1}) سے پرانا ہے؛ کچھ ترتیبات کام نہیں کر سکتیں۔</value></data>
+<data name="Hint_BypassTun" xml:space="preserve"><value>نوٹ: ٹیسٹ TUN لاگو کیے بغیر چلتے ہیں</value></data>
 </root>

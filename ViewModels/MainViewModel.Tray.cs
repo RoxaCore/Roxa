@@ -75,7 +75,8 @@ public partial class MainViewModel : ViewModelBase
                           Enrich(server);
                           server.Owner = this;
                           server.SubscriptionName = sub.Name;
-                          if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal))) continue;
+                          string tdk = DupeKey(server);
+                          if (Servers.Any(s => string.Equals(DupeKey(s), tdk, StringComparison.Ordinal))) continue;
                           Servers.Add(server);
                       }
                   sub.LastUpdated = DateTime.Now;

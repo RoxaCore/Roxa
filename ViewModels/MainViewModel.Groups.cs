@@ -30,12 +30,13 @@ public partial class MainViewModel : ViewModelBase
             s.Owner = this;
         RefreshConnectionFlags();
 
-        var seen = new HashSet<string>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
         int dupeCount = 0;
         foreach (var s in Servers)
         {
-            string key = $"{s.Address}:{s.Port}:{s.UserId}:{s.Password}";
-            if (!seen.Add(key)) dupeCount++;
+            // کلید واحد (آدرس+پورت+پروتکل+ترنسپورت)؛ باید عیناً با کلید
+            // RemoveDuplicates یکی باشد تا شمارندهٔ دکمه همان چیزی را حذف کند که می‌شمارد.
+            if (!seen.Add(DupeKey(s))) dupeCount++;
         }
         DuplicateCount = dupeCount;
 

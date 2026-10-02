@@ -459,4 +459,5 @@
 <data name="Sub_EmptyBody" xml:space="preserve"><value>Ответ сервера пуст.</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>Внимание: эта ссылка подписки использует незашифрованный http.</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>Версия движка ({0}) старше проверенной ({1}); часть конфигураций может не работать.</value></data>
+<data name="Hint_BypassTun" xml:space="preserve"><value>Примечание: тесты выполняются без применения TUN</value></data>
 </root>

@@ -461,4 +461,5 @@ Latence : {1}</value></data>
 <data name="Sub_EmptyBody" xml:space="preserve"><value>La réponse du serveur est vide.</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>Avertissement : ce lien d'abonnement utilise du http non chiffré.</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>La version du moteur ({0}) est plus ancienne que la version testée ({1}) ; certaines configurations peuvent ne pas fonctionner.</value></data>
+<data name="Hint_BypassTun" xml:space="preserve"><value>Remarque : les tests s'exécutent sans appliquer TUN</value></data>
 </root>

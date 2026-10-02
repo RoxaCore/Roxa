@@ -443,4 +443,5 @@
 <data name="Sub_EmptyBody" xml:space="preserve"><value>सर्वर प्रतिक्रिया खाली है।</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>चेतावनी: यह सदस्यता लिंक सादे http का उपयोग करता है और एन्क्रिप्टेड नहीं है।</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>इंजन संस्करण ({0}) परीक्षित संस्करण ({1}) से पुराना है; कुछ कॉन्फ़िगरेशन काम नहीं कर सकते।</value></data>
+<data name="Hint_BypassTun" xml:space="preserve"><value>नोट: परीक्षण TUN लागू किए बिना चलते हैं</value></data>
 </root>

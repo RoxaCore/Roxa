@@ -443,4 +443,5 @@
 <data name="Sub_EmptyBody" xml:space="preserve"><value>サーバの応答が空です。</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>警告: このサブスクリプションリンクは暗号化されていない http を使用しています。</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>エンジンバージョン ({0}) はテスト済みバージョン ({1}) より古いため、一部の設定が動作しない可能性があります。</value></data>
+<data name="Hint_BypassTun" xml:space="preserve"><value>注: テストはTUNを適用せずに実行されます</value></data>
 </root>

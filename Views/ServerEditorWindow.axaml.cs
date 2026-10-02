@@ -7,16 +7,23 @@ namespace Roxa.Views;
 
 public partial class ServerEditorWindow : Window
 {
+    private ServerInfo? _subscribed;
+
     public ServerInfo? EditedServer
     {
         get => DataContext as ServerInfo;
         set
         {
+            // بدون detach، هر بار باز شدن دیالوگ یک handler دیگر روی ServerInfo
+            // (که عمرش در کل برنامه است) اضافه می‌کرد → نشت و اجرای چندباره RefreshPreview.
+            if (_subscribed != null) _subscribed.PropertyChanged -= OnEditedServerChanged;
             DataContext = value;
-            if (value != null)
-                value.PropertyChanged += (_, _) => RefreshPreview();
+            _subscribed = value;
+            if (value != null) value.PropertyChanged += OnEditedServerChanged;
         }
     }
+
+    private void OnEditedServerChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => RefreshPreview();
 
     public ServerEditorWindow()
     {
@@ -27,6 +34,16 @@ public partial class ServerEditorWindow : Window
     {
         base.OnOpened(e);
         RefreshPreview();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+        if (_subscribed != null)
+        {
+            _subscribed.PropertyChanged -= OnEditedServerChanged;
+            _subscribed = null;
+        }
     }
 
     private void RefreshPreview()

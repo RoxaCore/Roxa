@@ -47,16 +47,19 @@ public static class NotificationHelper
     private static int _generation;
     private const int RemoveDelayMs = 5000;
 
+    // هندل آیکون یک بار ساخته می‌شود؛ ساختن LoadImage در هر بار نمایش پنجره،
+    // بدون DestroyIcon باعث نشت GDI handle می‌شد.
+    private static IntPtr _hIcon;
+
     private static bool AddIcon()
     {
-        var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "roxa-icon.ico");
         var nid = new NOTIFYICONDATA
         {
             cbSize = Marshal.SizeOf<NOTIFYICONDATA>(),
             hWnd = _hWnd,
             uID = _uId,
             uFlags = NIF_ICON | NIF_TIP,
-            hIcon = LoadIcon(iconPath),
+            hIcon = GetIcon(),
             szTip = "Roxa"
         };
         bool ok = Shell_NotifyIcon(NIM_ADD, ref nid);
@@ -77,15 +80,20 @@ public static class NotificationHelper
         _visible = false;
     }
 
-    private static IntPtr LoadIcon(string path)
+    private static IntPtr GetIcon()
     {
-        if (!System.IO.File.Exists(path))
-            return IntPtr.Zero;
-        return LoadImage(IntPtr.Zero, path, 1, 16, 16, 0x00000010);
+        if (_hIcon != IntPtr.Zero) return _hIcon;
+        var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "roxa-icon.ico");
+        if (!System.IO.File.Exists(iconPath)) return IntPtr.Zero;
+        _hIcon = LoadImage(IntPtr.Zero, iconPath, 1, 16, 16, 0x00000010);
+        return _hIcon;
     }
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr LoadImage(IntPtr hInst, string name, uint type, int cx, int cy, uint fuLoad);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool DestroyIcon(IntPtr hIcon);
 
     public static void Cleanup()
     {
@@ -93,6 +101,11 @@ public static class NotificationHelper
         {
             _generation++;
             RemoveIcon();
+            if (_hIcon != IntPtr.Zero)
+            {
+                try { DestroyIcon(_hIcon); } catch { }
+                _hIcon = IntPtr.Zero;
+            }
         }
     }
 

@@ -263,6 +263,7 @@ Latencia: {1}</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>Si se activa esta opción, la aplicación descarga e instala automáticamente las nuevas versiones; se cerrará y volverá a abrir para aplicar la actualización.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>Aplicaciones excluidas de TUN</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>El tráfico de estas aplicaciones no pasa por el servidor VPN y usa tu IP real. Solo se aplica mientras el modo TUN está activo.</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>Nota: esta lista es genérica; cualquier app se añade según su archivo ejecutable. En modo proxy (sin TUN) solo afecta a las apps que respetan el proxy del sistema. Todo el DNS del sistema sigue pasando por la VPN, así que los sitios bloqueados pueden abrirse también para estas apps.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>Añadir aplicación...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Eliminar</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Aún no se han añadido aplicaciones</value></data>
@@ -371,6 +372,8 @@ Latencia: {1}</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Enlace Trojan no válido</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Enlace VLESS no válido</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Solo se admiten vmess / vless / ss / trojan</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>transporte no admitido: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>valor no válido para el parámetro {0}: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>Buscar mejor: bloqueado — otra prueba está en ejecución</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>Error al buscar mejor: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>Buscar mejor: no quedan servidores para probar</value></data>
@@ -409,8 +412,35 @@ Latencia: {1}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>El modo TUN requiere administrador. Volviendo al modo proxy.</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>SO/arquitectura no admitidos.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll no disponible. Volviendo al modo proxy.</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Solo se permiten URL de suscripción https.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>El enlace de suscripción debe usar http o https.</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>Payload JSON no válido en el enlace</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>La URL de actualización debe usar https</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>El paquete de actualización no tiene huella sha256</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>Diagnóstico de conexión</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>Diagnosticando la conexión…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>Diagnóstico finalizado: no se encontraron problemas</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>Diagnóstico finalizado: {0} problema(s) (detalles en la pestaña Registro)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} resuelto → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: error de resolución — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: el adaptador '{0}' apunta a 127.0.0.1 pero no hay servicio DNS local</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: el adaptador '{0}' se restableció a automático</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: ejecute la aplicación como administrador para repararla</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: no se encontraron problemas</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>Proxy del sistema: desactivado</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>Proxy del sistema: activado ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>Proxy del sistema: apunta a una dirección de loopback inaccesible ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>Obtención de suscripción: HTTP {0} — {1} servidor(es) en {2} ms</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>Obtención de suscripción: HTTP {0} — no hay servidores en la respuesta; el contenido empieza con: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>Obtención de suscripción: error — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>Obtención sin proxy: HTTP {0} — {1} servidor(es) (el proxy es el culpable)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Motor Xray: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>No hay enlace disponible para probar</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>Respuesta fallida del servidor de suscripción: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>Respuesta recibida pero no contiene servidores. El contenido empieza con: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>La respuesta del servidor está vacía.</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>Advertencia: este enlace de suscripción usa http sin cifrar.</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>La versión del motor ({0}) es más antigua que la probada ({1}); algunas configuraciones pueden no funcionar.</value></data>
 </root>

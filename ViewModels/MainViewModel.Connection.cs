@@ -1,11 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Net.Http;
+﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Threading;
 using Avalonia.Input.Platform;
 using Avalonia.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Roxa.Core;
 using Roxa.Localization;
@@ -38,6 +35,14 @@ public partial class MainViewModel : ViewModelBase
         ConnectCommand.NotifyCanExecuteChanged();
         try
         {
+            string issue = server.TransportIssue;
+            if (issue.Length > 0)
+            {
+                Status = issue;
+                ToastHandler?.Invoke(issue);
+                AppendLog(string.Format(TranslationManager.Instance["Log_Error"], issue));
+                return;
+            }
             Status = TranslationManager.Instance["Status_Connecting"];
             await _engine.StartAsync(server, SetSystemProxy, _settings, tunExclusionHosts: Servers.Select(s => s.Address));
             IsConnected = true;
@@ -156,9 +161,7 @@ public partial class MainViewModel : ViewModelBase
         if (Servers.Count == 0) { Status = TranslationManager.Instance["Status_NoServers"]; ToastHandler?.Invoke(TranslationManager.Instance["Toast_NoServerForConnect"]); return; }
         if (IsConnected) Disconnect();
 
-        var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-        oldCts?.Dispose();
-        var ct = _testCts.Token;
+        var ct = NewTestToken();
         IsTesting = true;
         IsSmartConnecting = true;
 
@@ -341,9 +344,7 @@ public partial class MainViewModel : ViewModelBase
             return;
         }
 
-        var oldCts2 = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-        oldCts2?.Dispose();
-        var ct = _testCts.Token;
+        var ct = NewTestToken();
         IsTesting = true;
         IsFindingBetter = true;
 

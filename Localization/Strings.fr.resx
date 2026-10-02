@@ -281,6 +281,7 @@ Latence : {1}</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>Lorsque cette option est activée, l'application télécharge et installe automatiquement les nouvelles versions ; elle se fermera et se rouvrira pour appliquer la mise à jour.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>Applications exclues de TUN</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>Le trafic de ces applications contourne le serveur VPN et utilise votre IP réelle. S'applique uniquement lorsque le mode TUN est actif.</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>Remarque : cette liste est générique — toute app est acceptée selon son exécutable. En mode proxy (sans TUN), elle n'affecte que les applications qui respectent le proxy système. Tout le DNS du système passe encore par le VPN, donc les sites bloqués peuvent aussi s'ouvrir pour ces applications.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>Ajouter une application...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Supprimer</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Aucune application ajoutée pour l'instant</value></data>
@@ -389,6 +390,8 @@ Latence : {1}</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Lien Trojan invalide</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Lien VLESS invalide</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Seuls vmess / vless / ss / trojan sont pris en charge</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>transport non pris en charge : {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>valeur invalide pour le paramètre {0} : {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>Trouver mieux : bloqué — un autre test est en cours</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>Erreur lors de la recherche d'un meilleur serveur : {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>Trouver mieux : plus aucun serveur à tester</value></data>
@@ -427,8 +430,35 @@ Latence : {1}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>Le mode TUN nécessite les droits administrateur. Retour en mode proxy.</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>OS/architecture non pris en charge.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll indisponible. Retour en mode proxy.</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Seules les URL d'abonnement https sont autorisées.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Le lien d'abonnement doit utiliser http ou https.</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>Charge JSON invalide dans le lien</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>L'URL de mise à jour doit utiliser https</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>Le package de mise à jour n'a pas d'empreinte sha256</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>Diagnostic de connexion</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>Diagnostic de la connexion…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>Diagnostic terminé : aucun problème trouvé</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>Diagnostic terminé : {0} problème(s) (détails dans l'onglet Journal)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS : {0} résolu → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS : échec de résolution — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS : l'adaptateur '{0}' pointe vers 127.0.0.1 mais aucun service DNS local n'écoute</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS : l'adaptateur '{0}' a été réinitialisé en automatique</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS : lancez l'application en tant qu'administrateur pour la réparer</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS : aucun problème trouvé</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>Proxy système : désactivé</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>Proxy système : activé ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>Proxy système : pointe vers une adresse de bouclage local inaccessible ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>Récupération de l'abonnement : HTTP {0} — {1} serveur(s) en {2} ms</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>Récupération de l'abonnement : HTTP {0} — aucun serveur dans la réponse ; le contenu commence par : {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>Récupération de l'abonnement : erreur — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>Récupération sans proxy : HTTP {0} — {1} serveur(s) (le proxy est le coupable)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Moteur Xray : {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>Aucun lien disponible pour le test</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>Réponse sans succès du serveur d'abonnement : {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>Réponse reçue mais elle ne contient aucun serveur. Le contenu commence par : {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>La réponse du serveur est vide.</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>Avertissement : ce lien d'abonnement utilise du http non chiffré.</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>La version du moteur ({0}) est plus ancienne que la version testée ({1}) ; certaines configurations peuvent ne pas fonctionner.</value></data>
 </root>

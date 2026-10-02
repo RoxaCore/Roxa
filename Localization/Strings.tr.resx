@@ -628,6 +628,7 @@ Gecikme: {1}</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>Bu seçenek etkinken uygulama yeni sürümleri otomatik indirip kurar; güncelleme uygulanmak için uygulama kapanıp yeniden açılır.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>TUN'dan muaf uygulamalar</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>Bu uygulamaların trafiği VPN sunucusundan geçmez ve gerçek IP adresinizi kullanır. Yalnızca TUN modu etkinken geçerlidir.</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>Not: bu liste geneldir — her uygulama çalıştırılabilir dosyasına göre eklenir. Proxy modunda (TUN'süz) yalnızca sistem proxy'sine uyan uygulamaları etkiler. Sistemin tüm DNS'i hâlâ VPN üzerinden gider, bu nedenle engelli siteler bu uygulamalarda da açılabilir.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>Uygulama ekle...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Kaldır</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Henüz uygulama eklenmedi</value></data>
@@ -736,6 +737,8 @@ Gecikme: {1}</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Geçersiz Trojan bağlantısı</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Geçersiz VLESS bağlantısı</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Yalnızca vmess / vless / ss / trojan desteklenir</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>iletim yöntemi desteklenmiyor: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>{0} parametresi için geçersiz değer: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>Daha iyi bul: engellendi — başka bir test çalışıyor</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>Daha iyi bulma hatası: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>Daha iyi bul: test edilecek sunucu kalmadı</value></data>
@@ -774,8 +777,35 @@ Gecikme: {1}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN modu yönetici yetkisi gerektirir. Proxy moduna dönülüyor.</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>Desteklenmeyen işletim sistemi/mimari.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll kullanılamıyor. Proxy moduna dönülüyor.</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Yalnızca https abonelik URL'lerine izin verilir.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Abonelik bağlantısı http veya https kullanmalıdır.</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>Bağlantıda geçersiz JSON verisi</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>Güncelleme adresi https kullanmalıdır</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>Güncelleme paketinde sha256 parmak izi yok</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>Bağlantı tanılama</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>Bağlantı tanımlanıyor…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>Tanılama tamamlandı: sorun bulunamadı</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>Tanılama tamamlandı: {0} sorun (ayrıntılar Günlük sekmesinde)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} çözümlendi → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: çözümleme başarısız — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: '{0}' adaptörü 127.0.0.1'e işaret ediyor ancak yerel DNS hizmeti yanıt vermiyor</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: '{0}' adaptörü Otomatik olarak sıfırlandı</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: onarmak için uygulamayı yönetici olarak çalıştırın</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: sorun bulunamadı</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>Sistem proxy'si: kapalı</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>Sistem proxy'si: etkin ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>Sistem proxy'si: erişilemeyen bir loopback adresine işaret ediyor ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>Abonelik çekme: HTTP {0} — {2} ms içinde {1} sunucu</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>Abonelik çekme: HTTP {0} — yanıtta sunucu yok; gövde şöyle başlıyor: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>Abonelik çekme: hata — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>Proxy'siz abonelik çekme: HTTP {0} — {1} sunucu (suçlu proxy)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Xray motoru: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>Test edilecek bağlantı yok</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>Abonelik sunucusundan başarısız yanıt: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>Yanıt alındı ancak sunucu içermiyor. Gövde şöyle başlıyor: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>Sunucu yanıtı boş.</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>Uyarı: bu abonelik bağlantısı şifrelenmemiş http kullanıyor.</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>Motor sürümü ({0}), test edilen sürümden ({1}) daha eski; bazı yapılandırmalar çalışmayabilir.</value></data>
 </root>

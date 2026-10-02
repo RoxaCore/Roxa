@@ -23,6 +23,9 @@ public partial class ServerInfo : ObservableObject
     public string Flow { get; set; } = "";
     public string Security { get; set; } = "none";
     public string Network { get; set; } = "tcp";
+    public string Mode { get; set; } = "";
+    public string Extra { get; set; } = "";
+    public string Seed { get; set; } = "";
     public string Host { get; set; } = "";
     public string Path { get; set; } = "";
     public string ServiceName { get; set; } = "";
@@ -264,7 +267,29 @@ public partial class ServerInfo : ObservableObject
     }
 
     [JsonIgnore]
-    public string ToolTipText => $"{Name}\n{Address}:{Port}\n{Protocol} · {LatencyDisplay} · {SpeedDisplay}";
+    public string ToolTipText
+    {
+        get
+        {
+            string issue = TransportIssue;
+            string baseText = $"{Name}\n{Address}:{Port}\n{Protocol} · {LatencyDisplay} · {SpeedDisplay}";
+            return issue.Length == 0 ? baseText : $"{baseText}\n⚠ {issue}";
+        }
+    }
+
+    /// <summary>اگر transport این سرور پشتیبانی نشود، پیام خطا؛ وگرنه رشتهٔ خالی.</summary>
+    [JsonIgnore]
+    public string TransportIssue
+    {
+        get
+        {
+            string n = (Network ?? "").ToLowerInvariant();
+            if (n.Length == 0) return "";
+            return Array.IndexOf(Core.UrlParser.SupportedNetworks, n) >= 0
+                ? ""
+                : string.Format(Localization.TranslationManager.Instance["Url_UnsupportedTransport"], n);
+        }
+    }
 
     [JsonIgnore]
     public string StatusColor
@@ -437,6 +462,9 @@ public partial class ServerInfo : ObservableObject
         Flow = Flow,
         Security = Security,
         Network = Network,
+        Mode = Mode,
+        Extra = Extra,
+        Seed = Seed,
         Host = Host,
         Path = Path,
         ServiceName = ServiceName,

@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 
@@ -7,7 +8,6 @@ namespace Roxa.Core;
 public static class IpRoute
 {
     private const uint NO_ERROR = 0;
-    private const uint IFI_INVALID_INDEX = 0xFFFFFFFF;
     private const int RowSizeBytes = 56;
 
     [StructLayout(LayoutKind.Sequential)]
@@ -33,10 +33,7 @@ public static class IpRoute
     private static extern uint GetIpForwardTable(IntPtr pTable, ref uint pdwSize, bool bOrder);
 
     [DllImport("iphlpapi.dll", SetLastError = true)]
-    private static extern uint DeleteIpForwardEntry(ref Row pRoute);
-
-    [DllImport("iphlpapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern uint GetIfIndexByName(string pszInterfaceName);
+    private static extern uint DeleteIpForwardEntry(ref Row row);
 
     public static uint ParseIp(string? ip)
     {
@@ -51,10 +48,27 @@ public static class IpRoute
         if (!OperatingSystem.IsWindows()) return 0;
         try
         {
-            uint index = GetIfIndexByName(name);
-            return index == IFI_INVALID_INDEX ? 0 : index;
+            foreach (var nic in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (!string.Equals(nic.Name, name, StringComparison.OrdinalIgnoreCase)) continue;
+                var props = nic.GetIPProperties();
+                try
+                {
+                    int index = props.GetIPv4Properties()?.Index ?? 0;
+                    if (index != 0) return (uint)index;
+                }
+                catch { }
+                try
+                {
+                    int index = props.GetIPv6Properties()?.Index ?? 0;
+                    if (index != 0) return (uint)index;
+                }
+                catch { }
+                return 0;
+            }
         }
-        catch { return 0; }
+        catch { }
+        return 0;
     }
 
     public static List<Row>? GetTable()

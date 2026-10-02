@@ -49,6 +49,9 @@ public static class UrlBuilder
         if (!string.IsNullOrEmpty(s.ShortId)) qp["sid"] = s.ShortId;
         if (!string.IsNullOrEmpty(s.SpiderX)) qp["spx"] = s.SpiderX;
         if (!string.IsNullOrEmpty(s.HeaderType)) qp["headerType"] = s.HeaderType;
+        if (!string.IsNullOrEmpty(s.Mode)) qp["mode"] = s.Mode;
+        if (!string.IsNullOrEmpty(s.Extra)) qp["extra"] = s.Extra;
+        if (!string.IsNullOrEmpty(s.Seed)) qp["seed"] = s.Seed;
         if (s.AllowInsecure) qp["allowInsecure"] = "1";
         return $"vless://{Enc(s.UserId)}@{s.Address}:{s.Port}?{BuildQuery(qp)}#{Enc(s.Name)}";
     }
@@ -78,6 +81,9 @@ public static class UrlBuilder
             ["serviceName"] = s.ServiceName ?? "",
             ["flow"] = s.Flow ?? ""
         };
+        if (!string.IsNullOrEmpty(s.Mode)) obj["mode"] = s.Mode;
+        if (!string.IsNullOrEmpty(s.Extra)) obj["extra"] = s.Extra;
+        if (!string.IsNullOrEmpty(s.Seed)) obj["seed"] = s.Seed;
         return "vmess://" + Convert.ToBase64String(Encoding.UTF8.GetBytes(obj.ToJsonString()));
     }
 
@@ -94,6 +100,9 @@ public static class UrlBuilder
         if (!string.IsNullOrEmpty(s.Path)) qp["path"] = s.Path;
         if (!string.IsNullOrEmpty(s.ServiceName)) qp["serviceName"] = s.ServiceName;
         if (!string.IsNullOrEmpty(s.Alpn)) qp["alpn"] = s.Alpn;
+        if (!string.IsNullOrEmpty(s.Mode)) qp["mode"] = s.Mode;
+        if (!string.IsNullOrEmpty(s.Extra)) qp["extra"] = s.Extra;
+        if (!string.IsNullOrEmpty(s.Seed)) qp["seed"] = s.Seed;
         if (s.AllowInsecure) qp["allowInsecure"] = "1";
         return $"trojan://{Enc(s.Password)}@{s.Address}:{s.Port}?{BuildQuery(qp)}#{Enc(s.Name)}";
     }

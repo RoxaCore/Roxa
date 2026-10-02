@@ -8,6 +8,8 @@ namespace Roxa.Core;
 /// <summary>ساخت کانفیگ JSON موتور xray از روی یک سرور.</summary>
 public static class XrayConfigBuilder
 {
+    public static bool LastDnsStub { get; private set; }
+
     private static readonly string[] PrivateIpCidrs =
     [
         "0.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "127.0.0.0/8",
@@ -51,8 +53,33 @@ public static class XrayConfigBuilder
         var inbounds = (JsonArray)config["inbounds"]!;
 
         bool useTun = useTunOverride ?? settings?.UseTunMode == true;
+        bool dnsStub = useTun && TunDns.IsStubFree();
+        LastDnsStub = dnsStub;
         if (useTun)
         {
+            if (dnsStub)
+            {
+                inbounds.Add(new JsonObject
+                {
+                    ["tag"] = "dns-in",
+                    ["listen"] = TunDns.StubIp,
+                    ["port"] = TunDns.StubPort,
+                    ["protocol"] = "dokodemo-door",
+                    ["settings"] = new JsonObject
+                    {
+                        ["address"] = "8.8.8.8",
+                        ["port"] = 53,
+                        ["network"] = "udp,tcp"
+                    }
+                });
+                ((JsonArray)config["routing"]!["rules"]!).Insert(0, new JsonObject
+                {
+                    ["type"] = "field",
+                    ["inboundTag"] = new JsonArray("dns-in"),
+                    ["outboundTag"] = "proxy"
+                });
+            }
+
             inbounds.Add(new JsonObject
             {
                 ["tag"] = "tun-in",
@@ -106,6 +133,11 @@ public static class XrayConfigBuilder
         }
 
         var dns = BuildDnsObject(settings);
+        if (dns is null && dnsStub)
+            dns = new JsonObject
+            {
+                ["servers"] = new JsonArray(TunDns.PickUpstreamDns().Select(s => (JsonNode)s).ToArray())
+            };
         if (dns is not null) config["dns"] = dns;
 
         return config.ToJsonString(new JsonSerializerOptions
@@ -250,11 +282,28 @@ public static class XrayConfigBuilder
                 };
                 break;
             case "kcp":
-                stream["kcpSettings"] = new JsonObject
-                {
-                    ["header"] = new JsonObject { ["type"] = string.IsNullOrEmpty(s.HeaderType) ? "none" : s.HeaderType },
-                    ["seed"] = s.Path ?? ""
-                };
+                stream["kcpSettings"] = new JsonObject();
+                var kcpMasks = new JsonArray();
+                if (!string.IsNullOrEmpty(s.Seed))
+                    kcpMasks.Add(new JsonObject
+                    {
+                        ["type"] = "mkcp-aes128gcm",
+                        ["settings"] = new JsonObject { ["password"] = s.Seed }
+                    });
+                else
+                    kcpMasks.Add(new JsonObject
+                    {
+                        ["type"] = "mkcp-original",
+                        ["settings"] = new JsonObject()
+                    });
+                string? kcpHeader = MapKcpHeader(s.HeaderType);
+                if (kcpHeader != null)
+                    kcpMasks.Add(new JsonObject
+                    {
+                        ["type"] = kcpHeader,
+                        ["settings"] = new JsonObject()
+                    });
+                stream["finalmask"] = new JsonObject { ["udp"] = kcpMasks };
                 break;
             case "ws":
                 stream["wsSettings"] = new JsonObject
@@ -274,7 +323,24 @@ public static class XrayConfigBuilder
                 stream["grpcSettings"] = new JsonObject { ["serviceName"] = s.ServiceName ?? "" };
                 break;
             case "xhttp":
-                stream["xhttpSettings"] = new JsonObject
+                var xhttp = new JsonObject
+                {
+                    ["path"] = string.IsNullOrEmpty(s.Path) ? "/" : s.Path,
+                    ["host"] = string.IsNullOrEmpty(s.Host) ? (string.IsNullOrEmpty(s.SNI) ? s.Address : s.SNI) : s.Host
+                };
+                if (!string.IsNullOrEmpty(s.Mode)) xhttp["mode"] = s.Mode;
+                if (!string.IsNullOrEmpty(s.Extra))
+                {
+                    try
+                    {
+                        if (JsonNode.Parse(s.Extra) is JsonObject extra) xhttp["extra"] = extra.DeepClone();
+                    }
+                    catch (JsonException) { }
+                }
+                stream["xhttpSettings"] = xhttp;
+                break;
+            case "httpupgrade":
+                stream["httpupgradeSettings"] = new JsonObject
                 {
                     ["path"] = string.IsNullOrEmpty(s.Path) ? "/" : s.Path,
                     ["host"] = string.IsNullOrEmpty(s.Host) ? (string.IsNullOrEmpty(s.SNI) ? s.Address : s.SNI) : s.Host
@@ -326,6 +392,33 @@ public static class XrayConfigBuilder
         }
 
         return stream;
+    }
+
+    private static string? MapKcpHeader(string? headerType)
+    {
+        string t = (headerType ?? "").Trim().ToLowerInvariant();
+        return t switch
+        {
+            "" or "none" => null,
+            "srp" or "srtp" => "header-srtp",
+            "utp" => "header-utp",
+            "dtls" => "header-dtls",
+            "dns" => "header-dns",
+            "wechat" or "wechat-video" => "header-wechat",
+            "wireguard" => "header-wireguard",
+            // مقادیر خام finalmask که خودِ لینک صریحا با پیشوند header- نوشته
+            // (مثلا از سمت سرور با نسخه‌ی جدیدتر موتور) همان‌طور عبور داده می‌شوند
+            // تا بی‌صدا حذف نشوند و اتصال به خاطر ناهماهنگیِ obfuscation نشکند.
+            _ => IsRawFinalmaskId(t) ? t : null
+        };
+    }
+
+    private static bool IsRawFinalmaskId(string t)
+    {
+        if (!t.StartsWith("header-", StringComparison.Ordinal) || t.Length is < 8 or > 40) return false;
+        foreach (char c in t.AsSpan(7))
+            if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-')) return false;
+        return true;
     }
 
     private static JsonArray SplitList(string value)

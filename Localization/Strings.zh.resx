@@ -279,6 +279,7 @@
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>启用此选项后，应用会自动下载并安装新版本；将关闭并重新打开应用以应用更新。</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>从 TUN 中豁免的应用</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>这些应用的流量不经过 VPN 服务器，使用你的真实 IP。仅在 TUN 模式激活时生效。</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>注意：此列表是通用的——任何应用都可按其可执行文件添加。在代理模式（无 TUN）下，仅对遵循系统代理的应用生效。整个系统的 DNS 仍经由 VPN，因此这些应用也可能打开被屏蔽的网站。</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>添加应用...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>删除</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>尚未添加任何应用</value></data>
@@ -387,6 +388,8 @@
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>无效的 Trojan 链接</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>无效的 VLESS 链接</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>仅支持 vmess / vless / ss / trojan</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>不支持的传输方式：{0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>参数 {0} 的值无效：{1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>寻找更优：已阻止 — 另一测试正在进行</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>寻找更优时出错：{0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>寻找更优：没有可测试的服务器了</value></data>
@@ -425,8 +428,35 @@
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN 模式需要管理员权限，正在回退到代理模式。</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>不支持的操作系统/架构。</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll 不可用，正在回退到代理模式。</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>仅允许 https 订阅链接。</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>订阅链接必须使用 http 或 https。</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>链接中的 JSON 数据无效</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>更新地址必须使用 https</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>更新包缺少 sha256 校验值</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>连接诊断</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>正在诊断连接…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>诊断完成：未发现问题</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>诊断完成：{0} 个问题（详情在日志标签页）</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS：{0} 已解析 → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS：解析失败 — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS：适配器 '{0}' 指向 127.0.0.1，但本地 DNS 服务未监听</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS：适配器 '{0}' 已重置为自动</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS：请以管理员身份运行程序以修复</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS：未发现问题</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>系统代理：已禁用</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>系统代理：已启用（{0}）</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>系统代理：指向无法访问的回环地址（{0}）</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>获取订阅：HTTP {0} — {2} 毫秒内 {1} 个服务器</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>获取订阅：HTTP {0} — 响应中没有服务器；内容开头为：{1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>获取订阅：错误 — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>无代理获取订阅：HTTP {0} — {1} 个服务器（问题出在代理）</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Xray 内核：{0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>没有可测试的链接</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>订阅服务器返回失败响应：{0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>已收到响应但其中没有服务器。内容开头为：{0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>服务器响应为空。</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>警告：此订阅链接使用未加密的 http。</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>内核版本（{0}）低于已测试版本（{1}），某些配置可能无法工作。</value></data>
 </root>

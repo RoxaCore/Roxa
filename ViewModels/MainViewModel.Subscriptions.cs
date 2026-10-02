@@ -1,10 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using Avalonia.Input.Platform;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Roxa.Core;
@@ -34,6 +32,8 @@ public partial class MainViewModel : ViewModelBase
     {
         string url = (SubUrl ?? "").Trim();
         if (url.Length == 0) { ToastHandler?.Invoke(TranslationManager.Instance["Toast_EnterLink"]); return; }
+        if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            AppendLog(TranslationManager.Instance["Log_SubWarnHttp"]);
         string name = string.IsNullOrWhiteSpace(SubName) ? GuessSubName(url) : SubName.Trim();
         if (Subscriptions.Any(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase)))
         { AppendLog(string.Format(TranslationManager.Instance["Log_ServerDup"], name)); return; }
@@ -121,7 +121,9 @@ public partial class MainViewModel : ViewModelBase
                 Status = string.Format(TranslationManager.Instance["Status_Fetching"], sub.Name);
                 var (servers, subInfo) = proxyAddress != null
                     ? await SubscriptionManager.FetchWithInfoAndProxyAsync(sub.Url, proxyAddress)
-                    : await SubscriptionManager.FetchWithInfoAsync(sub.Url);
+                    : forceNoProxy
+                        ? await SubscriptionManager.FetchWithInfoDirectAsync(sub.Url)
+                        : await SubscriptionManager.FetchWithInfoAsync(sub.Url);
                 if (servers.Count == 0)
                 {
                     AppendLog(string.Format(TranslationManager.Instance["Log_FetchNoneKept"], sub.Name));
@@ -281,7 +283,7 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = string.Format(TranslationManager.Instance["Status_Fetching"], sub.Name);
-            var (fetched, subInfo) = await SubscriptionManager.FetchWithInfoAsync(sub.Url);
+            var (fetched, subInfo) = await SubscriptionManager.FetchWithInfoDirectAsync(sub.Url);
             if (fetched.Count == 0)
             {
                 AppendLog(string.Format(TranslationManager.Instance["Log_FetchNoneKept"], sub.Name));
@@ -307,8 +309,45 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Status = string.Format(TranslationManager.Instance["Status_UpdateErrorIn"], sub.Name);
+            Status = TranslationManager.Instance["Status_UpdateErrorIn"];
             AppendLog(string.Format(TranslationManager.Instance["Log_UpdateErrorIn"], sub.Name, ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// عیب‌یابی زنجیره‌ی دریافت اشتراک: DNS سیستم (و ترمیم DNS جامانده) ← پروکسی ← دریافت HTTP ← نسخه‌ی موتور.
+    /// جزئیات در سربرگ «لاگ» نمایش داده می‌شود.
+    /// </summary>
+    [RelayCommand]
+    private async Task DiagnoseSubscriptions()
+    {
+        try
+        {
+            string url = (SubUrl ?? "").Trim();
+            if (url.Length == 0)
+                url = Subscriptions.FirstOrDefault(s => !string.IsNullOrWhiteSpace(s.Url))?.Url ?? "";
+            string? proxyAddress = UseProxyForSubscriptions && IsConnected && _engine.HttpPort > 0
+                ? $"127.0.0.1:{_engine.HttpPort}"
+                : null;
+
+            Status = TranslationManager.Instance["Status_Diagnosing"];
+            AppendLog(TranslationManager.Instance["Status_Diagnosing"]);
+            var report = await SubscriptionDiagnostics.RunAsync(url.Length > 0 ? url : null, proxyAddress);
+            foreach (var line in report.Lines) AppendLog(line);
+
+            string summary = report.Healthy
+                ? TranslationManager.Instance["Status_DiagOk"]
+                : string.Format(TranslationManager.Instance["Status_DiagFound"], report.IssueCount);
+            Status = summary;
+            AppendLog(summary);
+            ToastHandler?.Invoke(summary);
+        }
+        catch (Exception ex)
+        {
+            string message = string.Format(TranslationManager.Instance["Log_Error"], ex.Message);
+            Status = TranslationManager.Instance["Status_FetchError"];
+            AppendLog(message);
+            ToastHandler?.Invoke(message);
         }
     }
 

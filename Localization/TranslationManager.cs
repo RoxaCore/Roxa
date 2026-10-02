@@ -33,7 +33,17 @@ public sealed class TranslationManager : INotifyPropertyChanged
 
     public void SetCulture(string code)
     {
-        Culture = CultureInfo.GetCultureInfo(code);
+        // کدِ زبان از فایل تنظیمات می‌آید؛ مقدار خراب/ناشناخته نباید برنامه را بیندازد.
+        try
+        {
+            Culture = string.IsNullOrWhiteSpace(code)
+                ? CultureInfo.GetCultureInfo("fa")
+                : CultureInfo.GetCultureInfo(code);
+        }
+        catch (CultureNotFoundException)
+        {
+            Culture = CultureInfo.GetCultureInfo("fa");
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

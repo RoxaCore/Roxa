@@ -305,7 +305,10 @@ public static class TunExclusion
         var present = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         try
         {
-            TunManager.RunRoute("print -4", out string output);
+            // اگر route print اجرا نشد یا خروجی خالی داد، نباید نتیجه بگیریم که هیچ
+            // پینی باقی نمانده؛ وگرنه فایل پین‌ها به‌اشتباه حذف می‌شود.
+            int code = TunManager.RunRoute("print -4", out string output);
+            if (code != 0 || string.IsNullOrWhiteSpace(output)) return want;
             foreach (var line in output.Split('\n'))
             {
                 var parts = line.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);

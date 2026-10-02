@@ -211,7 +211,9 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void AnnBannerAction()
     {
-        if (_currentAnnouncement is { } ann && !string.IsNullOrWhiteSpace(ann.Url))
+        if (_currentAnnouncement is { } ann && !string.IsNullOrWhiteSpace(ann.Url)
+            && Uri.TryCreate(ann.Url, UriKind.Absolute, out var uri)
+            && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp))
         {
             try
             {
@@ -249,7 +251,7 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            AppendLog($"[{DateTime.Now:HH:mm:ss}] Update failed: {ex.Message}");
+            AppendLog($"Update failed: {ex.Message}");
             BannerBody = TranslationManager.Instance["Upd_Failed"];
             IsBannerBusy = false;
         }

@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using Roxa.Localization;
 
 namespace Roxa.Core;
@@ -109,8 +108,10 @@ public static class TunManager
                 return false;
             }
 
-            string? currentHost = hosts?.FirstOrDefault(h => !string.IsNullOrWhiteSpace(h));
-            var serverIps = await ResolveServerIpsAsync(currentHost == null ? null : new[] { currentHost });
+            // همه میزبان‌های داده‌شده را resolve می‌کنیم (قبلاً فقط اولی در نظر گرفته
+            // می‌شد و بقیهٔ آدرس‌های سرور زیر TUN گم می‌شدند).
+            var hostList = hosts?.Where(h => !string.IsNullOrWhiteSpace(h)).ToList();
+            var serverIps = await ResolveServerIpsAsync(hostList == null || hostList.Count == 0 ? null : hostList);
             long tDns = Environment.TickCount64;
 
             foreach (var ip in serverIps)
@@ -360,14 +361,32 @@ public static class TunManager
             stdout = string.Empty;
             return -1;
         }
-        stdout = proc.StandardOutput.ReadToEnd();
-        proc.StandardError.ReadToEnd();
-        if (!proc.WaitForExit(5000))
+
+        // هر دو استریم را موازی می‌خوانیم؛ خواندن متوالی/همزمانِ sync می‌تواند
+        // وقتی بافر خطای پروسه پر شود کل فراخواننده را برای همیشه مسدود کند.
+        var outTask = proc.StandardOutput.ReadToEndAsync();
+        var errTask = proc.StandardError.ReadToEndAsync();
+        bool exited = proc.WaitForExit(5000);
+        if (!exited)
         {
             try { proc.Kill(); } catch { }
-            return -1;
+            try { proc.WaitForExit(2000); } catch { }
         }
-        return proc.ExitCode;
+        stdout = Collect(outTask);
+        Collect(errTask);
+        return exited ? proc.ExitCode : -1;
+    }
+
+    private static string Collect(Task<string> task)
+    {
+        try
+        {
+            return task.Wait(3000) ? task.Result : string.Empty;
+        }
+        catch
+        {
+            return string.Empty;
+        }
     }
 
     public static void Log(string message)

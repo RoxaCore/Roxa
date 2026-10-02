@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -7,7 +6,6 @@ using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Roxa.Core;
 using Roxa.Localization;
 using Roxa.Models;
 
@@ -81,9 +79,13 @@ public partial class MainViewModel : ViewModelBase
 
     private void UpdateGroupContent(ServerGroup group)
     {
-        var servers = Servers.Where(s =>
-            string.IsNullOrEmpty(s.SubscriptionName) ? string.IsNullOrEmpty(group.Key) :
-            s.SubscriptionName == group.Key).ToList();
+        // تب «همه سرورها» کلیدش «__all__» است و هیچ سروری چنین SubscriptionName ندارد؛
+        // بدون این شاخه، بعد از به‌روزرسانی اشتراک این تب خالی می‌شد.
+        var servers = group.Key == "__all__"
+            ? Servers.ToList()
+            : Servers.Where(s =>
+                string.IsNullOrEmpty(s.SubscriptionName) ? string.IsNullOrEmpty(group.Key) :
+                s.SubscriptionName == group.Key).ToList();
         SortServers(servers);
         group.Servers.Clear();
         foreach (var s in servers)

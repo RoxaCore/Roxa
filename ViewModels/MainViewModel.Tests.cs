@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -59,8 +58,11 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (OperationCanceledException)
         {
-            foreach (var s in targets)
-                if (s.RealDelayMs == -1) s.RecordRealDelay(-2);
+            // لغو؛ سرورهای بی‌نتیجه در پایین علامت‌گذاری می‌شوند.
+        }
+        catch (Exception ex)
+        {
+            AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
         }
 
         foreach (var s in targets)
@@ -73,8 +75,7 @@ public partial class MainViewModel : ViewModelBase
      {
          if (IsTesting) return;
          if (Servers.Count == 0) { Status = TranslationManager.Instance["Status_NoServers"]; return; }
-         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-         oldCts?.Dispose();
+         var ct = NewTestToken();
          IsTesting = true;
          BeginTestProgress(Servers.Count);
          try
@@ -89,24 +90,24 @@ public partial class MainViewModel : ViewModelBase
             }
             if (SelectedPingType == PingType.RealDelay)
             {
-                await RunRealDelayTestsAsync(Servers.ToList(), _testCts.Token);
+                await RunRealDelayTestsAsync(Servers.ToList(), ct);
             }
             else
             {
             using var sem = new SemaphoreSlim(8);
             var tasks = Servers.ToList().Select(async s =>
             {
-                if (_testCts.Token.IsCancellationRequested) return;
-                await sem.WaitAsync(_testCts.Token);
+                if (ct.IsCancellationRequested) return;
+                await sem.WaitAsync(ct);
                 try
                 {
-                    if (_testCts.Token.IsCancellationRequested) return;
+                    if (ct.IsCancellationRequested) return;
                     var (ok, ms) = SelectedPingType switch
                     {
                         PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
                         _ => await LatencyTester.TcpAsync(s.Address, s.Port)
                     };
-                    if (!_testCts.Token.IsCancellationRequested)
+                    if (!ct.IsCancellationRequested)
                         Post(() => s.RecordPing(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordPing(-2)); }
@@ -132,8 +133,7 @@ public partial class MainViewModel : ViewModelBase
          var checkedServers = Servers.Where(s => s.IsChecked).ToList();
          var targets = checkedServers.Count > 0 ? checkedServers : Servers.ToList();
          if (targets.Count == 0) { Status = TranslationManager.Instance["Status_NoServers"]; return; }
-         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-         oldCts?.Dispose();
+         var ct = NewTestToken();
          IsTesting = true;
          BeginTestProgress(targets.Count);
          try
@@ -142,7 +142,7 @@ public partial class MainViewModel : ViewModelBase
                foreach (var s in targets) s.RecordSpeed(-1);
                 try
                 {
-                    await SpeedTester.TestBatchAsync(targets, _testCts.Token, (s, r) =>
+                    await SpeedTester.TestBatchAsync(targets, ct, (s, r) =>
                     {
                         Post(() => Status = string.Format(TranslationManager.Instance["Status_TestSpeedOne"], s.Name));
                         Post(() => s.RecordSpeed(r));
@@ -169,6 +169,7 @@ public partial class MainViewModel : ViewModelBase
         var targets = checkedServers.Count > 0 ? checkedServers : (server != null ? new List<ServerInfo> { server } : new List<ServerInfo>());
         if (targets.Count == 0) return;
         if (IsTesting) return;
+        var ct = NewTestToken();
         IsTesting = true;
         BeginTestProgress(targets.Count);
         try
@@ -176,14 +177,15 @@ public partial class MainViewModel : ViewModelBase
             if (SelectedPingType == PingType.RealDelay)
             {
                 foreach (var s in targets) { s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
-                await RunRealDelayTestsAsync(targets, default);
+                await RunRealDelayTestsAsync(targets, ct);
             }
             else
             {
             using var sem = new SemaphoreSlim(8);
             var tasks = targets.Select(async s =>
             {
-                await sem.WaitAsync();
+                if (ct.IsCancellationRequested) return;
+                await sem.WaitAsync(ct);
                 try
                 {
                     var (ok, ms) = SelectedPingType switch
@@ -191,12 +193,14 @@ public partial class MainViewModel : ViewModelBase
                         PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
                         _ => await LatencyTester.TcpAsync(s.Address, s.Port)
                     };
-                    Post(() => s.RecordPing(ok ? ms : -2));
+                    if (!ct.IsCancellationRequested)
+                        Post(() => s.RecordPing(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordPing(-2)); }
                 finally { try { sem.Release(); } catch { } TickTestProgress(); }
             });
-            await Task.WhenAll(tasks);
+            try { await Task.WhenAll(tasks); }
+            catch (OperationCanceledException) { }
             }
             AutoSortAfterTest("latency");
             EndTestProgress();
@@ -210,8 +214,7 @@ public partial class MainViewModel : ViewModelBase
         var checkedServers = Servers.Where(s => s.IsChecked).ToList();
         var targets = checkedServers.Count > 0 ? checkedServers : (server != null ? new List<ServerInfo> { server } : new List<ServerInfo>());
         if (targets.Count == 0 || IsTesting) return;
-        var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-        oldCts?.Dispose();
+        var ct = NewTestToken();
         IsTesting = true;
         BeginTestProgress(targets.Count);
         try
@@ -221,13 +224,13 @@ public partial class MainViewModel : ViewModelBase
               using var sem = new SemaphoreSlim(SpeedTester.MaxConcurrency);
               var tasks = targets.Select(async s =>
               {
-                  if (_testCts.Token.IsCancellationRequested) return;
-                  await sem.WaitAsync(_testCts.Token);
+                  if (ct.IsCancellationRequested) return;
+                  await sem.WaitAsync(ct);
                   try
                   {
-                      if (_testCts.Token.IsCancellationRequested) return;
+                      if (ct.IsCancellationRequested) return;
                       Post(() => Status = string.Format(TranslationManager.Instance["Status_TestSpeedOne"], s.Name));
-                      var speedResult = await SpeedTester.TestAsync(s, _testCts.Token);
+                      var speedResult = await SpeedTester.TestAsync(s, ct);
                       Post(() => s.RecordSpeed(speedResult));
                   }
                   catch { Post(() => s.RecordSpeed(-2)); }
@@ -274,6 +277,7 @@ public partial class MainViewModel : ViewModelBase
     {
         var targets = Servers.Where(s => s.IsChecked).ToList();
         if (targets.Count == 0 || IsTesting) return;
+        var ct = NewTestToken();
         IsTesting = true;
         BeginTestProgress(targets.Count);
         try
@@ -288,14 +292,15 @@ public partial class MainViewModel : ViewModelBase
             }
             if (SelectedPingType == PingType.RealDelay)
             {
-                await RunRealDelayTestsAsync(targets, _testCts.Token);
+                await RunRealDelayTestsAsync(targets, ct);
             }
             else
             {
             using var sem = new SemaphoreSlim(8);
             var tasks = targets.Select(async s =>
             {
-                await sem.WaitAsync();
+                if (ct.IsCancellationRequested) return;
+                await sem.WaitAsync(ct);
                 try
                 {
                     var (ok, ms) = SelectedPingType switch
@@ -303,12 +308,14 @@ public partial class MainViewModel : ViewModelBase
                         PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
                         _ => await LatencyTester.TcpAsync(s.Address, s.Port)
                     };
-                    Post(() => s.RecordPing(ok ? ms : -2));
+                    if (!ct.IsCancellationRequested)
+                        Post(() => s.RecordPing(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordPing(-2)); }
                 finally { sem.Release(); TickTestProgress(); }
             });
-            await Task.WhenAll(tasks);
+            try { await Task.WhenAll(tasks); }
+            catch (OperationCanceledException) { }
             }
             Status = string.Format(TranslationManager.Instance["Status_PingSelDone"], targets.Count(t => t.LatencyMs >= 0));
             AutoSortAfterTest("latency");
@@ -323,6 +330,7 @@ public partial class MainViewModel : ViewModelBase
     {
         var targets = Servers.Where(s => s.IsChecked).ToList();
         if (targets.Count == 0 || IsTesting) return;
+        var ct = NewTestToken();
         IsTesting = true;
         BeginTestProgress(targets.Count);
         try
@@ -332,16 +340,18 @@ public partial class MainViewModel : ViewModelBase
             using var sem = new SemaphoreSlim(SpeedTester.MaxConcurrency);
             var tasks = targets.Select(async s =>
             {
-                await sem.WaitAsync();
+                if (ct.IsCancellationRequested) return;
+                await sem.WaitAsync(ct);
                 try
                 {
-                    var speedResult = await SpeedTester.TestAsync(s);
+                    var speedResult = await SpeedTester.TestAsync(s, ct);
                     Post(() => s.RecordSpeed(speedResult));
                 }
                 catch { Post(() => s.RecordSpeed(-2)); }
                 finally { sem.Release(); TickTestProgress(); }
             });
-            await Task.WhenAll(tasks);
+            try { await Task.WhenAll(tasks); }
+            catch (OperationCanceledException) { }
             Status = string.Format(TranslationManager.Instance["Status_SpeedSelDone"], targets.Count(t => t.DownloadMbps >= 0));
             AutoSortAfterTest("speed");
             SaveServers();
@@ -383,8 +393,7 @@ public partial class MainViewModel : ViewModelBase
      {
          var targets = group?.Servers.ToList() ?? new List<ServerInfo>();
          if (targets.Count == 0 || IsTesting) return;
-         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-         oldCts?.Dispose();
+         var ct = NewTestToken();
          IsTesting = true;
          BeginTestProgress(targets.Count);
          try
@@ -399,24 +408,24 @@ public partial class MainViewModel : ViewModelBase
             }
             if (SelectedPingType == PingType.RealDelay)
             {
-                await RunRealDelayTestsAsync(targets, _testCts.Token);
+                await RunRealDelayTestsAsync(targets, ct);
             }
             else
             {
             using var sem = new SemaphoreSlim(8);
             var tasks = targets.Select(async s =>
             {
-                if (_testCts.Token.IsCancellationRequested) return;
-                await sem.WaitAsync(_testCts.Token);
+                if (ct.IsCancellationRequested) return;
+                await sem.WaitAsync(ct);
                 try
                 {
-                    if (_testCts.Token.IsCancellationRequested) return;
+                    if (ct.IsCancellationRequested) return;
                     var (ok, ms) = SelectedPingType switch
                     {
                         PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
                         _ => await LatencyTester.TcpAsync(s.Address, s.Port)
                     };
-                    if (!_testCts.Token.IsCancellationRequested)
+                    if (!ct.IsCancellationRequested)
                         Post(() => s.RecordPing(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordPing(-2)); }
@@ -439,15 +448,14 @@ public partial class MainViewModel : ViewModelBase
      {
           var targets = group?.Servers.ToList() ?? new List<ServerInfo>();
          if (targets.Count == 0 || IsTesting) return;
-          var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-          oldCts?.Dispose();
+          var ct = NewTestToken();
           IsTesting = true;
           BeginTestProgress(targets.Count);
           try
           {
              Status = string.Format(TranslationManager.Instance["Status_GroupReal"], group!.Title, targets.Count);
              foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
-             await RunRealDelayTestsAsync(targets, _testCts.Token);
+             await RunRealDelayTestsAsync(targets, ct);
                int okCount = targets.Count(t => t.LatencyMs >= 0);
                 Status = string.Format(TranslationManager.Instance["Status_GroupRealDone"], okCount);
               AutoSortAfterTest("latency");
@@ -462,8 +470,7 @@ public partial class MainViewModel : ViewModelBase
      {
          var targets = group?.Servers.ToList() ?? new List<ServerInfo>();
          if (targets.Count == 0 || IsTesting) return;
-         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-         oldCts?.Dispose();
+         var ct = NewTestToken();
          IsTesting = true;
          BeginTestProgress(targets.Count);
          try
@@ -473,13 +480,13 @@ public partial class MainViewModel : ViewModelBase
                using var sem = new SemaphoreSlim(SpeedTester.MaxConcurrency);
                var tasks = targets.Select(async s =>
                {
-                   if (_testCts.Token.IsCancellationRequested) return;
-                   await sem.WaitAsync(_testCts.Token);
+                   if (ct.IsCancellationRequested) return;
+                   await sem.WaitAsync(ct);
                    try
                    {
-                       if (_testCts.Token.IsCancellationRequested) return;
+                       if (ct.IsCancellationRequested) return;
                        Post(() => Status = string.Format(TranslationManager.Instance["Status_TestSpeedOne"], s.Name));
-                       var speedResult = await SpeedTester.TestAsync(s, _testCts.Token);
+                       var speedResult = await SpeedTester.TestAsync(s, ct);
                        Post(() => s.RecordSpeed(speedResult));
                    }
                    catch { Post(() => s.RecordSpeed(-2)); }
@@ -503,15 +510,14 @@ public partial class MainViewModel : ViewModelBase
      {
          var targets = group?.Servers.ToList() ?? new List<ServerInfo>();
          if (targets.Count == 0 || IsTesting) return;
-         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-         oldCts?.Dispose();
+         var ct = NewTestToken();
          IsTesting = true;
          BeginTestProgress(targets.Count);
          try
          {
             Status = string.Format(TranslationManager.Instance["Status_GroupUpdate"], group!.Title, targets.Count);
             foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; s.RecordSpeed(-1); }
-            await RunRealDelayTestsAsync(targets, _testCts.Token);
+            await RunRealDelayTestsAsync(targets, ct);
              int okCount = targets.Count(s => s.LatencyMs >= 0);
              Status = string.Format(TranslationManager.Instance["Status_GroupUpdateDone"], okCount);
              AutoSortAfterTest("latency");
@@ -530,15 +536,14 @@ public partial class MainViewModel : ViewModelBase
          var checkedServers = Servers.Where(s => s.IsChecked).ToList();
          var targets = checkedServers.Count > 0 ? checkedServers : Servers.ToList();
          if (targets.Count == 0) { Status = TranslationManager.Instance["Status_NoServers"]; return; }
-         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-         oldCts?.Dispose();
+         var ct = NewTestToken();
          IsTesting = true;
          BeginTestProgress(targets.Count);
          try
          {
             Status = string.Format(TranslationManager.Instance["Status_RealAll"], targets.Count);
             foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
-            await RunRealDelayTestsAsync(targets, _testCts.Token);
+            await RunRealDelayTestsAsync(targets, ct);
             int okCount = targets.Count(t => t.LatencyMs >= 0);
             Status = string.Format(TranslationManager.Instance["Status_RealDone"], okCount);
             AutoSortAfterTest("latency");
@@ -553,15 +558,14 @@ public partial class MainViewModel : ViewModelBase
     {
         var targets = Servers.Where(s => s.IsChecked).ToList();
         if (targets.Count == 0 || IsTesting) return;
-        var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-        oldCts?.Dispose();
+        var ct = NewTestToken();
         IsTesting = true;
         BeginTestProgress(targets.Count);
         try
         {
              Status = string.Format(TranslationManager.Instance["Status_RealSelected"], targets.Count);
             foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
-            await RunRealDelayTestsAsync(targets, _testCts.Token);
+            await RunRealDelayTestsAsync(targets, ct);
             Status = string.Format(TranslationManager.Instance["Status_RealSelDone"], targets.Count(t => t.LatencyMs >= 0));
             AutoSortAfterTest("latency");
             SaveServers();
@@ -576,15 +580,14 @@ public partial class MainViewModel : ViewModelBase
         var checkedServers = Servers.Where(s => s.IsChecked).ToList();
         var targets = checkedServers.Count > 0 ? checkedServers : (server != null ? new List<ServerInfo> { server } : new List<ServerInfo>());
         if (targets.Count == 0 || IsTesting) return;
-        var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-        oldCts?.Dispose();
+        var ct = NewTestToken();
         IsTesting = true;
         BeginTestProgress(targets.Count);
         try
         {
             Status = string.Format(TranslationManager.Instance["Status_RealCount"], targets.Count);
             foreach (var s in targets) { s.LatencyMs = -1; s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
-            await RunRealDelayTestsAsync(targets, _testCts.Token);
+            await RunRealDelayTestsAsync(targets, ct);
             int okCount = targets.Count(s => s.LatencyMs >= 0);
             Status = string.Format(TranslationManager.Instance["Status_RealDoneCount"], okCount, targets.Count);
             AutoSortAfterTest("latency");
@@ -600,14 +603,32 @@ public partial class MainViewModel : ViewModelBase
      [RelayCommand]
      private void StopTest()
      {
-         var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
-         oldCts?.Cancel();
-         oldCts?.Dispose();
+         // CTS را عوض نمی‌کنیم تا تسک‌های در حال اجرا همان توکن لغوشده را ببینند؛
+         // فقط cancel می‌کنیم و dispose را به تأخیر می‌اندازیم (توکن هنوز در دسترس است).
+         var cts = _testCts;
+         try { cts?.Cancel(); } catch { }
          IsTesting = false;
           Status = TranslationManager.Instance["Log_TestStopped"];
           AppendLog(TranslationManager.Instance["Log_TestStopped"]);
           Post(() => { TestTestedCount = 0; TestTotalCount = 0; });
       }
 
-
+    /// <summary>
+    /// برای هر تست یک CTS تازه می‌سازد و CTS قبلی را لغو می‌کند.
+    /// dispose آن را به تعویق می‌اندازیم چون ممکن است هنوز توکنش در دست تسک‌های قبلی باشد.
+    /// </summary>
+    private CancellationToken NewTestToken()
+    {
+        var oldCts = Interlocked.Exchange(ref _testCts, new CancellationTokenSource());
+        if (oldCts != null)
+        {
+            try { oldCts.Cancel(); } catch { }
+            _ = Task.Run(async () =>
+            {
+                try { await Task.Delay(3000); } catch { }
+                try { oldCts.Dispose(); } catch { }
+            });
+        }
+        return _testCts.Token;
+    }
 }

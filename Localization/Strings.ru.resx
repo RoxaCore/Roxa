@@ -279,6 +279,7 @@
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>При включении этой опции приложение автоматически загружает и устанавливает новые версии; оно закроется и перезапустится для применения обновления.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>Приложения, исключённые из TUN</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>Трафик этих приложений не проходит через VPN-сервер и использует ваш настоящий IP. Действует только при активном режиме TUN.</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>Примечание: список универсальный — любое приложение добавляется по его исполняемому файлу. В режиме прокси (без TUN) это влияет только на приложения, использующие системный прокси. Весь DNS системы по-прежнему идёт через VPN, поэтому заблокированные сайты могут открываться и для этих приложений.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>Добавить приложение...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Удалить</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Приложения пока не добавлены</value></data>
@@ -387,6 +388,8 @@
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Недопустимая ссылка Trojan</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Недопустимая ссылка VLESS</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Поддерживаются только vmess / vless / ss / trojan</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>транспорт не поддерживается: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>недопустимое значение параметра {0}: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>Поиск лучшего: прерван — другой тест уже выполняется</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>Ошибка поиска лучшего: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>Поиск лучшего: больше нет серверов для тестирования</value></data>
@@ -425,8 +428,35 @@
   <data name="Eng_TunFallback" xml:space="preserve"><value>Режим TUN требует прав администратора. Возврат в режим прокси.</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>Неподдерживаемая ОС/архитектура.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll недоступен. Возврат в режим прокси.</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Разрешены только URL подписки https.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Ссылка подписки должна использовать http или https.</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>Недопустимое JSON-содержимое в ссылке</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>URL обновления должен использовать https</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>В пакете обновления отсутствует отпечаток sha256</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>Диагностика подключения</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>Диагностика подключения…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>Диагностика завершена: проблем не обнаружено</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>Диагностика завершена: проблем — {0} (подробности во вкладке журнала)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} разрешён → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: не удалось разрешить — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: адаптер '{0}' указывает на 127.0.0.1, но локальный DNS-сервис не отвечает</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: адаптер '{0}' сброшен в автоматический режим</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: запустите приложение от имени администратора, чтобы исправить</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: проблем не обнаружено</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>Системный прокси: отключён</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>Системный прокси: включён ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>Системный прокси: указывает на недоступный loopback-адрес ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>Получение подписки: HTTP {0} — серверов: {1} за {2} мс</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>Получение подписки: HTTP {0} — в ответе нет серверов; содержимое начинается с: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>Получение подписки: ошибка — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>Получение без прокси: HTTP {0} — серверов: {1} (виноват прокси)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Движок Xray: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>Нет ссылки для проверки</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>Неуспешный ответ от сервера подписки: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>Ответ получен, но серверов нет. Содержимое начинается с: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>Ответ сервера пуст.</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>Внимание: эта ссылка подписки использует незашифрованный http.</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>Версия движка ({0}) старше проверенной ({1}); часть конфигураций может не работать.</value></data>
 </root>

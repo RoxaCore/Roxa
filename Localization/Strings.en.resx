@@ -282,6 +282,7 @@ Latency: {1}</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>When enabled, the app downloads and installs new versions automatically; it closes and reopens to apply the update.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>Apps excluded from TUN</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>Traffic from these apps bypasses the VPN server and uses your real IP. Only applies while TUN mode is active.</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>Note: this list is generic — any app is accepted based on its executable file. In proxy mode (without TUN) it only affects apps that honor the system proxy. All system DNS still goes through the VPN, so blocked sites may open for these apps too.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>Add app...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Remove</value></data>
   <data name="Set_Bypass" xml:space="preserve"><value>Bypass VPN even without TUN</value></data>
@@ -404,6 +405,8 @@ Latency: {1}</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Invalid Trojan link</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Invalid VLESS link</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Only vmess / vless / ss / trojan are supported</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>transport is not supported: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>invalid value for parameter {0}: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>Find better: blocked — another test is running</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>Find better error: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>Find better: no more servers to test</value></data>
@@ -445,8 +448,35 @@ Latency: {1}</value></data>
   <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>Failed to add TUN routes: {0}</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>Unsupported OS/architecture.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll not available. Falling back to proxy mode.</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Only https subscription URLs are allowed.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Subscription link must use http or https.</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>Invalid JSON payload in link</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>Update URL must use https</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>Update package has no sha256 fingerprint</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>Connection diagnostics</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>Diagnosing connection…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>Diagnostics finished: no problems found</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>Diagnostics finished: {0} issue(s) (details in the Log tab)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} resolved → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: resolve failed — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: adapter '{0}' points to 127.0.0.1 but no local DNS service is listening</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: adapter '{0}' was reset to automatic</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: run the app as administrator to repair it</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: no problems found</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>System proxy: disabled</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>System proxy: enabled ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>System proxy: points to a loopback address that is not reachable ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>Subscription fetch: HTTP {0} — {1} server(s) in {2} ms</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>Subscription fetch: HTTP {0} — no servers in the response; body starts with: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>Subscription fetch: error — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>Subscription fetch without proxy: HTTP {0} — {1} server(s) (the proxy is the culprit)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Xray engine: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>No link available to test</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>Unsuccessful response from subscription server: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>Response received but it contains no servers. Body starts with: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>The server response is empty.</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>Warning: this subscription link uses plain http and is not encrypted.</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>Engine version ({0}) is older than the tested version ({1}); some configurations may not work.</value></data>
 </root>

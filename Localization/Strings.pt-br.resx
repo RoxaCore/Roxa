@@ -263,6 +263,7 @@ Latência: {1}</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>Com esta opção ativada, o aplicativo baixa e instala automaticamente novas versões; ele será fechado e reaberto para aplicar a atualização.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>Aplicativos excluídos do TUN</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>O tráfego desses aplicativos não passa pelo servidor VPN e usa seu IP real. Aplica-se apenas enquanto o modo TUN estiver ativo.</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>Observação: esta lista é genérica — qualquer app é aceito pelo seu executável. No modo proxy (sem TUN), ela só afeta apps que respeitam o proxy do sistema. Todo o DNS do sistema ainda passa pela VPN, então sites bloqueados podem abrir também para esses apps.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>Adicionar aplicativo...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Remover</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Nenhum aplicativo adicionado ainda</value></data>
@@ -371,6 +372,8 @@ Latência: {1}</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Link Trojan inválido</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Link VLESS inválido</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Somente vmess / vless / ss / trojan são suportados</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>transporte não suportado: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>valor inválido para o parâmetro {0}: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>Encontrar melhor: bloqueado — outro teste em andamento</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>Erro ao encontrar melhor: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>Encontrar melhor: não há mais servidores para testar</value></data>
@@ -409,8 +412,35 @@ Latência: {1}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>O modo TUN requer administrador. Voltando ao modo proxy.</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>SO/arquitetura não suportados.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll indisponível. Voltando ao modo proxy.</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Apenas URLs de assinatura https são permitidas.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>O link de assinatura deve usar http ou https.</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>Carga JSON inválida no link</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>A URL de atualização deve usar https</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>O pacote de atualização não possui impressão sha256</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>Diagnóstico de conexão</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>Diagnosticando a conexão…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>Diagnóstico concluído: nenhum problema encontrado</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>Diagnóstico concluído: {0} problema(s) (detalhes na aba Log)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} resolvido → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: falha na resolução — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: o adaptador '{0}' aponta para 127.0.0.1, mas nenhum serviço DNS local responde</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: o adaptador '{0}' foi redefinido para automático</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: execute o aplicativo como administrador para repará-lo</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: nenhum problema encontrado</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>Proxy do sistema: desativado</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>Proxy do sistema: ativado ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>Proxy do sistema: aponta para um endereço de loopback inacessível ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>Obtenção da assinatura: HTTP {0} — {1} servidor(es) em {2} ms</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>Obtenção da assinatura: HTTP {0} — nenhum servidor na resposta; o conteúdo começa com: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>Obtenção da assinatura: erro — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>Obtenção sem proxy: HTTP {0} — {1} servidor(es) (o proxy é o culpado)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Motor do Xray: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>Nenhum link disponível para teste</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>Resposta sem êxito do servidor de assinatura: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>Resposta recebida, mas sem servidores. O conteúdo começa com: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>A resposta do servidor está vazia.</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>Aviso: este link de assinatura usa http sem criptografia.</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>A versão do motor ({0}) é mais antiga que a testada ({1}); algumas configurações podem não funcionar.</value></data>
 </root>

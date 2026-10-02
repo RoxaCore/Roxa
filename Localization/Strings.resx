@@ -290,6 +290,7 @@
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>با فعال بودن این گزینه، برنامه هنگام اجرا نسخه جدید را دانلود و خودکار نصب می‌کند؛ برای اعمال، برنامه بسته و دوباره باز می‌شود.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>برنامه‌های معاف از TUN</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>ترافیک این برنامه‌ها از سرور VPN عبور نمی‌کند و با IP واقعی اینترنت می‌روند. این گزینه فقط زمانی که حالت TUN فعال است اثر دارد.</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>نکته: این لیست عمومی است و هر برنامه‌ای بر اساس فایلِ اجرایی‌اش پذیرفته می‌شود. در حالت پروکسی (بدون TUN) فقط روی برنامه‌هایی اثر دارد که پروکسی سیستم را رعایت کنند. DNS کل سیستم همچنان از VPN می‌رود، پس ممکن است سایت‌های فیلترشده برای همین برنامه‌ها هم باز شوند.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>افزودن برنامه...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>حذف</value></data>
   <data name="Set_Bypass" xml:space="preserve"><value>عبور از VPN حتی بدون TUN</value></data>
@@ -412,6 +413,8 @@
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>لینک Trojan نامعتبر است.</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>لینک VLESS نامعتبر است.</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>فقط vmess / vless / ss / trojan پشتیبانی می‌شود.</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>transport پشتیبانی نمی‌شود: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>مقدار نامعتبر برای پارامتر {0}: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>جستجوی سرور بهتر: متوقف شد — تست دیگری در حال اجراست</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>خطای جستجوی سرور بهتر: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>جستجوی سرور بهتر: سرور دیگری برای تست نمانده</value></data>
@@ -453,8 +456,35 @@
   <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>افزودن مسیرهای TUN ناموفق بود: {0}</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>سیستم‌عامل/معماری پشتیبانی نمی‌شود.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>فایل wintun.dll در دسترس نیست. بازگشت به حالت پراکسی.</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>فقط لینک‌های اشتراک https مجاز هستند.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>لینک اشتراک باید http یا https باشد.</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>انجام پینگ و تست‌ها از داخل TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>به‌صورت پیش‌فرض خاموش است و پینگ، تاخیر واقعی و سرعت از مسیر مستقیم اتصال اینترنت کامپیوتر اندازه‌گیری می‌شود تا عدد به‌دست‌آمده درست باشد. با روشن کردن این گزینه، تست‌ها از درون تونل TUN انجام می‌شوند.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>تست بدون اعمال TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>پیکربندی JSON داخل لینک نامعتبر است</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>آدرس به‌روزرسانی باید https باشد</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>بستهٔ به‌روزرسانی اثر انگشت sha256 ندارد</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>عیب‌یابی اتصال</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>در حال عیب‌یابی اتصال…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>عیب‌یابی پایان یافت: مشکلی دیده نشد</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>عیب‌یابی پایان یافت: {0} مورد (جزئیات در سربرگ لاگ)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} resolve شد → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: resolve ناموفق — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: آداپتر «{0}» روی 127.0.0.1 است ولی سرویس DNS محلی در دسترس نیست</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: آداپتر «{0}» به حالت خودکار بازگردانده شد</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: برای ترمیم، برنامه را با دسترسی مدیر اجرا کنید</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: مشکلی دیده نشد</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>پروکسی سیستم: غیرفعال</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>پروکسی سیستم: فعال ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>پروکسی سیستم: به آدرس لوپ‌بکی اشاره دارد که در دسترس نیست ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>دریافت ساب: HTTP {0} — {1} سرور در {2} میلی‌ثانیه</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>دریافت ساب: HTTP {0} — سروری در پاسخ نیست؛ ابتدای پاسخ: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>دریافت ساب: خطا — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>دریافت ساب بدون پروکسی: HTTP {0} — {1} سرور (مقصر پروکسی است)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>موتور Xray: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>لینکی برای تست دریافت وجود ندارد</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>پاسخ ناموفق از سرور اشتراک: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>پاسخ دریافت شد اما سروری در آن نیست. ابتدای پاسخ: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>پاسخ سرور خالی است.</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>هشدار: لینک اشتراک بدون https است و بدون رمزگذاری منتقل می‌شود.</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>نسخه موتور ({0}) از نسخه آزمایش‌شده ({1}) قدیمی است؛ ممکن است برخی پیکربندی‌ها پشتیبانی نشوند.</value></data>
 </root>

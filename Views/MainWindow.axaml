@@ -640,6 +640,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="12">
               <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateAll}" Command="{Binding UpdateSubscriptionsCommand}" Padding="12,8" CornerRadius="6"/>
+              <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Diagnose}" Command="{Binding DiagnoseSubscriptionsCommand}" Padding="12,8" CornerRadius="6"/>
               <CheckBox Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Sub_UseProxy}" IsChecked="{Binding UseProxyForSubscriptions}" VerticalAlignment="Center" FontSize="12"/>
             </StackPanel>
           </StackPanel>
@@ -775,6 +776,9 @@
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Bypass}" VerticalAlignment="Center"/>
                 </StackPanel>
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Bypass_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+                <Border CornerRadius="6" Padding="10,8" Background="#0E7C6B14" BorderBrush="#0E7C6B40" BorderThickness="1">
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TunExclude_Note}" FontSize="11" Foreground="#9CA3AF" TextWrapping="Wrap"/>
+                </Border>
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TunExclude_Add}" Padding="14,8" CornerRadius="8" Background="#0E7C6B" Foreground="White" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right" Command="{Binding AddTunExcludedAppCommand}"/>
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TunExclude_Empty}" FontSize="11" Foreground="#AAAAAA" IsVisible="{Binding TunExcludedEmpty}"/>
                 <ListBox ItemsSource="{Binding TunExcludedApps}" MaxHeight="150" Background="Transparent" BorderThickness="0" Padding="0">

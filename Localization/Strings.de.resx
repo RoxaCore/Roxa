@@ -263,6 +263,7 @@ Latenz: {1}</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>Wenn diese Option aktiviert ist, lädt die App neue Versionen automatisch herunter und installiert sie; die App wird geschlossen und neu gestartet, um die Aktualisierung zu übernehmen.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>Von TUN ausgeschlossene Apps</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>Der Datenverkehr dieser Apps umgeht den VPN-Server und nutzt deine echte IP. Gilt nur, wenn der TUN-Modus aktiv ist.</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>Hinweis: Diese Liste ist allgemein — jede App wird anhand ihrer ausführbaren Datei aufgenommen. Im Proxy-Modus (ohne TUN) wirkt sie nur auf Apps, die den Systemproxy beachten. Der DNS des gesamten Systems läuft weiterhin über das VPN, daher können gesperrte Websites auch für diese Apps erreichbar sein.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>App hinzufügen...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Entfernen</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Noch keine Apps hinzugefügt</value></data>
@@ -371,6 +372,8 @@ Latenz: {1}</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Ungültiger Trojan-Link</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Ungültiger VLESS-Link</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Nur vmess / vless / ss / trojan werden unterstützt</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>Transport wird nicht unterstützt: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>Ungültiger Wert für Parameter {0}: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>Besser finden: blockiert — ein anderer Test läuft</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>Fehler beim Besser-finden: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>Besser finden: keine weiteren Server zum Testen</value></data>
@@ -409,8 +412,35 @@ Latenz: {1}</value></data>
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN-Modus erfordert Administrator. Rückfall auf Proxy-Modus.</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>Nicht unterstützte OS-/Architektur.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll nicht verfügbar. Rückfall auf Proxy-Modus.</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Nur https-Abonnement-URLs sind erlaubt.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>Der Abo-Link muss http oder https verwenden.</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>Ungültiges JSON-Nutzdaten im Link</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>Die Update-URL muss https verwenden</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>Das Update-Paket hat keinen sha256-Abdruck</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>Verbindungsdiagnose</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>Verbindung wird diagnostiziert…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>Diagnose abgeschlossen: keine Probleme gefunden</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>Diagnose abgeschlossen: {0} Problem(e) (Details im Log-Tab)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} aufgelöst → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: Auflösung fehlgeschlagen — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: Adapter '{0}' zeigt auf 127.0.0.1, aber kein lokaler DNS-Dienst antwortet</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: Adapter '{0}' wurde auf Automatisch zurückgesetzt</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: Programm als Administrator ausführen, um es zu reparieren</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: keine Probleme gefunden</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>Systemproxy: deaktiviert</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>Systemproxy: aktiv ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>Systemproxy: zeigt auf eine nicht erreichbare Loopback-Adresse ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>Abo-Abruf: HTTP {0} — {1} Server in {2} ms</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>Abo-Abruf: HTTP {0} — keine Server in der Antwort; Inhalt beginnt mit: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>Abo-Abruf: Fehler — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>Abo-Abruf ohne Proxy: HTTP {0} — {1} Server (der Proxy ist die Ursache)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Xray-Engine: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>Kein Link zum Testen vorhanden</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>Erfolglose Antwort vom Abo-Server: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>Antwort erhalten, aber sie enthält keine Server. Inhalt beginnt mit: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>Die Serverantwort ist leer.</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>Warnung: Dieser Abo-Link nutzt unverschlüsseltes http.</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>Engine-Version ({0}) ist älter als die getestete Version ({1}); einige Konfigurationen funktionieren möglicherweise nicht.</value></data>
 </root>

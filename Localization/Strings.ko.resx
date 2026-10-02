@@ -263,6 +263,7 @@
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>이 옵션을 켜면 앱이 새 버전을 자동으로 다운로드하여 설치합니다. 업데이트를 적용하려면 앱이 종료 후 다시 시작됩니다.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>TUN 제외 앱</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>이 앱의 트래픽은 VPN 서버를 거치지 않고 실제 IP를 사용합니다. TUN 모드가 활성일 때만 적용됩니다.</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>참고: 이 목록은 범용으로, 실행 파일을 기준으로 어떤 앱이든 추가할 수 있습니다. 프록시 모드(TUN 없음)에서는 시스템 프록시를 따르는 앱에만 적용됩니다. 시스템 DNS는 여전히 VPN을 통과하므로 차단된 사이트가 이 앱에서도 열릴 수 있습니다.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>앱 추가</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>삭제</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>아직 추가된 앱이 없습니다</value></data>
@@ -371,6 +372,8 @@
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>잘못된 Trojan 링크입니다</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>잘못된 VLESS 링크입니다</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>vmess / vless / ss / trojan만 지원됩니다</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>지원되지 않는 전송 방식입니다: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>매개변수 {0}의 값이 잘못되었습니다: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>더 나은 서버 찾기: 차단됨 — 다른 테스트가 실행 중입니다</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>더 나은 서버 찾기 오류: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>더 나은 서버 찾기: 테스트할 서버가 없음</value></data>
@@ -409,8 +412,35 @@
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN 모드에는 관리자 권한이 필요합니다. 프록시 모드로 전환합니다.</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>지원되지 않는 OS/아키텍처입니다.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll을 사용할 수 없습니다. 프록시 모드로 전환합니다.</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>https 구독 URL만 허용됩니다.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>구독 링크는 http 또는 https여야 합니다.</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>링크의 JSON 페이로드가 잘못되었습니다</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>업데이트 URL은 https여야 합니다</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>업데이트 패키지에 sha256 지문이 없습니다</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>연결 진단</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>연결을 진단하는 중…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>진단 완료: 문제가 발견되지 않았습니다</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>진단 완료: {0}개의 문제(자세한 내용은 로그 탭)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} 확인됨 → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: 확인 실패 — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: 어댑터 '{0}'이(가) 127.0.0.1을 가리키지만 로컬 DNS 서비스가 응답하지 않습니다</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: 어댑터 '{0}'이(가) 자동으로 재설정되었습니다</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: 복구하려면 앱을 관리자 권한으로 실행하세요</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: 문제 없음</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>시스템 프록시: 사용 안 함</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>시스템 프록시: 사용 중 ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>시스템 프록시: 접근할 수 없는 루프백 주소를 가리킵니다 ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>구독 가져오기: HTTP {0} — {2}ms 동안 {1}개 서버</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>구독 가져오기: HTTP {0} — 응답에 서버가 없습니다. 본문 시작: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>구독 가져오기: 오류 — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>프록시 없이 구독 가져오기: HTTP {0} — {1}개 서버(원인은 프록시)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Xray 엔진: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>테스트할 링크가 없습니다</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>구독 서버의 실패 응답: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>응답을 받았지만 서버가 없습니다. 본문 시작: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>서버 응답이 비어 있습니다.</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>경고: 이 구독 링크는 암호화되지 않은 http를 사용합니다.</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>엔진 버전({0})이 테스트된 버전({1})보다 오래되어 일부 설정이 동작하지 않을 수 있습니다.</value></data>
 </root>

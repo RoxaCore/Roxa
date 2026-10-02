@@ -1,5 +1,4 @@
-using System.Diagnostics;
-using System.Net.Http;
+﻿using System.Diagnostics;
 using System.Net.Sockets;
 
 namespace Roxa.Core;
@@ -235,8 +234,12 @@ public static class TunKillSwitch
                         _appliedEngaged = 0;
                         TunManager.Log("kill-switch engage failed");
                         RaiseState(false, count);
+                        // در حالت «تونل قطع است» هیچ تغییر وضعیت دیگری رخ نمی‌دهد تا
+                        // Apply دوباره صدا زده شود؛ بدون retry، کلید قطع برای همیشه می‌ماند.
+                        ScheduleEngageRetry(gen);
                         return;
                     }
+                    Interlocked.Exchange(ref _engageRetries, 0);
                     _appliedEngaged = 1;
                     if (fresh)
                     {
@@ -257,6 +260,27 @@ public static class TunKillSwitch
                 TunManager.Log($"kill-switch sync failed: {ex.Message}");
             }
         }
+    }
+
+    private static int _engageRetries;
+    private const int MaxEngageRetries = 5;
+    private const int EngageRetryDelayMs = 3000;
+
+    private static void ScheduleEngageRetry(int gen)
+    {
+        if (Interlocked.Increment(ref _engageRetries) > MaxEngageRetries)
+        {
+            Interlocked.Exchange(ref _engageRetries, 0);
+            TunManager.Log($"kill-switch engage failed {MaxEngageRetries} time(s); will retry on next state change");
+            return;
+        }
+        _ = Task.Run(async () =>
+        {
+            try { await Task.Delay(EngageRetryDelayMs); } catch { }
+            // want دوباره محاسبه می‌شود؛ اگر در این فاصله تونل برگشته یا کلید قطع
+            // شده باشد، هیچ اتفاقی نمی‌افتد.
+            Apply(gen);
+        });
     }
 
     private static int EngageWfp()

@@ -1,11 +1,9 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Roxa.Core;
 using Roxa.Models;
 using Roxa.ViewModels;
 
@@ -13,8 +11,6 @@ namespace Roxa.Views;
 
 public partial class MainWindow : Window
 {
-    private int _resizingColumn = -1;
-    private double _resizeStartX = 0;
     private bool _forceClose = false;
 
     public MainWindow()
@@ -346,9 +342,6 @@ public partial class MainWindow : Window
             return result;
         };
         
-        // Setup column resize handles
-        SetupResizeHandles();
-        
         await vm.OnStartedAsync();
     }
 
@@ -360,23 +353,6 @@ public partial class MainWindow : Window
             var group = vm.Groups.FirstOrDefault(g => g.Key == groupKey);
             if (group != null && !group.IsExpanded)
                 group.IsExpanded = true;
-        }
-    }
-
-    private void ServerCard_PointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (sender is Border border && DataContext is MainViewModel vm)
-        {
-            var panel = border.Child;
-            if (panel is Grid grid)
-            {
-                // Find the server info from the DataContext of the border
-                var dc = border.DataContext;
-                if (dc is Models.ServerInfo server)
-                {
-                    vm.SelectServerCommand.Execute(server);
-                }
-            }
         }
     }
 
@@ -424,51 +400,6 @@ public partial class MainWindow : Window
             menu.Open(target);
         else
             menu.Open(grid);
-    }
-
-    private void SetupResizeHandles()
-    {
-        var header = this.FindControl<Grid>("TableHeader");
-        if (header == null) return;
-
-        for (int i = 0; i < 9; i++)
-        {
-            var handle = this.FindControl<Border>($"ResizeHandle{i}");
-            if (handle != null)
-            {
-                int columnIndex = i;
-                handle.PointerPressed += (s, e) =>
-                {
-                    _resizingColumn = columnIndex;
-                    _resizeStartX = e.GetPosition(this).X;
-                };
-                handle.PointerMoved += (s, e) =>
-                {
-                    if (_resizingColumn >= 0 && (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed))
-                    {
-                        var currentX = e.GetPosition(this).X;
-                        var delta = currentX - _resizeStartX;
-                        
-                        if (DataContext is MainViewModel vm && header.ColumnDefinitions != null)
-                        {
-                            var colDef = header.ColumnDefinitions[_resizingColumn];
-                            var newWidth = Math.Max(50, colDef.ActualWidth + delta);
-                            colDef.Width = new GridLength(newWidth);
-                            
-                            // Store in ViewModel
-                            if (vm.ColumnWidths.ContainsKey(_resizingColumn))
-                                vm.ColumnWidths[_resizingColumn] = newWidth;
-                            
-                            _resizeStartX = currentX;
-                        }
-                    }
-                };
-                handle.PointerReleased += (s, e) =>
-                {
-                    _resizingColumn = -1;
-                };
-            }
-        }
     }
 
     private void OpenDnsDialog()

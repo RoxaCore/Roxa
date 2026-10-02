@@ -1,5 +1,4 @@
-using System.IO;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
@@ -45,8 +44,15 @@ public partial class QrShareWindow : Window
 
     private async void Copy_Click(object? sender, RoutedEventArgs e)
     {
-        if (_clipboard != null)
-            await _clipboard.SetTextAsync(_link);
+        try
+        {
+            if (_clipboard != null)
+                await _clipboard.SetTextAsync(_link);
+        }
+        catch
+        {
+            // async void؛ استثنا نباید از اینجا رد شود و برنامه را بیندازد.
+        }
         Close();
     }
 

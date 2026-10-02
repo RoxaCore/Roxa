@@ -1,6 +1,5 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
-using System.Net.Http;
 using Roxa.Models;
 
 namespace Roxa.Core;
@@ -330,8 +329,8 @@ public static class SpeedTester
 
                 double elapsed = Math.Max(sw.Elapsed.TotalSeconds, MinElapsedMs / 1000.0);
                 double mbps = total * 8.0 / elapsed / 1_000_000.0;
-                extra["bytes"] = total.ToString();
-                extra["seconds"] = elapsed.ToString("F3");
+                extra["bytes"] = total.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                extra["seconds"] = elapsed.ToString("F3", System.Globalization.CultureInfo.InvariantCulture);
                 extra["url"] = url;
                 extra["early_stop"] = (total < TargetBytes).ToString();
                 return TestResult.Success(Math.Round(mbps, 1), extra);

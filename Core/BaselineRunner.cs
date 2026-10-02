@@ -1,5 +1,4 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json;
 using Roxa.Models;
 
 namespace Roxa.Core;
@@ -158,7 +157,7 @@ public static class BaselineRunner
                 Ms = r.Status == TestStatus.Ok ? (int)Math.Round(r.Value) : -1,
                 Status = r.Status.ToString(),
             };
-            if (r.Extra.TryGetValue("jitter", out var j) && double.TryParse(j, out var jd)) sample.Jitter = jd;
+            if (r.Extra.TryGetValue("jitter", out var j) && double.TryParse(j, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var jd)) sample.Jitter = jd;
             if (r.Extra.TryGetValue("warmup_ms", out var w) && int.TryParse(w, out var wi)) sample.WarmupMs = wi;
             if (r.Extra.TryGetValue("ok_count", out var o) && int.TryParse(o, out var oi)) sample.SuccessCount = oi;
             if (r.Extra.TryGetValue("startup_ms", out var su) && int.TryParse(su, out var sui)) sample.StartupMs = sui;

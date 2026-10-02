@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
+using Roxa.Localization;
 
 namespace Roxa.Core;
 
@@ -16,6 +17,15 @@ public static class UpdateInstaller
     {
         if (string.IsNullOrWhiteSpace(info.Url))
             throw new InvalidOperationException("update url is empty");
+
+        // The downloaded zip is extracted and executed, so it must arrive over TLS
+        // and be pinned to the hash the update feed published.
+        if (!Uri.TryCreate(info.Url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
+            throw new InvalidOperationException(TranslationManager.Get("Upd_RequireHttps"));
+
+        string sha256 = (info.Sha256 ?? "").Trim();
+        if (sha256.Length != 64 || !sha256.All(Uri.IsHexDigit))
+            throw new InvalidOperationException(TranslationManager.Get("Upd_RequireSha256"));
 
         var handler = new HttpClientHandler();
         if (proxyPort is > 0)
@@ -37,11 +47,10 @@ public static class UpdateInstaller
                 await input.CopyToAsync(fs, ct);
             }
 
-            if (!string.IsNullOrWhiteSpace(info.Sha256))
+            await using (var hs = File.OpenRead(zipPath))
             {
-                await using var hs = File.OpenRead(zipPath);
-                var hash = Convert.ToHexString(await SHA256.HashDataAsync(hs, ct)).ToLowerInvariant();
-                if (!hash.Equals(info.Sha256.Trim().ToLowerInvariant(), StringComparison.OrdinalIgnoreCase))
+                var hash = Convert.ToHexString(await SHA256.HashDataAsync(hs, ct));
+                if (!hash.Equals(sha256, StringComparison.OrdinalIgnoreCase))
                     throw new InvalidDataException("sha256 mismatch");
             }
 

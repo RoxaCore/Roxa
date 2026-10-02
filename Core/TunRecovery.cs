@@ -17,6 +17,11 @@ public static class TunRecovery
 
             KillOrphanEngine(state);
             if (state != null) RestoreProxyIfOurs(state);
+            TunDns.RestoreFromState(state);
+            // اگر فایل وضعیت گم شده باشد RestoreFromState هیچ کاری نمی‌کند؛
+            // این خط مستقیم دنبال DNSِ جامانده‌ی 127.0.0.1 (بدون سرویسِ روی :53) می‌گردد.
+            TunDns.SweepDeadAdapters(out bool dnsStaleNeedsAdmin);
+            CleanupStaleProxy();
 
             int swept = IpRoute.SweepOrphanRoutes(state);
             if (swept > 0) TunManager.Log($"Recovery removed {swept} leftover route(s).");
@@ -26,18 +31,19 @@ public static class TunRecovery
 
             bool engineLeft = state != null && IsOurEngineAlive(state);
             bool routesLeft = IpRoute.HasLeftoverRoutes(state);
+            bool dnsLeft = (state != null && state.DnsApplied) || dnsStaleNeedsAdmin;
 
-            if (!engineLeft && !routesLeft && !pinsLeft)
+            if (!engineLeft && !routesLeft && !pinsLeft && !dnsLeft)
             {
                 TunState.Delete();
                 TunManager.Log("Recovery clean.");
             }
             else
             {
-                TunManager.Log($"Recovery incomplete: engineAlive={engineLeft} routesLeft={routesLeft} pinsLeft={pinsLeft} admin={admin}");
+                TunManager.Log($"Recovery incomplete: engineAlive={engineLeft} routesLeft={routesLeft} pinsLeft={pinsLeft} dnsLeft={dnsLeft} admin={admin}");
             }
 
-            LeftoverNeedsAdmin = !admin && (engineLeft || routesLeft || pinsLeft);
+            LeftoverNeedsAdmin = !admin && (engineLeft || routesLeft || pinsLeft || dnsLeft);
         }
         catch (Exception ex)
         {
@@ -52,12 +58,33 @@ public static class TunRecovery
         {
             if (!SystemProxy.GetCurrent(out bool enable, out string server, out _)) return;
             if (!enable || !string.Equals(server, state.ProxySet, StringComparison.OrdinalIgnoreCase)) return;
-            SystemProxy.Apply(state.ProxyPrevEnable, state.ProxyPrevServer, state.ProxyPrevOverride);
+            bool restoreEnable = state.ProxyPrevEnable;
+            if (restoreEnable && SystemProxy.IsDeadLoopback(state.ProxyPrevServer))
+            {
+                TunManager.Log("Recovery: previous system proxy is stale, clearing instead.");
+                restoreEnable = false;
+            }
+            SystemProxy.Apply(restoreEnable, restoreEnable ? state.ProxyPrevServer : null, restoreEnable ? state.ProxyPrevOverride : null);
             TunManager.Log($"Recovery restored proxy to previous value (was {state.ProxySet}).");
         }
         catch (Exception ex)
         {
             TunManager.Log($"Recovery proxy restore failed: {ex.Message}");
+        }
+    }
+
+    private static void CleanupStaleProxy()
+    {
+        try
+        {
+            if (!SystemProxy.GetCurrent(out bool enable, out string server, out _)) return;
+            if (!enable || !SystemProxy.IsDeadLoopback(server)) return;
+            SystemProxy.Clear();
+            TunManager.Log($"Recovery cleared stale system proxy {server} (no listener).");
+        }
+        catch (Exception ex)
+        {
+            TunManager.Log($"Recovery stale proxy cleanup failed: {ex.Message}");
         }
     }
 
@@ -78,6 +105,7 @@ public static class TunRecovery
             {
                 KillOrphanEngine(state);
                 RestoreProxyIfOurs(state);
+                TunDns.RestoreFromState(state);
                 IpRoute.SweepOrphanRoutes(state);
             }
             TunExclusion.SweepPersistedPins(GuardedDests(state));

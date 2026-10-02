@@ -100,7 +100,8 @@ public static class TunManager
                 return false;
             }
 
-            string? via = GetDefaultGatewayVia();
+            // اجرای route print در پس‌زمینه تا رشتهٔ UI هنگام اتصال TUN قفل نشود.
+            string? via = await Task.Run(GetDefaultGatewayVia);
             long tGateway = Environment.TickCount64;
             if (via == null)
             {
@@ -114,24 +115,32 @@ public static class TunManager
             var serverIps = await ResolveServerIpsAsync(hostList == null || hostList.Count == 0 ? null : hostList);
             long tDns = Environment.TickCount64;
 
-            foreach (var ip in serverIps)
+            // هر AddRoute دو بار route.exe اجرا می‌کند (delete+add)؛ با ده‌ها سرور
+            // ده‌ها پروسه می‌شود و اجرای همزمان روی رشتهٔ UI چند ثانیه هنگ می‌آورد.
+            await Task.Run(() =>
             {
-                AddRoute($"add {ip} mask 255.255.255.255 {via}");
-                string? net24 = Subnet24(ip);
-                if (net24 != null) AddRoute($"add {net24} mask 255.255.255.0 {via}");
-            }
-            AddRoute($"add 10.0.0.0 mask 255.0.0.0 {via}");
-            AddRoute($"add 172.16.0.0 mask 255.240.0.0 {via}");
-            AddRoute($"add 192.168.0.0 mask 255.255.0.0 {via}");
+                foreach (var ip in serverIps)
+                {
+                    AddRoute($"add {ip} mask 255.255.255.255 {via}");
+                    string? net24 = Subnet24(ip);
+                    if (net24 != null) AddRoute($"add {net24} mask 255.255.255.0 {via}");
+                }
+                AddRoute($"add 10.0.0.0 mask 255.0.0.0 {via}");
+                AddRoute($"add 172.16.0.0 mask 255.240.0.0 {via}");
+                AddRoute($"add 192.168.0.0 mask 255.255.0.0 {via}");
+            });
             long tExcl = Environment.TickCount64;
 
-            RunRoute("delete 0.0.0.0 mask 128.0.0.0");
-            RunRoute("delete 128.0.0.0 mask 128.0.0.0");
+            await Task.Run(() =>
+            {
+                RunRoute("delete 0.0.0.0 mask 128.0.0.0");
+                RunRoute("delete 128.0.0.0 mask 128.0.0.0");
+            });
 
             if (!await WaitCaptureRoutesAsync())
             {
                 Log($"TUN adapter {TunAdapterName} did not appear in time; capture routes skipped.");
-                RemoveCaptureRoutes();
+                await Task.Run(RemoveCaptureRoutes);
                 return false;
             }
             long tCapture = Environment.TickCount64;
@@ -143,7 +152,7 @@ public static class TunManager
         catch (Exception ex)
         {
             Log($"AddCaptureRoutes failed: {ex.Message}");
-            RemoveCaptureRoutes();
+            await Task.Run(RemoveCaptureRoutes);
             return false;
         }
     }
@@ -201,7 +210,9 @@ public static class TunManager
             bool allAdded = true;
             foreach (var (prefix, dest, mask) in _capturePrefixes)
             {
-                if (RunNetsh($"interface ipv4 add route prefix={prefix} interface={TunAdapterName}") == 0)
+                // netsh هم پروسهٔ جدا می‌خواهد؛ در پس‌زمینه اجرا می‌شود.
+                bool ok = await Task.Run(() => RunNetsh($"interface ipv4 add route prefix={prefix} interface={TunAdapterName}") == 0);
+                if (ok)
                 {
                     lock (_routesLock)
                     {

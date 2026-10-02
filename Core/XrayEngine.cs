@@ -70,7 +70,14 @@ public sealed class XrayEngine : IDisposable
             if (p == null) return _engineVersionCache = "?";
             var stdoutTask = p.StandardOutput.ReadToEndAsync();
             var stderrTask = p.StandardError.ReadToEndAsync();
-            if (!p.WaitForExit(5000))
+            // WaitForExit همزمان رشتهٔ UI را نگه می‌دارد (اولین اتصال چند صدم ثانیه).
+            using var exitCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            exitCts.CancelAfter(TimeSpan.FromSeconds(5));
+            try
+            {
+                await p.WaitForExitAsync(exitCts.Token);
+            }
+            catch (OperationCanceledException)
             {
                 try { p.Kill(); } catch { }
                 return _engineVersionCache = "?";
@@ -263,18 +270,20 @@ public sealed class XrayEngine : IDisposable
     public async Task StartAsync(ServerInfo server, bool setSystemProxy, AppSettings? settings = null, CancellationToken ct = default, IEnumerable<string>? tunExclusionHosts = null)
     {
         var perf = System.Diagnostics.Stopwatch.StartNew();
-        Stop();
+        // پاکسازی قبلی (kill پروسه، حذف مسیرها، بازگردانی DNS با powershell) سنگین است؛
+        // در پس‌زمینه اجرا می‌شود تا رشتهٔ UI هنگ اتصال TUN نکند.
+        await Task.Run(Stop);
         _settings = settings;
         if (!File.Exists(EnginePath))
         {
             Log(TranslationManager.Get("Eng_NotFound"));
             await EnsureEngineAsync(false, ct);
         }
-        else if (!VerifyEngineIntegrity(requireSidecar: AdminHelper.IsRunningAsAdmin()))
+        else if (!await Task.Run(() => VerifyEngineIntegrity(requireSidecar: AdminHelper.IsRunningAsAdmin())))
         {
             Log(TranslationManager.Get("Eng_IntegrityRetry"));
             await EnsureEngineAsync(true, ct);
-            if (!VerifyEngineIntegrity(requireSidecar: true))
+            if (!await Task.Run(() => VerifyEngineIntegrity(requireSidecar: true)))
                 throw new InvalidDataException(TranslationManager.Get("Eng_IntegrityFailed"));
         }
 
@@ -338,7 +347,7 @@ public sealed class XrayEngine : IDisposable
 
             if (useTun && settings?.UseTunMode == false)
             {
-                TunManager.RemoveCaptureRoutes();
+                await Task.Run(() => TunManager.RemoveCaptureRoutes());
                 Log(TranslationManager.Get("Eng_TunFallback"));
                 useTun = false;
             }
@@ -346,14 +355,23 @@ public sealed class XrayEngine : IDisposable
             IsTunActive = useTun;
             UpdateState(process, st => st.TunActive = useTun);
 
-            if (useTun && XrayConfigBuilder.LastDnsStub && TunDns.TryApply(out var dnsPrev))
+            if (useTun && XrayConfigBuilder.LastDnsStub)
             {
-                UpdateState(process, st =>
+                // اجرای powershell (Set-DnsClientServerAddress) چند ثانیه طول می‌کشد؛ در پس‌زمینه.
+                var (dnsApplied, dnsPrev) = await Task.Run(() =>
                 {
-                    st.DnsApplied = true;
-                    st.DnsPrev = dnsPrev;
+                    bool ok = TunDns.TryApply(out var prev);
+                    return (ok, prev);
                 });
-                Log("DNS -> 127.0.0.1 (local stub)");
+                if (dnsApplied)
+                {
+                    UpdateState(process, st =>
+                    {
+                        st.DnsApplied = true;
+                        st.DnsPrev = dnsPrev;
+                    });
+                    Log("DNS -> 127.0.0.1 (local stub)");
+                }
             }
 
             if (!useTun && setSystemProxy && IsWindows && settings?.LeaveSystemProxyAsIs != true)

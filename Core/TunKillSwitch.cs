@@ -214,7 +214,7 @@ public static class TunKillSwitch
             want = _enabled && !_tunnelUp;
             count = _primaryPaths.Count;
         }
-        Task.Run(() => ApplyRules(gen, want, count));
+        Task.Factory.StartNew(() => ApplyRules(gen, want, count), TaskCreationOptions.LongRunning);
     }
 
     private static void ApplyRules(int gen, bool want, int count)

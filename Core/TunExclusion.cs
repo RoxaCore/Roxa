@@ -80,7 +80,7 @@ public static class TunExclusion
                 _timer = new Timer(_ => Scan(), null, 0, ScanIntervalMs);
             }
         }
-        Task.Run(() => SyncRules(gen, snapshot.Count > 0 ? snapshot : null));
+        Task.Factory.StartNew(() => SyncRules(gen, snapshot.Count > 0 ? snapshot : null), TaskCreationOptions.LongRunning);
     }
 
     public static void SetExcluded(IEnumerable<string>? excludedPaths)
@@ -99,11 +99,11 @@ public static class TunExclusion
             snapshot = _excludedPaths.ToList();
             gen = ++_rulesGen;
         }
-        Task.Run(() =>
+        Task.Factory.StartNew(() =>
         {
             lock (_lock) ClearPinnedLocked();
             SyncRules(gen, snapshot.Count > 0 ? snapshot : null);
-        });
+        }, TaskCreationOptions.LongRunning);
     }
 
     public static void Stop()
@@ -123,7 +123,7 @@ public static class TunExclusion
             _gateway = null;
             _scanTick = 0;
         }
-        Task.Run(() => SyncRules(gen, null));
+        Task.Factory.StartNew(() => SyncRules(gen, null), TaskCreationOptions.LongRunning);
     }
 
     private static bool ApplyExcludedLocked(IEnumerable<string>? excludedPaths)

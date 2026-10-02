@@ -488,4 +488,6 @@
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>هشدار: لینک اشتراک بدون https است و بدون رمزگذاری منتقل می‌شود.</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>نسخه موتور ({0}) از نسخه آزمایش‌شده ({1}) قدیمی است؛ ممکن است برخی پیکربندی‌ها پشتیبانی نشوند.</value></data>
 <data name="Hint_BypassTun" xml:space="preserve"><value>نکته: تست‌ها بدون اعمال TUN انجام می‌شوند</value></data>
+<data name="Notify_TunOn" xml:space="preserve"><value>ROXA وصل شد</value></data>
+<data name="Notify_TunOff" xml:space="preserve"><value>ROXA قطع شد</value></data>
 </root>

@@ -444,4 +444,6 @@
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>경고: 이 구독 링크는 암호화되지 않은 http를 사용합니다.</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>엔진 버전({0})이 테스트된 버전({1})보다 오래되어 일부 설정이 동작하지 않을 수 있습니다.</value></data>
 <data name="Hint_BypassTun" xml:space="preserve"><value>참고: 테스트는 TUN 적용 없이 실행됩니다</value></data>
+<data name="Notify_TunOn" xml:space="preserve"><value>ROXA 연결됨</value></data>
+<data name="Notify_TunOff" xml:space="preserve"><value>ROXA 연결 끊김</value></data>
 </root>

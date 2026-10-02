@@ -99,9 +99,11 @@ public partial class MainViewModel : ViewModelBase
 
         if (IsConnected && !IsTesting)
         {
-            Disconnect();
+            _tunToggleReconnect = value;
+            DisconnectCore(notify: false);
             _ = Connect();
         }
+        else _tunToggleReconnect = null;
     }
 
     partial void OnUseProxyForSubscriptionsChanged(bool value)

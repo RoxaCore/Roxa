@@ -444,4 +444,6 @@ Latenz: {1}</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>Warnung: Dieser Abo-Link nutzt unverschlüsseltes http.</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>Engine-Version ({0}) ist älter als die getestete Version ({1}); einige Konfigurationen funktionieren möglicherweise nicht.</value></data>
 <data name="Hint_BypassTun" xml:space="preserve"><value>Hinweis: Tests laufen ohne Anwendung von TUN</value></data>
+<data name="Notify_TunOn" xml:space="preserve"><value>ROXA verbunden</value></data>
+<data name="Notify_TunOff" xml:space="preserve"><value>ROXA getrennt</value></data>
 </root>

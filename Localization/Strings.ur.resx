@@ -444,4 +444,6 @@
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>خبردار: یہ سبسکرپشن لنک بغیر تعمیری http استعمال کرتا ہے۔</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>انجن کا ورژن ({0}) جانچے گئے ورژن ({1}) سے پرانا ہے؛ کچھ ترتیبات کام نہیں کر سکتیں۔</value></data>
 <data name="Hint_BypassTun" xml:space="preserve"><value>نوٹ: ٹیسٹ TUN لاگو کیے بغیر چلتے ہیں</value></data>
+<data name="Notify_TunOn" xml:space="preserve"><value>ROXA منسلک ہو گیا</value></data>
+<data name="Notify_TunOff" xml:space="preserve"><value>ROXA منقطع ہو گیا</value></data>
 </root>

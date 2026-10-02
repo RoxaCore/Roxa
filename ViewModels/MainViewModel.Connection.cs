@@ -15,6 +15,10 @@ public partial class MainViewModel : ViewModelBase
 
     private bool _isConnecting;
 
+    // وقتی تعویض TUN هنگام اتصال باعث قطع+وصل مجدد می‌شود، به‌جای دو نوتیفیشن
+    // «ROXA قطع/وصل شد» و «متصل شد به …»، فقط یک نوتیفیشن ادغام‌شده نشان داده می‌شود.
+    private bool? _tunToggleReconnect;
+
     private void RefreshConnectionFlags()
     {
         string? activeId = null;
@@ -29,6 +33,8 @@ public partial class MainViewModel : ViewModelBase
     private async Task Connect()
     {
         var server = SelectedServer;
+        bool? tunReconnect = _tunToggleReconnect;
+        _tunToggleReconnect = null;
         if (server == null || !Servers.Contains(server)) return;
         if (_isConnecting) return;
         _isConnecting = true;
@@ -41,6 +47,7 @@ public partial class MainViewModel : ViewModelBase
                 Status = issue;
                 ToastHandler?.Invoke(issue);
                 AppendLog(string.Format(TranslationManager.Instance["Log_Error"], issue));
+                if (tunReconnect != null) NotificationHelper.ShowError(issue);
                 return;
             }
             Status = TranslationManager.Instance["Status_Connecting"];
@@ -59,7 +66,14 @@ public partial class MainViewModel : ViewModelBase
             _settings.ActiveServerId = server.Id;
             SaveSettings();
             AppendLog(string.Format(TranslationManager.Instance["Log_Connected"], _engine.HttpPort));
-            NotificationHelper.ShowConnected(server.Name, server.LatencyDisplay);
+            if (tunReconnect is bool tunOn)
+            {
+                string tunLine = TranslationManager.Get(tunOn ? "Notify_TunOn" : "Notify_TunOff");
+                string connLine = string.Format(TranslationManager.Get("Notify_Connected"), server.Name, server.LatencyDisplay);
+                NotificationHelper.Show("Roxa", tunLine + "\n" + connLine);
+            }
+            else
+                NotificationHelper.ShowConnected(server.Name, server.LatencyDisplay);
 
             // Initialize byte counters for speed calculation
             _ = Task.Run(() =>
@@ -112,14 +126,16 @@ public partial class MainViewModel : ViewModelBase
     private bool CanConnect() => SelectedServer != null && !IsConnected && !IsTesting && !_isConnecting;
 
     [RelayCommand]
-    private void Disconnect()
+    private void Disconnect() => DisconnectCore(true);
+
+    private void DisconnectCore(bool notify)
     {
         _engine.StopAndCleanupTun();
         TunKillSwitch.SetTunnelUp(false, 0);
         IsConnected = false;
         RefreshConnectionFlags();
         AppendLog(TranslationManager.Instance["Log_Disconnected"]);
-        NotificationHelper.ShowDisconnected();
+        if (notify) NotificationHelper.ShowDisconnected();
         ConnectCommand.NotifyCanExecuteChanged();
     }
 

@@ -460,4 +460,6 @@
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>تحذير: رابط الاشتراك هذا يستخدم http عاديًا وغير مشفّر.</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>إصدار المحرك ({0}) أقدم من الإصدار المُختبر ({1}); قد لا تعمل بعض الإعدادات.</value></data>
 <data name="Hint_BypassTun" xml:space="preserve"><value>ملاحظة: تُجرى الاختبارات بدون تطبيق TUN</value></data>
+<data name="Notify_TunOn" xml:space="preserve"><value>تم توصيل ROXA</value></data>
+<data name="Notify_TunOff" xml:space="preserve"><value>تم فصل ROXA</value></data>
 </root>

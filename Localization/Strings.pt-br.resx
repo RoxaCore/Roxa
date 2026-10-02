@@ -444,4 +444,6 @@ Latência: {1}</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>Aviso: este link de assinatura usa http sem criptografia.</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>A versão do motor ({0}) é mais antiga que a testada ({1}); algumas configurações podem não funcionar.</value></data>
 <data name="Hint_BypassTun" xml:space="preserve"><value>Nota: os testes são executados sem aplicar o TUN</value></data>
+<data name="Notify_TunOn" xml:space="preserve"><value>ROXA conectado</value></data>
+<data name="Notify_TunOff" xml:space="preserve"><value>ROXA desconectado</value></data>
 </root>

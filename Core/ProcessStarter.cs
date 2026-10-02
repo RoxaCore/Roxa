@@ -141,8 +141,8 @@ public static class ProcessStarter
 
             IntPtr stdoutRead = hStdoutRead; hStdoutRead = IntPtr.Zero;
             IntPtr stderrRead = hStderrRead; hStderrRead = IntPtr.Zero;
-            Task.Run(() => ReadLines(stdoutRead, onOutput));
-            Task.Run(() => ReadLines(stderrRead, onOutput));
+            Task.Factory.StartNew(() => ReadLines(stdoutRead, onOutput), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() => ReadLines(stderrRead, onOutput), TaskCreationOptions.LongRunning);
             return process;
         }
         catch

@@ -116,8 +116,9 @@ public static class TunManager
             long tDns = Environment.TickCount64;
 
             // هر AddRoute دو بار route.exe اجرا می‌کند (delete+add)؛ با ده‌ها سرور
-            // ده‌ها پروسه می‌شود و اجرای همزمان روی رشتهٔ UI چند ثانیه هنگ می‌آورد.
-            await Task.Run(() =>
+            // ده‌ها پروسه می‌شود. LongRunning تا رشته‌های Thread-Pool در چند ثانیهٔ
+            // اجرای همزمان route.exe بلوکه نشوند و پیوست‌های UI به تعویق نیفتند.
+            await Task.Factory.StartNew(() =>
             {
                 foreach (var ip in serverIps)
                 {
@@ -128,7 +129,7 @@ public static class TunManager
                 AddRoute($"add 10.0.0.0 mask 255.0.0.0 {via}");
                 AddRoute($"add 172.16.0.0 mask 255.240.0.0 {via}");
                 AddRoute($"add 192.168.0.0 mask 255.255.0.0 {via}");
-            });
+            }, TaskCreationOptions.LongRunning);
             long tExcl = Environment.TickCount64;
 
             await Task.Run(() =>
@@ -140,7 +141,7 @@ public static class TunManager
             if (!await WaitCaptureRoutesAsync())
             {
                 Log($"TUN adapter {TunAdapterName} did not appear in time; capture routes skipped.");
-                await Task.Run(RemoveCaptureRoutes);
+                await Task.Factory.StartNew(RemoveCaptureRoutes, TaskCreationOptions.LongRunning);
                 return false;
             }
             long tCapture = Environment.TickCount64;
@@ -152,7 +153,7 @@ public static class TunManager
         catch (Exception ex)
         {
             Log($"AddCaptureRoutes failed: {ex.Message}");
-            await Task.Run(RemoveCaptureRoutes);
+            await Task.Factory.StartNew(RemoveCaptureRoutes, TaskCreationOptions.LongRunning);
             return false;
         }
     }

@@ -13,7 +13,13 @@ public sealed class TestRouteScope : IDisposable
         _disposed = true;
         string[] ips;
         lock (_ips) { ips = _ips.ToArray(); _ips.Clear(); }
-        foreach (var ip in ips) TestRouteBypass.Release(ip);
+        // route delete پروسه‌محور است و Dispose روی رشتهٔ UI صدا زده می‌شود؛
+        // آزادسازی مسیرها در پس‌زمینه انجام می‌شود تا UI ثانیه‌ای قفل نشود.
+        if (ips.Length > 0)
+            Task.Factory.StartNew(() =>
+            {
+                foreach (var ip in ips) TestRouteBypass.Release(ip);
+            }, TaskCreationOptions.LongRunning);
     }
 }
 
@@ -52,35 +58,41 @@ public static class TestRouteBypass
             }
             if (wanted.Count == 0) return scope;
 
-            string? via = Gateway();
+            // route print (Gateway) و حلقهٔ route delete/add پروسه‌محورند. اینها قبلاً
+            // روی رشتهٔ UI اجرا می‌شدند و هر TCP ping در اتصال هوشمند/تست‌ها UI را
+            // چند صد میلی‌ثانیه می‌گرفت؛ اکنون در پس‌زمینهٔ LongRunning اجرا می‌شوند.
+            string? via = await Task.Run(Gateway);
             if (via == null) return scope;
 
             var guard = TunManager.CaptureHostRoutes();
             var ips = await TunManager.ResolveIpsAsync(wanted);
 
-            foreach (var ip in ips)
+            await Task.Factory.StartNew(() =>
             {
-                if (guard.Contains(ip) || TunExclusion.IsPinned(ip)) continue;
-                bool ours = false;
-                lock (_lock)
+                foreach (var ip in ips)
                 {
-                    if (_held.TryGetValue(ip, out var held))
+                    if (guard.Contains(ip) || TunExclusion.IsPinned(ip)) continue;
+                    bool ours = false;
+                    lock (_lock)
                     {
-                        held.Refs++;
-                        ours = true;
-                    }
-                    else
-                    {
-                        TunManager.RunRoute($"delete {ip} mask 255.255.255.255");
-                        if (TunManager.RunRoute($"add {ip} mask 255.255.255.255 {via}") == 0)
+                        if (_held.TryGetValue(ip, out var held))
                         {
-                            _held[ip] = new Held { Via = via, Refs = 1 };
+                            held.Refs++;
                             ours = true;
                         }
+                        else
+                        {
+                            TunManager.RunRoute($"delete {ip} mask 255.255.255.255");
+                            if (TunManager.RunRoute($"add {ip} mask 255.255.255.255 {via}") == 0)
+                            {
+                                _held[ip] = new Held { Via = via, Refs = 1 };
+                                ours = true;
+                            }
+                        }
                     }
+                    if (ours) scope.Track(ip);
                 }
-                if (ours) scope.Track(ip);
-            }
+            }, TaskCreationOptions.LongRunning);
         }
         catch { }
         return scope;

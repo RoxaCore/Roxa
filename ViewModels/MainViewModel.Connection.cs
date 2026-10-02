@@ -130,7 +130,11 @@ public partial class MainViewModel : ViewModelBase
 
     private void DisconnectCore(bool notify)
     {
-        _engine.StopAndCleanupTun();
+        // kill پروسه، حذف مسیرها و بازگردانی DNS با powershell چند ثانیه طول می‌کشد؛
+        // اجرای همزمان آن روی رشتهٔ UI، قطع اتصال دستی/تعویض سرور/اتصال هوشمند را
+        // می‌گرفت. اکنون در پس‌زمینهٔ LongRunning اجرا می‌شود و گیت داخلی Stop()
+        // هم‌زمانی آن با پاکسازی StartAsync را سریالایز می‌کند.
+        Task.Factory.StartNew(() => { try { _engine.StopAndCleanupTun(); } catch { } }, TaskCreationOptions.LongRunning);
         TunKillSwitch.SetTunnelUp(false, 0);
         IsConnected = false;
         RefreshConnectionFlags();

@@ -21,6 +21,9 @@ public sealed class XrayEngine : IDisposable
     private string? _tempConfigPath;
     private AppSettings? _settings;
     private readonly object _lock = new();
+    // قطع اتصال اکنون در پس‌زمینه اجرا می‌شود و ممکن است همزمان با StartAsync دو Stop
+    // روی دو رشته بیفتد؛ این گیت هر دو را سریالایز می‌کند تا kill/process/proxy دوبار اجرا نشود.
+    private readonly SemaphoreSlim _stopGate = new(1, 1);
 
     public event Action<string>? Output;
     public event Action? Stopped;
@@ -271,8 +274,9 @@ public sealed class XrayEngine : IDisposable
     {
         var perf = System.Diagnostics.Stopwatch.StartNew();
         // پاکسازی قبلی (kill پروسه، حذف مسیرها، بازگردانی DNS با powershell) سنگین است؛
-        // در پس‌زمینه اجرا می‌شود تا رشتهٔ UI هنگ اتصال TUN نکند.
-        await Task.Run(Stop);
+        // در پس‌زمینهٔ LongRunning اجرا می‌شود تا هم رشتهٔ UI هنگ نکند و هم
+        // با بلوکه‌شدن رشته‌های Thread-Pool پیوست‌های ادامهٔ کار به تعویق نیفتد.
+        await Task.Factory.StartNew(Stop, TaskCreationOptions.LongRunning);
         _settings = settings;
         if (!File.Exists(EnginePath))
         {
@@ -347,7 +351,7 @@ public sealed class XrayEngine : IDisposable
 
             if (useTun && settings?.UseTunMode == false)
             {
-                await Task.Run(() => TunManager.RemoveCaptureRoutes());
+                await Task.Factory.StartNew(() => TunManager.RemoveCaptureRoutes(), TaskCreationOptions.LongRunning);
                 Log(TranslationManager.Get("Eng_TunFallback"));
                 useTun = false;
             }
@@ -358,11 +362,11 @@ public sealed class XrayEngine : IDisposable
             if (useTun && XrayConfigBuilder.LastDnsStub)
             {
                 // اجرای powershell (Set-DnsClientServerAddress) چند ثانیه طول می‌کشد؛ در پس‌زمینه.
-                var (dnsApplied, dnsPrev) = await Task.Run(() =>
+                var (dnsApplied, dnsPrev) = await Task.Factory.StartNew(() =>
                 {
                     bool ok = TunDns.TryApply(out var prev);
                     return (ok, prev);
-                });
+                }, TaskCreationOptions.LongRunning);
                 if (dnsApplied)
                 {
                     UpdateState(process, st =>
@@ -418,7 +422,9 @@ public sealed class XrayEngine : IDisposable
         }
         catch
         {
-            Stop();
+            // Stop() پشت گیت سریالایز می‌شود؛ اجرای همزمان آن روی رشتهٔ UI می‌توانست
+            // هنگام شکست اتصال، UI را تا آزادشدن گیت نگه دارد.
+            await Task.Factory.StartNew(Stop, TaskCreationOptions.LongRunning);
             throw;
         }
     }
@@ -456,7 +462,7 @@ public sealed class XrayEngine : IDisposable
 
     public async Task StartWithConfigAsync(string configJson, int httpPort, CancellationToken ct = default)
     {
-        Stop();
+        await Task.Factory.StartNew(Stop, TaskCreationOptions.LongRunning);
         if (!File.Exists(EnginePath))
         {
             Log(TranslationManager.Get("Eng_NotFound"));
@@ -507,40 +513,45 @@ public sealed class XrayEngine : IDisposable
 
     public void Stop()
     {
-        IsTunActive = false;
-        TunExclusion.Stop();
-        TunManager.RemoveCaptureRoutes();
-        try { TunDns.RestoreFromState(); } catch { }
-        Process? process;
-        JobObject? job;
-        lock (_lock)
+        _stopGate.Wait();
+        try
         {
-            process = _process;
-            _process = null;
-            job = _job;
-            _job = null;
-        }
-        if (process != null)
-        {
-            int pid = process.Id;
-            try { if (!process.HasExited) process.Kill(entireProcessTree: true); }
-            catch { /* already exited */ }
-            try { process.Dispose(); } catch { }
-            try
+            IsTunActive = false;
+            TunExclusion.Stop();
+            TunManager.RemoveCaptureRoutes();
+            try { TunDns.RestoreFromState(); } catch { }
+            Process? process;
+            JobObject? job;
+            lock (_lock)
             {
-                var st = TunState.Load();
-                if (st != null && st.EnginePid == pid) TunState.Delete();
+                process = _process;
+                _process = null;
+                job = _job;
+                _job = null;
             }
-            catch { }
+            if (process != null)
+            {
+                int pid = process.Id;
+                try { if (!process.HasExited) process.Kill(entireProcessTree: true); }
+                catch { /* already exited */ }
+                try { process.Dispose(); } catch { }
+                try
+                {
+                    var st = TunState.Load();
+                    if (st != null && st.EnginePid == pid) TunState.Delete();
+                }
+                catch { }
+            }
+            job?.Dispose();
+            try { ProxyRouter.StopForUpstream(HttpPort); } catch { }
+            ReleaseSystemProxy();
+            CurrentServer = null;
+            HttpPort = 0;
+            SocksPort = 0;
+            CleanupTempConfig(_tempConfigPath);
+            _tempConfigPath = null;
         }
-        job?.Dispose();
-        try { ProxyRouter.StopForUpstream(HttpPort); } catch { }
-        ReleaseSystemProxy();
-        CurrentServer = null;
-        HttpPort = 0;
-        SocksPort = 0;
-        CleanupTempConfig(_tempConfigPath);
-        _tempConfigPath = null;
+        finally { _stopGate.Release(); }
     }
 
     private void ReleaseSystemProxy()
@@ -579,7 +590,7 @@ public sealed class XrayEngine : IDisposable
 
     public async Task StartMultiAsync(string configJson, Dictionary<int, ServerInfo> portMap, CancellationToken ct = default)
     {
-        Stop();
+        await Task.Factory.StartNew(Stop, TaskCreationOptions.LongRunning);
         if (!File.Exists(EnginePath))
         {
             Log(TranslationManager.Get("Eng_NotFound"));

@@ -78,7 +78,10 @@ public partial class MainViewModel : ViewModelBase
         {
             Enrich(server);
             server.SubscriptionName = subName;
-            if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal))) continue;
+            // تشخیص تکراری با کلید واحد (آدرس+پورت+پروتکل+ترنسپورت)، نه با لینک کامل؛
+            // قبلاً نام داخل لینک بود و همان گره با نام متفاوت دوباره اضافه می‌شد.
+            string fdk = DupeKey(server);
+            if (Servers.Any(s => string.Equals(DupeKey(s), fdk, StringComparison.Ordinal))) continue;
                 Servers.Insert(0, server);
                 server.IsHighlighted = true;
                 added++;
@@ -140,7 +143,8 @@ public partial class MainViewModel : ViewModelBase
                     Enrich(server);
                     server.Owner = this;
                     server.SubscriptionName = sub.Name;
-                    if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal))) continue;
+                    string udk = DupeKey(server);
+                    if (Servers.Any(s => string.Equals(DupeKey(s), udk, StringComparison.Ordinal))) continue;
                     Servers.Add(server);
                 }
                 sub.LastUpdated = DateTime.Now;
@@ -202,7 +206,8 @@ public partial class MainViewModel : ViewModelBase
                 Enrich(server);
                 server.Owner = this;
                 server.SubscriptionName = sub.Name;
-                if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal))) continue;
+                string sdk = DupeKey(server);
+                if (Servers.Any(s => string.Equals(DupeKey(s), sdk, StringComparison.Ordinal))) continue;
                 Servers.Add(server);
                 added++;
             }

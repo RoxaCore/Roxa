@@ -808,4 +808,5 @@ Gecikme: {1}</value></data>
 <data name="Sub_EmptyBody" xml:space="preserve"><value>Sunucu yanıtı boş.</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>Uyarı: bu abonelik bağlantısı şifrelenmemiş http kullanıyor.</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>Motor sürümü ({0}), test edilen sürümden ({1}) daha eski; bazı yapılandırmalar çalışmayabilir.</value></data>
+<data name="Hint_BypassTun" xml:space="preserve"><value>Not: Testler TUN uygulanmadan çalışır</value></data>
 </root>

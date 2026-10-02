@@ -443,4 +443,5 @@ Latenz: {1}</value></data>
 <data name="Sub_EmptyBody" xml:space="preserve"><value>Die Serverantwort ist leer.</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>Warnung: Dieser Abo-Link nutzt unverschlüsseltes http.</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>Engine-Version ({0}) ist älter als die getestete Version ({1}); einige Konfigurationen funktionieren möglicherweise nicht.</value></data>
+<data name="Hint_BypassTun" xml:space="preserve"><value>Hinweis: Tests laufen ohne Anwendung von TUN</value></data>
 </root>

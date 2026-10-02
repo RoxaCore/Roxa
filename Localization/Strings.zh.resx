@@ -459,4 +459,5 @@
 <data name="Sub_EmptyBody" xml:space="preserve"><value>服务器响应为空。</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>警告：此订阅链接使用未加密的 http。</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>内核版本（{0}）低于已测试版本（{1}），某些配置可能无法工作。</value></data>
+<data name="Hint_BypassTun" xml:space="preserve"><value>注意：测试在不应用 TUN 的情况下运行</value></data>
 </root>

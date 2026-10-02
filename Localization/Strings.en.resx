@@ -479,4 +479,5 @@ Latency: {1}</value></data>
 <data name="Sub_EmptyBody" xml:space="preserve"><value>The server response is empty.</value></data>
 <data name="Log_SubWarnHttp" xml:space="preserve"><value>Warning: this subscription link uses plain http and is not encrypted.</value></data>
 <data name="Eng_WarnOld" xml:space="preserve"><value>Engine version ({0}) is older than the tested version ({1}); some configurations may not work.</value></data>
+<data name="Hint_BypassTun" xml:space="preserve"><value>Note: tests run without applying TUN</value></data>
 </root>

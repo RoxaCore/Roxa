@@ -28,7 +28,8 @@ public partial class MainViewModel : ViewModelBase
             {
                 var server = UrlParser.Parse(line);
                 Enrich(server);
-                if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal)))
+                string dk = DupeKey(server);
+                if (Servers.Any(s => string.Equals(DupeKey(s), dk, StringComparison.Ordinal)))
                 {
                     AppendLog(string.Format(TranslationManager.Instance["Log_ServerDup"], server.Name));
                     Status = string.Format(TranslationManager.Instance["Status_DupServer"], server.Name);
@@ -100,7 +101,8 @@ public partial class MainViewModel : ViewModelBase
             {
                 var server = UrlParser.Parse(line);
                 Enrich(server);
-                if (Servers.Any(s => string.Equals(s.Link, server.Link, StringComparison.Ordinal)))
+                string cdk = DupeKey(server);
+                if (Servers.Any(s => string.Equals(DupeKey(s), cdk, StringComparison.Ordinal)))
                 {
                     duplicates++;
                     continue;
@@ -166,14 +168,13 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void RemoveDuplicates()
     {
-        var seen = new HashSet<string>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
         var dupes = new List<ServerInfo>();
         foreach (var s in Servers)
         {
-            // ترنسپورت/مسیر/SNI هم باید در کلید باشند؛ دو سرور با آدرس یکسان ولی
-            // مثلاً ws در مقابل grpc سرورهای متفاوتی هستند و نباید حذف شوند.
-            string key = $"{s.Address}:{s.Port}:{s.UserId}:{s.Password}|{s.Network}|{s.Path}|{s.Host}|{s.SNI}|{s.Flow}";
-            if (!seen.Add(key)) dupes.Add(s);
+            // همان کلید واحد شمارش (DupeKey): آدرس+پورت+پروتکل+ترنسپورت، بدون نام؛
+            // قبلاً Path/Host/SNI/Flow هم در کلید بودند پس شمارنده ۱۱ تا می‌داد ولی حذف صفر تا.
+            if (!seen.Add(DupeKey(s))) dupes.Add(s);
         }
         foreach (var d in dupes)
         {

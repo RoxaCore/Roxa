@@ -60,7 +60,6 @@ public static class ProxyRouter
     private static int _port;
     private static int _clientSeq;
 
-    public static bool IsRunning { get { lock (_lock) return _listener != null; } }
     public static int Port { get { lock (_lock) return _port; } }
 
     public static bool Start(IEnumerable<string>? bypassPaths, int upstreamPort)

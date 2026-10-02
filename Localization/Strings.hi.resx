@@ -263,6 +263,7 @@
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>इस विकल्प के सक्रिय होने पर ऐप नए संस्करण स्वतः डाउनलोड और इंस्टॉल करता है; अपडेट लागू करने के लिए ऐप बंद और फिर से खुलेगा।</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>TUN से बाहर रखे गए ऐप्स</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>इन ऐप्स का ट्रैफ़िक VPN सर्वर से नहीं गुज़रता और आपका असली IP उपयोग करता है। केवल TUN मोड सक्रिय होने पर लागू होता है।</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>नोट: यह सूची सामान्य है — किसी भी ऐप को उसकी एक्ज़ेक्यूटेबल फ़ाइल के आधार पर जोड़ा जा सकता है। प्रॉक्सी मोड (TUN के बिना) में यह केवल उन्हीं ऐप्स पर असर करता है जो सिस्टम प्रॉक्सी का पालन करते हैं। पूरे सिस्टम का DNS अभी भी VPN से गुज़रता है, इसलिए इन ऐप्स के लिए भी ब्लॉक किए गए साइट खुल सकते हैं।</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>ऐप जोड़ें...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>हटाएँ</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>अभी तक कोई ऐप जोड़ा नहीं गया है</value></data>
@@ -371,6 +372,8 @@
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>अमान्य Trojan लिंक</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>अमान्य VLESS लिंक</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>केवल vmess / vless / ss / trojan समर्थित हैं</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>ट्रांसपोर्ट समर्थित नहीं है: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>पैरामीटर {0} के लिए अमान्य मान: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>बेहतर खोजें: रोका गया — कोई अन्य परीक्षण चल रहा है</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>बेहतर खोजने में त्रुटि: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>बेहतर खोजें: परीक्षण के लिए और सर्वर नहीं बचे</value></data>
@@ -409,8 +412,35 @@
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN मोड के लिए व्यवस्थापक आवश्यक है। प्रॉक्सी मोड पर वापस जा रहा है।</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>असमर्थित OS/आर्किटेक्चर।</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll उपलब्ध नहीं है। प्रॉक्सी मोड पर वापस जा रहा है।</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>केवल https सब्सक्रिप्शन URL की अनुमति है।</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>सदस्यता लिंक को http या https का उपयोग करना चाहिए।</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>लिंक में अमान्य JSON पेलोड</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>अपडेट URL में https का उपयोग होना चाहिए</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>अपडेट पैकेज में sha256 फ़िंगरप्रिंट नहीं है</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>कनेक्शन निदान</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>कनेक्शन का निदान हो रहा है…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>निदान पूर्ण: कोई समस्या नहीं मिली</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>निदान पूर्ण: {0} समस्या (विवरण लॉग टैब में)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} का समाधान हुआ → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: resolve विफल — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: एडेप्टर '{0}' 127.0.0.1 पर है लेकिन कोई स्थानीय DNS सेवा नहीं सुन रही</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: एडेप्टर '{0}' को स्वचालित पर रीसेट किया गया</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: इसे ठीक करने के लिए ऐप को व्यवस्थापक के रूप में चलाएँ</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: कोई समस्या नहीं</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>सिस्टम प्रॉक्सी: निष्क्रिय</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>सिस्टम प्रॉक्सी: सक्रिय ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>सिस्टम प्रॉक्सी: अप्राप्य लूपबैक पते की ओर इशारा करता है ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>सदस्यता प्राप्ति: HTTP {0} — {2} मि.से. में {1} सर्वर</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>सदस्यता प्राप्ति: HTTP {0} — उत्तर में कोई सर्वर नहीं; सामग्री इससे शुरू: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>सदस्यता प्राप्ति: त्रुटि — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>प्रॉक्सी के बिना सदस्यता प्राप्ति: HTTP {0} — {1} सर्वर (प्रॉक्सी ही कारण है)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Xray इंजन: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>परीक्षण के लिए कोई लिंक नहीं</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>सदस्यता सर्वर से असफल प्रतिक्रिया: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>प्रतिक्रिया मिली लेकिन उसमें कोई सर्वर नहीं। सामग्री इससे शुरू: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>सर्वर प्रतिक्रिया खाली है।</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>चेतावनी: यह सदस्यता लिंक सादे http का उपयोग करता है और एन्क्रिप्टेड नहीं है।</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>इंजन संस्करण ({0}) परीक्षित संस्करण ({1}) से पुराना है; कुछ कॉन्फ़िगरेशन काम नहीं कर सकते।</value></data>
 </root>

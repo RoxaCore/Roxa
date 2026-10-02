@@ -57,6 +57,52 @@ public static class SystemProxy
         catch { }
     }
 
+    public static bool IsDeadLoopback(string? server)
+    {
+        if (string.IsNullOrWhiteSpace(server)) return false;
+        bool sawLoopback = false;
+        foreach (var part in server.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            string v = part;
+            int eq = v.IndexOf('=');
+            if (eq >= 0) v = v[(eq + 1)..];
+            v = v.Trim();
+            if (v.StartsWith("http://", StringComparison.OrdinalIgnoreCase)) v = v[7..];
+            int c = v.LastIndexOf(':');
+            if (c <= 0) continue;
+            string host = v[..c].Trim();
+            // آدرس‌های IPv6 داخل براکت می‌آیند: [::1]:8080
+            if (host.Length > 1 && host[0] == '[' && host[^1] == ']') host = host[1..^1];
+            if (!int.TryParse(v[(c + 1)..].Trim(), out int port) || port <= 0 || port > 65535) continue;
+            if (!IsLoopbackHost(host))
+            {
+                // پراکسی غیر-loopback مال ما نیست (پراکسی ما همیشه 127.0.0.1 است)؛
+                // پاک کردنش تنظیمات کاربر را خراب می‌کند.
+                return false;
+            }
+            sawLoopback = true;
+            if (CanConnect(host, port)) return false;
+        }
+        return sawLoopback;
+    }
+
+    private static bool IsLoopbackHost(string host) =>
+        host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
+        || host.StartsWith("127.", StringComparison.Ordinal)
+        || host == "::1";
+
+    private static bool CanConnect(string host, int port)
+    {
+        try
+        {
+            using var client = new System.Net.Sockets.TcpClient();
+            var task = client.ConnectAsync(host, port);
+            if (!task.Wait(400)) return false;
+            return client.Connected;
+        }
+        catch { return false; }
+    }
+
     [DllImport("wininet.dll", SetLastError = true, CharSet = CharSet.Auto)]
     private static extern bool InternetSetOption(IntPtr hInternet, int dwOption, IntPtr lpBuffer, int dwBufferLength);
 

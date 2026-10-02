@@ -263,6 +263,7 @@
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>このオプションを有効にすると、アプリは新しいバージョンを自動的にダウンロードしてインストールします。更新を適用するためアプリは終了して再起動します。</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>TUN から除外するアプリ</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>これらのアプリのトラフィックは VPN サーバーを経由せず、実際の IP アドレスを使用します。TUN モード有効時のみ適用されます。</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>注: このリストは汎用で、実行可能ファイルに基づいて任意のアプリを追加できます。プロキシモード（TUN なし）では、システムプロキシを使用するアプリにのみ影響します。システムの DNS は引き続き VPN を通るため、ブロック済みサイトがこれらのアプリでも開く可能性があります。</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>アプリを追加...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>削除</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>まだアプリが追加されていません</value></data>
@@ -371,6 +372,8 @@
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>無効な Trojan リンクです</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>無効な VLESS リンクです</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>対応は vmess / vless / ss / trojan のみです</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>未対応のトランスポートです: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>パラメーター {0} の値が無効です: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>より良いサーバー検索: 中断 — 別のテストが実行中です</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>より良いサーバー検索エラー: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>より良いサーバー検索: テストするサーバーがありません</value></data>
@@ -409,8 +412,35 @@
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN モードには管理者権限が必要です。プロキシモードに戻ります。</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>サポートされてない OS/アーキテクチャです。</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll が利用できません。プロキシモードに戻ります。</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>https のサブスクリプション URL のみ使用できます。</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>サブスクリプションリンクは http または https である必要があります。</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>リンク内のJSONペイロードが無効です</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>更新URLはhttpsを使用する必要があります</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>更新パッケージにsha256フィンガープリントがありません</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>接続の診断</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>接続を診断しています…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>診断完了：問題は見つかりませんでした</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>診断完了：{0} 件の問題（詳細はログタブ）</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} を解決 → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: 解決に失敗 — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: アダプタ '{0}' は 127.0.0.1 を指していますが、ローカル DNS サービスが応答しません</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: アダプタ '{0}' を自動にリセットしました</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: 修復するにはアプリを管理者として実行してください</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: 問題は見つかりませんでした</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>システムプロキシ: 無効</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>システムプロキシ: 有効 ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>システムプロキシ: 到達できないループバックアドレスを指しています ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>サブスクリプション取得: HTTP {0} — {2} ミリ秒で {1} 台のサーバ</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>サブスクリプション取得: HTTP {0} — 応答にサーバがありません。内容の先頭: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>サブスクリプション取得: エラー — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>プロキシなしのサブスク取得: HTTP {0} — {1} 台（原因はプロキシ）</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Xray エンジン: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>テストするリンクがありません</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>サブスクリプションサーバからの失敗応答: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>応答は受信しましたがサーバが含まれていません。内容の先頭: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>サーバの応答が空です。</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>警告: このサブスクリプションリンクは暗号化されていない http を使用しています。</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>エンジンバージョン ({0}) はテスト済みバージョン ({1}) より古いため、一部の設定が動作しない可能性があります。</value></data>
 </root>

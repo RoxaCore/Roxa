@@ -24,6 +24,8 @@ public sealed class TunState
     public bool ProxyPrevEnable { get; set; }
     public string? ProxyPrevServer { get; set; }
     public string? ProxyPrevOverride { get; set; }
+    public bool DnsApplied { get; set; }
+    public List<TunDnsRecord>? DnsPrev { get; set; }
     public DateTime SavedUtc { get; set; }
 
     public static string ProgramDataPath =>

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -97,20 +96,6 @@ public partial class MainViewModel : ViewModelBase
       [ObservableProperty] private bool _sortAscending = true;
       [ObservableProperty] private string _customDnsServers = "";
       [ObservableProperty] private string _customDnsAdvancedJson = "";
-
-      [ObservableProperty] private Dictionary<int, double> _columnWidths = new()
-      {
-          { 0, 80 },   // Type
-          { 1, 150 },  // Remarks
-          { 2, 150 },  // Address
-          { 3, 70 },   // Port
-          { 4, 80 },   // Security
-          { 5, 80 },   // Transport
-          { 6, 70 },   // TLS
-          { 7, 90 },   // Subs group
-          { 8, 90 },   // Delay
-           { 9, 90 }    // Speed
-       };
 
       public string[] SortOptions => [TranslationManager.Instance["Sort_None"], TranslationManager.Instance["Sort_Latency"], TranslationManager.Instance["Sort_Speed"], TranslationManager.Instance["Sort_Name"]];
 
@@ -368,23 +353,31 @@ public partial class MainViewModel : ViewModelBase
 
     public async Task OnStartedAsync()
     {
-        StartRemoteChecks();
-        if (AutoUpdateSubs && Subscriptions.Count > 0)
+        // صدازننده async void است؛ هر استثنایی اینجا باعث crash کل برنامه می‌شود.
+        try
         {
-            var since = DateTime.Now - _settings.LastSubscriptionUpdate;
-            if (since.TotalHours >= AutoUpdateIntervalHours)
-                await UpdateSubscriptions();
-        }
-        bool restartReconnect = Program.StartupArgs.Length > 0 && Array.Exists(Program.StartupArgs, a => a == "--reconnect");
-        if ((AutoConnect || restartReconnect) && !IsConnected)
-        {
-            if (SelectedServer != null)
-                await Connect();
-            else
+            StartRemoteChecks();
+            if (AutoUpdateSubs && Subscriptions.Count > 0)
             {
-                AppendLog(TranslationManager.Instance["Log_AutoConnectNoServer"]);
-                ToastHandler?.Invoke(TranslationManager.Instance["Toast_AutoConnectSelect"]);
+                var since = DateTime.Now - _settings.LastSubscriptionUpdate;
+                if (since.TotalHours >= AutoUpdateIntervalHours)
+                    await UpdateSubscriptions();
             }
+            bool restartReconnect = Program.StartupArgs.Length > 0 && Array.Exists(Program.StartupArgs, a => a == "--reconnect");
+            if ((AutoConnect || restartReconnect) && !IsConnected)
+            {
+                if (SelectedServer != null)
+                    await Connect();
+                else
+                {
+                    AppendLog(TranslationManager.Instance["Log_AutoConnectNoServer"]);
+                    ToastHandler?.Invoke(TranslationManager.Instance["Toast_AutoConnectSelect"]);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
         }
     }
 

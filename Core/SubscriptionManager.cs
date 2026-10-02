@@ -1,5 +1,5 @@
+﻿using System.Diagnostics;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text.Json;
@@ -8,28 +8,27 @@ using Roxa.Models;
 
 namespace Roxa.Core;
 
+/// <summary>نتیجه‌ی بررسی سبکِ دریافت اشتراک (دکمه‌ی عیب‌یابی): بدون پرتاب کردن خطا.</summary>
+public sealed class FetchProbe
+{
+    public int StatusCode { get; set; }
+    public string Reason { get; set; } = "";
+    public int ServerCount { get; set; }
+    public string BodyHead { get; set; } = "";
+    public long ElapsedMs { get; set; }
+    public string? Error { get; set; }
+    public bool Success => Error == null && StatusCode >= 200 && StatusCode < 300 && ServerCount > 0;
+}
+
 /// <summary>دریافت و پارس سابسکریپشن: plain-links / base64 / JSON.</summary>
 public static class SubscriptionManager
 {
     public static string UserAgent { get; set; } = "v2rayNG/1.8.33";
 
-    public static async Task<List<ServerInfo>> FetchAsync(string url, CancellationToken ct = default)
-    {
-        int hash = url.IndexOf('#');
-        if (hash >= 0) url = url[..hash];
-        string content = await FetchRawAsync(url, ct: ct);
-        return ParseContent(content);
-    }
+    /// <summary>تعداد تلاش برای خطاهای گذرای شبکه (قطع DNS موقت، ۵xx و …).</summary>
+    private const int FetchAttempts = 3;
 
-    public static async Task<List<ServerInfo>> FetchWithProxyAsync(string url, string proxyAddress, CancellationToken ct = default)
-    {
-        int hash = url.IndexOf('#');
-        if (hash >= 0) url = url[..hash];
-        string content = await FetchRawAsync(url, proxyAddress, ct);
-        return ParseContent(content);
-    }
-
-    private static SocketsHttpHandler CreateHandler(string? proxyAddress = null)
+    private static SocketsHttpHandler CreateHandler(string? proxyAddress = null, bool forceDirect = false)
     {
         var handler = new SocketsHttpHandler
         {
@@ -52,57 +51,126 @@ public static class SubscriptionManager
                 }
             }
         };
-        if (!string.IsNullOrEmpty(proxyAddress))
+        if (forceDirect)
+        {
+            // حالت «بدون پروکسی» باید واقعاً مستقیم باشد؛
+            // بدون این خط، UseProxy پیش‌فرض true است و از پراکسی سیستم استفاده می‌شود.
+            handler.UseProxy = false;
+        }
+        else if (!string.IsNullOrEmpty(proxyAddress))
+        {
             handler.Proxy = new WebProxy(proxyAddress);
+        }
         return handler;
     }
 
-    public static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoAsync(string url, CancellationToken ct = default)
+    public static Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoAsync(string url, CancellationToken ct = default)
+        => FetchWithRetryAsync(url, forceDirect: false, null, ct);
+
+    /// <summary>دریافت مستقیم: حتی پراکسی تنظیم‌شده‌ی سیستم هم استفاده نمی‌شود.</summary>
+    public static Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoDirectAsync(string url, CancellationToken ct = default)
+        => FetchWithRetryAsync(url, forceDirect: true, null, ct);
+
+    public static Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoAndProxyAsync(string url, string proxyAddress, CancellationToken ct = default)
+        => FetchWithRetryAsync(url, forceDirect: false, proxyAddress, ct);
+
+    private static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithRetryAsync(string url, bool forceDirect, string? proxyAddress, CancellationToken ct)
     {
-        int hash = url.IndexOf('#');
-        if (hash >= 0) url = url[..hash];
-        try
+        url = StripFragment(url);
+        EnsureHttpUrl(url);
+        for (int attempt = 1; ; attempt++)
         {
-            using var handler = CreateHandler();
-            using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
-            http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
-            http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
-            using var response = await http.GetAsync(url, ct);
-            string content = await response.Content.ReadAsStringAsync(ct);
-            var servers = ParseContent(content);
-            SubscriptionInfo? info = null;
-            try { info = ParseHeaders(response.Headers); } catch { }
-            return (servers, info);
-        }
-        catch
-        {
-            string content = await FetchRawAsync(url, ct: ct);
-            return (ParseContent(content), null);
+            try
+            {
+                return await FetchOnceAsync(url, forceDirect, proxyAddress, ct);
+            }
+            catch (Exception ex) when (attempt < FetchAttempts && IsTransient(ex))
+            {
+                await Task.Delay(TimeSpan.FromSeconds(attempt), ct);
+            }
         }
     }
 
-    public static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoAndProxyAsync(string url, string proxyAddress, CancellationToken ct = default)
+    private static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchOnceAsync(string url, bool forceDirect, string? proxyAddress, CancellationToken ct)
     {
-        int hash = url.IndexOf('#');
-        if (hash >= 0) url = url[..hash];
+        using var handler = CreateHandler(proxyAddress, forceDirect);
+        using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
+        http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
+        http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
+        using var response = await http.GetAsync(url, ct);
+        if (!response.IsSuccessStatusCode)
+        {
+            // قبلاً بدنه‌ی خطا (مثلا صفحه‌ی HTML پشت CDN) بی‌صدا «۰ سرور» تلقی می‌شد.
+            throw new HttpRequestException(
+                string.Format(TranslationManager.Get("Sub_HttpStatus"), (int)response.StatusCode, response.ReasonPhrase ?? ""),
+                null, response.StatusCode);
+        }
+        string content = await response.Content.ReadAsStringAsync(ct);
+        var servers = ParseContent(content);
+        if (servers.Count == 0)
+        {
+            throw new FormatException(content.Trim().Length == 0
+                ? TranslationManager.Get("Sub_EmptyBody")
+                : string.Format(TranslationManager.Get("Sub_EmptyResult"), BodyHead(content)));
+        }
+        SubscriptionInfo? info = null;
+        try { info = ParseHeaders(response.Headers); } catch { }
+        return (servers, info);
+    }
+
+    /// <summary>دریافت سبک برای عیب‌یابی: خطا را گزارش می‌کند، پرتاب نمی‌کند.</summary>
+    public static async Task<FetchProbe> ProbeAsync(string url, string? proxyAddress = null, bool forceDirect = false, CancellationToken ct = default)
+    {
+        var result = new FetchProbe();
+        url = StripFragment(url);
+        try { EnsureHttpUrl(url); }
+        catch (Exception ex) { result.Error = ex.Message; return result; }
+        var sw = Stopwatch.StartNew();
         try
         {
-            using var handler = CreateHandler(proxyAddress);
-            using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
+            using var handler = CreateHandler(proxyAddress, forceDirect);
+            using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(15) };
             http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
             http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
             using var response = await http.GetAsync(url, ct);
+            result.ElapsedMs = sw.ElapsedMilliseconds;
+            result.StatusCode = (int)response.StatusCode;
+            result.Reason = response.ReasonPhrase ?? "";
             string content = await response.Content.ReadAsStringAsync(ct);
-            var servers = ParseContent(content);
-            SubscriptionInfo? info = null;
-            try { info = ParseHeaders(response.Headers); } catch { }
-            return (servers, info);
+            result.BodyHead = BodyHead(content);
+            try { result.ServerCount = ParseContent(content).Count; }
+            catch (JsonException) { result.ServerCount = 0; }
         }
-        catch
+        catch (Exception ex)
         {
-            string content = await FetchRawAsync(url, proxyAddress, ct);
-            return (ParseContent(content), null);
+            result.ElapsedMs = sw.ElapsedMilliseconds;
+            result.Error = ex.InnerException?.Message ?? ex.Message;
         }
+        return result;
+    }
+
+    /// <summary>فقط خطای گذرای شبکه دوباره تلاش می‌شود؛ خطای محتوا/پاسخ قطعی تکرار نمی‌شود.</summary>
+    private static bool IsTransient(Exception ex)
+    {
+        if (ex is HttpRequestException hre)
+        {
+            if (hre.StatusCode is null) return true;
+            int code = (int)hre.StatusCode.Value;
+            return code >= 500 || code == 408 || code == 429;
+        }
+        return ex is IOException or SocketException or TaskCanceledException;
+    }
+
+    private static string StripFragment(string url)
+    {
+        int hash = url.IndexOf('#');
+        return hash >= 0 ? url[..hash] : url;
+    }
+
+    private static string BodyHead(string content)
+    {
+        string s = content.TrimStart('\uFEFF', ' ', '\r', '\n').Replace("\r", " ").Replace("\n", " ");
+        return s.Length <= 160 ? s : s[..160] + "…";
     }
 
     private static SubscriptionInfo? ParseHeaders(HttpResponseHeaders headers)
@@ -180,30 +248,12 @@ public static class SubscriptionManager
         return info;
     }
 
-    private static void EnsureHttps(string url)
+    /// <summary>لینک اشتراک باید مطلق و http/https باشد؛ بقیه‌ی پروتکل‌ها رد می‌شوند.</summary>
+    private static void EnsureHttpUrl(string url)
     {
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)
+            || (uri.Scheme != Uri.UriSchemeHttps && uri.Scheme != Uri.UriSchemeHttp))
             throw new InvalidOperationException(TranslationManager.Get("Sub_OnlyHttps"));
-    }
-
-    public static async Task<string> FetchRawAsync(string url, CancellationToken ct = default)
-    {
-        EnsureHttps(url);
-        using var handler = CreateHandler();
-        using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
-        http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
-        http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
-        return await http.GetStringAsync(url, ct);
-    }
-
-    public static async Task<string> FetchRawAsync(string url, string proxyAddress, CancellationToken ct = default)
-    {
-        EnsureHttps(url);
-        using var handler = CreateHandler(proxyAddress);
-        using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
-        http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
-        http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
-        return await http.GetStringAsync(url, ct);
     }
 
     public static List<ServerInfo> ParseContent(string content)
@@ -239,14 +289,22 @@ public static class SubscriptionManager
             foreach (var item in doc.RootElement.EnumerateArray())
             {
                 if (item.ValueKind != JsonValueKind.Object) continue;
-                var server = FromConfigObject(item);
-                if (server != null) list.Add(server);
+                try
+                {
+                    var server = FromConfigObject(item);
+                    if (server != null) list.Add(server);
+                }
+                catch (FormatException) { }
             }
         }
         else if (doc.RootElement.ValueKind == JsonValueKind.Object)
         {
-            var server = FromConfigObject(doc.RootElement);
-            if (server != null) list.Add(server);
+            try
+            {
+                var server = FromConfigObject(doc.RootElement);
+                if (server != null) list.Add(server);
+            }
+            catch (FormatException) { }
         }
         return list;
     }
@@ -314,6 +372,21 @@ public static class SubscriptionManager
                 if (xhttp.ValueKind != JsonValueKind.Object) xhttp = GetObject(stream, "splithttpSettings");
                 server.Path = GetString(xhttp, "path") ?? "";
                 server.Host = GetString(xhttp, "host") ?? "";
+                server.Mode = UrlParser.ValidateXhttpMode(GetString(xhttp, "mode") ?? "");
+                if (xhttp.ValueKind == JsonValueKind.Object &&
+                    xhttp.TryGetProperty("extra", out var xhttpExtra) &&
+                    xhttpExtra.ValueKind == JsonValueKind.Object)
+                    server.Extra = xhttpExtra.GetRawText();
+                break;
+            case "kcp":
+                var kcp = GetObject(stream, "kcpSettings");
+                server.Seed = GetString(kcp, "seed") ?? "";
+                server.HeaderType = GetString(GetObject(kcp, "header"), "type") ?? "";
+                break;
+            case "httpupgrade":
+                var httpUpgrade = GetObject(stream, "httpupgradeSettings");
+                server.Path = GetString(httpUpgrade, "path") ?? "";
+                server.Host = GetString(httpUpgrade, "host") ?? "";
                 break;
             case "h2":
             case "http":

@@ -263,6 +263,7 @@
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>اس آپشن کے فعال ہونے پر ایپ نئی ورژن خودکار ڈاؤن لوڈ اور انسٹال کرتی ہے؛ اپ ڈیٹ لاگو کرنے کے لیے ایپ بند اور دوبارہ کھلے گی۔</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>TUN سے مستثنی٤ ایپس</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>ان ایپس کا ٹریفک VPN سرور سے نہیں گزرتا اور آپ کا اصل IP استعمال ہوتا ہے۔ صرف TUN موڈ فعال ہونے پر لاگو ہوتا ہے۔</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>نوٹ: یہ فہرست عمومی ہے — کوئی بھی ایپ اس کی ایگزیکیوٹ فائل کے مطابق شامل ہو سکتی ہے۔ پراکسی موڈ (TUN کے بغیر) میں صرف انہی ایپس پر اثر ڈالتا ہے جو سسٹم پراکسی کا پابندی کرتی ہیں۔ پورے سسٹم کا DNS اب بھی VPN سے گزرتا ہے، اس لیے ان ایپس کے لیے بھی بلاک شدہ سائٹس کھل سکتی ہیں۔</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>ایپ شامل کریں...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>حذف</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>ابھی کوئی ایپ شامل نہیں کی گئی</value></data>
@@ -371,6 +372,8 @@
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>ناموز لنک Trojan</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>ناموز لنک VLESS</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>صرف vmess / vless / ss / trojan سپورٹ ہوتے ہیں</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>ٹرانسپورٹ سپورٹڈ نہیں: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>پیرامیٹر {0} کے لیے نامعتبر قدر: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>بہترین تلاش: روک دیا — دوسرا ٹیسٹ چل رہا ہے</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>بہترین تلاش میں خرابی: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>بہترین تلاش: ٹیسٹ کے لیے مزید سرور نہیں بچے</value></data>
@@ -409,8 +412,35 @@
   <data name="Eng_TunFallback" xml:space="preserve"><value>TUN موڈ کو ایڈمنسٹریٹر کی ضرورت ہے۔ پراکسی موڈ پر واپس جا رہا ہے۔</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>غیر معاون نظام یا ڈھانچہ۔</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>wintun.dll دستیاب نہیں۔ پراکسی موڈ پر واپس جا رہا ہے۔</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>صرف https سبسکرپشن URL اجازت یافتہ ہیں۔</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>سبسکرپشن لنک کو http یا https استعمال کرنا چاہیے۔</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>لنک میں ناجائز JSON پی لوڈ</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>اپ ڈیٹ یو آر ایل https استعمال کرنا چاہیے</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>اپ ڈیٹ پیکج میں sha256 فنگر پرنٹ نہیں ہے</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>کنکشن کی تشخیص</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>کنکشن کی تشخیص جاری ہے…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>تشخیص مکمل: کوئی مسئلہ نہیں ملا</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>تشخیص مکمل: {0} مسئلہ (تفصیلات لاگ ٹیب میں)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: {0} resolve ہوا → {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: resolve ناکام — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: ایڈاپٹر '{0}' 127.0.0.1 کی طرف اشارہ کرتا ہے مگر مقامی DNS سروس جواب نہیں دے رہی</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: ایڈاپٹر '{0}' کو خودکار پر ری سیٹ کیا گیا</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: مرمت کے لیے ایپ کو منتظم کے طور پر چلائیں</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: کوئی مسئلہ نہیں</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>سسٹم پراکسی: غیر فعال</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>سسٹم پراکسی: فعال ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>سسٹم پراکسی: غیر قابل رسید لوپ بیک ایڈریس کی طرف اشارہ کرتا ہے ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>سبسکرپشن حاصل کرنا: HTTP {0} — {2} ملی سیکنڈ میں {1} سرور</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>سبسکرپشن حاصل کرنا: HTTP {0} — جواب میں کوئی سرور نہیں؛ مواد اس سے شروع: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>سبسکرپشن حاصل کرنا: خرابی — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>پراکسی کے بغیر سبسکرپشن: HTTP {0} — {1} سرور (پراکسی کا مسئلہ ہے)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>Xray انجن: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>ٹیسٹ کے لیے کوئی لنک نہیں</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>سبسکرپشن سرور سے ناکام جواب: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>جواب موصول مگر اس میں کوئی سرور نہیں۔ مواد اس سے شروع: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>سرور کا جواب خالی ہے۔</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>خبردار: یہ سبسکرپشن لنک بغیر تعمیری http استعمال کرتا ہے۔</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>انجن کا ورژن ({0}) جانچے گئے ورژن ({1}) سے پرانا ہے؛ کچھ ترتیبات کام نہیں کر سکتیں۔</value></data>
 </root>

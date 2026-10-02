@@ -1,5 +1,4 @@
-using System.Diagnostics;
-using System.Net.Http;
+﻿using System.Diagnostics;
 using System.Net.Sockets;
 
 namespace Roxa.Core;

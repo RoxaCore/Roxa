@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Roxa.Localization;
 using Roxa.Models;
 
@@ -20,11 +21,20 @@ public static class UrlParser
     public static ServerInfo Parse(string text)
     {
         text = text.Trim();
-        if (text.StartsWith("vmess://", StringComparison.OrdinalIgnoreCase)) return ParseVmess(text);
-        if (text.StartsWith("vless://", StringComparison.OrdinalIgnoreCase)) return ParseVless(text);
-        if (text.StartsWith("ss://", StringComparison.OrdinalIgnoreCase)) return ParseShadowsocks(text);
-        if (text.StartsWith("trojan://", StringComparison.OrdinalIgnoreCase)) return ParseTrojan(text);
-        throw new FormatException(TranslationManager.Get("Url_Unsupported"));
+        try
+        {
+            if (text.StartsWith("vmess://", StringComparison.OrdinalIgnoreCase)) return ParseVmess(text);
+            if (text.StartsWith("vless://", StringComparison.OrdinalIgnoreCase)) return ParseVless(text);
+            if (text.StartsWith("ss://", StringComparison.OrdinalIgnoreCase)) return ParseShadowsocks(text);
+            if (text.StartsWith("trojan://", StringComparison.OrdinalIgnoreCase)) return ParseTrojan(text);
+            throw new FormatException(TranslationManager.Get("Url_Unsupported"));
+        }
+        catch (JsonException ex)
+        {
+            // vmess base64 payload that is not valid JSON must surface as a normal link error,
+            // otherwise callers with only `catch (FormatException)` crash the dispatcher.
+            throw new FormatException(TranslationManager.Get("Url_InvalidJson"), ex);
+        }
     }
 
     private static ServerInfo ParseVmess(string text)
@@ -71,6 +81,8 @@ public static class UrlParser
             Encryption = Get("scy"),
             AllowInsecure = Get("allowInsecure") is "1" or "true"
         };
+        ApplyXhttpParams(server, Get("mode"), Get("extra"));
+        ApplyKcpSeed(server, Get("seed"));
         if (string.IsNullOrEmpty(server.Name)) server.Name = server.Address;
         if (string.IsNullOrEmpty(server.Encryption)) server.Encryption = "auto";
         return server;
@@ -96,6 +108,8 @@ public static class UrlParser
         server.Port = port;
         server.Name = string.IsNullOrEmpty(fragment) ? address : fragment;
         server.Network = NormalizeNetwork(qp.Get("type"));
+        ApplyXhttpParams(server, qp.Get("mode"), qp.Get("extra"));
+        ApplyKcpSeed(server, qp.Get("seed"));
         server.Security = NormalizeSecurity(qp.Get("security"));
         server.Flow = qp.Get("flow");
         server.Host = qp.Get("host");
@@ -135,6 +149,8 @@ public static class UrlParser
         server.Security = NormalizeSecurity(qp.Get("security"));
         server.Flow = qp.Get("flow");
         server.Network = NormalizeNetwork(qp.Get("type"));
+        ApplyXhttpParams(server, qp.Get("mode"), qp.Get("extra"));
+        ApplyKcpSeed(server, qp.Get("seed"));
         server.Host = qp.Get("host");
         server.Path = qp.Get("path");
         server.ServiceName = qp.Get("serviceName");
@@ -234,7 +250,56 @@ public static class UrlParser
     public static string NormalizeNetwork(string network)
     {
         string n = (network ?? "").ToLowerInvariant();
-        return n is "tcp" or "kcp" or "ws" or "h2" or "http" or "grpc" or "xhttp" or "splithttp" ? n : "tcp";
+        if (n.Length == 0) return "tcp";
+        if (Array.IndexOf(SupportedNetworks, n) >= 0) return n;
+        throw new FormatException(string.Format(TranslationManager.Get("Url_UnsupportedTransport"), n));
+    }
+
+    public static readonly string[] SupportedNetworks =
+    [
+        "tcp", "kcp", "ws", "h2", "http", "grpc", "xhttp", "splithttp", "httpupgrade"
+    ];
+
+    public static readonly string[] XhttpModes =
+    [
+        "auto", "packet-up", "stream-up", "stream-one"
+    ];
+
+    /// <summary>مقدار mode را بررسی می‌کند؛ خالی "" برمی‌گرداند و مقدار نامعتبر خطا می‌دهد.</summary>
+    public static string ValidateXhttpMode(string mode)
+    {
+        string m = (mode ?? "").Trim();
+        if (m.Length == 0) return "";
+        if (Array.IndexOf(XhttpModes, m) >= 0) return m;
+        throw new FormatException(string.Format(TranslationManager.Get("Url_InvalidParam"), "mode", m));
+    }
+
+    /// <summary>فقط JSON معتبرِ object پذیرفته می‌شود؛ در غیر این صورت نادیده گرفته می‌شود.</summary>
+    public static string NormalizeXhttpExtra(string extra)
+    {
+        string e = (extra ?? "").Trim();
+        if (e.Length == 0) return "";
+        try
+        {
+            return JsonNode.Parse(e) is JsonObject ? e : "";
+        }
+        catch (JsonException)
+        {
+            return "";
+        }
+    }
+
+    private static void ApplyXhttpParams(ServerInfo server, string mode, string extra)
+    {
+        if (server.Network is not ("xhttp" or "splithttp")) return;
+        server.Mode = ValidateXhttpMode(mode);
+        server.Extra = NormalizeXhttpExtra(extra);
+    }
+
+    private static void ApplyKcpSeed(ServerInfo server, string seed)
+    {
+        if (server.Network != "kcp") return;
+        server.Seed = (seed ?? "").Trim();
     }
 
     public static string NormalizeSecurity(string security)

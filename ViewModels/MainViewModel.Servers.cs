@@ -1,10 +1,7 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
-using System.Threading;
 using Avalonia.Input.Platform;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Roxa.Core;
@@ -23,6 +20,7 @@ public partial class MainViewModel : ViewModelBase
         if (input.Length == 0) return;
         int added = 0;
         int duplicates = 0;
+        ServerInfo? lastAdded = null;
         foreach (var line in input.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
             if (!UrlParser.IsProtocolLink(line)) { AppendLog(TranslationManager.Instance["Log_InvalidLink"]); continue; }
@@ -40,12 +38,24 @@ public partial class MainViewModel : ViewModelBase
                 }
                 Servers.Insert(0, server);
                 server.IsHighlighted = true;
+                lastAdded = server;
                 added++;
                 AppendLog(string.Format(TranslationManager.Instance["Log_ServerAdded"], server.Name));
             }
-            catch (FormatException ex) { AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message)); }
+            catch (FormatException ex)
+            {
+                AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
+                Status = ex.Message;
+                ToastHandler?.Invoke(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
+                Status = ex.Message;
+                ToastHandler?.Invoke(ex.Message);
+            }
         }
-        if (added > 0) { SaveServers(); SelectedServer = Servers.LastOrDefault(); Status = string.Format(TranslationManager.Instance["Status_ServersAdded"], added); }
+        if (added > 0) { SaveServers(); SelectedServer = lastAdded ?? Servers.FirstOrDefault(); Status = string.Format(TranslationManager.Instance["Status_ServersAdded"], added); }
         else if (duplicates > 0) { Status = string.Format(TranslationManager.Instance["Status_DupCount"], duplicates); }
         ServerLink = "";
         RefreshGroups();
@@ -82,6 +92,7 @@ public partial class MainViewModel : ViewModelBase
 
         int added = 0;
         int duplicates = 0;
+        string? parseError = null;
         foreach (var line in text.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
             if (!UrlParser.IsProtocolLink(line)) continue;
@@ -98,6 +109,7 @@ public partial class MainViewModel : ViewModelBase
                 server.IsHighlighted = true;
                 added++;
             }
+            catch (FormatException ex) { parseError = ex.Message; }
             catch { }
         }
         if (added > 0)
@@ -108,7 +120,11 @@ public partial class MainViewModel : ViewModelBase
             ToastHandler?.Invoke(string.Format(TranslationManager.Instance["Status_ServersAdded"], added));
         }
         else if (duplicates > 0) { Status = string.Format(TranslationManager.Instance["Status_DupCount"], duplicates); }
-        else { Status = TranslationManager.Instance["Status_NoValidClipboardLink"]; }
+        else
+        {
+            Status = parseError ?? TranslationManager.Instance["Status_NoValidClipboardLink"];
+            if (parseError != null) ToastHandler?.Invoke(parseError);
+        }
     }
 
      [RelayCommand]
@@ -154,7 +170,9 @@ public partial class MainViewModel : ViewModelBase
         var dupes = new List<ServerInfo>();
         foreach (var s in Servers)
         {
-            string key = $"{s.Address}:{s.Port}:{s.UserId}:{s.Password}";
+            // ترنسپورت/مسیر/SNI هم باید در کلید باشند؛ دو سرور با آدرس یکسان ولی
+            // مثلاً ws در مقابل grpc سرورهای متفاوتی هستند و نباید حذف شوند.
+            string key = $"{s.Address}:{s.Port}:{s.UserId}:{s.Password}|{s.Network}|{s.Path}|{s.Host}|{s.SNI}|{s.Flow}";
             if (!seen.Add(key)) dupes.Add(s);
         }
         foreach (var d in dupes)

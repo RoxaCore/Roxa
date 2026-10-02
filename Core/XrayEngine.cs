@@ -1,6 +1,5 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -44,6 +43,90 @@ public sealed class XrayEngine : IDisposable
     public bool IsRunning
     {
         get { lock (_lock) return _process is { HasExited: false }; }
+    }
+
+    private static string? _engineVersionCache;
+
+    /// <summary>حداقل نسخه‌ای که پیکربندی‌های فعلی (finalmask/mkcp جدید) روی آن آزمایش شده‌اند.</summary>
+    public const int MinEngineMajor = 26;
+
+    /// <summary>نسخه‌ی باینری موتور را یک بار می‌خواند و کش می‌کند؛ در صورت خطا "؟" برمی‌گرداند.</summary>
+    public static async Task<string> GetVersionAsync(CancellationToken ct = default)
+    {
+        if (_engineVersionCache != null) return _engineVersionCache;
+        try
+        {
+            if (!File.Exists(EnginePath)) return _engineVersionCache = "?";
+            var psi = new ProcessStartInfo
+            {
+                FileName = EnginePath,
+                Arguments = "version",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            using var p = Process.Start(psi);
+            if (p == null) return _engineVersionCache = "?";
+            var stdoutTask = p.StandardOutput.ReadToEndAsync();
+            var stderrTask = p.StandardError.ReadToEndAsync();
+            if (!p.WaitForExit(5000))
+            {
+                try { p.Kill(); } catch { }
+                return _engineVersionCache = "?";
+            }
+            string text = await stdoutTask;
+            if (string.IsNullOrWhiteSpace(text)) text = await stderrTask;
+            _engineVersionCache = ParseVersionLine(text) ?? "?";
+        }
+        catch { _engineVersionCache = "?"; }
+        return _engineVersionCache;
+    }
+
+    /// <summary>آیا نسخه‌ی داده‌شده حداقل MinEngineMajor هست؟ نسخه‌ی ناخواندنی را رد نمی‌کند (قضاوت نکردن بهتر از خطای کاذب است).</summary>
+    public static bool IsVersionSupported(string version)
+    {
+        if (!TryParseVersion(version, out int major, out _)) return true;
+        return major >= MinEngineMajor;
+    }
+
+    private static string? ParseVersionLine(string text)
+    {
+        foreach (var line in text.Split('\n'))
+        {
+            string s = line.Trim();
+            int i = 0;
+            while (i < s.Length && !char.IsDigit(s[i])) i++;
+            if (i >= s.Length) continue;
+            int j = i;
+            while (j < s.Length && (char.IsDigit(s[j]) || s[j] == '.')) j++;
+            string cand = s[i..j].Trim('.');
+            if (TryParseVersion(cand, out _, out _)) return cand;
+        }
+        return null;
+    }
+
+    private static bool TryParseVersion(string? v, out int major, out int minor)
+    {
+        major = 0;
+        minor = 0;
+        if (string.IsNullOrWhiteSpace(v)) return false;
+        var parts = v.Split('.');
+        if (parts.Length < 2) return false;
+        if (!int.TryParse(parts[0], out major) || !int.TryParse(parts[1], out minor)) return false;
+        return true;
+    }
+
+    private async Task WarnIfEngineOldAsync(CancellationToken ct)
+    {
+        try
+        {
+            string v = await GetVersionAsync(ct);
+            if (v == "?") return;
+            if (!IsVersionSupported(v))
+                Log(string.Format(TranslationManager.Get("Eng_WarnOld"), v, MinEngineMajor));
+        }
+        catch { }
     }
 
     private void Log(string message)
@@ -195,6 +278,8 @@ public sealed class XrayEngine : IDisposable
                 throw new InvalidDataException(TranslationManager.Get("Eng_IntegrityFailed"));
         }
 
+        await WarnIfEngineOldAsync(ct);
+
         bool useTun = settings?.UseTunMode == true;
         if (useTun && !AdminHelper.IsRunningAsAdmin())
         {
@@ -261,9 +346,26 @@ public sealed class XrayEngine : IDisposable
             IsTunActive = useTun;
             UpdateState(process, st => st.TunActive = useTun);
 
+            if (useTun && XrayConfigBuilder.LastDnsStub && TunDns.TryApply(out var dnsPrev))
+            {
+                UpdateState(process, st =>
+                {
+                    st.DnsApplied = true;
+                    st.DnsPrev = dnsPrev;
+                });
+                Log("DNS -> 127.0.0.1 (local stub)");
+            }
+
             if (!useTun && setSystemProxy && IsWindows && settings?.LeaveSystemProxyAsIs != true)
             {
                 SystemProxy.GetCurrent(out bool prevEnable, out string prevServer, out string prevOverride);
+                if (prevEnable && SystemProxy.IsDeadLoopback(prevServer))
+                {
+                    TunManager.Log($"ignoring stale system proxy {prevServer} (no listener).");
+                    prevEnable = false;
+                    prevServer = "";
+                    prevOverride = "";
+                }
                 string proxyValue;
                 if (settings is { BypassVpnWithoutTun: true } && settings.TunExcludedApps is { Count: > 0 }
                     && ProxyRouter.Start(settings.TunExcludedApps, HttpPort))
@@ -390,6 +492,7 @@ public sealed class XrayEngine : IDisposable
         IsTunActive = false;
         TunExclusion.Stop();
         TunManager.RemoveCaptureRoutes();
+        try { TunDns.RestoreFromState(); } catch { }
         Process? process;
         JobObject? job;
         lock (_lock)
@@ -436,7 +539,13 @@ public sealed class XrayEngine : IDisposable
         {
             if (!SystemProxy.GetCurrent(out bool enable, out string server, out _)) return;
             if (!enable || !string.Equals(server, _proxyValue, StringComparison.OrdinalIgnoreCase)) return;
-            SystemProxy.Apply(_prevProxyEnable, _prevProxyServer, _prevProxyOverride);
+            bool restoreEnable = _prevProxyEnable;
+            if (restoreEnable && SystemProxy.IsDeadLoopback(_prevProxyServer))
+            {
+                TunManager.Log($"not restoring stale system proxy {_prevProxyServer} (no listener).");
+                restoreEnable = false;
+            }
+            SystemProxy.Apply(restoreEnable, restoreEnable ? _prevProxyServer : null, restoreEnable ? _prevProxyOverride : null);
             TunManager.Log($"system proxy restored to previous value (was {_proxyValue})");
         }
         catch (Exception ex) { Log(string.Format(TranslationManager.Get("Eng_ClearProxyFailed"), ex.Message)); }
@@ -511,6 +620,7 @@ public sealed class XrayEngine : IDisposable
             IsTunActive = false;
             TunExclusion.Stop();
             TunManager.RemoveCaptureRoutes();
+            try { TunDns.RestoreFromState(); } catch { }
             try
             {
                 var st = TunState.Load();

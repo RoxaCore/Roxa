@@ -279,6 +279,7 @@
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>عند تفعيل هذا الخيار، يقوم التطبيق بتنزيل وتثبيت الإصدارات الجديدة تلقائيًا؛ يتم إغلاق التطبيق وإعادة فتحه لتطبيق التحديث.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>برامج معفاة من TUN</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>تمرير هذه التطبيقات متجاوزًا عن خادم VPN ويستخدم عنوان IP الحقيقي لديك. لا يسري هذا إلا عندما يكون وضع TUN مفعّلاً.</value></data>
+  <data name="Set_TunExclude_Note" xml:space="preserve"><value>ملاحظة: هذه القائمة عامة — يُقبل أي تطبيق حسب ملفه التنفيذي. في وضع البروكسي (بدون TUN) لا تؤثر إلا على التطبيقات التي تلتزم ببروكسي النظام. لا تزال كل عناوين DNS تمر عبر VPN، لذا قد تُفتح المواقع المحجوبة لهذه التطبيقات أيضًا.</value></data>
   <data name="Set_TunExclude_Add" xml:space="preserve"><value>إضافة تطبيق...</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>حذف</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>لم تتم إضافة أي تطبيقات بعد</value></data>
@@ -387,6 +388,8 @@
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>رابط Trojan غير صالح</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>رابط VLESS غير صالح</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>يُدعم فقط vmess / vless / ss / trojan</value></data>
+  <data name="Url_UnsupportedTransport" xml:space="preserve"><value>نوع النقل غير مدعوم: {0}</value></data>
+  <data name="Url_InvalidParam" xml:space="preserve"><value>قيمة غير صالحة للمعامل {0}: {1}</value></data>
   <data name="Log_FindBusy" xml:space="preserve"><value>البحث عن أفضل: تم الحظر — يوجد اختبار آخر قيد التشغيل</value></data>
   <data name="Log_FindError" xml:space="preserve"><value>خطأ في البحث عن أفضل: {0}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>البحث عن أفضل: لا يوجد خوادم أخرى للاختبار</value></data>
@@ -425,8 +428,35 @@
   <data name="Eng_TunFallback" xml:space="preserve"><value>وضع TUN يتطلب صلاحية المسؤول. العودة إلى وضع البروكسي.</value></data>
   <data name="Eng_UnsupportedOs" xml:space="preserve"><value>نظام التشغيل/المعمارية غير مدعوم.</value></data>
   <data name="Eng_WintunFallback" xml:space="preserve"><value>ملف wintun.dll غير متاح. العودة إلى وضع البروكسي.</value></data>
-  <data name="Sub_OnlyHttps" xml:space="preserve"><value>يُسمح فقط بروابط الاشتراك https.</value></data>
+  <data name="Sub_OnlyHttps" xml:space="preserve"><value>يجب أن يستخدم رابط الاشتراك http أو https.</value></data>
   <data name="Set_TestsViaTun" xml:space="preserve"><value>Run tests through TUN</value></data>
   <data name="Set_TestsViaTun_Desc" xml:space="preserve"><value>Off by default: ping, real delay and speed are measured over the computer&apos;s direct internet connection instead of the TUN tunnel, so the numbers stay accurate. Turn on to run the tests inside TUN.</value></data>
   <data name="Test_BypassTun" xml:space="preserve"><value>Tested without TUN</value></data>
+  <data name="Url_InvalidJson" xml:space="preserve"><value>محتوى JSON غير صالح في الرابط</value></data>
+  <data name="Upd_RequireHttps" xml:space="preserve"><value>يجب أن يستخدم رابط التحديث https</value></data>
+  <data name="Upd_RequireSha256" xml:space="preserve"><value>لا يحتوي حزمة التحديث على بصمة sha256</value></data>
+<data name="Btn_Diagnose" xml:space="preserve"><value>تشخيص الاتصال</value></data>
+<data name="Status_Diagnosing" xml:space="preserve"><value>جارٍ تشخيص الاتصال…</value></data>
+<data name="Status_DiagOk" xml:space="preserve"><value>انتهى التشخيص: لم يتم العثور على مشاكل</value></data>
+<data name="Status_DiagFound" xml:space="preserve"><value>انتهى التشخيص: {0} مسألة (التفاصيل في تبويب السجل)</value></data>
+<data name="Diag_DnsOk" xml:space="preserve"><value>DNS: تم حل {0} ← {1}</value></data>
+<data name="Diag_DnsFail" xml:space="preserve"><value>DNS: فشل تحليل الاسم — {0}</value></data>
+<data name="Diag_DnsDead" xml:space="preserve"><value>DNS: يشير المحول '{0}' إلى 127.0.0.1 لكن لا توجد خدمة DNS محلية</value></data>
+<data name="Diag_DnsFixed" xml:space="preserve"><value>DNS: تمت إعادة المحول '{0}' إلى تلقائي</value></data>
+<data name="Diag_DnsNeedAdmin" xml:space="preserve"><value>DNS: شغّل البرنامج كمسؤول لإصلاحه</value></data>
+<data name="Diag_DnsClean" xml:space="preserve"><value>DNS: لم يتم العثور على مشاكل</value></data>
+<data name="Diag_ProxyOff" xml:space="preserve"><value>الوكيل المحدث: معطل</value></data>
+<data name="Diag_ProxyOn" xml:space="preserve"><value>الوكيل المحدث: مفعّل ({0})</value></data>
+<data name="Diag_ProxyDead" xml:space="preserve"><value>الوكيل المحدث: يشير إلى عنوان حلقة داخلية غير متاح ({0})</value></data>
+<data name="Diag_FetchOk" xml:space="preserve"><value>جلب الاشتراك: HTTP {0} — {1} خادم في {2} مللي ثانية</value></data>
+<data name="Diag_FetchHttp" xml:space="preserve"><value>جلب الاشتراك: HTTP {0} — لا خوادم في الرد؛ بداية المحتوى: {1}</value></data>
+<data name="Diag_FetchErr" xml:space="preserve"><value>جلب الاشتراك: خطأ — {0}</value></data>
+<data name="Diag_FetchDirectOk" xml:space="preserve"><value>جلب الاشتراك بدون وكيل: HTTP {0} — {1} خادم (الوكيل هو السبب)</value></data>
+<data name="Diag_Engine" xml:space="preserve"><value>محرك Xray: {0}</value></data>
+<data name="Diag_NoUrl" xml:space="preserve"><value>لا يوجد رابط للاختبار</value></data>
+<data name="Sub_HttpStatus" xml:space="preserve"><value>استجابة غير ناجحة من خادم الاشتراك: {0} {1}</value></data>
+<data name="Sub_EmptyResult" xml:space="preserve"><value>تم استلام الاستجابة لكنها لا تحتوي على خوادم. بداية المحتوى: {0}</value></data>
+<data name="Sub_EmptyBody" xml:space="preserve"><value>استجابة الخادم فارغة.</value></data>
+<data name="Log_SubWarnHttp" xml:space="preserve"><value>تحذير: رابط الاشتراك هذا يستخدم http عاديًا وغير مشفّر.</value></data>
+<data name="Eng_WarnOld" xml:space="preserve"><value>إصدار المحرك ({0}) أقدم من الإصدار المُختبر ({1}); قد لا تعمل بعض الإعدادات.</value></data>
 </root>

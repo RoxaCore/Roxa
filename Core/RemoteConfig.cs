@@ -26,7 +26,25 @@ public sealed class Announcement
 
 public static class RemoteConfig
 {
-    public const string BaseUrl = "https://up.roxacore.com";
+    public const string DefaultBaseUrl = "https://up.roxacore.com";
+
+    /// <summary>
+    /// آدرس فید اپدیت/اعلان‌ها. فقط برای تست محلی می‌توان آن را با متغیر محیطی
+    /// ROXA_TEST_FEED به یک سرور لوکال (loopback) اشاره داد؛ هر مقدار غیر-lopback
+    /// نادیده گرفته می‌شود تا مسیر اصلیِ انتشارِ امن حفظ شود.
+    /// </summary>
+    public static string BaseUrl { get; } = ResolveBaseUrl();
+
+    private static string ResolveBaseUrl()
+    {
+        var feed = Environment.GetEnvironmentVariable("ROXA_TEST_FEED");
+        if (string.IsNullOrWhiteSpace(feed)) return DefaultBaseUrl;
+        if (!Uri.TryCreate(feed, UriKind.Absolute, out var uri)) return DefaultBaseUrl;
+        if (uri.Host is not ("127.0.0.1" or "localhost" or "::1" or "[::1]")) return DefaultBaseUrl;
+        if (uri.Scheme != "http" && uri.Scheme != "https") return DefaultBaseUrl;
+        return feed.TrimEnd('/');
+    }
+
     private const string UserAgent = "Roxa/3.0";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -109,7 +127,8 @@ public static class RemoteConfig
         return await FetchCountryAsync("https://ipwho.is/", "country_code", ct);
     }
 
-    public static async Task<UpdateInfo?> CheckUpdateAsync(string lang, string country, string clientId, int? proxyPort, CancellationToken ct = default)
+    public static async Task<UpdateInfo?> CheckUpdateAsync(string lang, string country, string clientId, int? proxyPort,
+        int connectCount = 0, bool includeStats = true, CancellationToken ct = default)
     {
         try
         {
@@ -117,11 +136,17 @@ public static class RemoteConfig
             var url = $"{BaseUrl}/api/check.php?v={Uri.EscapeDataString(AppVersion)}&lang={Uri.EscapeDataString(lang)}";
             if (!string.IsNullOrWhiteSpace(country))
                 url += $"&country={Uri.EscapeDataString(country)}";
-            if (!string.IsNullOrWhiteSpace(clientId))
-                url += $"&id={Uri.EscapeDataString(clientId)}";
-            if (proxyPort is not > 0)
-                url += "&direct=1";
-            url += $"&os={Uri.EscapeDataString(System.Runtime.InteropServices.RuntimeInformation.OSDescription)}";
+            // آمار/شناسه فقط با اجازهٔ کاربر (بخش حریم خصوصی) ارسال می‌شود؛ نام رایانه اصلاً فرستاده نمی‌شود.
+            if (includeStats)
+            {
+                if (!string.IsNullOrWhiteSpace(clientId))
+                    url += $"&id={Uri.EscapeDataString(clientId)}";
+                if (connectCount > 0)
+                    url += $"&conn={connectCount}";
+                if (proxyPort is not > 0)
+                    url += "&direct=1";
+                url += $"&os={Uri.EscapeDataString(System.Runtime.InteropServices.RuntimeInformation.OSDescription)}";
+            }
             using var resp = await http.GetAsync(url, ct);
             if (!resp.IsSuccessStatusCode) return null;
             var json = await resp.Content.ReadAsStringAsync(ct);

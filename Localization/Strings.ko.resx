@@ -56,7 +56,7 @@
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ 중복 삭제</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 내보내기</value></data>
   <data name="Btn_Import" xml:space="preserve"><value>📋 가져오기</value></data>
-  <data name="Ph_ServerLink" xml:space="preserve"><value>서버 링크 (vmess://, vless://, ...)</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>서버 링크 (vmess://, vless://, ss://, trojan://)</value></data>
   <data name="Ph_SubName" xml:space="preserve"><value>이름</value></data>
   <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
   <data name="Sort_None" xml:space="preserve"><value>정렬 없음</value></data>
@@ -76,10 +76,6 @@
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>속도 테스트</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>서버 삭제</value></data>
   <data name="Ctx_ClearSel" xml:space="preserve"><value>선택 해제</value></data>
-  <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess 추가</value></data>
-  <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS 추가</value></data>
-  <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks 추가</value></data>
-  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Trojan 추가</value></data>
   <data name="Add_Clipboard" xml:space="preserve"><value>📋 클립보드에서 가져오기</value></data>
   <data name="Set_Proxy" xml:space="preserve"><value>시스템 프록시 설정</value></data>
   <data name="Set_AutoConnect" xml:space="preserve"><value>자동 연결</value></data>
@@ -96,7 +92,6 @@
   <data name="Set_Every" xml:space="preserve"><value>매</value></data>
   <data name="Set_Hours" xml:space="preserve"><value>시간마다 업데이트</value></data>
   <data name="Set_Advanced" xml:space="preserve"><value>고급 설정</value></data>
-  <data name="Set_PingType" xml:space="preserve"><value>핑 유형:</value></data>
   <data name="Set_GlobalSort" xml:space="preserve"><value>전역 정렬 (테스트 후 모든 그룹에서 최고 서버 표시)</value></data>
   <data name="Set_DNS" xml:space="preserve"><value>사용자 지정 DNS</value></data>
   <data name="Set_DNSBtn" xml:space="preserve"><value>⚙ DNS 설정</value></data>
@@ -201,7 +196,6 @@
     <value>단축키: Ctrl+Shift+C = 연결 | Ctrl+Shift+D = 연결 해제 | Ctrl+Shift+S = 스마트 연결 | Ctrl+Shift+Q = 종료</value>
   </data>
 
-  <data name="Add_Link" xml:space="preserve"><value>추가</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>프록시로 업데이트</value></data>
   <!-- Notifications -->
@@ -230,7 +224,75 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>{0}시간 남음</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 수동</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>서버 선택 안 됨</value></data>
+  <data name="Set_Reports" xml:space="preserve">
+    <value>버그 및 문제 신고</value>
+  </data>
+  <data name="Set_Reports_Desc" xml:space="preserve">
+    <value>앱이 충돌하거나 문제가 발생하면 신고가 자동으로 개발자에게 전송됩니다. 아래 버튼으로 직접 문제를 선택적 설명과 함께 신고할 수 있습니다. 버전, 운영체제, 장치 ID, 연결 상태, 최근 로그가 자동으로 첨부됩니다.</value>
+  </data>
+  <data name="Btn_ReportBug" xml:space="preserve">
+    <value>문제 신고...</value>
+  </data>
+  <data name="Dlg_ReportTitle" xml:space="preserve">
+    <value>버그 및 문제 신고</value>
+  </data>
+  <data name="Dlg_ReportHint" xml:space="preserve">
+    <value>문제 설명(선택): 무엇을 했고 무엇이 일어났나...</value>
+  </data>
+  <data name="Btn_SendReport" xml:space="preserve">
+    <value>신고 보내기</value>
+  </data>
+  <data name="Rpt_AutoInfo" xml:space="preserve">
+    <value>앱이 자동으로 수집한 정보가 사용자 작업 없이 첨부됩니다:
+버전 {0} • {1}
+장치 ID {2}
+상태: {3}</value>
+  </data>
+  <data name="Rpt_StateOn" xml:space="preserve">
+    <value>{0}에 연결됨</value>
+  </data>
+  <data name="Rpt_StateOff" xml:space="preserve">
+    <value>연결 끊김</value>
+  </data>
+  <data name="Log_ReportSent" xml:space="preserve">
+    <value>문제 신고를 보냈습니다</value>
+  </data>
+  <data name="Toast_ReportSent" xml:space="preserve">
+    <value>신고를 보냈습니다 — 감사합니다</value>
+  </data>
+  <data name="Log_ReportFailed" xml:space="preserve">
+    <value>전송 실패; 큐에 저장되었으며 다음 실행 시 전송됩니다</value>
+  </data>
+  <data name="Log_ReportFlushed" xml:space="preserve">
+    <value>큐에 있던 신고 {0}건 전송됨</value>
+  </data>
   <data name="Home_NotConnected" xml:space="preserve"><value>연결되지 않음</value></data>
+  <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>인터넷은 정상입니다: 직접 경로는 정상이고 네트워크 변경 후 터널이 응답하지 않습니다</value></data>
+  <data name="Set_Privacy" xml:space="preserve"><value>개인정보 보호</value></data>
+  <data name="Set_Stats" xml:space="preserve"><value>연결 통계를 패널로 전송</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>60분마다 앱 버전, 언어, 국가, 장치 ID를 업데이트 확인을 위해 패널로 보냅니다. 끄면 업데이트 확인은 유지되지만 ID나 통계는 전송되지 않으며 컴퓨터 이름은 절대 전송되지 않습니다.</value></data>
+  <data name="Set_DeviceId" xml:space="preserve"><value>장치 ID</value></data>
+  <data name="Set_DeviceId_Desc" xml:space="preserve"><value>이 시스템용으로 앱이 생성한 고유 ID(컴퓨터 이름 아님)로, 관리 패널에 표시됩니다.</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>이전 실행에서 남은 연결이 발견되었습니다.&amp;#10;완전히 정리하려면 관리자 권한으로 다시 시작해야 합니다.</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>TUN 어댑터가 준비되지 않았습니다.</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>TUN 경로가 추가되었습니다.</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>TUN 경로 추가 실패: {0}</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>연결 엔진이 예기치 않게 중지되었습니다</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>TUN 없이도 VPN 우회</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>켜져 있으면 이 목록의 앱은 VPN이 시스템 프록시(TUN 없음)로 연결되어 있어도 VPN 대신 시스템의 직접 인터넷을 사용합니다.</value></data>
+  <data name="Set_KillSwitch" xml:space="preserve"><value>전역 킬 스위치</value></data>
+  <data name="Set_KillSwitch_Desc" xml:space="preserve"><value>VPN 터널이 끊기면 실제 주소가 유출되지 않도록 VPN가 복귀할 때까지 모든 인터넷 트래픽이 차단됩니다. 'TUN 제외 목록'의 앱은 직접 연결을 유지합니다.</value></data>
+  <data name="Set_KillSwitch_Add" xml:space="preserve"><value>보호할 앱 추가...</value></data>
+  <data name="Set_KillSwitch_Remove" xml:space="preserve"><value>보호 목록에서 제거</value></data>
+  <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>아직 보호할 앱이 추가되지 않았습니다</value></data>
+  <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>연결되지 않음 — 모든 트래픽 차단됨({0}개 앱 제외)</value></data>
+  <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>VPN 연결이 끊겼습니다</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>VPN가 다시 연결될 때까지 인터넷이 차단되었습니다({0}개 앱 제외). 복귀하지 않으면 비상 해제 버튼을 누르세요.</value></data>
+  <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>VPN 다시 연결됨</value></data>
+  <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>인터넷이 다시 작동 중입니다</value></data>
+  <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>비상 인터넷 해제</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>해제 버튼을 눌러도 인터넷이 돌아오지 않으면 킬 스위치 문제가 아닙니다. Wi-Fi/Windows 네트워크를 확인하거나 시스템을 다시 시작하세요.</value></data>
+  <data name="Home_SwitchingServer" xml:space="preserve"><value>새 서버에 연결 중</value></data>
   <data name="LastUpdate_DayAgo" xml:space="preserve"><value>마지막 업데이트: {0}일 전</value></data>
   <data name="LastUpdate_HourAgo" xml:space="preserve"><value>마지막 업데이트: {0}시간 전</value></data>
   <data name="LastUpdate_MinAgo" xml:space="preserve"><value>마지막 업데이트: {0}분 전</value></data>
@@ -254,7 +316,11 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>설치</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>업데이트 다운로드 중…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>다운로드 완료. 설치를 위해 앱이 종료됩니다</value></data>
+  <data name="Upd_Installing" xml:space="preserve"><value>업들이트 설고 중…</value></data>
+  <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>업데이트 다운로드에 실패했습니다</value></data>
+  <data name="Btn_FullTest" xml:space="preserve"><value>전체 테스트</value></data>
+  <data name="Status_GroupFullDone" xml:space="preserve"><value>{0} 전체 테스트 완료</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>계속하려면 새 버전을 설치하세요</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>닫기</value></data>
   <data name="Ann_View" xml:space="preserve"><value>보기</value></data>
@@ -268,7 +334,6 @@
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>삭제</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>아직 추가된 앱이 없습니다</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>이 앱의 제외 전환</value></data>
-  <data name="Status_ClipboardAdded" xml:space="preserve"><value>클립보드에서 서버 {0}개 추가됨</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>클립보드가 비어 있습니다</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>클립보드에 접근할 수 없습니다</value></data>
   <data name="Status_ConnectError" xml:space="preserve"><value>연결 오류</value></data>
@@ -295,10 +360,8 @@
   <data name="Status_GroupSpeedDone" xml:space="preserve"><value>그룹 속도 테스트 완료 ({0}개 성공)</value></data>
   <data name="Status_GroupUpdate" xml:space="preserve"><value>그룹 "{0}" 업데이트 중 ({1}개 서버) ...</value></data>
   <data name="Status_GroupUpdateDone" xml:space="preserve"><value>그룹 업데이트 완료 ({0}개 성공)</value></data>
-  <data name="Status_NewServerName" xml:space="preserve"><value>새 서버 ({0})</value></data>
   <data name="Status_NoServerFromSub" xml:space="preserve"><value>"{0}"에서 서버를 받지 못했습니다</value></data>
   <data name="Status_NoServers" xml:space="preserve"><value>서버 없음</value></data>
-  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>클립보드에 유효한 링크가 없습니다</value></data>
   <data name="Status_PingAll" xml:space="preserve"><value>서버 {0}개 핑 중 ...</value></data>
   <data name="Status_PingDoneCount" xml:space="preserve"><value>핑 완료: {1}개 중 {0}개 응답</value></data>
   <data name="Status_PingSelDone" xml:space="preserve"><value>선택 항목 핑 완료 ({0}개 성공)</value></data>
@@ -309,7 +372,6 @@
   <data name="Status_RealDoneCount" xml:space="preserve"><value>실제 지연 테스트 완료: {1}개 중 {0}개 성공</value></data>
   <data name="Status_RealSelDone" xml:space="preserve"><value>선택 항목 실제 지연 테스트 완료 ({0}개 성공)</value></data>
   <data name="Status_RealSelected" xml:space="preserve"><value>선택한 서버 {0}개 실제 지연 테스트 ...</value></data>
-  <data name="Status_ServerAdded" xml:space="preserve"><value>서버 "{0}" 추가됨</value></data>
   <data name="Status_ServersAdded" xml:space="preserve"><value>서버 {0}개 추가됨</value></data>
   <data name="Status_SmartBest" xml:space="preserve"><value>스마트 연결: 최적 서버 → {0} ({1})</value></data>
   <data name="Status_SmartCancelled" xml:space="preserve"><value>스마트 연결 취소됨</value></data>
@@ -342,6 +404,7 @@
   <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>서버 링크가 복사되었습니다</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>연결할 서버가 없습니다</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>이 배치의 서버가 응답하지 않았습니다</value></data>
+  <data name="Toast_BatchAllInvalidDomains" xml:space="preserve"><value>이 배치의 도메인을 확인할 수 없습니다. 링크가 유효하지 않습니다</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>응답한 서버가 없음</value></data>
   <data name="Toast_RealDelayFailed" xml:space="preserve"><value>실제 지연 테스트 실패</value></data>
   <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>실제 지연 테스트에서 확인된 서버가 없습니다</value></data>
@@ -371,6 +434,7 @@
   <data name="Url_InvalidSs" xml:space="preserve"><value>잘못된 Shadowsocks 링크입니다</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>잘못된 Trojan 링크입니다</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>잘못된 VLESS 링크입니다</value></data>
+  <data name="Url_InvalidVmess" xml:space="preserve"><value>잘못된 VMess 링크입니다</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>vmess / vless / ss / trojan만 지원됩니다</value></data>
   <data name="Url_UnsupportedTransport" xml:space="preserve"><value>지원되지 않는 전송 방식입니다: {0}</value></data>
   <data name="Url_InvalidParam" xml:space="preserve"><value>매개변수 {0}의 값이 잘못되었습니다: {1}</value></data>
@@ -379,6 +443,7 @@
   <data name="Log_FindNoMore" xml:space="preserve"><value>더 나은 서버 찾기: 테스트할 서버가 없음</value></data>
   <data name="Log_FindNoSelection" xml:space="preserve"><value>더 나은 서버 찾기: 차단됨 — 서버 선택 안 됨</value></data>
   <data name="Log_FindNoSurvivors" xml:space="preserve"><value>더 나은 서버 찾기: TCP 핑 생존자가 없음</value></data>
+  <data name="Log_BatchDomainInvalid" xml:space="preserve"><value>도메인 확인 실패: {0}</value></data>
   <data name="Log_FindNotConnected" xml:space="preserve"><value>더 나은 서버 찾기: 차단됨 — 연결되지 않음</value></data>
   <data name="Log_FindRealBatch" xml:space="preserve"><value>더 나은 서버 찾기: 배치 multi-outbound로 생존 {0}개 테스트</value></data>
   <data name="Log_FindRealFailedAll" xml:space="preserve"><value>더 나은 서버 찾기: 모든 실제 지연 테스트 실패</value></data>
@@ -446,4 +511,25 @@
 <data name="Hint_BypassTun" xml:space="preserve"><value>참고: 테스트는 TUN 적용 없이 실행됩니다</value></data>
 <data name="Notify_TunOn" xml:space="preserve"><value>ROXA 연결됨</value></data>
 <data name="Notify_TunOff" xml:space="preserve"><value>ROXA 연결 끊김</value></data>
+  <data name="Set_Notifications" xml:space="preserve"><value>Windows 알림</value></data>
+  <data name="Set_Notifications_Desc" xml:space="preserve"><value>연결, 연결 해제 및 오류 시 Windows 시계 옆에 알림 풍선을 표시합니다.</value></data>
+  <data name="Tray_Notifications" xml:space="preserve"><value>Windows 알림</value></data>
+  <data name="Stg_Cleanup" xml:space="preserve"><value>이전 연결 정리 중 ...</value></data>
+  <data name="Stg_Routes" xml:space="preserve"><value>TUN 경로 설정 중 ...</value></data>
+  <data name="Stg_Dns" xml:space="preserve"><value>DNS 구성 중 ...</value></data>
+  <data name="Stg_Engine" xml:space="preserve"><value>잠시 기다려 주세요</value></data>
+  <data name="Toast_NoInternet" xml:space="preserve"><value>인터넷이 연결되지 않았습니다</value></data>
+  <data name="SubFetch_Direct" xml:space="preserve"><value>직접 가져오기(프록시 없음)...</value></data>
+  <data name="SubFetch_Proxy" xml:space="preserve"><value>프록시로 가져오기...</value></data>
+  <data name="SubFetch_SystemProxy" xml:space="preserve"><value>시스템 프록시로 가져오기...</value></data>
+  <data name="Log_SubHealDns" xml:space="preserve"><value>TUN 잔여 DNS 어댑터 {0}개 복구됨</value></data>
+  <data name="Log_SubBypass" xml:space="preserve"><value>TUN을 우회하여 직접 가져오는 중...</value></data>
+  <data name="Set_SingBox" xml:space="preserve"><value>sing-box 사용</value></data>
+  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box 코어가 기존 엔진에 추가되었습니다. 지금은 켜도 설정만 저장될 뿐 연결 동작은 바뀌지 않습니다.</value></data>
+  <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUN 활성화</value></data>
+  <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>TUN을 활성화하면 전체 시스템 트래픽이 터널을 통해 전송되며 앱에 관리자 권한이 필요합니다. 계속하시겠습니까?</value></data>
+  <data name="Set_Table" xml:space="preserve"><value>표</value></data>
+  <data name="Set_ShowIp" xml:space="preserve"><value>IP 주소 열 표시</value></data>
+  <data name="Set_ShowIp_Desc" xml:space="preserve"><value>활성화하면 서버 표에 IP 주소 열이 표시됩니다。</value></data>
+<data name="Btn_Paste" xml:space="preserve"><value>클립보드에서 붙여넣기</value></data>
 </root>

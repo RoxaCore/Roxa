@@ -112,11 +112,21 @@
                 <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Connected"/>
               </TextBlock.Text>
             </TextBlock>
-            <TextBlock FontSize="12" FontWeight="Medium" Margin="0,0,0,2" IsVisible="{Binding IsConnected, Converter={StaticResource Not}}" Foreground="#E53E3E">
+            <TextBlock FontSize="12" FontWeight="Medium" Margin="0,0,0,2" IsVisible="{Binding IsSwitchingServer}" Foreground="#7C3AED">
+              <TextBlock.Text>
+                <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Home_SwitchingServer"/>
+              </TextBlock.Text>
+            </TextBlock>
+            <TextBlock FontSize="12" FontWeight="Medium" Margin="0,0,0,2" IsVisible="{Binding ShowDisconnectedStatus}" Foreground="#E53E3E">
               <TextBlock.Text>
                 <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Home_NotConnected"/>
               </TextBlock.Text>
             </TextBlock>
+            <!-- Connect progress: visible only while connecting so the UI follows the operation -->
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,2" IsVisible="{Binding IsConnecting}">
+              <ProgressBar IsIndeterminate="True" Width="72" Height="4" VerticalAlignment="Center" Foreground="#7C3AED"/>
+              <TextBlock Text="{Binding Status}" FontSize="12" FontWeight="Medium" Foreground="#7C3AED" VerticalAlignment="Center"/>
+            </StackPanel>
             <!-- Server Name (when connected) -->
             <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,2" IsVisible="{Binding IsConnected}">
               <TextBlock Text="{Binding HomeProtocol}" FontSize="11" FontWeight="SemiBold" Foreground="#7C3AED" VerticalAlignment="Center"/>
@@ -200,6 +210,16 @@
                        Foreground="{Binding BannerForeground}" TextTrimming="CharacterEllipsis"/>
             <TextBlock Text="{Binding BannerBody}" FontSize="12" Foreground="{Binding BannerForeground}" Opacity="0.85"
                        TextWrapping="Wrap" IsVisible="{Binding BannerBody, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+            <!-- آپدیت: نوار پیشرفت دانلود، سپس نشانگر نصب -->
+            <StackPanel Spacing="4" Margin="0,6,0,0" IsVisible="{Binding IsUpdateProgressVisible}">
+              <ProgressBar Minimum="0" Maximum="100" Height="6"
+                           Value="{Binding UpdateProgress, Mode=OneWay}"
+                           IsIndeterminate="{Binding IsUpdateProgressIndeterminate}"
+                           Foreground="{Binding BannerForeground}" Background="#F0EDFB"/>
+              <TextBlock Text="{Binding UpdateProgressText}" FontSize="11" FontWeight="SemiBold"
+                         HorizontalAlignment="Right" Foreground="{Binding BannerForeground}" Opacity="0.8"
+                         IsVisible="{Binding UpdateProgressText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+            </StackPanel>
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="14,0,0,0">
             <Button Content="{Binding BannerActionText}" IsVisible="{Binding BannerHasAction}"
@@ -207,6 +227,7 @@
                     Command="{Binding BannerActionCommand}" Padding="14,6" CornerRadius="8" FontSize="12" FontWeight="SemiBold"
                     Background="{Binding BannerForeground}" Foreground="White"/>
             <Button Command="{Binding DismissBannerCommand}"
+                    IsVisible="{Binding BannerCanDismiss}"
                     IsEnabled="{Binding IsBannerBusy, Converter={StaticResource Not}}"
                     Padding="14,6" CornerRadius="8" FontSize="12"
                     Background="#FFFFFF" BorderBrush="#D1D5DB" BorderThickness="1"
@@ -280,24 +301,19 @@
           <Border DockPanel.Dock="Top" Padding="0,0,0,16">
             <StackPanel Spacing="12">
               <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBox Text="{Binding ServerLink, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ph_ServerLink}" Width="400" Padding="12,10" BorderThickness="1" BorderBrush="#E0E0E0" CornerRadius="10" Background="#FFFFFF" FontSize="13">
-                  <TextBox.KeyBindings>
-                    <KeyBinding Gesture="Enter" Command="{Binding AddLinkCommand}"/>
-                  </TextBox.KeyBindings>
-                </TextBox>
-                <Button Padding="16,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold">
-                  <Button.Flyout>
-                    <MenuFlyout Placement="Bottom">
-                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Add_Link}" Command="{Binding AddLinkCommand}"/>
-                      <Separator/>
-                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Add_VMess}" Command="{Binding AddManualServerCommand}" CommandParameter="VMess"/>
-                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Add_VLESS}" Command="{Binding AddManualServerCommand}" CommandParameter="VLESS"/>
-                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Add_SS}" Command="{Binding AddManualServerCommand}" CommandParameter="Shadowsocks"/>
-                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Add_Trojan}" Command="{Binding AddManualServerCommand}" CommandParameter="Trojan"/>
-                      <Separator/>
-                      <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Add_Clipboard}" Command="{Binding ImportFromClipboardCommand}"/>
-                    </MenuFlyout>
-                  </Button.Flyout>
+                <Grid Width="400">
+                  <TextBox Text="{Binding ServerLink, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ph_ServerLink}" Padding="40,10,12,10" BorderThickness="1" BorderBrush="#E0E0E0" CornerRadius="10" Background="#FFFFFF" FontSize="13">
+                    <TextBox.KeyBindings>
+                      <KeyBinding Gesture="Enter" Command="{Binding AddLinkCommand}"/>
+                    </TextBox.KeyBindings>
+                  </TextBox>
+                  <Button Command="{Binding PasteFromClipboardCommand}" ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Paste}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7,0,0,0" Width="26" Height="26" Padding="0" CornerRadius="6" Background="Transparent" BorderThickness="0">
+                    <Viewbox Width="15" Height="15">
+                      <Path Data="M9,5 L6,5 L6,21 L18,21 L18,5 L15,5 M9,2 L15,2 L15,6 L9,6 Z M9,11 L15,11 M9,15 L13,15" Stroke="#777777" StrokeThickness="1.6" StrokeLineCap="Round"/>
+                    </Viewbox>
+                  </Button>
+                </Grid>
+                <Button Padding="16,10" CornerRadius="10" Background="#0E7C6B" Foreground="White" FontSize="13" FontWeight="SemiBold" Command="{Binding AddLinkCommand}">
                   <TextBlock>
                     <TextBlock.Text>
                       <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Btn_Add"/>
@@ -338,7 +354,10 @@
 
           <!-- Servers List -->
           <ScrollViewer x:Name="GroupsScrollViewer" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Groups}">
+            <ItemsControl x:Name="GroupsItemsControl" ItemsSource="{Binding Groups}"
+                          PointerMoved="GroupsItemsControl_PointerMoved"
+                          PointerReleased="GroupsItemsControl_PointerReleased"
+                          PointerCaptureLost="GroupsItemsControl_PointerCaptureLost">
               <ItemsControl.Styles>
                 <Style Selector="ContentPresenter">
                   <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -387,6 +406,7 @@
                               <MenuItem IsVisible="{Binding IsAllGroup}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateAll}" Command="{Binding Owner.UpdateSubscriptionsCommand}"/>
                               <MenuItem IsVisible="{Binding IsSubscription}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateNoProxy}" Command="{Binding Owner.UpdateSingleSubscriptionNoProxyCommand}" CommandParameter="{Binding Subscription}"/>
                               <MenuItem IsVisible="{Binding IsAllGroup}" Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateNoProxy}" Command="{Binding Owner.UpdateSubscriptionsNoProxyCommand}"/>
+                              <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_FullTest}" Command="{Binding Owner.TestGroupFullCommand}" CommandParameter="{Binding}"/>
                               <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Speed}" Command="{Binding Owner.TestGroupSpeedCommand}" CommandParameter="{Binding}"/>
                               <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Ping}" Command="{Binding Owner.TestGroupCommand}" CommandParameter="{Binding}"/>
                               <Separator IsVisible="{Binding IsNotAllGroup}"/>
@@ -462,7 +482,7 @@
                             <SolidColorBrush x:Key="DataGridCellFocusVisualSecondaryBrush" Color="Transparent"/>
                           </Style.Resources>
                           <Setter Property="BorderThickness" Value="0"/>
-                          <Setter Property="Padding" Value="4,0"/>
+                          <Setter Property="Padding" Value="6,0"/>
                           <Setter Property="VerticalContentAlignment" Value="Center"/>
                           <Setter Property="Background" Value="Transparent"/>
                         </Style>
@@ -474,6 +494,28 @@
                         </Style>
                         <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
                           <Setter Property="IsVisible" Value="False"/>
+                        </Style>
+                        <Style Selector="Button.MoreMenu">
+                          <Setter Property="Width" Value="30"/>
+                          <Setter Property="Height" Value="30"/>
+                          <Setter Property="Padding" Value="0"/>
+                          <Setter Property="Background" Value="#F9FAFB"/>
+                          <Setter Property="BorderBrush" Value="#E5E7EB"/>
+                          <Setter Property="BorderThickness" Value="1"/>
+                          <Setter Property="CornerRadius" Value="9"/>
+                          <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                          <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        </Style>
+                        <Style Selector="Button.MoreMenu:pointerover">
+                          <Setter Property="Background" Value="#F5F3FF"/>
+                          <Setter Property="BorderBrush" Value="#DDD6FE"/>
+                        </Style>
+                        <Style Selector="Button.MoreMenu:pointerover Ellipse">
+                          <Setter Property="Fill" Value="#7C3AED"/>
+                        </Style>
+                        <Style Selector="Button.MoreMenu:pressed">
+                          <Setter Property="Background" Value="#EDE9FE"/>
+                          <Setter Property="BorderBrush" Value="#C4B5FD"/>
                         </Style>
                       </dg:DataGrid.Styles>
                       <dg:DataGrid.Columns>
@@ -498,26 +540,40 @@
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="models:ServerInfo">
-                              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                <Ellipse Width="8" Height="8" Fill="{Binding StatusColor}" VerticalAlignment="Center"/>
-                                <Image Width="18" Height="13" VerticalAlignment="Center"
+                              <Grid ColumnDefinitions="Auto,Auto,*" VerticalAlignment="Center" ToolTip.Tip="{Binding ToolTipText}">
+                                <Ellipse Grid.Column="0" Width="8" Height="8" Fill="{Binding StatusColor}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <Image Grid.Column="1" Width="18" Height="13" VerticalAlignment="Center" Margin="0,0,6,0"
                                        Source="{Binding CountryCode, Converter={x:Static converters:FlagToImageConverter.Instance}}"/>
-                                <TextBlock Text="{Binding ShortName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                                           FontWeight="SemiBold" Foreground="#1A1A1A" ToolTip.Tip="{Binding ToolTipText}"/>
-                              </StackPanel>
+                                <TextBlock Grid.Column="2" Text="{Binding ShortName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                           FontWeight="SemiBold" Foreground="#1A1A1A"/>
+                              </Grid>
+                            </DataTemplate>
+                          </dg:DataGridTemplateColumn.CellTemplate>
+                        </dg:DataGridTemplateColumn>
+
+                        <!-- Address (IP) -->
+                        <dg:DataGridTemplateColumn Width="120" MinWidth="120" SortMemberPath="Address" IsReadOnly="True" IsVisible="{Binding #RootWindow.DataContext.ShowIpColumn}">
+                          <dg:DataGridTemplateColumn.Header>
+                            <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Address]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Address]}"/>
+                          </dg:DataGridTemplateColumn.Header>
+                          <dg:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="models:ServerInfo">
+                              <TextBlock Text="{Binding Address}" FontSize="{Binding IpFontSize}" Foreground="{Binding PingTextColor}"
+                                         VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
+                                         ToolTip.Tip="{Binding Address}"/>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
                         </dg:DataGridTemplateColumn>
 
                         <!-- Ping -->
-                        <dg:DataGridTemplateColumn Width="90" MinWidth="90" SortMemberPath="PingSortKey" IsReadOnly="True">
+                        <dg:DataGridTemplateColumn Width="72" MinWidth="72" SortMemberPath="PingSortKey" IsReadOnly="True">
                           <dg:DataGridTemplateColumn.Header>
                             <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Ping]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Ping]}"/>
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                               <Border Background="{Binding PingBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding PingDisplay}" Foreground="{Binding PingTextColor}" FontWeight="SemiBold" FontSize="11"/>
+                                <TextBlock Text="{Binding PingDisplay}" Foreground="{Binding PingTextColor}" FontWeight="SemiBold" FontSize="{Binding PingFontSize}"/>
                               </Border>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
@@ -531,30 +587,36 @@
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                               <Border Background="{Binding RealDelayBgColor}" CornerRadius="4" Padding="6,2" Margin="4,4" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding RealDelayDisplay}" Foreground="{Binding RealDelayTextColor}" FontWeight="SemiBold" FontSize="11"/>
+                                <TextBlock Text="{Binding RealDelayDisplay}" Foreground="{Binding RealDelayTextColor}" FontWeight="SemiBold" FontSize="{Binding DelayFontSize}"/>
                               </Border>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
                         </dg:DataGridTemplateColumn>
 
                         <!-- Speed -->
-                        <dg:DataGridTemplateColumn SortMemberPath="DownloadMbps" Width="110" MinWidth="110" IsReadOnly="True">
+                        <dg:DataGridTemplateColumn SortMemberPath="DownloadMbps" Width="88" MinWidth="88" IsReadOnly="True">
                           <dg:DataGridTemplateColumn.Header>
                             <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Speed]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Speed]}"/>
                           </dg:DataGridTemplateColumn.Header>
                           <dg:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                              <TextBlock Text="{Binding SpeedDisplay, Mode=OneWay}" VerticalAlignment="Center"/>
+                              <TextBlock Text="{Binding SpeedDisplay, Mode=OneWay}" FontSize="{Binding SpeedFontSize}" VerticalAlignment="Center"/>
                             </DataTemplate>
                           </dg:DataGridTemplateColumn.CellTemplate>
                         </dg:DataGridTemplateColumn>
 
                         <!-- Protocol -->
-                        <dg:DataGridTextColumn Binding="{Binding ProtocolDisplay}" SortMemberPath="Protocol" Width="110" MinWidth="110" IsReadOnly="True">
-                          <dg:DataGridTextColumn.Header>
+                        <dg:DataGridTemplateColumn Width="110" MinWidth="110" SortMemberPath="Protocol" IsReadOnly="True">
+                          <dg:DataGridTemplateColumn.Header>
                             <TextBlock Text="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Protocol]}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTip.Tip="{Binding Source={x:Static loc:TranslationManager.Instance}, Path=[Header_Protocol]}"/>
-                          </dg:DataGridTextColumn.Header>
-                        </dg:DataGridTextColumn>
+                          </dg:DataGridTemplateColumn.Header>
+                          <dg:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="models:ServerInfo">
+                              <TextBlock Text="{Binding ProtocolDisplay}" FontSize="{Binding ProtocolFontSize}" VerticalAlignment="Center"
+                                         TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                            </DataTemplate>
+                          </dg:DataGridTemplateColumn.CellTemplate>
+                        </dg:DataGridTemplateColumn>
 
                         <!-- Actions -->
                         <dg:DataGridTemplateColumn Width="140" MinWidth="140" IsReadOnly="True">
@@ -565,7 +627,7 @@
                             <DataTemplate>
                               <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                                 <!-- Connect -->
-                                <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Height="26" Padding="8,0" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="#FFFFFF" Foreground="#0E7C6B" CornerRadius="6" BorderThickness="0">
+                                <Button ToolTip.Tip="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Card_Connect}" Height="30" Padding="8,0" Command="{Binding Owner.ConnectServerCommand}" CommandParameter="{Binding}" IsVisible="{Binding IsActiveConnection, Converter={StaticResource Not}}" Background="#FFFFFF" Foreground="#0E7C6B" CornerRadius="6" BorderThickness="0">
                                   <TextBlock FontSize="11" FontWeight="SemiBold">
                                     <TextBlock.Text>
                                       <Binding Path="." Converter="{x:Static loc:TranslateConverter.Instance}" ConverterParameter="Card_Connect" StringFormat="▶  {0}"/>
@@ -586,7 +648,7 @@
                                   </StackPanel>
                                 </Button>
                                 <!-- More menu -->
-                                <Button Padding="6,4" CornerRadius="6" Background="Transparent" Foreground="#6B7280" FontSize="14" BorderThickness="0" ToolTip.Tip="...">
+                                <Button Classes="MoreMenu">
                                   <Button.Flyout>
                                     <MenuFlyout Placement="Bottom">
                                       <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Edit}" Command="{Binding Owner.EditServerCommand}" CommandParameter="{Binding}"/>
@@ -600,7 +662,11 @@
                                       <MenuItem Header="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Ctx_Delete}" Command="{Binding Owner.RemoveServerCommand}" CommandParameter="{Binding}" Foreground="#E53E3E"/>
                                     </MenuFlyout>
                                   </Button.Flyout>
-                                  <TextBlock Text="⋯" FontSize="16"/>
+                                  <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <Ellipse Width="3.5" Height="3.5" Fill="#9CA3AF"/>
+                                    <Ellipse Width="3.5" Height="3.5" Fill="#9CA3AF"/>
+                                    <Ellipse Width="3.5" Height="3.5" Fill="#9CA3AF"/>
+                                  </StackPanel>
                                 </Button>
                               </StackPanel>
                             </DataTemplate>
@@ -617,10 +683,10 @@
       </TabItem>
 
       <!-- Subscriptions Tab -->
-      <TabItem Padding="16">
-        <TabItem.Header>
-          <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Tab_Subscription}" FontSize="13" FontWeight="Medium"/>
-        </TabItem.Header>
+    <TabItem x:Name="SubscriptionsTab" Padding="16">
+      <TabItem.Header>
+        <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Tab_Subscription}" FontSize="13" FontWeight="Medium"/>
+      </TabItem.Header>
         <DockPanel>
           <StackPanel DockPanel.Dock="Top" Spacing="12" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" Spacing="8">
@@ -743,6 +809,26 @@
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="8">
                 <StackPanel Orientation="Horizontal" Spacing="10">
+                  <ToggleSwitch IsChecked="{Binding NotificationsEnabled}"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Notifications}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Notifications_Desc}" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <ToggleSwitch IsChecked="{Binding EnableSingBox}"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_SingBox}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_SingBox_Desc}" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="10">
                   <ToggleSwitch IsChecked="{Binding UseTunMode}"/>
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TUN}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
                 </StackPanel>
@@ -837,11 +923,18 @@
 
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Advanced}" FontWeight="Bold" FontSize="13"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Table}" FontWeight="Bold" FontSize="13"/>
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_PingType}" VerticalAlignment="Center"/>
-                  <ComboBox ItemsSource="{Binding PingTypeOptions}" SelectedItem="{Binding SelectedPingType}" Width="160"/>
+                  <CheckBox IsChecked="{Binding ShowIpColumn}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_ShowIp}" VerticalAlignment="Center"/>
                 </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_ShowIp_Desc}" FontSize="11" Foreground="#888888" Margin="24,0,0,0"/>
+              </StackPanel>
+            </Border>
+
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Advanced}" FontWeight="Bold" FontSize="13"/>
                 <StackPanel Orientation="Horizontal" Spacing="8">
                   <CheckBox IsChecked="{Binding GlobalSort}" VerticalAlignment="Center"/>
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_GlobalSort}" VerticalAlignment="Center" TextWrapping="Wrap"/>
@@ -853,6 +946,31 @@
               <StackPanel Spacing="12">
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Language}" FontWeight="Bold" FontSize="13"/>
                 <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedItem="{Binding SelectedLanguage}" Width="160" Padding="4,4" FontSize="13"/>
+              </StackPanel>
+            </Border>
+
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Privacy}" FontWeight="Bold" FontSize="13"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <ToggleSwitch IsChecked="{Binding SendUsageStats}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Stats}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Stats_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_DeviceId}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding DeviceId}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_DeviceId_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Reports}" FontWeight="Bold" FontSize="13"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Reports_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+                <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_ReportBug}"
+                        Command="{Binding OpenBugReportCommand}" HorizontalAlignment="Right" Padding="14,6" FontSize="13"/>
               </StackPanel>
             </Border>
 

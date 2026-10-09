@@ -270,13 +270,23 @@ public sealed class XrayEngine : IDisposable
         catch { return false; }
     }
 
-    public async Task StartAsync(ServerInfo server, bool setSystemProxy, AppSettings? settings = null, CancellationToken ct = default, IEnumerable<string>? tunExclusionHosts = null)
+    public async Task StartAsync(ServerInfo server, bool setSystemProxy, AppSettings? settings = null, CancellationToken ct = default, IEnumerable<string>? tunExclusionHosts = null, Action<string>? progress = null)
     {
         var perf = System.Diagnostics.Stopwatch.StartNew();
+        // هر مرحله هم در لاگ موتور می‌نشیند (از طریق Output) و هم از طریق
+        // progress به Status سربرگ می‌رسد تا UI هنگام اتصال TUN از عملیات عقب نماند.
+        void Stage(string key)
+        {
+            string text = TranslationManager.Get(key);
+            Log(text);
+            progress?.Invoke(text);
+        }
+        Stage("Stg_Cleanup");
         // پاکسازی قبلی (kill پروسه، حذف مسیرها، بازگردانی DNS با powershell) سنگین است؛
         // در پس‌زمینهٔ LongRunning اجرا می‌شود تا هم رشتهٔ UI هنگ نکند و هم
         // با بلوکه‌شدن رشته‌های Thread-Pool پیوست‌های ادامهٔ کار به تعویق نیفتد.
         await Task.Factory.StartNew(Stop, TaskCreationOptions.LongRunning);
+        Stage("Stg_Engine");
         _settings = settings;
         if (!File.Exists(EnginePath))
         {
@@ -334,7 +344,8 @@ public sealed class XrayEngine : IDisposable
                     if (_process == null || _process.HasExited)
                         throw new InvalidOperationException(TranslationManager.Get("Eng_ExitedUnexpectedly"));
                 }
-                if (TryConnect(HttpPort)) { ready = true; break; }
+                // اتصال TCP همزمان روی رشتهٔ UI، سربرگ را در هر نوبت ۲۰۰ms کوتاه قفل می‌کرد.
+                if (await Task.Run(() => TryConnect(HttpPort))) { ready = true; break; }
             }
             if (!ready) throw new InvalidOperationException(TranslationManager.Get("Eng_PortNotUp"));
             Log($"[perf] engine ready in {perf.ElapsedMilliseconds}ms");
@@ -343,6 +354,8 @@ public sealed class XrayEngine : IDisposable
             if (useTun && settings?.UseTunMode == false)
                 useTun = false;
 
+            if (useTun)
+                Stage("Stg_Routes");
             if (useTun && !await SetupTunRoutesAsync(server, tunExclusionHosts))
             {
                 Log(TranslationManager.Get("Eng_TunFallback"));
@@ -361,6 +374,7 @@ public sealed class XrayEngine : IDisposable
 
             if (useTun && XrayConfigBuilder.LastDnsStub)
             {
+                Stage("Stg_Dns");
                 // اجرای powershell (Set-DnsClientServerAddress) چند ثانیه طول می‌کشد؛ در پس‌زمینه.
                 var (dnsApplied, dnsPrev) = await Task.Factory.StartNew(() =>
                 {

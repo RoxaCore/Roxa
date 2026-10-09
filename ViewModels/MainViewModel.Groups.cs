@@ -40,6 +40,8 @@ public partial class MainViewModel : ViewModelBase
         }
         DuplicateCount = dupeCount;
 
+        var built = new List<ServerGroup>();
+
         // ساب‌ها — جدیدترین بالاتر
         foreach (var sub in Subscriptions.AsEnumerable().Reverse())
         {
@@ -49,7 +51,7 @@ public partial class MainViewModel : ViewModelBase
             SortServers(sortedServers);
             foreach (var s in sortedServers)
                 group.Servers.Add(s);
-            Groups.Add(group);
+            built.Add(group);
         }
         var manual = Servers.Where(s => string.IsNullOrEmpty(s.SubscriptionName)).ToList();
         if (manual.Count > 0)
@@ -59,7 +61,7 @@ public partial class MainViewModel : ViewModelBase
             SortServers(manual);
             foreach (var s in manual)
                 group.Servers.Add(s);
-            Groups.Add(group);
+            built.Add(group);
         }
 
         // تب «همه سرورها» — آخرین تب، بسته به صورت پیش‌فرض
@@ -69,13 +71,48 @@ public partial class MainViewModel : ViewModelBase
         SortServers(allServers);
         foreach (var s in allServers)
             allGroup.Servers.Add(s);
-        Groups.Add(allGroup);
+        built.Add(allGroup);
+
+        foreach (var g in ApplySavedGroupOrder(built))
+            Groups.Add(g);
 
         if (SelectedServer == null && keepSelected != null && Servers.Contains(keepSelected))
             SelectedServer = keepSelected;
         foreach (var s in Servers)
             s.IsSelected = ReferenceEquals(s, SelectedServer);
         RefreshConnectionFlags();
+    }
+
+    /// <summary>ترتیب ذخیره‌شدهٔ سربرگ‌های گروه (درگ با موس) را اعمال می‌کند؛
+    /// گروه‌های تازه‌ای که در ترتیب ذخیره‌شده نیستند بالاتر از «همه سرورها» قرار می‌گیرند.</summary>
+    private List<ServerGroup> ApplySavedGroupOrder(List<ServerGroup> built)
+    {
+        if (_settings.GroupOrder is not { Count: > 0 } order)
+            return built;
+
+        var byKey = new Dictionary<string, ServerGroup>(StringComparer.Ordinal);
+        foreach (var g in built) byKey[g.Key] = g;
+
+        var result = new List<ServerGroup>();
+        foreach (var key in order)
+            if (byKey.Remove(key, out var g))
+                result.Add(g);
+
+        var leftovers = built.Where(g => !result.Contains(g)).ToList();
+        if (leftovers.Count > 0)
+        {
+            int at = result.FindIndex(g => g.Key == "__all__");
+            if (at < 0) at = result.Count;
+            result.InsertRange(at, leftovers);
+        }
+        return result;
+    }
+
+    /// <summary>ترتیب جدید سربرگ‌های گروه را بعد از درگ با موس ذخیره می‌کند.</summary>
+    public void PersistGroupOrder()
+    {
+        _settings.GroupOrder = Groups.Select(g => g.Key).ToList();
+        SaveSettings();
     }
 
     private void UpdateGroupContent(ServerGroup group)

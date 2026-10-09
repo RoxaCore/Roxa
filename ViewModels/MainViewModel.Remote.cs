@@ -17,10 +17,26 @@ public partial class MainViewModel : ViewModelBase
     private bool _remoteStarted;
     private bool _remoteChecking;
     private bool _updateNotified;
-    private bool _forceDialogShown;
+    private bool _installRunning;
     private readonly HashSet<int> _toastedAnnouncements = new();
 
+    [ObservableProperty] private bool _isUpdateProgressVisible;
+    [ObservableProperty] private bool _isUpdateProgressIndeterminate;
+    [ObservableProperty] private double _updateProgress;
+    [ObservableProperty] private string _updateProgressText = "";
+
+    partial void OnIsBannerVisibleChanged(bool value)
+    {
+        if (!value && !_installRunning)
+        {
+            IsUpdateProgressVisible = false;
+            UpdateProgress = 0;
+            UpdateProgressText = "";
+        }
+    }
+
     [ObservableProperty] private bool _isBannerVisible;
+    [ObservableProperty] private bool _bannerCanDismiss = true;
     [ObservableProperty] private string _bannerTitle = "";
     [ObservableProperty] private string _bannerBody = "";
     [ObservableProperty] private IBrush _bannerBackground = new SolidColorBrush(Color.Parse("#EFF6FF"));
@@ -44,7 +60,7 @@ public partial class MainViewModel : ViewModelBase
         if (_remoteStarted) return;
         _remoteStarted = true;
         _ = CheckRemoteAsync();
-        _remoteTimer = new DispatcherTimer { Interval = TimeSpan.FromHours(6) };
+        _remoteTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(60) };
         _remoteTimer.Tick += (_, _) => _ = CheckRemoteAsync();
         _remoteTimer.Start();
     }
@@ -72,7 +88,8 @@ public partial class MainViewModel : ViewModelBase
             }
             var country = _settings.Country ?? "";
             var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
-            var update = await Task.Run(() => RemoteConfig.CheckUpdateAsync(lang, country, _settings.ClientId, proxyPort));
+            var update = await Task.Run(() => RemoteConfig.CheckUpdateAsync(lang, country, _settings.ClientId, proxyPort,
+                _settings.ConnectCount, includeStats: SendUsageStats));
             var announcements = await Task.Run(() => RemoteConfig.FetchAnnouncementsAsync(_settings.LastSeenAnnouncementId, lang, country, proxyPort));
             Post(() => ApplyRemote(update, announcements));
         }
@@ -112,15 +129,13 @@ public partial class MainViewModel : ViewModelBase
                     TranslationManager.Instance["Upd_Notify"],
                     string.Format(TranslationManager.Instance["Upd_BannerTitle"], _pendingUpdate.Latest));
             }
-            if (AutoUpdate && _dismissedUpdateVersion != _pendingUpdate.Latest && !IsBannerBusy
-                && _settings.LastUpdateAttempt != _pendingUpdate.Latest)
+            // اپدیت اجباری: نادیده گرفتنِ ردِ قبلی (چون دیگر قابل کنسل نیست) و شروع خودکار نصب.
+            // LastUpdateAttempt برای جلوگیری از حلقهٔ ری‌استارت بی‌نهایت در صورتِ شکستِ apply حفظ می‌شود.
+            if ((AutoUpdate || _pendingUpdate.Force) && !_installRunning && !IsBannerBusy
+                && _settings.LastUpdateAttempt != _pendingUpdate.Latest
+                && (_pendingUpdate.Force || _dismissedUpdateVersion != _pendingUpdate.Latest))
             {
                 _ = InstallUpdateAsync();
-            }
-            else if (_pendingUpdate.Force && !_forceDialogShown)
-            {
-                _forceDialogShown = true;
-                ShowUpdateRequiredHandler?.Invoke();
             }
         }
         if (freshAnnouncement != null)
@@ -153,14 +168,18 @@ public partial class MainViewModel : ViewModelBase
 
     private void ShowUpdateBanner(UpdateInfo update)
     {
-        if (_dismissedUpdateVersion == update.Latest) return;
-        IsBannerBusy = false;
+        if (_dismissedUpdateVersion == update.Latest && !update.Force) return;
+        if (!_installRunning) IsBannerBusy = false;
         BannerTitle = string.Format(TranslationManager.Instance["Upd_BannerTitle"], update.Latest);
-        BannerBody = update.Notes;
+        BannerBody = update.Force
+            ? TranslationManager.Instance["Upd_ForceMsg"] +
+              (string.IsNullOrWhiteSpace(update.Notes) ? "" : "\n" + update.Notes)
+            : update.Notes;
         BannerBackground = new SolidColorBrush(Color.Parse("#F5F3FF"));
         BannerForeground = new SolidColorBrush(Color.Parse("#6D28D9"));
         BannerActionText = TranslationManager.Instance["Upd_Btn_Install"];
         BannerHasAction = !string.IsNullOrWhiteSpace(update.Url);
+        BannerCanDismiss = !update.Force;
         IsBannerVisible = true;
     }
 
@@ -192,6 +211,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void DismissBanner()
     {
+        if (!BannerCanDismiss) return;
         _dismissedUpdateVersion = _pendingUpdate?.Latest;
         IsBannerVisible = false;
     }
@@ -235,16 +255,28 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task InstallUpdateAsync()
     {
-        if (_pendingUpdate is not { UpdateAvailable: true } || IsBannerBusy) return;
+        if (_pendingUpdate is not { UpdateAvailable: true } || IsBannerBusy || _installRunning) return;
         IsBannerBusy = true;
+        _installRunning = true;
+        // وضعیت اتصال در لحظهٔ شروع آپدیت ثبت می‌شود؛ اگر کاربر هنگام دانلود قطع کند،
+        // پس از ری‌استارت همچنان به همان سرور قبلی وصل شود.
+        bool wasConnected = IsConnected;
         BannerBody = TranslationManager.Instance["Upd_Downloading"];
         try
         {
+            BeginUpdateProgress();
             var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
             var info = _pendingUpdate;
-            await Task.Run(() => UpdateInstaller.StageAsync(info, proxyPort));
+            var progress = new Progress<double>(SetUpdateDownloadPercent);
+            await Task.Run(() => UpdateInstaller.StageAsync(info, proxyPort, progress));
             _settings.LastUpdateAttempt = info.Latest;
             SaveSettings();
+            if (wasConnected)
+                UpdateInstaller.MarkReconnectAfterUpdate();
+            // دانلود کامل شد → نوار وارد مرحلهٔ نصب می‌شود (نامعین، تا پایان نصب توسط آپدیت‌گذار)
+            SetUpdateDownloadPercent(100);
+            IsUpdateProgressIndeterminate = true;
+            UpdateProgressText = TranslationManager.Instance["Upd_Installing"];
             BannerBody = TranslationManager.Instance["Upd_Done"];
             UpdateInstaller.LaunchUpdater();
             UpdateShutdownRequested?.Invoke();
@@ -253,7 +285,35 @@ public partial class MainViewModel : ViewModelBase
         {
             AppendLog($"Update failed: {ex.Message}");
             BannerBody = TranslationManager.Instance["Upd_Failed"];
+            EndUpdateProgress();
             IsBannerBusy = false;
+            _installRunning = false;
         }
+    }
+
+    /// <summary>آغاز نوار پیشرفت آپدیت؛ مرحلهٔ دانلود با درصد معین نمایش داده می‌شود.</summary>
+    private void BeginUpdateProgress()
+    {
+        UpdateProgress = 0;
+        IsUpdateProgressIndeterminate = false;
+        IsUpdateProgressVisible = true;
+        SetUpdateDownloadPercent(0);
+    }
+
+    /// <summary>به‌روزرسانی درصد دانلود و متن کنار نوار پیشرفت.</summary>
+    private void SetUpdateDownloadPercent(double percent)
+    {
+        double p = Math.Clamp(percent, 0, 100);
+        UpdateProgress = p;
+        UpdateProgressText = string.Format(TranslationManager.Instance["Upd_Percent"], (int)Math.Round(p));
+    }
+
+    /// <summary>پایان نوار پیشرفت و مخفی‌سازی آن.</summary>
+    private void EndUpdateProgress()
+    {
+        IsUpdateProgressVisible = false;
+        IsUpdateProgressIndeterminate = false;
+        UpdateProgress = 0;
+        UpdateProgressText = "";
     }
 }

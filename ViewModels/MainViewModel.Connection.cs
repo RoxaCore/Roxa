@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading;
 using Avalonia.Input.Platform;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Roxa.Core;
 using Roxa.Localization;
@@ -13,11 +14,22 @@ namespace Roxa.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
 
-    private bool _isConnecting;
+    // با تغییر مقدار، رویداد PropertyChanged می‌نشیند تا سربرگ «در حال اتصال…»
+    // هنگام اتصال TUN ناپدید نشود و UI از عملیات عقب نماند.
+    [ObservableProperty] private bool _isConnecting;
 
     // وقتی تعویض TUN هنگام اتصال باعث قطع+وصل مجدد می‌شود، به‌جای دو نوتیفیشن
     // «ROXA قطع/وصل شد» و «متصل شد به …»، فقط یک نوتیفیشن ادغام‌شده نشان داده می‌شود.
     private bool? _tunToggleReconnect;
+
+    [ObservableProperty] private bool _isSwitchingServer;
+
+    public bool ShowDisconnectedStatus => !IsConnected && !IsSwitchingServer;
+
+    partial void OnIsSwitchingServerChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowDisconnectedStatus));
+    }
 
     private void RefreshConnectionFlags()
     {
@@ -28,6 +40,46 @@ public partial class MainViewModel : ViewModelBase
             s.IsActiveConnection = activeId != null && string.Equals(s.Id, activeId, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// اگر اینترنت قطع باشد پیام «اینترنت قطع است» نشان می‌دهد و true برمی‌گرداند تا
+    /// به‌جای پیام گمراه‌کنندهٔ «هیچ سروری پاسخ نداد»، دلیل واقعی دیده شود.
+    /// </summary>
+    private async Task<bool> NoInternetAsync()
+    {
+        // در حالت اتصال، پروب‌ها از مسیر پروکسی داخلی موتور هم می‌روند؛
+        // وگرنه در TUN پروب‌های خامِ پورت ۸۰ وارد تونل می‌شوند و «اینترنت قطع» غلط دیده می‌شود.
+        int? proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
+        if (await NetHealth.IsInternetAvailableAsync(proxyPort: proxyPort)) return false;
+
+        // بعد از عوض‌شدن شبکه (قطعی WiFi و وصل‌شدن دوباره) اولین پروب اغلب به‌خاطر
+        // بالا آمدن DHCP/DNS شکست می‌خورد؛ یک بار دیگر با فاصلهٔ کوتاه.
+        await Task.Delay(700);
+        if (await NetHealth.IsInternetAvailableAsync(proxyPort: proxyPort, timeoutMs: 2000)) return false;
+
+        // تونلِ بعد از تعویض شبکه مرده ولی مسیر مستقیم سالم است: پروب مستقیم با
+        // بایپس (همان مکانیزم مرحلهٔ ۱ «یافتن سرور بهتر»). اگر جواب داد یعنی
+        // اینترنت قطع نیست و نباید جلوی کار (مثل جستجو که تونل را تازه می‌کند) گرفته شود.
+        if (IsConnected)
+        {
+            try
+            {
+                using var bypass = await TestRouteBypass.BeginAsync(NetHealth.ProbeHosts, forceDirect: true);
+                if (await NetHealth.IsInternetAvailableAsync(timeoutMs: 2000))
+                {
+                    AppendLog(TranslationManager.Instance["Log_TunnelDeadDirectOk"]);
+                    return false;
+                }
+            }
+            catch { }
+        }
+
+        string offline = TranslationManager.Instance["Toast_NoInternet"];
+        Status = offline;
+        ToastHandler?.Invoke(offline);
+        AppendLog(offline);
+        return true;
+    }
+
 
     [RelayCommand(CanExecute = nameof(CanConnect))]
     private async Task Connect()
@@ -36,8 +88,8 @@ public partial class MainViewModel : ViewModelBase
         bool? tunReconnect = _tunToggleReconnect;
         _tunToggleReconnect = null;
         if (server == null || !Servers.Contains(server)) return;
-        if (_isConnecting) return;
-        _isConnecting = true;
+        if (IsConnecting) return;
+        IsConnecting = true;
         ConnectCommand.NotifyCanExecuteChanged();
         try
         {
@@ -50,20 +102,35 @@ public partial class MainViewModel : ViewModelBase
                 if (tunReconnect != null) NotificationHelper.ShowError(issue);
                 return;
             }
+            // قطع‌بودن اینترنت را قبل از شروع اتصال (و اتصال‌مجددِ تعویض TUN) بگوی؛
+            // وگرنه موتور بالا می‌آید و کاربر فکر می‌کند وصل است.
+            if (await NoInternetAsync()) return;
             Status = TranslationManager.Instance["Status_Connecting"];
-            await _engine.StartAsync(server, SetSystemProxy, _settings, tunExclusionHosts: Servers.Select(s => s.Address));
+            await _engine.StartAsync(server, SetSystemProxy, _settings, tunExclusionHosts: Servers.Select(s => s.Address),
+                progress: s => Post(() => Status = s));
             IsConnected = true;
             TunKillSwitch.SetTunnelUp(true, _engine.HttpPort);
             if (!IsTesting && SetSystemProxy && !LeaveSystemProxyAsIs && !_engine.IsTunActive)
                 ApplySystemProxyEndpoint();
             if (_engine.IsTunActive)
-                TunExclusion.Start(_settings.TunExcludedApps);
+            {
+                // SweepPersistedPins داخل Start روی رشتهٔ UI و در قفل اجرا می‌شد و
+                // می‌توانست با route.exe چند ثانیه سربرگ را نگه دارد؛ به پس‌زمینه رفت.
+                var tunExcluded = _settings.TunExcludedApps?.ToList();
+                _ = Task.Run(() => TunExclusion.Start(tunExcluded));
+            }
             LiveDownSpeed = "0 B/s";
             LiveUpSpeed = "0 B/s";
             SpeedBlinkOpacity = 1.0;
             RefreshConnectionFlags();
             Status = string.Format(TranslationManager.Instance["Status_ConnectedTo"], server.Name);
+            // اگر گزارشی در صف مانده (مثلاً کرشِ هنگام قطع شبکه)، حالا از مسیر تونل ارسال شود.
+            _ = Task.Run(async () =>
+            {
+                try { await Core.BugReport.FlushPendingAsync(_engine.HttpPort); } catch { }
+            });
             _settings.ActiveServerId = server.Id;
+            _settings.ConnectCount++;
             SaveSettings();
             AppendLog(string.Format(TranslationManager.Instance["Log_Connected"], _engine.HttpPort));
             if (tunReconnect is bool tunOn)
@@ -120,10 +187,10 @@ public partial class MainViewModel : ViewModelBase
             AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
             FlushLog();
         }
-        finally { _isConnecting = false; ConnectCommand.NotifyCanExecuteChanged(); }
+        finally { IsConnecting = false; ConnectCommand.NotifyCanExecuteChanged(); }
     }
 
-    private bool CanConnect() => SelectedServer != null && !IsConnected && !IsTesting && !_isConnecting;
+    private bool CanConnect() => SelectedServer != null && !IsConnected && !IsTesting && !IsConnecting;
 
     [RelayCommand]
     private void Disconnect() => DisconnectCore(true);
@@ -134,7 +201,7 @@ public partial class MainViewModel : ViewModelBase
         // اجرای همزمان آن روی رشتهٔ UI، قطع اتصال دستی/تعویض سرور/اتصال هوشمند را
         // می‌گرفت. اکنون در پس‌زمینهٔ LongRunning اجرا می‌شود و گیت داخلی Stop()
         // هم‌زمانی آن با پاکسازی StartAsync را سریالایز می‌کند.
-        Task.Factory.StartNew(() => { try { _engine.StopAndCleanupTun(); } catch { } }, TaskCreationOptions.LongRunning);
+        _cleanupTask = Task.Factory.StartNew(() => { try { _engine.StopAndCleanupTun(); } catch { } }, TaskCreationOptions.LongRunning);
         TunKillSwitch.SetTunnelUp(false, 0);
         IsConnected = false;
         RefreshConnectionFlags();
@@ -143,11 +210,26 @@ public partial class MainViewModel : ViewModelBase
         ConnectCommand.NotifyCanExecuteChanged();
     }
 
+    private Task? _cleanupTask;
+
+    /// <summary>
+    /// تا پاکسازیِ پس‌زمینهٔ اتصال قبلی تمام شود صبر می‌کند؛ بدون آن، پینگ/تست مرحلهٔ ۱
+    /// اتصال هوشمند با DNSِ مردهٔ تونل و مسیرهای در حال حذف هم‌زمان می‌شود و ثانیه‌ها می‌ایستد.
+    /// </summary>
+    private async Task AwaitCleanupAsync()
+    {
+        var t = _cleanupTask;
+        if (t == null || t.IsCompleted) return;
+        Status = TranslationManager.Instance["Stg_Cleanup"];
+        try { await t; } catch { }
+    }
+
     [RelayCommand]
     private async Task Reconnect()
     {
         if (SelectedServer == null) return;
         if (IsConnected) Disconnect();
+        await AwaitCleanupAsync();
         await Connect();
     }
 
@@ -156,14 +238,22 @@ public partial class MainViewModel : ViewModelBase
     {
         if (server != null) SelectedServer = server;
         RefreshConnectionFlags();
-        if (SelectedServer == null || IsTesting || _isConnecting) return;
-        if (IsConnected)
+        if (SelectedServer == null || IsTesting || IsConnecting) return;
+        bool switching = false;
+        try
         {
-            var active = _engine.CurrentServer;
-            if (active != null && string.Equals(active.Id, SelectedServer.Id, StringComparison.Ordinal)) return;
-            Disconnect();
+            if (IsConnected)
+            {
+                var active = _engine.CurrentServer;
+                if (active != null && string.Equals(active.Id, SelectedServer.Id, StringComparison.Ordinal)) return;
+                switching = true;
+                IsSwitchingServer = true;
+                Disconnect();
+                await AwaitCleanupAsync();
+            }
+            await Connect();
         }
-        await Connect();
+        finally { if (switching) IsSwitchingServer = false; }
     }
 
     // ---------- تست ----------
@@ -179,6 +269,7 @@ public partial class MainViewModel : ViewModelBase
     {
         if (IsTesting) return;
         if (Servers.Count == 0) { Status = TranslationManager.Instance["Status_NoServers"]; ToastHandler?.Invoke(TranslationManager.Instance["Toast_NoServerForConnect"]); return; }
+        if (await NoInternetAsync()) return;
         if (IsConnected) Disconnect();
 
         var ct = NewTestToken();
@@ -187,6 +278,10 @@ public partial class MainViewModel : ViewModelBase
 
         try
         {
+            // پاکسازی اتصال قبلی (kill + حذف مسیرها + بازگردانی DNS) باید تمام شود؛
+            // وگرنه پینگ‌های مرحلهٔ ۱ با DNSِ مردهٔ تونل هم‌زمان می‌شوند و ثانیه‌ها می‌ایستند.
+            await AwaitCleanupAsync();
+
             int totalServers = Servers.Count;
             int tested = 0;
             SearchTestedCount = 0;
@@ -198,6 +293,10 @@ public partial class MainViewModel : ViewModelBase
             ToastHandler?.Invoke(TranslationManager.Instance["Toast_FindingBest"]);
             AppendLog(TranslationManager.Instance["Log_SmartStage1"]);
 
+            // یک scope مشترک برای همهٔ پینگ‌ها: قبلاً هر پینگ جداگانه route print +
+            // resolve + افزودن/حذف مسیر اجرا می‌کرد و شروع اتصال هوشمند می‌خوابید.
+            using var bypassScope = await TestRouteBypass.BeginAsync(Servers.Select(s => (string?)s.Address));
+
             foreach (var s in Servers) { s.LatencyMs = -1; s.PingMs = -1; }
 
             using var sem1 = new SemaphoreSlim(20);
@@ -207,7 +306,7 @@ public partial class MainViewModel : ViewModelBase
                 await sem1.WaitAsync(ct);
                 try
                 {
-                    var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 3000);
+                    var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 3000, bypassScope);
                     Post(() => s.RecordPing(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordPing(-2)); }
@@ -220,6 +319,7 @@ public partial class MainViewModel : ViewModelBase
             });
             try { await Task.WhenAll(pingTasks); }
             catch (OperationCanceledException) { }
+            if (ct.IsCancellationRequested) throw new OperationCanceledException(ct);
 
             // صبر تا همه Post() ها اجرا بشن
             await Dispatcher.UIThread.InvokeAsync(() => { });
@@ -244,6 +344,7 @@ public partial class MainViewModel : ViewModelBase
             {
                 IsTesting = false;
                 IsSmartConnecting = false;
+                if (await NoInternetAsync()) return;
                 Status = TranslationManager.Instance["Status_SmartNoResponse"];
                 ToastHandler?.Invoke(TranslationManager.Instance["Toast_NoServerResponded"]);
                 AppendLog(TranslationManager.Instance["Log_NoPing"]);
@@ -268,6 +369,7 @@ public partial class MainViewModel : ViewModelBase
                 });
             }
             catch (OperationCanceledException) { }
+            if (ct.IsCancellationRequested) throw new OperationCanceledException(ct);
 
             await Dispatcher.UIThread.InvokeAsync(() => { });
 
@@ -341,6 +443,8 @@ public partial class MainViewModel : ViewModelBase
             AppendLog(TranslationManager.Instance["Log_FindNoSelection"]);
             return;
         }
+        // اینترنت قطع است؟ قبل از اتلافِ وقتِ تست بگو تا «هیچ سروری پاسخ نداد» دیده نشود.
+        if (await NoInternetAsync()) return;
 
         // بررسی انقضا: اگه ۱۵ دقیقه گذشته، از اول شروع کن
         if (_searchPool.Count == 0 || (DateTime.Now - _lastSearchTime) > SearchExpiry)
@@ -381,6 +485,24 @@ public partial class MainViewModel : ViewModelBase
             ToastHandler?.Invoke(string.Format(TranslationManager.Instance["Toast_CheckingNew"], batch.Count));
 
             // --- مرحله ۱: TCP ping سریع روی batch ---
+            // scope مشترک برای کل batch؛ قبلاً هر پینگ جداگانه route/resolve اجرا می‌کرد.
+            int invalidDomains = 0;
+
+            static async Task<bool> IsHostUnresolvableAsync(string? address)
+            {
+                string host = (address ?? "").Trim();
+                if (host.Length == 0) return true;
+                if (System.Net.IPAddress.TryParse(host, out _)) return false;
+                try
+                {
+                    var resolved = await System.Net.Dns.GetHostAddressesAsync(host);
+                    return resolved.Length == 0;
+                }
+                catch (System.Net.Sockets.SocketException) { return true; }
+                catch (ArgumentException) { return true; }
+            }
+
+            using var bypassScope = await TestRouteBypass.BeginAsync(batch.Select(s => (string?)s.Address));
             using var sem = new SemaphoreSlim(10);
             var pingTasks = batch.Select(async s =>
             {
@@ -388,7 +510,14 @@ public partial class MainViewModel : ViewModelBase
                 await sem.WaitAsync(ct);
                 try
                 {
-                    var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 3000);
+                    if (await IsHostUnresolvableAsync(s.Address))
+                    {
+                        Interlocked.Increment(ref invalidDomains);
+                        AppendLog(string.Format(TranslationManager.Instance["Log_BatchDomainInvalid"], s.Address));
+                        Post(() => s.RecordPing(-2));
+                        return;
+                    }
+                    var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port, 3000, bypassScope);
                     Post(() => s.RecordPing(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordPing(-2)); }
@@ -411,8 +540,10 @@ public partial class MainViewModel : ViewModelBase
             {
                 IsTesting = false;
                 IsFindingBetter = false;
+                if (await NoInternetAsync()) return;
                 Status = TranslationManager.Instance["Status_FindNoCandidate"];
-                ToastHandler?.Invoke(TranslationManager.Instance["Toast_NoServerInBatch"]);
+                bool allInvalid = invalidDomains >= batch.Count;
+                ToastHandler?.Invoke(TranslationManager.Instance[allInvalid ? "Toast_BatchAllInvalidDomains" : "Toast_NoServerInBatch"]);
                 AppendLog(TranslationManager.Instance["Log_FindNoSurvivors"]);
                 return;
             }
@@ -460,6 +591,7 @@ public partial class MainViewModel : ViewModelBase
                     Disconnect();
                     SelectedServer = bestCandidate;
                     RefreshConnectionFlags();
+                    await AwaitCleanupAsync();
                     await Connect();
                     AutoSortAfterTest("latency");
                     FocusServerHandler?.Invoke(bestCandidate);

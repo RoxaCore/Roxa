@@ -56,7 +56,7 @@
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ Remover Duplicatas</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 Exportar</value></data>
   <data name="Btn_Import" xml:space="preserve"><value>📋 Importar</value></data>
-  <data name="Ph_ServerLink" xml:space="preserve"><value>Link do servidor (vmess://, vless://, ...)</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>Link do servidor (vmess://, vless://, ss://, trojan://)</value></data>
   <data name="Ph_SubName" xml:space="preserve"><value>Nome</value></data>
   <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
   <data name="Sort_None" xml:space="preserve"><value>Sem Ordenação</value></data>
@@ -76,10 +76,6 @@
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>Teste de Velocidade</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>Excluir Servidor</value></data>
   <data name="Ctx_ClearSel" xml:space="preserve"><value>Limpar seleção</value></data>
-  <data name="Add_VMess" xml:space="preserve"><value>🟢 Adicionar VMess</value></data>
-  <data name="Add_VLESS" xml:space="preserve"><value>🔵 Adicionar VLESS</value></data>
-  <data name="Add_SS" xml:space="preserve"><value>🟠 Adicionar Shadowsocks</value></data>
-  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Adicionar Trojan</value></data>
   <data name="Add_Clipboard" xml:space="preserve"><value>📋 Importar da Área de Transferência</value></data>
   <data name="Set_Proxy" xml:space="preserve"><value>Configurar Proxy do Sistema</value></data>
   <data name="Set_AutoConnect" xml:space="preserve"><value>Conexão Automática</value></data>
@@ -96,7 +92,6 @@
   <data name="Set_Every" xml:space="preserve"><value>Todos</value></data>
   <data name="Set_Hours" xml:space="preserve"><value>Horas atualizar</value></data>
   <data name="Set_Advanced" xml:space="preserve"><value>Configurações Avançadas</value></data>
-  <data name="Set_PingType" xml:space="preserve"><value>Tipo de ping:</value></data>
   <data name="Set_GlobalSort" xml:space="preserve"><value>Ordenação Global (após o teste, o melhor servidor de todos os grupos aparece no topo)</value></data>
   <data name="Set_DNS" xml:space="preserve"><value>DNS Personalizado</value></data>
   <data name="Set_DNSBtn" xml:space="preserve"><value>⚙ Configurações DNS</value></data>
@@ -201,7 +196,6 @@
     <value>Atalhos: Ctrl+Shift+C = Conectar | Ctrl+Shift+D = Desconectar | Ctrl+Shift+S = Conexão Inteligente | Ctrl+Shift+Q = Sair</value>
   </data>
 
-  <data name="Add_Link" xml:space="preserve"><value>Adicionar</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>Usar proxy para atualizações</value></data>
   <!-- Notifications -->
@@ -230,7 +224,75 @@ Latência: {1}</value></data>
   <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} horas restantes</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 Manual</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>Nenhum servidor selecionado</value></data>
+  <data name="Set_Reports" xml:space="preserve">
+    <value>Relato de bug e problema</value>
+  </data>
+  <data name="Set_Reports_Desc" xml:space="preserve">
+    <value>Se o aplicativo travou ou você encontrou um problema, o relato é enviado ao desenvolvedor automaticamente. Com o botão abaixo, você mesmo pode relatar um problema com uma descrição opcional; versão, sistema operacional, ID do dispositivo, estado da conexão e o log recente são anexados automaticamente.</value>
+  </data>
+  <data name="Btn_ReportBug" xml:space="preserve">
+    <value>Relatar um problema...</value>
+  </data>
+  <data name="Dlg_ReportTitle" xml:space="preserve">
+    <value>Relato de bug e problema</value>
+  </data>
+  <data name="Dlg_ReportHint" xml:space="preserve">
+    <value>Descreva o problema (opcional): o que você fez e o que aconteceu...</value>
+  </data>
+  <data name="Btn_SendReport" xml:space="preserve">
+    <value>Enviar relato</value>
+  </data>
+  <data name="Rpt_AutoInfo" xml:space="preserve">
+    <value>As informações automáticas do app são anexadas sem nenhuma ação sua:
+Versão {0} • {1}
+ID do dispositivo {2}
+Estado: {3}</value>
+  </data>
+  <data name="Rpt_StateOn" xml:space="preserve">
+    <value>Conectado a {0}</value>
+  </data>
+  <data name="Rpt_StateOff" xml:space="preserve">
+    <value>Desconectado</value>
+  </data>
+  <data name="Log_ReportSent" xml:space="preserve">
+    <value>Relato de problema enviado</value>
+  </data>
+  <data name="Toast_ReportSent" xml:space="preserve">
+    <value>Relato enviado — obrigado</value>
+  </data>
+  <data name="Log_ReportFailed" xml:space="preserve">
+    <value>Falha no envio; o relato ficou na fila e será enviado na próxima inicialização</value>
+  </data>
+  <data name="Log_ReportFlushed" xml:space="preserve">
+    <value>{0} relato(s) da fila enviados</value>
+  </data>
   <data name="Home_NotConnected" xml:space="preserve"><value>Não conectado</value></data>
+  <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>A internet está ok: o caminho direto está saudável; o túnel não responde após a mudança de rede</value></data>
+  <data name="Set_Privacy" xml:space="preserve"><value>Privacidade</value></data>
+  <data name="Set_Stats" xml:space="preserve"><value>Enviar estatísticas de conexão ao painel</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>A cada 60 minutos, a versão, o idioma, o país e o ID do dispositivo são enviados ao painel para verificar atualizações. Desativar isso mantém a verificação, mas nenhum ID ou estatística é enviado; o nome do computador nunca é enviado.</value></data>
+  <data name="Set_DeviceId" xml:space="preserve"><value>ID do dispositivo</value></data>
+  <data name="Set_DeviceId_Desc" xml:space="preserve"><value>Um ID único gerado pelo app para este sistema (não o nome do computador), exibido no painel de administração.</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>Foi encontrada uma conexão residual de uma execução anterior.&amp;#10;Para uma limpeza completa, o aplicativo precisa ser reiniciado como administrador.</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>O adaptador TUN não está pronto.</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>Rotas TUN adicionadas.</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>Falha ao adicionar rotas TUN: {0}</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>O mecanismo de conexão parou inesperadamente</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>Ignorar VPN mesmo sem TUN</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>Quando ativado, os apps desta lista usam a internet direta do sistema mesmo com a VPN conectada pelo proxy do sistema (sem TUN), em vez da VPN.</value></data>
+  <data name="Set_KillSwitch" xml:space="preserve"><value>Kill switch global</value></data>
+  <data name="Set_KillSwitch_Desc" xml:space="preserve"><value>Se o túnel VPN cair, todo o tráfego de internet é bloqueado até a VPN voltar, para que seu endereço real nunca vaze. Os apps da lista 'Exclusões do TUN' permanecem conectados diretamente.</value></data>
+  <data name="Set_KillSwitch_Add" xml:space="preserve"><value>Adicionar app para proteger...</value></data>
+  <data name="Set_KillSwitch_Remove" xml:space="preserve"><value>Remover da lista protegida</value></data>
+  <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>Nenhum app adicionado para proteção ainda</value></data>
+  <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>Não conectado: todo o tráfego está bloqueado ({0} apps isentas)</value></data>
+  <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>Conexão VPN caiu</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>A internet está bloqueada até a VPN reconectar ({0} apps isentas). Se não voltar, pressione o botão de liberação de emergência.</value></data>
+  <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>VPN reconectado</value></data>
+  <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>A internet está funcionando novamente</value></data>
+  <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>Liberação de emergência da internet</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>Se a internet não voltar mesmo com o botão de liberação, o kill switch não é o problema — verifique o Wi-Fi/rede do Windows ou reinicie o sistema.</value></data>
+  <data name="Home_SwitchingServer" xml:space="preserve"><value>Conectando ao novo servidor</value></data>
   <data name="LastUpdate_DayAgo" xml:space="preserve"><value>Última atualização: há {0} d</value></data>
   <data name="LastUpdate_HourAgo" xml:space="preserve"><value>Última atualização: há {0} h</value></data>
   <data name="LastUpdate_MinAgo" xml:space="preserve"><value>Última atualização: há {0} min</value></data>
@@ -254,7 +316,11 @@ Latência: {1}</value></data>
   <data name="Upd_Btn_Install" xml:space="preserve"><value>Instalar</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>Baixando a atualização…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>Download concluído; o aplicativo será fechado para instalar</value></data>
+  <data name="Upd_Installing" xml:space="preserve"><value>Instalando a atualização…</value></data>
+  <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>Falha no download da atualização</value></data>
+  <data name="Btn_FullTest" xml:space="preserve"><value>Teste completo</value></data>
+  <data name="Status_GroupFullDone" xml:space="preserve"><value>Teste completo de {0} concluído</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>Você precisa instalar a nova versão para continuar</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>Fechar</value></data>
   <data name="Ann_View" xml:space="preserve"><value>Ver</value></data>
@@ -268,7 +334,6 @@ Latência: {1}</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Remover</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Nenhum aplicativo adicionado ainda</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>Alternar a exclusão deste aplicativo</value></data>
-  <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servidores adicionados da área de transferência</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>A área de transferência está vazia</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Acesso à área de transferência indisponível</value></data>
   <data name="Status_ConnectError" xml:space="preserve"><value>Erro de conexão</value></data>
@@ -295,10 +360,8 @@ Latência: {1}</value></data>
   <data name="Status_GroupSpeedDone" xml:space="preserve"><value>Teste de velocidade do grupo concluído ({0} ok)</value></data>
   <data name="Status_GroupUpdate" xml:space="preserve"><value>Atualizando o grupo "{0}" ({1} servidores) ...</value></data>
   <data name="Status_GroupUpdateDone" xml:space="preserve"><value>Atualização do grupo concluída ({0} ok)</value></data>
-  <data name="Status_NewServerName" xml:space="preserve"><value>Novo servidor ({0})</value></data>
   <data name="Status_NoServerFromSub" xml:space="preserve"><value>Nenhum servidor recebido de "{0}"</value></data>
   <data name="Status_NoServers" xml:space="preserve"><value>Nenhum servidor</value></data>
-  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>Nenhum link válido na área de transferência</value></data>
   <data name="Status_PingAll" xml:space="preserve"><value>Fazendo ping em {0} servidores ...</value></data>
   <data name="Status_PingDoneCount" xml:space="preserve"><value>Ping concluído: {0} de {1} responderam</value></data>
   <data name="Status_PingSelDone" xml:space="preserve"><value>Ping dos selecionados concluído ({0} ok)</value></data>
@@ -309,7 +372,6 @@ Latência: {1}</value></data>
   <data name="Status_RealDoneCount" xml:space="preserve"><value>Teste de latência real concluído: {0} de {1} com sucesso</value></data>
   <data name="Status_RealSelDone" xml:space="preserve"><value>Teste de latência real dos selecionados concluído ({0} ok)</value></data>
   <data name="Status_RealSelected" xml:space="preserve"><value>Teste de latência real em {0} servidores selecionados ...</value></data>
-  <data name="Status_ServerAdded" xml:space="preserve"><value>Servidor "{0}" adicionado</value></data>
   <data name="Status_ServersAdded" xml:space="preserve"><value>{0} servidores adicionados</value></data>
   <data name="Status_SmartBest" xml:space="preserve"><value>Conexão inteligente: melhor servidor → {0} ({1})</value></data>
   <data name="Status_SmartCancelled" xml:space="preserve"><value>Conexão inteligente cancelada</value></data>
@@ -342,6 +404,7 @@ Latência: {1}</value></data>
   <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>Links dos servidores copiados</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>Nenhum servidor disponível para conectar</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>Nenhum servidor deste lote respondeu</value></data>
+  <data name="Toast_BatchAllInvalidDomains" xml:space="preserve"><value>Não foi possível resolver os domínios deste lote; os links são inválidos</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>Nenhum servidor respondeu</value></data>
   <data name="Toast_RealDelayFailed" xml:space="preserve"><value>Teste de latência real falhou</value></data>
   <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>O teste de latência real não confirmou nenhum servidor</value></data>
@@ -371,6 +434,7 @@ Latência: {1}</value></data>
   <data name="Url_InvalidSs" xml:space="preserve"><value>Link Shadowsocks inválido</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Link Trojan inválido</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Link VLESS inválido</value></data>
+  <data name="Url_InvalidVmess" xml:space="preserve"><value>Link VMess inválido</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Somente vmess / vless / ss / trojan são suportados</value></data>
   <data name="Url_UnsupportedTransport" xml:space="preserve"><value>transporte não suportado: {0}</value></data>
   <data name="Url_InvalidParam" xml:space="preserve"><value>valor inválido para o parâmetro {0}: {1}</value></data>
@@ -379,6 +443,7 @@ Latência: {1}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>Encontrar melhor: não há mais servidores para testar</value></data>
   <data name="Log_FindNoSelection" xml:space="preserve"><value>Encontrar melhor: bloqueado — nenhum servidor selecionado</value></data>
   <data name="Log_FindNoSurvivors" xml:space="preserve"><value>Encontrar melhor: nenhum sobrevivente do ping TCP</value></data>
+  <data name="Log_BatchDomainInvalid" xml:space="preserve"><value>Falha ao resolver o domínio: {0}</value></data>
   <data name="Log_FindNotConnected" xml:space="preserve"><value>Encontrar melhor: bloqueado — não está conectado</value></data>
   <data name="Log_FindRealBatch" xml:space="preserve"><value>Encontrar melhor: testando {0} sobreviventes por lote multi-outbound</value></data>
   <data name="Log_FindRealFailedAll" xml:space="preserve"><value>Encontrar melhor: todos os testes de latência real falharam</value></data>
@@ -446,4 +511,25 @@ Latência: {1}</value></data>
 <data name="Hint_BypassTun" xml:space="preserve"><value>Nota: os testes são executados sem aplicar o TUN</value></data>
 <data name="Notify_TunOn" xml:space="preserve"><value>ROXA conectado</value></data>
 <data name="Notify_TunOff" xml:space="preserve"><value>ROXA desconectado</value></data>
+  <data name="Set_Notifications" xml:space="preserve"><value>Notificações do Windows</value></data>
+  <data name="Set_Notifications_Desc" xml:space="preserve"><value>Mostrar balões de notificação perto do relógio do Windows ao conectar, desconectar e em erros.</value></data>
+  <data name="Tray_Notifications" xml:space="preserve"><value>Notificações do Windows</value></data>
+  <data name="Stg_Cleanup" xml:space="preserve"><value>Limpando conexão anterior ...</value></data>
+  <data name="Stg_Routes" xml:space="preserve"><value>Configurando rotas TUN ...</value></data>
+  <data name="Stg_Dns" xml:space="preserve"><value>Configurando DNS ...</value></data>
+  <data name="Stg_Engine" xml:space="preserve"><value>Aguarde</value></data>
+  <data name="Toast_NoInternet" xml:space="preserve"><value>A internet está desconectada</value></data>
+  <data name="SubFetch_Direct" xml:space="preserve"><value>Obtenção direta (sem proxy)...</value></data>
+  <data name="SubFetch_Proxy" xml:space="preserve"><value>Obtenção via proxy...</value></data>
+  <data name="SubFetch_SystemProxy" xml:space="preserve"><value>Obtenção via proxy do sistema...</value></data>
+  <data name="Log_SubHealDns" xml:space="preserve"><value>{0} adaptador(es) DNS residual(is) do TUN reparado(s)</value></data>
+  <data name="Log_SubBypass" xml:space="preserve"><value>Contornando TUN para obtenção direta...</value></data>
+  <data name="Set_SingBox" xml:space="preserve"><value>Ativar sing-box</value></data>
+  <data name="Set_SingBox_Desc" xml:space="preserve"><value>O núcleo sing-box foi adicionado ao lado do mecanismo atual. Ativar isso salva apenas a configuração por enquanto; o comportamento da conexão não muda.</value></data>
+  <data name="Dlg_ConfirmTun" xml:space="preserve"><value>Ativar TUN</value></data>
+  <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>Com o TUN ativado, todo o tráfego do sistema passa pelo túnel e o aplicativo precisará de permissões de administrador. Tem certeza?</value></data>
+  <data name="Set_Table" xml:space="preserve"><value>Tabela</value></data>
+  <data name="Set_ShowIp" xml:space="preserve"><value>Mostrar coluna de endereço IP</value></data>
+  <data name="Set_ShowIp_Desc" xml:space="preserve"><value>Quando ativada, a coluna de endereço IP é mostrada na tabela de servidores.</value></data>
+<data name="Btn_Paste" xml:space="preserve"><value>Colar da área de transferência</value></data>
 </root>

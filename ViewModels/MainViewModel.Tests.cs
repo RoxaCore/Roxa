@@ -81,19 +81,11 @@ public partial class MainViewModel : ViewModelBase
          try
          {
             Status = string.Format(TranslationManager.Instance["Status_PingAll"], Servers.Count);
-            bool resetReal = SelectedPingType == PingType.RealDelay;
             foreach (var s in Servers)
             {
                 s.LatencyMs = -1;
-                if (resetReal) { s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
-                else s.PingMs = -1;
+                s.PingMs = -1;
             }
-            if (SelectedPingType == PingType.RealDelay)
-            {
-                await RunRealDelayTestsAsync(Servers.ToList(), ct);
-            }
-            else
-            {
             using var sem = new SemaphoreSlim(8);
             var tasks = Servers.ToList().Select(async s =>
             {
@@ -102,20 +94,15 @@ public partial class MainViewModel : ViewModelBase
                 try
                 {
                     if (ct.IsCancellationRequested) return;
-                    var (ok, ms) = SelectedPingType switch
-                    {
-                        PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
-                        _ => await LatencyTester.TcpAsync(s.Address, s.Port)
-                    };
+                    var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port);
                     if (!ct.IsCancellationRequested)
                         Post(() => s.RecordPing(ok ? ms : -2));
                 }
                 catch { Post(() => s.RecordPing(-2)); }
                 finally { sem.Release(); TickTestProgress(); }
             });
-             try { await Task.WhenAll(tasks); }
-             catch (OperationCanceledException) { }
-            }
+            try { await Task.WhenAll(tasks); }
+            catch (OperationCanceledException) { }
              int okCount = Servers.Count(s => s.LatencyMs >= 0);
              Status = string.Format(TranslationManager.Instance["Status_PingDoneCount"], okCount, Servers.Count);
              AppendLog(Status);
@@ -174,13 +161,6 @@ public partial class MainViewModel : ViewModelBase
         BeginTestProgress(targets.Count);
         try
         {
-            if (SelectedPingType == PingType.RealDelay)
-            {
-                foreach (var s in targets) { s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
-                await RunRealDelayTestsAsync(targets, ct);
-            }
-            else
-            {
             using var sem = new SemaphoreSlim(8);
             var tasks = targets.Select(async s =>
             {
@@ -188,11 +168,7 @@ public partial class MainViewModel : ViewModelBase
                 await sem.WaitAsync(ct);
                 try
                 {
-                    var (ok, ms) = SelectedPingType switch
-                    {
-                        PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
-                        _ => await LatencyTester.TcpAsync(s.Address, s.Port)
-                    };
+                    var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port);
                     if (!ct.IsCancellationRequested)
                         Post(() => s.RecordPing(ok ? ms : -2));
                 }
@@ -201,7 +177,6 @@ public partial class MainViewModel : ViewModelBase
             });
             try { await Task.WhenAll(tasks); }
             catch (OperationCanceledException) { }
-            }
             AutoSortAfterTest("latency");
             EndTestProgress();
         }
@@ -283,19 +258,11 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = string.Format(TranslationManager.Instance["Status_PingSelected"], targets.Count);
-            bool resetReal = SelectedPingType == PingType.RealDelay;
             foreach (var s in targets)
             {
                 s.LatencyMs = -1;
-                if (resetReal) { s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
-                else s.PingMs = -1;
+                s.PingMs = -1;
             }
-            if (SelectedPingType == PingType.RealDelay)
-            {
-                await RunRealDelayTestsAsync(targets, ct);
-            }
-            else
-            {
             using var sem = new SemaphoreSlim(8);
             var tasks = targets.Select(async s =>
             {
@@ -303,11 +270,7 @@ public partial class MainViewModel : ViewModelBase
                 await sem.WaitAsync(ct);
                 try
                 {
-                    var (ok, ms) = SelectedPingType switch
-                    {
-                        PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
-                        _ => await LatencyTester.TcpAsync(s.Address, s.Port)
-                    };
+                    var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port);
                     if (!ct.IsCancellationRequested)
                         Post(() => s.RecordPing(ok ? ms : -2));
                 }
@@ -316,7 +279,6 @@ public partial class MainViewModel : ViewModelBase
             });
             try { await Task.WhenAll(tasks); }
             catch (OperationCanceledException) { }
-            }
             Status = string.Format(TranslationManager.Instance["Status_PingSelDone"], targets.Count(t => t.LatencyMs >= 0));
             AutoSortAfterTest("latency");
             SaveServers();
@@ -399,19 +361,11 @@ public partial class MainViewModel : ViewModelBase
          try
          {
             Status = string.Format(TranslationManager.Instance["Status_GroupPing"], group!.Title, targets.Count);
-            bool resetReal = SelectedPingType == PingType.RealDelay;
             foreach (var s in targets)
             {
                 s.LatencyMs = -1;
-                if (resetReal) { s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
-                else s.PingMs = -1;
+                s.PingMs = -1;
             }
-            if (SelectedPingType == PingType.RealDelay)
-            {
-                await RunRealDelayTestsAsync(targets, ct);
-            }
-            else
-            {
             using var sem = new SemaphoreSlim(8);
             var tasks = targets.Select(async s =>
             {
@@ -420,11 +374,7 @@ public partial class MainViewModel : ViewModelBase
                 try
                 {
                     if (ct.IsCancellationRequested) return;
-                    var (ok, ms) = SelectedPingType switch
-                    {
-                        PingType.HttpPing => await LatencyTester.HttpAsync(s.Address, s.Port),
-                        _ => await LatencyTester.TcpAsync(s.Address, s.Port)
-                    };
+                    var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port);
                     if (!ct.IsCancellationRequested)
                         Post(() => s.RecordPing(ok ? ms : -2));
                 }
@@ -433,7 +383,6 @@ public partial class MainViewModel : ViewModelBase
             });
              try { await Task.WhenAll(tasks); }
              catch (OperationCanceledException) { }
-            }
              int okCount = targets.Count(t => t.LatencyMs >= 0);
              Status = string.Format(TranslationManager.Instance["Status_GroupPingDone"], okCount);
              AutoSortAfterTest("latency");
@@ -503,6 +452,88 @@ public partial class MainViewModel : ViewModelBase
              EndTestProgress();
          }
          finally { IsTesting = false; }
+     }
+
+     /// <summary>
+     /// تست کامل گروه: ابتدا پینگ (سریع‌ترین تست)، سپس تأخیر واقعی و در پایان تست سرعت.
+     /// هر سه مرحله با یک توکن لغو مشترک اجرا می‌شوند تا دکمهٔ «توقف» کل زنجیره را متوقف کند؛
+     /// پس از هر مرحله، اگر لغو شده باشد مرحلهٔ بعد اجرا نمی‌شود.
+     /// </summary>
+     [RelayCommand]
+     private async Task TestGroupFull(ServerGroup? group)
+     {
+         var targets = group?.Servers.ToList() ?? new List<ServerInfo>();
+         if (targets.Count == 0 || IsTesting) return;
+         var ct = NewTestToken();
+         IsTesting = true;
+         try
+         {
+             // ---- مرحله ۱: پینگ TCP (سریع‌ترین) ----
+             BeginTestProgress(targets.Count);
+             Status = string.Format(TranslationManager.Instance["Status_GroupPing"], group!.Title, targets.Count);
+             foreach (var s in targets) { s.LatencyMs = -1; s.PingMs = -1; }
+             using (var sem = new SemaphoreSlim(8))
+             {
+                 var tasks = targets.Select(async s =>
+                 {
+                     if (ct.IsCancellationRequested) return;
+                     await sem.WaitAsync(ct);
+                     try
+                     {
+                         var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port);
+                         if (!ct.IsCancellationRequested)
+                             Post(() => s.RecordPing(ok ? ms : -2));
+                     }
+                     catch { Post(() => s.RecordPing(-2)); }
+                     finally { try { sem.Release(); } catch { } TickTestProgress(); }
+                 });
+                 try { await Task.WhenAll(tasks); }
+                 catch (OperationCanceledException) { }
+             }
+             AutoSortAfterTest("latency");
+             EndTestProgress();
+             if (ct.IsCancellationRequested) return;
+
+             // ---- مرحله ۲: تأخیر واقعی ----
+             BeginTestProgress(targets.Count);
+             Status = string.Format(TranslationManager.Instance["Status_GroupReal"], group.Title, targets.Count);
+             foreach (var s in targets) { s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
+             await RunRealDelayTestsAsync(targets, ct);
+             AutoSortAfterTest("latency");
+             EndTestProgress();
+             if (ct.IsCancellationRequested) return;
+
+             // ---- مرحله ۳: تست سرعت ----
+             BeginTestProgress(targets.Count);
+             Status = string.Format(TranslationManager.Instance["Status_GroupSpeed"], group.Title, targets.Count);
+             foreach (var s in targets) s.RecordSpeed(-1);
+             using (var sem = new SemaphoreSlim(SpeedTester.MaxConcurrency))
+             {
+                 var tasks = targets.Select(async s =>
+                 {
+                     if (ct.IsCancellationRequested) return;
+                     await sem.WaitAsync(ct);
+                     try
+                     {
+                         Post(() => Status = string.Format(TranslationManager.Instance["Status_TestSpeedOne"], s.Name));
+                         var speedResult = await SpeedTester.TestAsync(s, ct);
+                         Post(() => s.RecordSpeed(speedResult));
+                     }
+                     catch { Post(() => s.RecordSpeed(-2)); }
+                     finally { try { sem.Release(); } catch { } TickTestProgress(); }
+                 });
+                 try { await Task.WhenAll(tasks); }
+                 catch (OperationCanceledException) { }
+             }
+             foreach (var s in targets)
+                 if (s.DownloadMbps == -1) s.RecordSpeed(-2);
+             AutoSortAfterTest("speed");
+             EndTestProgress();
+
+             if (!ct.IsCancellationRequested)
+                 Status = string.Format(TranslationManager.Instance["Status_GroupFullDone"], group.Title);
+         }
+         finally { SaveServers(); IsTesting = false; }
      }
 
      [RelayCommand]

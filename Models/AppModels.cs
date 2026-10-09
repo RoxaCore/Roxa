@@ -106,6 +106,7 @@ public class AppSettings
     public bool AutoUpdateSubs { get; set; } = false;
     public bool AutoUpdate { get; set; } = false;
     public int AutoUpdateIntervalHours { get; set; } = 12;
+    public bool ShowIpColumn { get; set; } = false;
     public DateTime LastSubscriptionUpdate { get; set; } = DateTime.MinValue;
     public HashSet<string> CollapsedGroups { get; set; } = new();
     public string SortField { get; set; } = "none";
@@ -115,6 +116,8 @@ public class AppSettings
     public string CustomDnsServers { get; set; } = "";
     public string? CustomDnsAdvancedJson { get; set; }
     public bool UseTunMode { get; set; }
+    public bool TunConfirmed { get; set; }
+    public bool EnableSingBox { get; set; } = false;
     public bool LeaveSystemProxyAsIs { get; set; }
     public bool ClearProxyOnDisconnect { get; set; } = true;
     public bool UseProxyForSubscriptions { get; set; } = true;
@@ -125,9 +128,13 @@ public class AppSettings
     public int ShownAnnouncementCount { get; set; }
     public string Country { get; set; } = "";
     public string ClientId { get; set; } = "";
+    public bool SendUsageStats { get; set; } = true;
+    public int ConnectCount { get; set; }
     public List<string> TunExcludedApps { get; set; } = new();
     public List<string> TunExcludedAppsDisabled { get; set; } = new();
     public bool BypassVpnWithoutTun { get; set; }
     public bool KillSwitchEnabled { get; set; }
     public bool TestsViaTun { get; set; }
+    public bool NotificationsEnabled { get; set; } = true;
+    public List<string> GroupOrder { get; set; } = new();
 }

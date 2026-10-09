@@ -16,6 +16,14 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty] private bool _showAdvancedDns;
     [ObservableProperty] private bool _useTunMode;
+    [ObservableProperty] private bool _enableSingBox;
+
+    partial void OnEnableSingBoxChanged(bool value)
+    {
+        _settings.EnableSingBox = value;
+        SaveSettings();
+    }
+
     [ObservableProperty] private bool _useProxyForSubscriptions;
 
     public string[] LanguageOptions { get; } = ["فارسی", "English", "العربية", "中文", "Русский", "Türkçe", "اردو", "Español", "Français", "한국어", "Deutsch", "日本語", "Português", "हिन्दी"];
@@ -29,7 +37,7 @@ public partial class MainViewModel : ViewModelBase
             Localization.TranslationManager.Instance.SetCulture(match.code);
             _settings.Language = match.code;
             SaveSettings();
-            RestartRequested?.Invoke();
+            RestartRequested?.Invoke("");
         }
     }
 
@@ -59,6 +67,7 @@ public partial class MainViewModel : ViewModelBase
     }
     partial void OnClearProxyOnDisconnectChanged(bool value) { _settings.ClearProxyOnDisconnect = value; SaveSettings(); }
     partial void OnAutoUpdateChanged(bool value) { _settings.AutoUpdate = value; SaveSettings(); }
+    partial void OnShowIpColumnChanged(bool value) { _settings.ShowIpColumn = value; SaveSettings(); }
     partial void OnAutoUpdateIntervalHoursChanged(int value)
     {
         _settings.AutoUpdateIntervalHours = Math.Clamp(value, 1, 168);
@@ -86,6 +95,8 @@ public partial class MainViewModel : ViewModelBase
     }
     partial void OnCustomDnsServersChanged(string value) { _settings.CustomDnsServers = value; SaveSettings(); }
     partial void OnCustomDnsAdvancedJsonChanged(string value) { _settings.CustomDnsAdvancedJson = value; SaveSettings(); }
+    private bool _tunConfirmPending;
+
     partial void OnUseTunModeChanged(bool value)
     {
         if (value && !AdminHelper.IsRunningAsAdmin())
@@ -94,8 +105,47 @@ public partial class MainViewModel : ViewModelBase
             ShowAdminWarningHandler?.Invoke();
             return;
         }
+        if (value && !_settings.TunConfirmed)
+        {
+            if (!_tunConfirmPending) _ = ConfirmTunEnableAsync();
+            return;
+        }
+        ApplyUseTunMode(value);
+    }
+
+    private async Task ConfirmTunEnableAsync()
+    {
+        _tunConfirmPending = true;
+        bool ok = false;
+        try
+        {
+            if (ConfirmTunEnableHandler != null)
+                ok = await ConfirmTunEnableHandler();
+        }
+        finally { _tunConfirmPending = false; }
+
+        if (ok)
+        {
+            // کاربر ممکن است در حین دیالوگ تیک را خاموش کرده باشد؛ در آن صورت
+            // اعمالِ دوبارهٔ TUN با UI ناهمخوان می‌شود و اتصال غیرمنتظره وصل/قطع می‌شود.
+            if (!UseTunMode) return;
+            _settings.TunConfirmed = true;
+            SaveSettings();
+            ApplyUseTunMode(true);
+        }
+        else if (UseTunMode)
+        {
+            UseTunMode = false;
+        }
+    }
+
+    private void ApplyUseTunMode(bool value)
+    {
+        bool changed = _settings.UseTunMode != value;
         _settings.UseTunMode = value;
         SaveSettings();
+
+        if (!changed) { _tunToggleReconnect = null; return; }
 
         if (IsConnected && !IsTesting)
         {
@@ -110,6 +160,25 @@ public partial class MainViewModel : ViewModelBase
     {
         _settings.UseProxyForSubscriptions = value;
         SaveSettings();
+    }
+
+    [ObservableProperty] private bool _sendUsageStats;
+
+    partial void OnSendUsageStatsChanged(bool value)
+    {
+        _settings.SendUsageStats = value;
+        SaveSettings();
+    }
+
+    public string DeviceId => _settings.ClientId;
+
+    [ObservableProperty] private bool _notificationsEnabled;
+
+    partial void OnNotificationsEnabledChanged(bool value)
+    {
+        _settings.NotificationsEnabled = value;
+        SaveSettings();
+        NotificationHelper.Enabled = value;
     }
 
     [ObservableProperty] private bool _testsViaTun;

@@ -59,7 +59,7 @@
   <data name="Btn_Export" xml:space="preserve"><value>📦 Экспорт</value></data>
   <data name="Btn_Import" xml:space="preserve"><value>📋 Импорт</value></data>
   <!-- Placeholders -->
-  <data name="Ph_ServerLink" xml:space="preserve"><value>Ссылка на сервер (vmess://, vless://, ...)</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>Ссылка на сервер (vmess://, vless://, ss://, trojan://)</value></data>
   <data name="Ph_SubName" xml:space="preserve"><value>Название</value></data>
   <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
   <!-- Sort -->
@@ -83,10 +83,6 @@
   <data name="Ctx_Delete" xml:space="preserve"><value>Удалить сервер</value></data>
   <data name="Ctx_ClearSel" xml:space="preserve"><value>Снять выделение</value></data>
   <!-- Add Menu -->
-  <data name="Add_VMess" xml:space="preserve"><value>🟢 Добавить VMess</value></data>
-  <data name="Add_VLESS" xml:space="preserve"><value>🔵 Добавить VLESS</value></data>
-  <data name="Add_SS" xml:space="preserve"><value>🟠 Добавить Shadowsocks</value></data>
-  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Добавить Trojan</value></data>
   <data name="Add_Clipboard" xml:space="preserve"><value>📋 Импорт из буфера обмена</value></data>
   <!-- Settings -->
   <data name="Set_Proxy" xml:space="preserve"><value>Установить системный прокси</value></data>
@@ -104,7 +100,6 @@
   <data name="Set_Every" xml:space="preserve"><value>Каждые</value></data>
   <data name="Set_Hours" xml:space="preserve"><value>часов обновлять</value></data>
   <data name="Set_Advanced" xml:space="preserve"><value>Дополнительные настройки</value></data>
-  <data name="Set_PingType" xml:space="preserve"><value>Тип пинга:</value></data>
   <data name="Set_GlobalSort" xml:space="preserve"><value>Глобальная сортировка (после теста лучший сервер из всех групп)</value></data>
   <data name="Set_DNS" xml:space="preserve"><value>Пользовательский DNS</value></data>
   <data name="Set_DNSBtn" xml:space="preserve"><value>⚙  Настройки DNS</value></data>
@@ -217,7 +212,6 @@
     <value>Горячие клавиши: Ctrl+Shift+C = Подключить | Ctrl+Shift+D = Отключить | Ctrl+Shift+S = Умное подключение | Ctrl+Shift+Q = Выход</value>
   </data>
 
-  <data name="Add_Link" xml:space="preserve"><value>Добавить</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>Обновление через прокси</value></data>
   <!-- Notifications -->
@@ -246,7 +240,75 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>Осталось {0} ч</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 Вручную</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>Сервер не выбран</value></data>
+  <data name="Set_Reports" xml:space="preserve">
+    <value>Отчёт об ошибке и проблеме</value>
+  </data>
+  <data name="Set_Reports_Desc" xml:space="preserve">
+    <value>Если приложение вылетело или вы столкнулись с проблемой, отчёт отправляется разработчику автоматически. Кнопкой ниже вы можете сами сообщить о проблеме с необязательным описанием; версия, ОС, ID устройства, состояние соединения и последний лог прилагаются автоматически.</value>
+  </data>
+  <data name="Btn_ReportBug" xml:space="preserve">
+    <value>Сообщить о проблеме...</value>
+  </data>
+  <data name="Dlg_ReportTitle" xml:space="preserve">
+    <value>Отчёт об ошибке и проблеме</value>
+  </data>
+  <data name="Dlg_ReportHint" xml:space="preserve">
+    <value>Опишите проблему (необязательно): что вы сделали и что произошло...</value>
+  </data>
+  <data name="Btn_SendReport" xml:space="preserve">
+    <value>Отправить отчёт</value>
+  </data>
+  <data name="Rpt_AutoInfo" xml:space="preserve">
+    <value>Автоматические сведения о приложении прилагаются без ваших действий:
+Версия {0} • {1}
+ID устройства {2}
+Состояние: {3}</value>
+  </data>
+  <data name="Rpt_StateOn" xml:space="preserve">
+    <value>Подключено к {0}</value>
+  </data>
+  <data name="Rpt_StateOff" xml:space="preserve">
+    <value>Отключено</value>
+  </data>
+  <data name="Log_ReportSent" xml:space="preserve">
+    <value>Отчёт о проблеме отправлен</value>
+  </data>
+  <data name="Toast_ReportSent" xml:space="preserve">
+    <value>Отчёт отправлен — спасибо</value>
+  </data>
+  <data name="Log_ReportFailed" xml:space="preserve">
+    <value>Не удалось отправить; отчёт в очереди и будет отправлен при следующем запуске</value>
+  </data>
+  <data name="Log_ReportFlushed" xml:space="preserve">
+    <value>Отправлено отчётов из очереди: {0}</value>
+  </data>
   <data name="Home_NotConnected" xml:space="preserve"><value>Не подключено</value></data>
+  <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>Интернет в порядке: прямой путь исправен; туннель не отвечает после смены сети</value></data>
+  <data name="Set_Privacy" xml:space="preserve"><value>Конфиденциальность</value></data>
+  <data name="Set_Stats" xml:space="preserve"><value>Отправлять статистику подключений в панель</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>Раз в 60 минут версия, язык, страна и ID устройства отправляются в панель для проверки обновлений. Если выключить, проверка обновлений продолжится, но ID и статистика отправляться не будут; имя компьютера никогда не отправляется.</value></data>
+  <data name="Set_DeviceId" xml:space="preserve"><value>ID устройства</value></data>
+  <data name="Set_DeviceId_Desc" xml:space="preserve"><value>Уникальный ID, созданный приложением для этой системы (не имя компьютера), отображается в панели управления.</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>Обнаружено остаточное соединение от предыдущего запуска.&amp;#10;Для полной очистки приложение нужно перезапустить от имени администратора.</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>Адаптер TUN не готов.</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>Маршруты TUN добавлены.</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>Не удалось добавить маршруты TUN: {0}</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>Движок соединения неожиданно остановлен</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>Обход VPN даже без TUN</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>Если включено, приложения из этого списка используют прямой интернет системы, даже когда VPN подключён через системный прокси (без TUN), вместо VPN.</value></data>
+  <data name="Set_KillSwitch" xml:space="preserve"><value>Глобальный kill switch</value></data>
+  <data name="Set_KillSwitch_Desc" xml:space="preserve"><value>Если VPN-туннель упадёт, весь интернет-трафик блокируется до возвращения VPN, чтобы ваш реальный адрес никогда не утек. Приложения из списка «Исключения TUN» остаются с прямым подключением.</value></data>
+  <data name="Set_KillSwitch_Add" xml:space="preserve"><value>Добавить приложение для защиты...</value></data>
+  <data name="Set_KillSwitch_Remove" xml:space="preserve"><value>Удалить из списка защиты</value></data>
+  <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>Пока не добавлено ни одного приложения для защиты</value></data>
+  <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>Нет подключения — весь трафик заблокирован ({0} приложений исключены)</value></data>
+  <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>VPN-соединение разорвано</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>Интернет заблокирован до переподключения VPN ({0} приложений исключены). Если он не вернётся, нажмите кнопку аварийной разблокировки.</value></data>
+  <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>VPN переподключён</value></data>
+  <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>Интернет снова работает</value></data>
+  <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>Аварийная разблокировка интернета</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>Если интернет не вернулся даже после нажатия кнопки разблокировки, дело не в kill switch — проверьте Wi-Fi/сеть Windows или перезагрузите систему.</value></data>
+  <data name="Home_SwitchingServer" xml:space="preserve"><value>Подключение к новому серверу</value></data>
   <data name="LastUpdate_DayAgo" xml:space="preserve"><value>Последнее обновление: {0} дн. назад</value></data>
   <data name="LastUpdate_HourAgo" xml:space="preserve"><value>Последнее обновление: {0} ч назад</value></data>
   <data name="LastUpdate_MinAgo" xml:space="preserve"><value>Последнее обновление: {0} мин назад</value></data>
@@ -270,7 +332,11 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>Установить</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>Загрузка обновления…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>Загрузка завершена; приложение закроется для установки</value></data>
+  <data name="Upd_Installing" xml:space="preserve"><value>Ъстановка обновления…</value></data>
+  <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>Не удалось загрузить обновление</value></data>
+  <data name="Btn_FullTest" xml:space="preserve"><value>Полный тест</value></data>
+  <data name="Status_GroupFullDone" xml:space="preserve"><value>Полный тест {0} завершён</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>Для продолжения установите новую версию</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>Закрыть</value></data>
   <data name="Ann_View" xml:space="preserve"><value>Просмотр</value></data>
@@ -284,7 +350,6 @@
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Удалить</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Приложения пока не добавлены</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>Переключить исключение для этого приложения</value></data>
-  <data name="Status_ClipboardAdded" xml:space="preserve"><value>Добавлено серверов из буфера: {0}</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Буфер обмена пуст</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Нет доступа к буферу обмена</value></data>
   <data name="Status_ConnectError" xml:space="preserve"><value>Ошибка подключения</value></data>
@@ -311,10 +376,8 @@
   <data name="Status_GroupSpeedDone" xml:space="preserve"><value>Тест скорости группы завершён (успешно: {0})</value></data>
   <data name="Status_GroupUpdate" xml:space="preserve"><value>Обновление группы «{0}» ({1} серверов) ...</value></data>
   <data name="Status_GroupUpdateDone" xml:space="preserve"><value>Обновление группы завершено (успешно: {0})</value></data>
-  <data name="Status_NewServerName" xml:space="preserve"><value>Новый сервер ({0})</value></data>
   <data name="Status_NoServerFromSub" xml:space="preserve"><value>Серверы от "{0}" не получены</value></data>
   <data name="Status_NoServers" xml:space="preserve"><value>Нет серверов</value></data>
-  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>В буфере обмена нет допустимой ссылки</value></data>
   <data name="Status_PingAll" xml:space="preserve"><value>Пинг {0} серверов ...</value></data>
   <data name="Status_PingDoneCount" xml:space="preserve"><value>Пинг завершён: ответили {0} из {1}</value></data>
   <data name="Status_PingSelDone" xml:space="preserve"><value>Пинг выбранных завершён (успешно: {0})</value></data>
@@ -325,7 +388,6 @@
   <data name="Status_RealDoneCount" xml:space="preserve"><value>Тест реальной задержки завершён: успешно {0} из {1}</value></data>
   <data name="Status_RealSelDone" xml:space="preserve"><value>Тест реальной задержки выбранных завершён (успешно: {0})</value></data>
   <data name="Status_RealSelected" xml:space="preserve"><value>Тест реальной задержки {0} выбранных серверов ...</value></data>
-  <data name="Status_ServerAdded" xml:space="preserve"><value>Сервер "{0}" добавлен</value></data>
   <data name="Status_ServersAdded" xml:space="preserve"><value>Добавлено серверов: {0}</value></data>
   <data name="Status_SmartBest" xml:space="preserve"><value>Умное подключение: лучший сервер → {0} ({1})</value></data>
   <data name="Status_SmartCancelled" xml:space="preserve"><value>Умное подключение отменено</value></data>
@@ -358,6 +420,7 @@
   <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>Ссылки серверов скопированы</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>Нет сервера для подключения</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>Ни один сервер из этой партии не ответил</value></data>
+  <data name="Toast_BatchAllInvalidDomains" xml:space="preserve"><value>Не удалось разрешить домены этой партии; ссылки недействительны</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>Ни один сервер не ответил</value></data>
   <data name="Toast_RealDelayFailed" xml:space="preserve"><value>Тест реальной задержки не удался</value></data>
   <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>Тест реальной задержки не подтвердил ни один сервер</value></data>
@@ -387,6 +450,7 @@
   <data name="Url_InvalidSs" xml:space="preserve"><value>Недопустимая ссылка Shadowsocks</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Недопустимая ссылка Trojan</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Недопустимая ссылка VLESS</value></data>
+  <data name="Url_InvalidVmess" xml:space="preserve"><value>Недопустимая ссылка VMess</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Поддерживаются только vmess / vless / ss / trojan</value></data>
   <data name="Url_UnsupportedTransport" xml:space="preserve"><value>транспорт не поддерживается: {0}</value></data>
   <data name="Url_InvalidParam" xml:space="preserve"><value>недопустимое значение параметра {0}: {1}</value></data>
@@ -395,6 +459,7 @@
   <data name="Log_FindNoMore" xml:space="preserve"><value>Поиск лучшего: больше нет серверов для тестирования</value></data>
   <data name="Log_FindNoSelection" xml:space="preserve"><value>Поиск лучшего: прерван — сервер не выбран</value></data>
   <data name="Log_FindNoSurvivors" xml:space="preserve"><value>Поиск лучшего: нет выживших после TCP-пинга</value></data>
+  <data name="Log_BatchDomainInvalid" xml:space="preserve"><value>Не удалось разрешить домен: {0}</value></data>
   <data name="Log_FindNotConnected" xml:space="preserve"><value>Поиск лучшего: прерван — нет подключения</value></data>
   <data name="Log_FindRealBatch" xml:space="preserve"><value>Поиск лучшего: тестируем {0} выживших пакетным multi-outbound</value></data>
   <data name="Log_FindRealFailedAll" xml:space="preserve"><value>Поиск лучшего: все тесты реальной задержки не пройдены</value></data>
@@ -462,4 +527,25 @@
 <data name="Hint_BypassTun" xml:space="preserve"><value>Примечание: тесты выполняются без применения TUN</value></data>
 <data name="Notify_TunOn" xml:space="preserve"><value>ROXA подключено</value></data>
 <data name="Notify_TunOff" xml:space="preserve"><value>ROXA отключено</value></data>
+  <data name="Set_Notifications" xml:space="preserve"><value>Уведомления Windows</value></data>
+  <data name="Set_Notifications_Desc" xml:space="preserve"><value>Показывать всплывающие уведомления рядом с часами Windows при подключении, отключении и ошибках.</value></data>
+  <data name="Tray_Notifications" xml:space="preserve"><value>Уведомления Windows</value></data>
+  <data name="Stg_Cleanup" xml:space="preserve"><value>Очистка предыдущего подключения ...</value></data>
+  <data name="Stg_Routes" xml:space="preserve"><value>Настройка маршрутов TUN ...</value></data>
+  <data name="Stg_Dns" xml:space="preserve"><value>Настройка DNS ...</value></data>
+  <data name="Stg_Engine" xml:space="preserve"><value>Подождите</value></data>
+  <data name="Toast_NoInternet" xml:space="preserve"><value>Интернет отключён</value></data>
+  <data name="SubFetch_Direct" xml:space="preserve"><value>Прямая загрузка (без прокси)...</value></data>
+  <data name="SubFetch_Proxy" xml:space="preserve"><value>Загрузка через прокси...</value></data>
+  <data name="SubFetch_SystemProxy" xml:space="preserve"><value>Загрузка через системный прокси...</value></data>
+  <data name="Log_SubHealDns" xml:space="preserve"><value>Восстановлено {0} устаревших DNS-адаптеров TUN</value></data>
+  <data name="Log_SubBypass" xml:space="preserve"><value>Обход TUN для прямой загрузки...</value></data>
+  <data name="Set_SingBox" xml:space="preserve"><value>Включить sing-box</value></data>
+  <data name="Set_SingBox_Desc" xml:space="preserve"><value>Ядро sing-box добавлено рядом с текущим движком. Включение пока только сохраняет настройку; поведение подключения не меняется.</value></data>
+  <data name="Dlg_ConfirmTun" xml:space="preserve"><value>Включить TUN</value></data>
+  <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>Когда TUN включён, весь системный трафик идёт через туннель, и приложению потребуются права администратора. Вы уверены?</value></data>
+  <data name="Set_Table" xml:space="preserve"><value>Таблица</value></data>
+  <data name="Set_ShowIp" xml:space="preserve"><value>Показывать столбец IP-адреса</value></data>
+  <data name="Set_ShowIp_Desc" xml:space="preserve"><value>Если включено, столбец IP-адреса отображается в таблице серверов.</value></data>
+<data name="Btn_Paste" xml:space="preserve"><value>Вставить из буфера обмена</value></data>
 </root>

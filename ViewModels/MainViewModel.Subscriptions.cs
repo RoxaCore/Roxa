@@ -14,6 +14,10 @@ namespace Roxa.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
 
+    /// <summary>آدرس پروکسیِ موتور برای دریافت اشتراک (فقط وقتی وصل باشد)؛
+    /// فقط تعیین‌کنندهٔ ترتیبِ زنجیرهٔ خودکار است، نه محدودیت.</summary>
+    private string? EngineSubProxy => IsConnected && _engine.HttpPort > 0 ? $"127.0.0.1:{_engine.HttpPort}" : null;
+
     private static string GuessSubName(string url)
     {
         try
@@ -40,7 +44,11 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = string.Format(TranslationManager.Instance["Status_Fetching"], name);
-            var (servers, subInfo) = await SubscriptionManager.FetchWithInfoAsync(url);
+            // زنجیرهٔ خودکار: پروکسی/مستقیم/پروکسی سیستم — قبلاً فقط یک مسیر زده می‌شد
+            // و شکستِ آن (مثلاً به‌خاطر DNS جاماندهٔ TUN) کل افزودن را خراب می‌کرد.
+            var (servers, subInfo) = await SubscriptionManager.FetchSmartAsync(
+                url, EngineSubProxy, preferDirect: !UseProxyForSubscriptions,
+                progress: s => { Status = s; AppendLog(s); });
             AppendLog(string.Format(TranslationManager.Instance["Log_FetchedCount"], servers.Count));
             var info = new SubscriptionInfo { Name = name, Url = url, LastUpdated = DateTime.Now, ServerCount = servers.Count };
             if (subInfo != null)
@@ -116,17 +124,16 @@ public partial class MainViewModel : ViewModelBase
         if (Subscriptions.Count == 0) { AppendLog(TranslationManager.Instance["Log_NoSub"]); return; }
         string? activeId = SelectedServer?.Id;
         int total = 0;
-        string? proxyAddress = !forceNoProxy && UseProxyForSubscriptions && IsConnected && _engine.HttpPort > 0 ? $"127.0.0.1:{_engine.HttpPort}" : null;
+        string? engineProxy = EngineSubProxy;
+        bool preferDirect = forceNoProxy || !UseProxyForSubscriptions;
         foreach (var sub in Subscriptions.ToList())
         {
             try
             {
                 Status = string.Format(TranslationManager.Instance["Status_Fetching"], sub.Name);
-                var (servers, subInfo) = proxyAddress != null
-                    ? await SubscriptionManager.FetchWithInfoAndProxyAsync(sub.Url, proxyAddress)
-                    : forceNoProxy
-                        ? await SubscriptionManager.FetchWithInfoDirectAsync(sub.Url)
-                        : await SubscriptionManager.FetchWithInfoAsync(sub.Url);
+                var (servers, subInfo) = await SubscriptionManager.FetchSmartAsync(
+                    sub.Url, engineProxy, preferDirect,
+                    progress: s => { Status = s; AppendLog(s); });
                 if (servers.Count == 0)
                 {
                     AppendLog(string.Format(TranslationManager.Instance["Log_FetchNoneKept"], sub.Name));
@@ -184,10 +191,9 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = string.Format(TranslationManager.Instance["Status_Fetching"], sub.Name);
-            string? proxyAddress = UseProxyForSubscriptions && IsConnected && _engine.HttpPort > 0 ? $"127.0.0.1:{_engine.HttpPort}" : null;
-            var (fetched, subInfo) = proxyAddress != null
-                ? await SubscriptionManager.FetchWithInfoAndProxyAsync(sub.Url, proxyAddress)
-                : await SubscriptionManager.FetchWithInfoAsync(sub.Url);
+            var (fetched, subInfo) = await SubscriptionManager.FetchSmartAsync(
+                sub.Url, EngineSubProxy, preferDirect: !UseProxyForSubscriptions,
+                progress: s => { Status = s; AppendLog(s); });
             if (fetched.Count == 0)
             {
                 AppendLog(string.Format(TranslationManager.Instance["Log_FetchNoneKept"], sub.Name));
@@ -288,7 +294,9 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = string.Format(TranslationManager.Instance["Status_Fetching"], sub.Name);
-            var (fetched, subInfo) = await SubscriptionManager.FetchWithInfoDirectAsync(sub.Url);
+            var (fetched, subInfo) = await SubscriptionManager.FetchSmartAsync(
+                sub.Url, EngineSubProxy, preferDirect: true,
+                progress: s => { Status = s; AppendLog(s); });
             if (fetched.Count == 0)
             {
                 AppendLog(string.Format(TranslationManager.Instance["Log_FetchNoneKept"], sub.Name));
@@ -346,6 +354,11 @@ public partial class MainViewModel : ViewModelBase
             Status = summary;
             AppendLog(summary);
             ToastHandler?.Invoke(summary);
+            // طبق درخواست: بعد از پایان عیب‌یابی، برنامه یک‌بار کامل بسته شود و در
+            // تب «اشتراکات» باز شود؛ تأخیر کوتاه تا خلاصه دیده شود و اتصال با
+            // --reconnect (توسط handler ری‌استارت) حفظ شود.
+            await Task.Delay(1800);
+            RestartRequested?.Invoke("--tab subscriptions");
         }
         catch (Exception ex)
         {

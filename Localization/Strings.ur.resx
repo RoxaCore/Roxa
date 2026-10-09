@@ -56,7 +56,7 @@
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ نقلیں ہٹائیں</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 برآمد</value></data>
   <data name="Btn_Import" xml:space="preserve"><value>📋 درآمد</value></data>
-  <data name="Ph_ServerLink" xml:space="preserve"><value>سرور لنک (vmess://, vless://, ...)</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>سرور لنک (vmess://, vless://, ss://, trojan://)</value></data>
   <data name="Ph_SubName" xml:space="preserve"><value>نام</value></data>
   <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
   <data name="Sort_None" xml:space="preserve"><value>کوئی ترتیب نہیں</value></data>
@@ -76,10 +76,6 @@
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>رفتار ٹیسٹ</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>سرور حذف</value></data>
   <data name="Ctx_ClearSel" xml:space="preserve"><value>انتخاب صاف کریں</value></data>
-  <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess شامل کریں</value></data>
-  <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS شامل کریں</value></data>
-  <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks شامل کریں</value></data>
-  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Trojan شامل کریں</value></data>
   <data name="Add_Clipboard" xml:space="preserve"><value>📋 کلپ بورڈ سے درآمد</value></data>
   <data name="Set_Proxy" xml:space="preserve"><value>سسٹم پراکسی سیٹ کریں</value></data>
   <data name="Set_AutoConnect" xml:space="preserve"><value>خودکار جڑیں</value></data>
@@ -96,7 +92,6 @@
   <data name="Set_Every" xml:space="preserve"><value>ہر</value></data>
   <data name="Set_Hours" xml:space="preserve"><value>گھنٹے میں اپ ڈیٹ</value></data>
   <data name="Set_Advanced" xml:space="preserve"><value>جدید ترتیبات</value></data>
-  <data name="Set_PingType" xml:space="preserve"><value>پنگ کی قسم:</value></data>
   <data name="Set_GlobalSort" xml:space="preserve"><value>عالمی ترتیب</value></data>
   <data name="Set_DNS" xml:space="preserve"><value>مخصوص DNS</value></data>
   <data name="Set_DNSBtn" xml:space="preserve"><value>⚙ DNS ترتیبات</value></data>
@@ -201,7 +196,6 @@
     <value>شورٹ کاٹس: Ctrl+Shift+C = جڑنا | Ctrl+Shift+D = توڑنا | Ctrl+Shift+S = اسمارٹ جڑنا | Ctrl+Shift+Q = باہر جانا</value>
   </data>
 
-  <data name="Add_Link" xml:space="preserve"><value>شامل کریں</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>اپڈیٹ کے لیے پراکسی استعمال کریں</value></data>
   <!-- Notifications -->
@@ -230,7 +224,75 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} گھنٹے باقی</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 دستی</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>کوئی سرور منتخب نہیں</value></data>
+  <data name="Set_Reports" xml:space="preserve">
+    <value>بگ اور مسئلے کی رپورٹ</value>
+  </data>
+  <data name="Set_Reports_Desc" xml:space="preserve">
+    <value>اگر ایپ کریش ہو گیا یا آپ کو کوئی مسئلہ ملا تو رپورٹ خودکار ڈویلپر کو بھیجی جاتی ہے۔ نیچے والے بٹن سے آپ خود بھی اختیاری تفصیل کے ساتھ مسئلہ رپورٹ کر سکتے ہیں؛ ورژن، آپریٹنگ سسٹم، ڈیوائس ID، کنکشن کی صورتحال اور حالیہ لاگ خودکار منسلک ہو جاتے ہیں۔</value>
+  </data>
+  <data name="Btn_ReportBug" xml:space="preserve">
+    <value>مسئلہ رپورٹ کریں...</value>
+  </data>
+  <data name="Dlg_ReportTitle" xml:space="preserve">
+    <value>بگ اور مسئلے کی رپورٹ</value>
+  </data>
+  <data name="Dlg_ReportHint" xml:space="preserve">
+    <value>مسئلہ بیان کریں (اختیاری): آپ نے کیا کیا اور کیا ہوا...</value>
+  </data>
+  <data name="Btn_SendReport" xml:space="preserve">
+    <value>رپورٹ بھیجیں</value>
+  </data>
+  <data name="Rpt_AutoInfo" xml:space="preserve">
+    <value>ایپ کی خودکار معلومات آپ کے کچھ کیے بغیر منسلک ہو جاتی ہیں:
+ورژن {0} • {1}
+ڈیوائس ID {2}
+صورتحال: {3}</value>
+  </data>
+  <data name="Rpt_StateOn" xml:space="preserve">
+    <value>{0} سے منسلک</value>
+  </data>
+  <data name="Rpt_StateOff" xml:space="preserve">
+    <value>غیر منسلک</value>
+  </data>
+  <data name="Log_ReportSent" xml:space="preserve">
+    <value>مسئلے کی رپورٹ بھیج دی گئی</value>
+  </data>
+  <data name="Toast_ReportSent" xml:space="preserve">
+    <value>رپورٹ بھیج دی گئی — شکریہ</value>
+  </data>
+  <data name="Log_ReportFailed" xml:space="preserve">
+    <value>بھیجنا ناکام؛ رپورٹ قطار میں رہی اور اگلی بار کھولنے پر بھیجی جائے گی</value>
+  </data>
+  <data name="Log_ReportFlushed" xml:space="preserve">
+    <value>قطار کی {0} رپورٹیں بھیج دی گئیں</value>
+  </data>
   <data name="Home_NotConnected" xml:space="preserve"><value>منقطع ہے</value></data>
+  <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>انٹرنٹ ٹھیک ہے: براہِ راست راستہ ٹھیک ہے، نیٹ ورک تبدیل ہونے کے بعد ٹنل جواب نہیں دیتا</value></data>
+  <data name="Set_Privacy" xml:space="preserve"><value>رازداری</value></data>
+  <data name="Set_Stats" xml:space="preserve"><value>کنکشن کے اعداد و شمار پینل کو بھیجیں</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>ہر 60 منٹ میں ایپ ورژن، زبان، ملک اور ڈیوائس ID اپڈیٹ چیک کے لیے پینل کو بھیجا جاتا ہے۔ اسے بند کرنے پر اپڈیٹ چیک جاری رہتا ہے مگر کوئی ID یا اعداد و شمار نہیں جاتے؛ آپ کا کمپیوٹر نام کبھی نہیں بھیجا جاتا۔</value></data>
+  <data name="Set_DeviceId" xml:space="preserve"><value>ڈیوائس ID</value></data>
+  <data name="Set_DeviceId_Desc" xml:space="preserve"><value>اس سسٹم کے لیے ایپ کی طرف سے بنایا گیا منفرد ID (آپ کا کمپیوٹر نام نہیں)، منتظمی پینل میں نظر آتا ہے۔</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>پچھلے رن سے بچا ہوا کنکشن ملا۔&amp;#10;مکمل صفائی کے لیے ایپ کو ایڈمن کے طور پر دوبارہ شروع کرنا ہوگا۔</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>TUN ایڈپٹر تیار نہیں ہے۔</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>TUN راستے شامل کیے گئے۔</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>TUN راستے شامل کرنے میں ناکامی: {0}</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>کنکشن انجن غیر متوقع طور پر رک گیا</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>TUN کے بغیر بھی VPN کو نظرانداز</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>آن ہونے پر، اس فہرست کے ایپس VPN کے سسٹم پراکسی (TUN کے بغیر) سے منسلک ہونے پر بھی VPN کے بجائے سسٹم کا براہ راست انٹرنیٹ استعمال کرتے ہیں۔</value></data>
+  <data name="Set_KillSwitch" xml:space="preserve"><value>عمومی کل سوئچ</value></data>
+  <data name="Set_KillSwitch_Desc" xml:space="preserve"><value>VPN ٹنل گرنے پر، آپ کا اصل پتہ کبھی لیک نہ ہو اس کے لیے VPN واپس آنے تک سارا انٹرنیٹ ٹریفک بلاک ہو جاتا ہے۔ 'TUN استثناء فہرست' کے ایپس براہ راست منسلک رہتے ہیں۔</value></data>
+  <data name="Set_KillSwitch_Add" xml:space="preserve"><value>حفاظت کے لیے ایپ شامل کریں...</value></data>
+  <data name="Set_KillSwitch_Remove" xml:space="preserve"><value>حفاظتی فہرست سے ہٹائیں</value></data>
+  <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>ابھی حفاظت کے لیے کوئی ایپ شامل نہیں ہوئی</value></data>
+  <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>منسلک نہیں — سارا ٹریفک بلاک ہے ({0} ایپ معاف)</value></data>
+  <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>VPN کنکشن ٹوٹ گیا</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>VPN کے دوبارہ منسلک ہونے تک انٹرنیٹ بلاک ہے ({0} ایپ معاف)۔ واپس نہ آئے تو یمی جاری رہائی بٹن دبائیں۔</value></data>
+  <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>VPN دوبارہ منسلک ہوا</value></data>
+  <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>انٹرنیٹ دوبارہ کام کر رہا ہے</value></data>
+  <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>یمی انٹرنیٹ رہائی</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>رہائی بٹن کے باوجود اگر انٹرنیٹ واپس نہ آئے تو مسئلہ کل سوئچ کا نہیں — Wi-Fi/Windows نیٹ ورک چیک کریں یا سسٹم ری اسٹارٹ کریں۔</value></data>
+  <data name="Home_SwitchingServer" xml:space="preserve"><value>نئے سرور سے منسلک ہو رہا ہے</value></data>
   <data name="LastUpdate_DayAgo" xml:space="preserve"><value>آخری تازہ کاری: {0} دن پہلے</value></data>
   <data name="LastUpdate_HourAgo" xml:space="preserve"><value>آخری تازہ کاری: {0} گھنٹہ پہلے</value></data>
   <data name="LastUpdate_MinAgo" xml:space="preserve"><value>آخری تازہ کاری: {0} منٹ پہلے</value></data>
@@ -254,7 +316,11 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>انسٹال کریں</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>اپ ڈیٹ ڈاؤن لوڈ ہو رہی ہے…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>ڈاؤن لوڈ مکمل؛ انسٹال کے لیے ایپ بند ہوگی</value></data>
+  <data name="Upd_Installing" xml:space="preserve"><value>اپ ڈیٹ انسٹال هو رهی هے…</value></data>
+  <data name="Upd_Percent" xml:space="preserve"><value>{0}٪</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>اپ ڈیٹ ڈاؤن لوڈ ناکام</value></data>
+  <data name="Btn_FullTest" xml:space="preserve"><value>مکمل ٹیسٹ</value></data>
+  <data name="Status_GroupFullDone" xml:space="preserve"><value>{0} کا مکمل ٹیسٹ مکمل ہو گیا</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>جاری رکھنے کے لیے نیا ورژن انسٹال کریں</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>بند کریں</value></data>
   <data name="Ann_View" xml:space="preserve"><value>دیکھیں</value></data>
@@ -268,7 +334,6 @@
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>حذف</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>ابھی کوئی ایپ شامل نہیں کی گئی</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>اس ایپ کو مستثنیٰ کرنے کی تبدیلی</value></data>
-  <data name="Status_ClipboardAdded" xml:space="preserve"><value>کلپ بورڈ سے {0} سرور شامل کیے گئے</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>کلپ بورڈ خالی ہے</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>کلپ بورڈ تک رسائی دستیاب نہیں</value></data>
   <data name="Status_ConnectError" xml:space="preserve"><value>جڑنے میں خرابی</value></data>
@@ -295,10 +360,8 @@
   <data name="Status_GroupSpeedDone" xml:space="preserve"><value>گروپ کا رفتار ٹیسٹ مکمل ({0} کامیاب)</value></data>
   <data name="Status_GroupUpdate" xml:space="preserve"><value>گروپ "{0}" تازہ کاری ہو رہی ہے ({1} سرور) ...</value></data>
   <data name="Status_GroupUpdateDone" xml:space="preserve"><value>گروپ تازہ کاری مکمل ({0} کامیاب)</value></data>
-  <data name="Status_NewServerName" xml:space="preserve"><value>نیا سرور ({0})</value></data>
   <data name="Status_NoServerFromSub" xml:space="preserve"><value>"{0}" سے کوئی سرور وصول نہیں ہوا</value></data>
   <data name="Status_NoServers" xml:space="preserve"><value>کوئی سرور نہیں</value></data>
-  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>کلپ بورڈ میں کوئی درست لنک نہیں</value></data>
   <data name="Status_PingAll" xml:space="preserve"><value>{0} سروروں کو پنگ کیا جا رہا ہے ...</value></data>
   <data name="Status_PingDoneCount" xml:space="preserve"><value>پنگ مکمل: {1} میں سے {0} نے جواب دیا</value></data>
   <data name="Status_PingSelDone" xml:space="preserve"><value>منتخبوں کا پنگ مکمل ({0} کامیاب)</value></data>
@@ -309,7 +372,6 @@
   <data name="Status_RealDoneCount" xml:space="preserve"><value>اصل تاخیر ٹیسٹ مکمل: {1} میں سے {0} کامیاب</value></data>
   <data name="Status_RealSelDone" xml:space="preserve"><value>منتخبوں کا اصل تاخیر ٹیسٹ مکمل ({0} کامیاب)</value></data>
   <data name="Status_RealSelected" xml:space="preserve"><value>منتخب {0} سروروں پر اصل تاخیر ٹیسٹ ...</value></data>
-  <data name="Status_ServerAdded" xml:space="preserve"><value>سرور "{0}" شامل کیا گیا</value></data>
   <data name="Status_ServersAdded" xml:space="preserve"><value>{0} سرور شامل کیے گئے</value></data>
   <data name="Status_SmartBest" xml:space="preserve"><value>سمارٹ جڑنا: بہترین سرور → {0} ({1})</value></data>
   <data name="Status_SmartCancelled" xml:space="preserve"><value>سمارٹ جڑنا منسوخ</value></data>
@@ -342,6 +404,7 @@
   <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>سرور کے لنکس کاپی ہو گئے</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>جڑنے کے لیے کوئی سرور دستیاب نہیں</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>اس بیچ میں کسی سرور نے جواب نہیں دیا</value></data>
+  <data name="Toast_BatchAllInvalidDomains" xml:space="preserve"><value>اس بیچ کے ڈومین resolve نہیں ہوئے؛ لنکس نامعتبر ہیں</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>کسی سرور نے جواب نہیں دیا</value></data>
   <data name="Toast_RealDelayFailed" xml:space="preserve"><value>اصل تاخیر کا ٹیسٹ ناکام رہا</value></data>
   <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>اصل تاخیر کے ٹیسٹ نے کسی سرور کی تصدیق نہیں کی</value></data>
@@ -371,6 +434,7 @@
   <data name="Url_InvalidSs" xml:space="preserve"><value>ناموز لنک Shadowsocks</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>ناموز لنک Trojan</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>ناموز لنک VLESS</value></data>
+  <data name="Url_InvalidVmess" xml:space="preserve"><value>ناموز لنک VMess</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>صرف vmess / vless / ss / trojan سپورٹ ہوتے ہیں</value></data>
   <data name="Url_UnsupportedTransport" xml:space="preserve"><value>ٹرانسپورٹ سپورٹڈ نہیں: {0}</value></data>
   <data name="Url_InvalidParam" xml:space="preserve"><value>پیرامیٹر {0} کے لیے نامعتبر قدر: {1}</value></data>
@@ -379,6 +443,7 @@
   <data name="Log_FindNoMore" xml:space="preserve"><value>بہترین تلاش: ٹیسٹ کے لیے مزید سرور نہیں بچے</value></data>
   <data name="Log_FindNoSelection" xml:space="preserve"><value>بہترین تلاش: روک دیا — کوئی سرور منتخب نہیں</value></data>
   <data name="Log_FindNoSurvivors" xml:space="preserve"><value>بہترین تلاش: TCP پنگ سے کوئی باقی نہیں رہا</value></data>
+  <data name="Log_BatchDomainInvalid" xml:space="preserve"><value>ڈومین resolve نہیں ہوا: {0}</value></data>
   <data name="Log_FindNotConnected" xml:space="preserve"><value>بہترین تلاش: روک دیا — منقطع ہیں</value></data>
   <data name="Log_FindRealBatch" xml:space="preserve"><value>بہترین تلاش: batch multi-outbound سے {0} باقی کا ٹیسٹ</value></data>
   <data name="Log_FindRealFailedAll" xml:space="preserve"><value>بہترین تلاش: تمام اصل تاخیر ٹیسٹ ناکام</value></data>
@@ -446,4 +511,25 @@
 <data name="Hint_BypassTun" xml:space="preserve"><value>نوٹ: ٹیسٹ TUN لاگو کیے بغیر چلتے ہیں</value></data>
 <data name="Notify_TunOn" xml:space="preserve"><value>ROXA منسلک ہو گیا</value></data>
 <data name="Notify_TunOff" xml:space="preserve"><value>ROXA منقطع ہو گیا</value></data>
+  <data name="Set_Notifications" xml:space="preserve"><value>ونڈوز اطلاعات</value></data>
+  <data name="Set_Notifications_Desc" xml:space="preserve"><value>کنیکٹ، ڈسکنیکٹ اور خرابیوں پر ونڈوز گھڑی کے قریب اطلاعات کے بلبلے دکھائیں۔</value></data>
+  <data name="Tray_Notifications" xml:space="preserve"><value>ونڈوز اطلاعات</value></data>
+  <data name="Stg_Cleanup" xml:space="preserve"><value>پځھلے کنکشن کی صفائی ...</value></data>
+  <data name="Stg_Routes" xml:space="preserve"><value>TUN روتس سیت ہو رهې ہین ...</value></data>
+  <data name="Stg_Dns" xml:space="preserve"><value>DNS ترتیب دیا جا رحا ہای، ...</value></data>
+  <data name="Stg_Engine" xml:space="preserve"><value>براہ کرم انتظار کریں</value></data>
+  <data name="Toast_NoInternet" xml:space="preserve"><value>انٹرنیٹ بند ہے</value></data>
+  <data name="SubFetch_Direct" xml:space="preserve"><value>براہِ راست حاصل (پراکسی کے بغیر)...</value></data>
+  <data name="SubFetch_Proxy" xml:space="preserve"><value>پراکسی کے ذریعے حاصل...</value></data>
+  <data name="SubFetch_SystemProxy" xml:space="preserve"><value>سسٹم پراکسی کے ذریعے حاصل...</value></data>
+  <data name="Log_SubHealDns" xml:space="preserve"><value>TUN کے باقی {0} DNS ایڈاپٹر مرمت ہوئے</value></data>
+  <data name="Log_SubBypass" xml:space="preserve"><value>براہِ راست حاصل کے لیے TUN سے بچ رہا ہے...</value></data>
+  <data name="Set_SingBox" xml:space="preserve"><value>sing-box فعال کریں</value></data>
+  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box کور موجود انجن کے ساتھ شامل کر دیا گیا ہے۔ فی الحال اسے فعال کرنے صرف سیٹنگ محفوظ ہوتی ہے؛ کنکشن کا رویہ نہیں بدلتا۔</value></data>
+  <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUN فعال کریں</value></data>
+  <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>TUN فعال ہونے پر پورا سسٹم ٹریفک ٹنل سے گزرتا ہے اور ایپ کو ایڈمنسٹریٹر کی اجازت درکار ہوگی. کیا آپ پکے ہیں?</value></data>
+  <data name="Set_Table" xml:space="preserve"><value>جدول</value></data>
+  <data name="Set_ShowIp" xml:space="preserve"><value>IP پتہ کالم دکھائیں</value></data>
+  <data name="Set_ShowIp_Desc" xml:space="preserve"><value>فعال ہونے پر، سروس ٹیبل میں IP پتہ کالم دکھایا جاتا ہے۔</value></data>
+<data name="Btn_Paste" xml:space="preserve"><value>کلپ بورد سے پیسٹ کریں</value></data>
 </root>

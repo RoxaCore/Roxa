@@ -16,13 +16,14 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void AddLink()
     {
-        string input = (ServerLink ?? "").Trim();
+        string input = UrlParser.UnwrapEncoded((ServerLink ?? "").Trim());
         if (input.Length == 0) return;
         int added = 0;
         int duplicates = 0;
         ServerInfo? lastAdded = null;
-        foreach (var line in input.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        foreach (var rawLine in input.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
+            string line = UrlParser.UnwrapEncoded(rawLine);
             if (!UrlParser.IsProtocolLink(line)) { AppendLog(TranslationManager.Instance["Log_InvalidLink"]); continue; }
             try
             {
@@ -63,70 +64,12 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task AddManualServer(string? protocol)
-    {
-        var server = new ServerInfo();
-        if (Enum.TryParse<ProxyProtocol>(protocol, out var p))
-            server.Protocol = p;
-        server.Name = string.Format(TranslationManager.Instance["Status_NewServerName"], protocol);
-
-        if (EditServerHandler != null && await EditServerHandler(server))
-        {
-            Enrich(server);
-            Servers.Insert(0, server);
-            server.IsHighlighted = true;
-            SaveServers();
-            SelectedServer = server;
-            RefreshGroups();
-            AppendLog(string.Format(TranslationManager.Instance["Log_ServerAdded"], server.Name));
-            Status = string.Format(TranslationManager.Instance["Status_ServerAdded"], server.Name);
-            ToastHandler?.Invoke(string.Format(TranslationManager.Instance["Status_ServerAdded"], server.Name));
-        }
-    }
-
-    [RelayCommand]
-    private async Task ImportFromClipboard()
+    private async Task PasteFromClipboard()
     {
         if (Clipboard == null) { Status = TranslationManager.Instance["Status_ClipboardNoAccess"]; return; }
         var text = await Clipboard.TryGetTextAsync();
         if (string.IsNullOrWhiteSpace(text)) { Status = TranslationManager.Instance["Status_ClipboardEmpty"]; return; }
-
-        int added = 0;
-        int duplicates = 0;
-        string? parseError = null;
-        foreach (var line in text.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-        {
-            if (!UrlParser.IsProtocolLink(line)) continue;
-            try
-            {
-                var server = UrlParser.Parse(line);
-                Enrich(server);
-                string cdk = DupeKey(server);
-                if (Servers.Any(s => string.Equals(DupeKey(s), cdk, StringComparison.Ordinal)))
-                {
-                    duplicates++;
-                    continue;
-                }
-                Servers.Insert(0, server);
-                server.IsHighlighted = true;
-                added++;
-            }
-            catch (FormatException ex) { parseError = ex.Message; }
-            catch { }
-        }
-        if (added > 0)
-        {
-            SaveServers();
-            RefreshGroups();
-            Status = string.Format(TranslationManager.Instance["Status_ClipboardAdded"], added);
-            ToastHandler?.Invoke(string.Format(TranslationManager.Instance["Status_ServersAdded"], added));
-        }
-        else if (duplicates > 0) { Status = string.Format(TranslationManager.Instance["Status_DupCount"], duplicates); }
-        else
-        {
-            Status = parseError ?? TranslationManager.Instance["Status_NoValidClipboardLink"];
-            if (parseError != null) ToastHandler?.Invoke(parseError);
-        }
+        ServerLink = UrlParser.UnwrapEncoded(text.Trim());
     }
 
      [RelayCommand]
@@ -172,8 +115,8 @@ public partial class MainViewModel : ViewModelBase
         var dupes = new List<ServerInfo>();
         foreach (var s in Servers)
         {
-            // همان کلید واحد شمارش (DupeKey): آدرس+پورت+پروتکل+ترنسپورت، بدون نام؛
-            // قبلاً Path/Host/SNI/Flow هم در کلید بودند پس شمارنده ۱۱ تا می‌داد ولی حذف صفر تا.
+            // همان کلید واحد شمارش (DupeKey = ServerInfo.GetDupeKey): همهٔ فیلدهای
+            // مؤثر بر اتصال، بدون نام و لینک؛ شمارش و حذف از یک تعریف واحد می‌آیند.
             if (!seen.Add(DupeKey(s))) dupes.Add(s);
         }
         foreach (var d in dupes)

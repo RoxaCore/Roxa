@@ -17,6 +17,7 @@ public partial class App : Application
     private TrayIcon? _trayIcon;
     private NativeMenuItem _smartItem = null!;
     private NativeMenuItem _proxyItem = null!;
+    private NativeMenuItem _notifItem = null!;
     private NativeMenuItem _showItem = null!;
     private NativeMenuItem _updateNoProxyItem = null!;
     private NativeMenuItem _updateProxyItem = null!;
@@ -34,14 +35,31 @@ public partial class App : Application
         TunKillSwitch.CleanupLeftovers();
         AppDomain.CurrentDomain.ProcessExit += (_, _) =>
         {
+            // آیکون سینی اول پاک شود؛ اگر کار دیگری کند/خطا بدهد نباید شبح بماند.
+            try { DisposeTray(); } catch { }
+            try { NotificationHelper.Cleanup(); } catch { }
             try { TunKillSwitch.Shutdown(); } catch { }
-            try { NotificationHelper.Cleanup(); DisposeTray(); } catch { }
             TunRecovery.EmergencyCleanup();
         };
-        AppDomain.CurrentDomain.UnhandledException += (_, _) =>
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
         {
+            // گزارش کرش: بخش خودکار (exception + stack + لاگ اخیر) در صف نوشته می‌شود
+            // و یا همین‌جا ارسال می‌شود یا در اجرای بعدی برنامه.
+            try
+            {
+                string tail = "";
+                try
+                {
+                    if (MainWindow?.DataContext is ViewModels.MainViewModel vm)
+                        tail = vm.GetLogTail(40);
+                }
+                catch { }
+                BugReport.ReportCrash(e.ExceptionObject as Exception, tail);
+            }
+            catch { }
+            try { DisposeTray(); } catch { }
+            try { NotificationHelper.Cleanup(); } catch { }
             try { TunKillSwitch.Shutdown(); } catch { }
-            try { NotificationHelper.Cleanup(); DisposeTray(); } catch { }
             TunRecovery.EmergencyCleanup();
         };
     }
@@ -68,8 +86,8 @@ public partial class App : Application
 
             desktop.ShutdownRequested += (_, _) =>
             {
+                try { DisposeTray(); } catch { }
                 try { TunKillSwitch.Shutdown(); } catch { }
-                DisposeTray();
                 TunRecovery.EmergencyCleanup();
             };
         }
@@ -122,6 +140,22 @@ public partial class App : Application
             }
         };
         menu.Add(_proxyItem);
+
+        _notifItem = new NativeMenuItem(TranslationManager.Get("Tray_Notifications"))
+        {
+            ToggleType = MenuItemToggleType.CheckBox,
+        };
+        if (MainWindow?.DataContext is MainViewModel vmNotif)
+            _notifItem.IsChecked = vmNotif.NotificationsEnabled;
+        _notifItem.Click += (_, _) =>
+        {
+            if (MainWindow?.DataContext is MainViewModel vm)
+            {
+                vm.NotificationsEnabled = !vm.NotificationsEnabled;
+                _notifItem.IsChecked = vm.NotificationsEnabled;
+            }
+        };
+        menu.Add(_notifItem);
 
         menu.Add(new NativeMenuItemSeparator());
 
@@ -178,7 +212,7 @@ public partial class App : Application
             if (MainWindow?.DataContext is not MainViewModel vm) return;
             // اگر ساخت آیکون تری شکست خورده باشد (مثلاً فایل ico موجود نیست) همهٔ
             // آیتم‌ها null می‌مانند و این تایمر هر ۲ ثانیه برنامه را crash می‌کرد.
-            if (_trayIcon == null || _smartItem == null || _proxyItem == null) return;
+            if (_trayIcon == null || _smartItem == null || _proxyItem == null || _notifItem == null) return;
 
             if (vm.IsSmartConnecting)
             {
@@ -197,6 +231,7 @@ public partial class App : Application
             }
 
             _proxyItem.IsChecked = vm.SetSystemProxy;
+            _notifItem.IsChecked = vm.NotificationsEnabled;
         };
         _traySyncTimer.Start();
     }
@@ -216,10 +251,18 @@ public partial class App : Application
     {
         Dispatcher.UIThread.Post(() =>
         {
-            DisposeTray();
-            if (MainWindow?.DataContext is MainViewModel vm)
-                vm.Shutdown();
-            MainWindow?.ForceClose();
+            try { DisposeTray(); } catch { }
+            try
+            {
+                if (MainWindow?.DataContext is MainViewModel vm)
+                    vm.Shutdown();
+            }
+            catch { }
+            finally
+            {
+                // حتی اگر توقف موتور خطا بدهد، پروسه نباید زامبی بماند.
+                try { MainWindow?.ForceClose(); } catch { }
+            }
         });
     }
 

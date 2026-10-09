@@ -12,8 +12,6 @@ using Roxa.Models;
 
 namespace Roxa.ViewModels;
 
-public enum PingType { Ping, TcpPing, RealDelay, HttpPing }
-
 public partial class MainViewModel : ViewModelBase
 {
     private readonly XrayEngine _engine = new();
@@ -24,11 +22,11 @@ public partial class MainViewModel : ViewModelBase
      public Func<ServerInfo, Task<bool>>? EditServerHandler { get; set; }
      public Func<string, string, Task>? ShowQrHandler { get; set; }
      public Func<string, Task<bool>>? ConfirmDeleteHandler { get; set; }
+     public Func<Task<bool>>? ConfirmTunEnableHandler { get; set; }
      public Action<string>? ToastHandler { get; set; }
      public Action? OpenDnsSettingsHandler { get; set; }
      public Action<ServerInfo>? FocusServerHandler { get; set; }
      public Action? SelectionRefreshHandler { get; set; }
-     public Action? ShowUpdateRequiredHandler { get; set; }
      public Func<Task<string?>>? PickTunExcludedAppHandler { get; set; }
 
     [ObservableProperty] private ObservableCollection<ServerInfo> _servers = new();
@@ -47,8 +45,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private bool _autoUpdateSubs;
     [ObservableProperty] private bool _autoUpdate;
     [ObservableProperty] private int _autoUpdateIntervalHours = 12;
-     [ObservableProperty] private PingType _selectedPingType = PingType.Ping;
-     public PingType[] PingTypeOptions { get; } = (PingType[])Enum.GetValues(typeof(PingType));
+    [ObservableProperty] private bool _showIpColumn;
       [ObservableProperty] private bool _isTesting;
       [ObservableProperty] private bool _isSmartConnecting;
       [ObservableProperty] private bool _isFindingBetter;
@@ -90,12 +87,11 @@ public partial class MainViewModel : ViewModelBase
      public bool HasDuplicates => DuplicateCount > 0;
 
      /// <summary>
-     /// مبنای واحد تشخیص تکراری برای شمارش، حذف و افزودن:
-     /// آدرس + پورت + پروتکل + ترنسپورت. نام سرور در کلید نیست تا دو نسخهٔ
-     /// یک گره با نام‌های متفاوت تکراری حساب شوند و شمارش دقیقاً با حذف یکی باشد.
+     /// مبنای واحد تشخیص تکراری برای شمارش، حذف و افزودن: ServerInfo.GetDupeKey —
+     /// آدرس + پورت + پروتکل + ترنسپورت + مسیر + حالت + امنیت + رمزنگاری +
+     /// احراز هویت و بقیهٔ فیلدهای مؤثر بر اتصال؛ نام و لینک در کلید نیستند.
      /// </summary>
-     public static string DupeKey(ServerInfo s) =>
-         $"{s.Address}:{s.Port}|{s.Protocol}|{s.Network}".ToLowerInvariant();
+     public static string DupeKey(ServerInfo s) => s.GetDupeKey();
 
       [ObservableProperty] private string _selectedSubscriptionName = "";
       [ObservableProperty] private string _sortField = TranslationManager.Instance["Sort_None"];
@@ -109,7 +105,8 @@ public partial class MainViewModel : ViewModelBase
       public string[] SortOptions => [TranslationManager.Instance["Sort_None"], TranslationManager.Instance["Sort_Latency"], TranslationManager.Instance["Sort_Speed"], TranslationManager.Instance["Sort_Name"]];
 
 
-    public event Action? RestartRequested;
+    // آرگومان اضافه (مثل --tab subscriptions) به فرمان relaunch پیوست می‌شود.
+    public event Action<string>? RestartRequested;
 
     private ServerInfo? DisplayServer => IsConnected ? _engine.CurrentServer ?? SelectedServer : SelectedServer;
 
@@ -143,6 +140,7 @@ public partial class MainViewModel : ViewModelBase
         AutoUpdateSubs = _settings.AutoUpdateSubs;
         AutoUpdate = _settings.AutoUpdate;
         AutoUpdateIntervalHours = _settings.AutoUpdateIntervalHours <= 0 ? 12 : _settings.AutoUpdateIntervalHours;
+        ShowIpColumn = _settings.ShowIpColumn;
         _sortField = _settings.SortField;
         _sortAscending = _settings.SortAscending;
         _globalSort = _settings.GlobalSort;
@@ -154,6 +152,15 @@ public partial class MainViewModel : ViewModelBase
         _bypassVpnWithoutTun = _settings.BypassVpnWithoutTun;
         _testsViaTun = _settings.TestsViaTun;
         Core.TestRouteBypass.TestsViaTun = _settings.TestsViaTun;
+        _notificationsEnabled = _settings.NotificationsEnabled;
+        Core.NotificationHelper.Enabled = _settings.NotificationsEnabled;
+        _sendUsageStats = _settings.SendUsageStats;
+        if (string.IsNullOrWhiteSpace(_settings.ClientId))
+        {
+            _settings.ClientId = Guid.NewGuid().ToString("D");
+            Core.Storage.SaveSettings(_settings);
+            OnPropertyChanged(nameof(DeviceId));
+        }
         if (_settings.UseTunMode && !Core.AdminHelper.IsRunningAsAdmin())
         {
             TunDisabledNeedsAdmin = true;
@@ -178,6 +185,7 @@ public partial class MainViewModel : ViewModelBase
                     TunExcludedApps.Add(new TunExcludedItem { Path = app, Name = Path.GetFileName(app), IsEnabled = false });
         TunExcludedEmpty = TunExcludedApps.Count == 0;
         KillSwitchEnabled = _settings.KillSwitchEnabled;
+        EnableSingBox = _settings.EnableSingBox;
         TunKillSwitch.StateChanged += OnKillSwitchStateChanged;
         TunKillSwitch.Configure(_settings.KillSwitchEnabled, _settings.TunExcludedApps, 0);
         foreach (var s in Storage.LoadSubscriptions())
@@ -218,6 +226,18 @@ public partial class MainViewModel : ViewModelBase
             });
         };
         AppendLog(string.Format(TranslationManager.Instance["Log_ServersLoaded"], Servers.Count, Subscriptions.Count));
+
+        // ارسال گزارش‌های در صف (کرشِ اجرای قبلی یا گزارشی که هنگام قطع شبکه ماند).
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                int n = await Core.BugReport.FlushPendingAsync(null);
+                if (n > 0)
+                    Post(() => AppendLog(string.Format(TranslationManager.Instance["Log_ReportFlushed"], n)));
+            }
+            catch { }
+        });
 
         _speedTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
         _speedTimer.Tick += (_, _) => UpdateLiveSpeed();
@@ -340,6 +360,7 @@ public partial class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(HomeAddress));
         OnPropertyChanged(nameof(HomeLatency));
         OnPropertyChanged(nameof(HomeSpeed));
+        OnPropertyChanged(nameof(ShowDisconnectedStatus));
         RefreshConnectionFlags();
         RefreshTestsBypassingTun();
         if (!value)
@@ -494,5 +515,9 @@ public partial class MainViewModel : ViewModelBase
     // ---------- سرور ----------
 
 
-      public void Shutdown() => _engine.Dispose();
+      public void Shutdown()
+      {
+          try { SaveServers(); } catch { }
+          _engine.Dispose();
+      }
  }

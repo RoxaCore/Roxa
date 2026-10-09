@@ -75,12 +75,12 @@ public partial class ServerInfo : ObservableObject
         return $"{val:F1}{Units[unit]}";
     }
 
-    [ObservableProperty] [property: JsonIgnore] private int _latencyMs = -1;
+    [ObservableProperty] private int _latencyMs = -1;
     [ObservableProperty] private int _realDelayMs = -1;
-    [ObservableProperty] [property: JsonIgnore] private int _pingMs = -1;
-    [ObservableProperty] [property: JsonIgnore] private double _downloadMbps = -1;
-    [ObservableProperty] [property: JsonIgnore] private double _realDelaySuccessRate = -1;
-    [ObservableProperty] [property: JsonIgnore] private int _realDelayJitter;
+    [ObservableProperty] private int _pingMs = -1;
+    [ObservableProperty] private double _downloadMbps = -1;
+    [ObservableProperty] private double _realDelaySuccessRate = -1;
+    [ObservableProperty] private int _realDelayJitter;
     [ObservableProperty] private string _countryCode = "";
     [ObservableProperty] [property: JsonIgnore] private bool _isSelected;
     [ObservableProperty] [property: JsonIgnore] private bool _isActiveConnection;
@@ -200,15 +200,37 @@ public partial class ServerInfo : ObservableObject
         get
         {
             string name = Name;
-            if (string.IsNullOrWhiteSpace(name)) return CountryCode.Length == 2 ? CountryCode : "Unknown";
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                string cnOnly = Core.GeoFlags.CountryName(CountryCode);
+                return cnOnly.Length > 0 ? cnOnly : (CountryCode.Length == 2 ? CountryCode : "Unknown");
+            }
 
             string shortName = RemoveCommonParts(name);
 
-            if (!string.IsNullOrEmpty(CountryCode) && shortName.StartsWith(CountryCode, StringComparison.OrdinalIgnoreCase))
-                return shortName;
-
             if (!string.IsNullOrEmpty(CountryCode))
-                return $"{CountryCode} {shortName}";
+            {
+                string cn = Core.GeoFlags.CountryName(CountryCode);
+
+                if (shortName.Equals(CountryCode, StringComparison.OrdinalIgnoreCase))
+                    return cn.Length > 0 ? cn : shortName;
+
+                if (shortName.StartsWith(CountryCode, StringComparison.OrdinalIgnoreCase))
+                {
+                    // کد به اسم چسبیده («DE-01») → «آلمان 01»؛ ولی اگر حرف بعدی بخشی از کلمه باشد
+                    // (مثل «India» با کد IN) دست نمی‌زنیم تا اسم خراب نشود.
+                    if (shortName.Length == CountryCode.Length)
+                        return cn.Length > 0 ? cn : shortName;
+                    if (!char.IsLetter(shortName[CountryCode.Length]) && cn.Length > 0)
+                    {
+                        string rest = shortName[CountryCode.Length..].TrimStart(Core.GeoFlags.SplitChars);
+                        if (rest.Length > 0) return $"{cn} {rest}";
+                    }
+                    return shortName;
+                }
+
+                if (cn.Length > 0) return $"{cn} {shortName}";
+            }
 
             return shortName;
         }
@@ -342,7 +364,7 @@ public partial class ServerInfo : ObservableObject
         _ => Protocol.ToString()
     };
 
-    [JsonIgnore] public List<int> LatencyHistory { get; } = new();
+    public List<int> LatencyHistory { get; set; } = new();
 
     [JsonIgnore]
     public string HistoryDisplay => LatencyHistory.Count == 0
@@ -351,13 +373,27 @@ public partial class ServerInfo : ObservableObject
 
     [JsonIgnore] public string LastTestedDisplay => LastTested == DateTime.MinValue ? "" : LastTested.ToString("HH:mm dd/MM");
 
+    [JsonIgnore] public double IpFontSize => IsActiveConnection ? 15 : 12;
+    [JsonIgnore] public double PingFontSize => IsActiveConnection ? 14 : 11;
+    [JsonIgnore] public double DelayFontSize => IsActiveConnection ? 14 : 11;
+    [JsonIgnore] public double SpeedFontSize => IsActiveConnection ? 15 : 12;
+    [JsonIgnore] public double ProtocolFontSize => IsActiveConnection ? 15 : 12;
+
     partial void OnLatencyMsChanged(int value) { OnPropertyChanged(nameof(LatencyDisplay)); OnPropertyChanged(nameof(LatencyColor)); OnPropertyChanged(nameof(HasLatency)); OnPropertyChanged(nameof(LatencyBgColor)); OnPropertyChanged(nameof(StatusColor)); }
     partial void OnPingMsChanged(int value) { OnPropertyChanged(nameof(PingDisplay)); OnPropertyChanged(nameof(PingSortKey)); OnPropertyChanged(nameof(PingBgColor)); OnPropertyChanged(nameof(PingTextColor)); }
     partial void OnRealDelayMsChanged(int value) { OnPropertyChanged(nameof(RealDelayDisplay)); OnPropertyChanged(nameof(RealDelaySortKey)); OnPropertyChanged(nameof(RealDelayBgColor)); OnPropertyChanged(nameof(RealDelayTextColor)); }
     partial void OnDownloadMbpsChanged(double value) { OnPropertyChanged(nameof(SpeedDisplay)); }
     partial void OnCountryCodeChanged(string value) { OnPropertyChanged(nameof(Flag)); OnPropertyChanged(nameof(ShortName)); }
     partial void OnIsCheckedChanged(bool value) => Owner?.UpdateSelectedCount();
-    partial void OnIsActiveConnectionChanged(bool value) => OnPropertyChanged(nameof(StatusColor));
+    partial void OnIsActiveConnectionChanged(bool value)
+    {
+        OnPropertyChanged(nameof(StatusColor));
+        OnPropertyChanged(nameof(IpFontSize));
+        OnPropertyChanged(nameof(PingFontSize));
+        OnPropertyChanged(nameof(DelayFontSize));
+        OnPropertyChanged(nameof(SpeedFontSize));
+        OnPropertyChanged(nameof(ProtocolFontSize));
+    }
 
     public void RecordLatency(int ms)
     {
@@ -478,6 +514,38 @@ public partial class ServerInfo : ObservableObject
         AllowInsecure = AllowInsecure,
         SubscriptionName = ""
     };
+
+    /// <summary>
+    /// کلید واحد تشخیص تکراری: همهٔ فیلدهای مؤثر بر پیکربندی اتصال — آدرس، پورت،
+    /// پروتکل، ترنسپورت، مسیر، حالت، امنیت، رمزنگاری، احراز هویت و پارامترهای لایهٔ
+    /// پروکسی. نام و لینک داخل کلید نیستند (دو لینک متفاوتِیک پیکربندی تکراری‌اند)؛
+    /// دو سرور با آدرس/پورت یکسان ولی هر فیلدمؤثر دیگر متفاوت، تکراری نیستند.
+    /// </summary>
+    public string GetDupeKey() => string.Join('|',
+        Protocol,
+        Address.ToLowerInvariant(),
+        Port,
+        Network.ToLowerInvariant(),
+        Mode,
+        Security.ToLowerInvariant(),
+        Encryption.ToLowerInvariant(),
+        Method.ToLowerInvariant(),
+        Flow.ToLowerInvariant(),
+        HeaderType,
+        ServiceName,
+        Host.ToLowerInvariant(),
+        SNI.ToLowerInvariant(),
+        Path,
+        UserId,
+        Password,
+        AlterId,
+        Fingerprint,
+        Alpn,
+        PublicKey,
+        ShortId,
+        SpiderX,
+        Seed,
+        Extra);
 
     public static int CompareByPriority(ServerInfo a, ServerInfo b)
     {

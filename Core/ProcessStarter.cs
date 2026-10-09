@@ -8,7 +8,6 @@ namespace Roxa.Core;
 
 public static class ProcessStarter
 {
-    private const uint CREATE_SUSPENDED = 0x00000004;
     private const uint CREATE_NO_WINDOW = 0x08000000;
     private const uint STARTF_USESTDHANDLES = 0x00000100;
     private const uint HANDLE_FLAG_INHERIT = 0x00000001;
@@ -75,9 +74,6 @@ public static class ProcessStarter
     private static extern bool SetHandleInformation(IntPtr hObject, uint dwMask, uint dwFlags);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern uint ResumeThread(IntPtr hThread);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
 
     [DllImport("kernel32.dll", SetLastError = true)]
@@ -115,7 +111,7 @@ public static class ProcessStarter
             };
             var cmd = BuildCommandLine(exePath, args);
             if (!CreateProcessW(null, cmd, IntPtr.Zero, IntPtr.Zero, true,
-                    CREATE_SUSPENDED | CREATE_NO_WINDOW, IntPtr.Zero, null, ref si, out var pi))
+                    CREATE_NO_WINDOW, IntPtr.Zero, null, ref si, out var pi))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
 
             hProcess = pi.hProcess;
@@ -128,8 +124,6 @@ public static class ProcessStarter
             if (job != null && !assigned)
                 TunManager.Log($"AssignProcessToJobObject failed: {Marshal.GetLastWin32Error()}");
 
-            if (ResumeThread(hThread) == 0xFFFFFFFF)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
             CloseHandle(hThread); hThread = IntPtr.Zero;
 
             Process process;

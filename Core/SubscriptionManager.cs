@@ -74,6 +74,93 @@ public static class SubscriptionManager
     public static Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoAndProxyAsync(string url, string proxyAddress, CancellationToken ct = default)
         => FetchWithRetryAsync(url, forceDirect: false, proxyAddress, ct);
 
+    /// <summary>هر تلاشِ هوشمند حداکثر اینقدر طول می‌کشد؛ کوتاه‌تر از مسیر قدیمی (۳۰s×۳)
+    /// تا زنجیرهٔ چندمسیره بیش از حد معطل نکند.</summary>
+    private const int SmartFetchTimeoutSeconds = 20;
+
+    /// <summary>
+    /// دریافت با زنجیرهٔ خودکار چندمسیره (مثل v2rayN): اول مسیرِ ترجیحی، بعد بقیهٔ
+    /// مسیرها بدون دخالت کاربر — «اگر بدون پروکسی نیاورد با پروکسی، و برعکس».
+    /// ترتیب: preferDirect یا پروکسیِ موتور (هرکدام اول) ← پروکسیِ سیستم‌پیش‌فرض.
+    /// اگر شکست ناشی از DNSِ جاماندهٔ TUN قبلی باشد، یک‌بار خودکار ترمیم می‌شود؛
+    /// قبلاً چنین حالتی فقط با ری‌استارت کامل برنامه درست می‌شد.
+    /// </summary>
+    public static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchSmartAsync(
+        string url, string? engineProxyAddress, bool preferDirect, Action<string>? progress = null, CancellationToken ct = default)
+    {
+        url = StripFragment(url);
+        EnsureHttpUrl(url);
+
+        // اگر DNSِ جاماندهٔ TUNِ قبلی جلوی resolve را بگیرد، همین اول ترمیم شود.
+        await TryHealDeadDnsAsync(progress);
+
+        // دور زدن TUN — خودمان یا بیگانه مثل v2rayN/sing-tun: مسیرِ میزبانِ اشتراک را
+        // مستقیم به گیت‌ویِ فیزیکی وصل می‌کنیم تا «دریافت مستقیم» واقعاً از زیرِ هر TUN
+        // بیرون برود؛ وگرنه پنل‌های ایرانی با خروجِ خارجی جواب نمی‌دهند.
+        string fetchHost = new Uri(url).Host;
+        using var bypass = await TestRouteBypass.BeginAsync(new[] { fetchHost });
+        if (bypass.HasRoutes) progress?.Invoke(TranslationManager.Get("Log_SubBypass"));
+
+        var modes = new List<(string Label, bool ForceDirect, string? Proxy)>();
+        void AddMode(string label, bool forceDirect, string? proxy)
+        {
+            foreach (var m in modes)
+                if (m.ForceDirect == forceDirect && string.Equals(m.Proxy, proxy, StringComparison.Ordinal)) return;
+            modes.Add((label, forceDirect, proxy));
+        }
+
+        string directLabel = TranslationManager.Get("SubFetch_Direct");
+        string proxyLabel = TranslationManager.Get("SubFetch_Proxy");
+        string systemLabel = TranslationManager.Get("SubFetch_SystemProxy");
+
+        if (preferDirect) AddMode(directLabel, forceDirect: true, null);
+        if (!string.IsNullOrEmpty(engineProxyAddress)) AddMode(proxyLabel, forceDirect: false, engineProxyAddress);
+        if (!preferDirect) AddMode(directLabel, forceDirect: true, null);
+        AddMode(systemLabel, forceDirect: false, null);
+
+        Exception? last = null;
+        foreach (var mode in modes)
+        {
+            ct.ThrowIfCancellationRequested();
+            progress?.Invoke(mode.Label);
+            try
+            {
+                return await FetchOnceAsync(url, mode.ForceDirect, mode.Proxy, ct, SmartFetchTimeoutSeconds);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                last = ex;
+                string path = mode.Proxy != null ? "engine-proxy" : mode.ForceDirect ? "direct" : "system-proxy";
+                TunManager.Log($"subscription fetch via {path} failed: {ex.Message}");
+                // شکستِ همه‌جانبه معمولاً تقصیر DNSِ 127.0.0.1 جامانده از نشست TUN قبلی است؛
+                // قبلاً فقط ری‌استارت (با TunRecovery) آن را درست می‌کرد.
+                await TryHealDeadDnsAsync(progress);
+            }
+        }
+        throw last ?? new InvalidOperationException("subscription fetch failed");
+    }
+
+    /// <summary>اگر DNS آداپترها به stub مردهٔ 127.0.0.1 اشاره می‌کند یک‌بار ترمیم می‌کند.</summary>
+    private static async Task TryHealDeadDnsAsync(Action<string>? progress)
+    {
+        string? msg = null;
+        try
+        {
+            // SweepDeadAdapters پروسهٔ PowerShell را اجرا می‌کند؛ روی رشتهٔ UI یخ چندثانیه‌ای می‌زد.
+            bool needsSweep = await Task.Run(() => !TunDns.IsStubListening());
+            if (!needsSweep) return;  // stub بالاست؛ تقصیر DNS نیست
+            int healed = await Task.Run(() => TunDns.SweepDeadAdapters(out _));
+            if (healed > 0)
+                msg = string.Format(TranslationManager.Get("Log_SubHealDns"), healed);
+        }
+        catch { }
+        if (msg != null)
+        {
+            TunManager.Log(msg);
+            progress?.Invoke(msg);
+        }
+    }
+
     private static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithRetryAsync(string url, bool forceDirect, string? proxyAddress, CancellationToken ct)
     {
         url = StripFragment(url);
@@ -91,10 +178,10 @@ public static class SubscriptionManager
         }
     }
 
-    private static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchOnceAsync(string url, bool forceDirect, string? proxyAddress, CancellationToken ct)
+    private static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchOnceAsync(string url, bool forceDirect, string? proxyAddress, CancellationToken ct, int timeoutSeconds = 30)
     {
         using var handler = CreateHandler(proxyAddress, forceDirect);
-        using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
+        using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(timeoutSeconds) };
         http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
         http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
         using var response = await http.GetAsync(url, ct);
@@ -310,9 +397,8 @@ public static class SubscriptionManager
         return list;
     }
 
-    /// <summary>کلید واحد تکراری: آدرس+پورت+پروتکل+ترنسپورت؛ نام داخل کلید نیست.</summary>
-    private static string DupeKey(ServerInfo s) =>
-        $"{s.Address}:{s.Port}|{s.Protocol}|{s.Network}".ToLowerInvariant();
+    /// <summary>کلید واحد تکراری: ServerInfo.GetDupeKey؛ نام داخل کلید نیست.</summary>
+    private static string DupeKey(ServerInfo s) => s.GetDupeKey();
 
     private static ServerInfo? FromConfigObject(JsonElement item)
     {

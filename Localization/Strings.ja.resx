@@ -56,7 +56,7 @@
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ 重複削除</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 エクスポート</value></data>
   <data name="Btn_Import" xml:space="preserve"><value>📋 インポート</value></data>
-  <data name="Ph_ServerLink" xml:space="preserve"><value>サーバーリンク (vmess://, vless://, ...)</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>サーバーリンク (vmess://, vless://, ss://, trojan://)</value></data>
   <data name="Ph_SubName" xml:space="preserve"><value>名前</value></data>
   <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
   <data name="Sort_None" xml:space="preserve"><value>ソートなし</value></data>
@@ -76,10 +76,6 @@
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>速度テスト</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>サーバー削除</value></data>
   <data name="Ctx_ClearSel" xml:space="preserve"><value>選択を解除</value></data>
-  <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess追加</value></data>
-  <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS追加</value></data>
-  <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks追加</value></data>
-  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Trojan追加</value></data>
   <data name="Add_Clipboard" xml:space="preserve"><value>📋 クリップボードからインポート</value></data>
   <data name="Set_Proxy" xml:space="preserve"><value>システムプロキシ設定</value></data>
   <data name="Set_AutoConnect" xml:space="preserve"><value>自動接続</value></data>
@@ -96,7 +92,6 @@
   <data name="Set_Every" xml:space="preserve"><value>毎</value></data>
   <data name="Set_Hours" xml:space="preserve"><value>時間更新</value></data>
   <data name="Set_Advanced" xml:space="preserve"><value>詳細設定</value></data>
-  <data name="Set_PingType" xml:space="preserve"><value>Pingタイプ:</value></data>
   <data name="Set_GlobalSort" xml:space="preserve"><value>グローバルソート（テスト後、全グループで最良のサーバーが上に表示）</value></data>
   <data name="Set_DNS" xml:space="preserve"><value>カスタムDNS</value></data>
   <data name="Set_DNSBtn" xml:space="preserve"><value>⚙ DNS設定</value></data>
@@ -201,7 +196,6 @@
     <value>ホットキー: Ctrl+Shift+C = 接続 | Ctrl+Shift+D = 切断 | Ctrl+Shift+S = スマート接続 | Ctrl+Shift+Q = 終了</value>
   </data>
 
-  <data name="Add_Link" xml:space="preserve"><value>追加</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>プロキシで更新</value></data>
   <!-- Notifications -->
@@ -230,7 +224,75 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>残り {0} 時間</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 手動</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>サーバー未選択</value></data>
+  <data name="Set_Reports" xml:space="preserve">
+    <value>バグ・問題レポート</value>
+  </data>
+  <data name="Set_Reports_Desc" xml:space="preserve">
+    <value>アプリがクラッシュした場合や問題が発生した場合は、レポートが自動的に開発者に送信されます。下のボタンから任意の説明とともに問題を報告できます。バージョン、OS、デバイスID、接続状態、最近のログは自動的に添付されます。</value>
+  </data>
+  <data name="Btn_ReportBug" xml:space="preserve">
+    <value>問題を報告...</value>
+  </data>
+  <data name="Dlg_ReportTitle" xml:space="preserve">
+    <value>バグ・問題レポート</value>
+  </data>
+  <data name="Dlg_ReportHint" xml:space="preserve">
+    <value>問題の説明（任意）：何をして、何が起きたか...</value>
+  </data>
+  <data name="Btn_SendReport" xml:space="preserve">
+    <value>レポートを送信</value>
+  </data>
+  <data name="Rpt_AutoInfo" xml:space="preserve">
+    <value>アプリの自動収集情報が、お客様の操作なしで添付されます：
+バージョン {0} • {1}
+デバイスID {2}
+状態: {3}</value>
+  </data>
+  <data name="Rpt_StateOn" xml:space="preserve">
+    <value>{0} に接続中</value>
+  </data>
+  <data name="Rpt_StateOff" xml:space="preserve">
+    <value>切断</value>
+  </data>
+  <data name="Log_ReportSent" xml:space="preserve">
+    <value>問題レポートを送信しました</value>
+  </data>
+  <data name="Toast_ReportSent" xml:space="preserve">
+    <value>レポートを送信しました — ありがとうございます</value>
+  </data>
+  <data name="Log_ReportFailed" xml:space="preserve">
+    <value>送信失敗。キューに保存され、次回起動時に送信されます</value>
+  </data>
+  <data name="Log_ReportFlushed" xml:space="preserve">
+    <value>キュー内の {0} 件のレポートを送信しました</value>
+  </data>
   <data name="Home_NotConnected" xml:space="preserve"><value>未接続</value></data>
+  <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>インターネットは問題ありません：直接経路は正常、ネットワーク変更後にトンネルが応答しません</value></data>
+  <data name="Set_Privacy" xml:space="preserve"><value>プライバシー</value></data>
+  <data name="Set_Stats" xml:space="preserve"><value>接続統計をパネルへ送信</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>60分ごとにアプリのバージョン、言語、国、デバイスIDを更新確認のためパネルへ送信します。オフにすると更新確認は続きますが、IDや統計は送信されず、コンピューター名が送信されることもありません。</value></data>
+  <data name="Set_DeviceId" xml:space="preserve"><value>デバイスID</value></data>
+  <data name="Set_DeviceId_Desc" xml:space="preserve"><value>このシステム用にアプリが生成した一意のID（コンピューター名ではありません）。管理パネルに表示されます。</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>以前の実行からの残留接続が見つかりました。&amp;#10;完全にクリーンアップするには、管理者として再起動する必要があります。</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>TUNアダプターの準備ができていません。</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>TUNルートを追加しました。</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>TUNルートの追加に失敗しました: {0}</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>接続エンジンが予期せず停止しました</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>TUNがなくてもVPNをバイパス</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>オンの場合、このリストのアプリはVPNがシステムプロキシ（TUNなし）経由で接続していても、VPNではなくシステムの直接インターネットを使用します。</value></data>
+  <data name="Set_KillSwitch" xml:space="preserve"><value>グローバルキルスイッチ</value></data>
+  <data name="Set_KillSwitch_Desc" xml:space="preserve"><value>VPNトンネルが切断されると、実際のアドレスが漏れないようVPNが戻るまですべてのインターネットトラフィックがブロックされます。「TUN除外リスト」のアプリは直接接続のままです。</value></data>
+  <data name="Set_KillSwitch_Add" xml:space="preserve"><value>保護するアプリを追加...</value></data>
+  <data name="Set_KillSwitch_Remove" xml:space="preserve"><value>保護リストから削除</value></data>
+  <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>保護するアプリはまだ追加されていません</value></data>
+  <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>未接続 — 全トラフィックがブロックされています（{0}つのアプリが除外）</value></data>
+  <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>VPN接続が切断されました</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>VPNが再接続するまでインターネットがブロックされています（{0}つのアプリが除外）。戻らない場合は緊急解放ボタンを押してください。</value></data>
+  <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>VPNに再接続しました</value></data>
+  <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>インターネットが再び動作しています</value></data>
+  <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>インターネット緊急解放</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>解放ボタンを押してもインターネットが戻らない場合、キルスイッチが原因ではありません。Wi-Fi/Windowsのネットワークを確認するか、システムを再起動してください。</value></data>
+  <data name="Home_SwitchingServer" xml:space="preserve"><value>新しいサーバーに接続中</value></data>
   <data name="LastUpdate_DayAgo" xml:space="preserve"><value>最終更新: {0}日前</value></data>
   <data name="LastUpdate_HourAgo" xml:space="preserve"><value>最終更新: {0}時間前</value></data>
   <data name="LastUpdate_MinAgo" xml:space="preserve"><value>最終更新: {0}分前</value></data>
@@ -254,7 +316,11 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>インストール</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>アップデートをダウンロード中…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>ダウンロード完了。インストールのためアプリを終了します</value></data>
+  <data name="Upd_Installing" xml:space="preserve"><value>アップデートをインストール中…</value></data>
+  <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>アップデートのダウンロードに失敗しました</value></data>
+  <data name="Btn_FullTest" xml:space="preserve"><value>フルテスト</value></data>
+  <data name="Status_GroupFullDone" xml:space="preserve"><value>{0} のフルテストが完了しました</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>続行するには新しいバージョンをインストールしてください</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>閉じる</value></data>
   <data name="Ann_View" xml:space="preserve"><value>表示</value></data>
@@ -268,7 +334,6 @@
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>削除</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>まだアプリが追加されていません</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>このアプリの除外を切り替える</value></data>
-  <data name="Status_ClipboardAdded" xml:space="preserve"><value>クリップボードから {0} 件のサーバーを追加しました</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>クリップボードは空です</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>クリップボードにアクセスできません</value></data>
   <data name="Status_ConnectError" xml:space="preserve"><value>接続エラー</value></data>
@@ -295,10 +360,8 @@
   <data name="Status_GroupSpeedDone" xml:space="preserve"><value>グループの速度テスト完了 ({0} 件成功)</value></data>
   <data name="Status_GroupUpdate" xml:space="preserve"><value>グループ「{0}」を更新中 ({1} 件) ...</value></data>
   <data name="Status_GroupUpdateDone" xml:space="preserve"><value>グループの更新完了 ({0} 件成功)</value></data>
-  <data name="Status_NewServerName" xml:space="preserve"><value>新しいサーバー ({0})</value></data>
   <data name="Status_NoServerFromSub" xml:space="preserve"><value>「{0}」からサーバーを取得できませんでした</value></data>
   <data name="Status_NoServers" xml:space="preserve"><value>サーバーがありません</value></data>
-  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>クリップボードに有効なリンクがありません</value></data>
   <data name="Status_PingAll" xml:space="preserve"><value>{0} 件のサーバーに ping 中 ...</value></data>
   <data name="Status_PingDoneCount" xml:space="preserve"><value>ピング完了: {1} 件中 {0} 件が応答</value></data>
   <data name="Status_PingSelDone" xml:space="preserve"><value>選択分のピング完了 ({0} 件成功)</value></data>
@@ -309,7 +372,6 @@
   <data name="Status_RealDoneCount" xml:space="preserve"><value>実レイテンシテスト完了: {1} 件中 {0} 件成功</value></data>
   <data name="Status_RealSelDone" xml:space="preserve"><value>選択分の実レイテンシテスト完了 ({0} 件成功)</value></data>
   <data name="Status_RealSelected" xml:space="preserve"><value>選択した {0} 件のサーバーの実レイテンシテスト ...</value></data>
-  <data name="Status_ServerAdded" xml:space="preserve"><value>サーバー「{0}」を追加しました</value></data>
   <data name="Status_ServersAdded" xml:space="preserve"><value>{0} 件のサーバーを追加しました</value></data>
   <data name="Status_SmartBest" xml:space="preserve"><value>スマート接続: 最良のサーバー → {0} ({1})</value></data>
   <data name="Status_SmartCancelled" xml:space="preserve"><value>スマート接続をキャンセルしました</value></data>
@@ -342,6 +404,7 @@
   <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>サーバーのリンクをコピーしました</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>接続できるサーバーがありません</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>このバッチ内のサーバーは応答しませんでした</value></data>
+  <data name="Toast_BatchAllInvalidDomains" xml:space="preserve"><value>このバッチのドメインを解決できませんでした。リンクが無効です</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>応答したサーバーがありません</value></data>
   <data name="Toast_RealDelayFailed" xml:space="preserve"><value>実レイテンシテストに失敗しました</value></data>
   <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>実レイテンシテストで確認できたサーバーがありません</value></data>
@@ -371,6 +434,7 @@
   <data name="Url_InvalidSs" xml:space="preserve"><value>無効な Shadowsocks リンクです</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>無効な Trojan リンクです</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>無効な VLESS リンクです</value></data>
+  <data name="Url_InvalidVmess" xml:space="preserve"><value>無効な VMess リンクです</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>対応は vmess / vless / ss / trojan のみです</value></data>
   <data name="Url_UnsupportedTransport" xml:space="preserve"><value>未対応のトランスポートです: {0}</value></data>
   <data name="Url_InvalidParam" xml:space="preserve"><value>パラメーター {0} の値が無効です: {1}</value></data>
@@ -379,6 +443,7 @@
   <data name="Log_FindNoMore" xml:space="preserve"><value>より良いサーバー検索: テストするサーバーがありません</value></data>
   <data name="Log_FindNoSelection" xml:space="preserve"><value>より良いサーバー検索: 中断 — サーバー未選択</value></data>
   <data name="Log_FindNoSurvivors" xml:space="preserve"><value>より良いサーバー検索: TCPピングの生存者がありません</value></data>
+  <data name="Log_BatchDomainInvalid" xml:space="preserve"><value>ドメインを解決できませんでした: {0}</value></data>
   <data name="Log_FindNotConnected" xml:space="preserve"><value>より良いサーバー検索: 中断 — 未接続です</value></data>
   <data name="Log_FindRealBatch" xml:space="preserve"><value>より良いサーバー検索: バッチ multi-outbound で生存 {0} 件をテスト</value></data>
   <data name="Log_FindRealFailedAll" xml:space="preserve"><value>より良いサーバー検索: すべての実レイテンシテストが失敗しました</value></data>
@@ -446,4 +511,25 @@
 <data name="Hint_BypassTun" xml:space="preserve"><value>注: テストはTUNを適用せずに実行されます</value></data>
 <data name="Notify_TunOn" xml:space="preserve"><value>ROXA に接続しました</value></data>
 <data name="Notify_TunOff" xml:space="preserve"><value>ROXA の接続が切れました</value></data>
+  <data name="Set_Notifications" xml:space="preserve"><value>Windows通知</value></data>
+  <data name="Set_Notifications_Desc" xml:space="preserve"><value>接続・切断・エラー時に Windows 時計の近くに通知バルーンを表示します。</value></data>
+  <data name="Tray_Notifications" xml:space="preserve"><value>Windows通知</value></data>
+  <data name="Stg_Cleanup" xml:space="preserve"><value>前の接続をクリーンアップ中 ...</value></data>
+  <data name="Stg_Routes" xml:space="preserve"><value>TUNルートを設定中 ...</value></data>
+  <data name="Stg_Dns" xml:space="preserve"><value>DNSを設定中 ...</value></data>
+  <data name="Stg_Engine" xml:space="preserve"><value>お待ちください</value></data>
+  <data name="Toast_NoInternet" xml:space="preserve"><value>インターネットが切断されています</value></data>
+  <data name="SubFetch_Direct" xml:space="preserve"><value>直接取得（プロキシなし）...</value></data>
+  <data name="SubFetch_Proxy" xml:space="preserve"><value>プロキシ経由で取得...</value></data>
+  <data name="SubFetch_SystemProxy" xml:space="preserve"><value>システムプロキシ経由で取得...</value></data>
+  <data name="Log_SubHealDns" xml:space="preserve"><value>TUNの残存DNSアダプター{0}件を修復しました</value></data>
+  <data name="Log_SubBypass" xml:space="preserve"><value>TUNを迂回して直接取得...</value></data>
+  <data name="Set_SingBox" xml:space="preserve"><value>sing-box を有効にする</value></data>
+  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box コアが既存のエンジンに加わりました。今のところ有効化しても設定の保存のみで、接続の動作は変わりません。</value></data>
+  <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUNを有効化</value></data>
+  <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>TUNを有効にすると、システム全体のトラフィックがトンネルを通過し、アプリに管理者権限が必要になります。よろしいですか？</value></data>
+  <data name="Set_Table" xml:space="preserve"><value>テーブル</value></data>
+  <data name="Set_ShowIp" xml:space="preserve"><value>IPアドレス列を表示</value></data>
+  <data name="Set_ShowIp_Desc" xml:space="preserve"><value>有効にすると、サーバーテーブルにIPアドレス列が表示されます。</value></data>
+<data name="Btn_Paste" xml:space="preserve"><value>クリップボードから貼り付け</value></data>
 </root>

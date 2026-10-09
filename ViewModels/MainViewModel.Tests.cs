@@ -44,6 +44,75 @@ public partial class MainViewModel : ViewModelBase
         });
     }
 
+    /// <summary>
+    /// سقف همزمانی «تست کامل» — عمدتاً کمتر از تست تک‌مرحله‌ای.
+    /// مرحلهٔ سرعت برای هر سرور یک پروسهٔ xray تازه می‌سازد؛ بالابردنش باعث
+    /// پرش ناگهانی CPU/رم و کندی کل سیستم می‌شود.
+    /// </summary>
+    private const int FullTestPingConcurrency = 4;
+    private const int FullTestSpeedConcurrency = 2;
+
+    /// <summary>مکث بین شروع سرورهای پشت‌سرهم (میلی‌ثانیه) تا اتصال‌ها/پروسه‌ها پلکانی بالا بیایند.</summary>
+    private const int FullTestStaggerMs = 75;
+
+    /// <summary>مکث بین مراحل سه‌گانه تا رشتهٔ UI نفس بکشد و پروسه‌های مرحلهٔ قبل بسته شوند.</summary>
+    private const int FullTestSettleMs = 300;
+
+    /// <summary>
+    /// اجرای پلکانی آیتم‌ها با سقف همزمانی و مکث کوتاه بین شروع‌ها.
+    /// برخلاف <c>Task.WhenAll</c> روی کل لیست، اینجا همهٔ تسک‌ها یک‌جا ساخته نمی‌شوند؛
+    /// هر آیتم پس از آزادشدن جای خالی و گذشت مکث، تازه شروع می‌شود.
+    /// به این ترتیب هم UI قفل نمی‌شود و هم منابع به‌یک‌باره اشباع نمی‌شوند.
+    /// </summary>
+    private static async Task RunThrottledAsync(
+        IReadOnlyList<ServerInfo> targets,
+        int concurrency,
+        int staggerMs,
+        CancellationToken ct,
+        Func<ServerInfo, Task> body)
+    {
+        using var sem = new SemaphoreSlim(Math.Max(1, concurrency));
+        var tasks = new List<Task>(targets.Count);
+
+        foreach (var s in targets)
+        {
+            if (ct.IsCancellationRequested) break;
+            try { await sem.WaitAsync(ct); }
+            catch (OperationCanceledException) { break; }
+
+            var captured = s;
+            tasks.Add(Task.Run(async () =>
+            {
+                try { await body(captured); }
+                catch { }
+                finally { try { sem.Release(); } catch { } }
+            }, CancellationToken.None));
+
+            if (staggerMs > 0)
+            {
+                try { await Task.Delay(staggerMs, ct); }
+                catch (OperationCanceledException) { break; }
+            }
+        }
+
+        try { await Task.WhenAll(tasks); }
+        catch { }
+    }
+
+    /// <summary>
+    /// توقف کوتاه برای دادن فرصت به رشتهٔ UI: رویدادهای عقب‌ماندهٔ CollectionChanged و
+    /// به‌روزرسانی Status تخلیه می‌شوند و پروسه‌های xray مرحلهٔ قبل فرصت بسته‌شدن پیدا می‌کنند.
+    /// </summary>
+    private static async Task SettleBeforeUiAsync(CancellationToken ct)
+    {
+        try
+        {
+            await Task.Yield();
+            await Task.Delay(FullTestSettleMs, ct);
+        }
+        catch (OperationCanceledException) { }
+    }
+
     private async Task RunRealDelayTestsAsync(IReadOnlyList<ServerInfo> targets, CancellationToken ct)
     {
         if (targets.Count == 0 || ct.IsCancellationRequested) return;
@@ -472,33 +541,29 @@ public partial class MainViewModel : ViewModelBase
              BeginTestProgress(targets.Count);
              Status = string.Format(TranslationManager.Instance["Status_GroupPing"], group!.Title, targets.Count);
              foreach (var s in targets) { s.LatencyMs = -1; s.PingMs = -1; }
-             using (var sem = new SemaphoreSlim(8))
+             await RunThrottledAsync(targets, FullTestPingConcurrency, FullTestStaggerMs, ct, async s =>
              {
-                 var tasks = targets.Select(async s =>
+                 try
                  {
-                     if (ct.IsCancellationRequested) return;
-                     await sem.WaitAsync(ct);
-                     try
-                     {
-                         var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port);
-                         if (!ct.IsCancellationRequested)
-                             Post(() => s.RecordPing(ok ? ms : -2));
-                     }
-                     catch { Post(() => s.RecordPing(-2)); }
-                     finally { try { sem.Release(); } catch { } TickTestProgress(); }
-                 });
-                 try { await Task.WhenAll(tasks); }
-                 catch (OperationCanceledException) { }
-             }
+                     var (ok, ms) = await LatencyTester.TcpAsync(s.Address, s.Port);
+                     if (!ct.IsCancellationRequested)
+                         Post(() => s.RecordPing(ok ? ms : -2));
+                 }
+                 catch { Post(() => s.RecordPing(-2)); }
+                 finally { TickTestProgress(); }
+             });
+             await SettleBeforeUiAsync(ct);
              AutoSortAfterTest("latency");
              EndTestProgress();
              if (ct.IsCancellationRequested) return;
 
              // ---- مرحله ۲: تأخیر واقعی ----
+             await SettleBeforeUiAsync(ct);
              BeginTestProgress(targets.Count);
              Status = string.Format(TranslationManager.Instance["Status_GroupReal"], group.Title, targets.Count);
              foreach (var s in targets) { s.RealDelayMs = -1; s.RealDelaySuccessRate = -1; s.RealDelayJitter = 0; }
              await RunRealDelayTestsAsync(targets, ct);
+             await SettleBeforeUiAsync(ct);
              AutoSortAfterTest("latency");
              EndTestProgress();
              if (ct.IsCancellationRequested) return;
@@ -507,26 +572,20 @@ public partial class MainViewModel : ViewModelBase
              BeginTestProgress(targets.Count);
              Status = string.Format(TranslationManager.Instance["Status_GroupSpeed"], group.Title, targets.Count);
              foreach (var s in targets) s.RecordSpeed(-1);
-             using (var sem = new SemaphoreSlim(SpeedTester.MaxConcurrency))
+             await RunThrottledAsync(targets, FullTestSpeedConcurrency, FullTestStaggerMs, ct, async s =>
              {
-                 var tasks = targets.Select(async s =>
+                 try
                  {
-                     if (ct.IsCancellationRequested) return;
-                     await sem.WaitAsync(ct);
-                     try
-                     {
-                         Post(() => Status = string.Format(TranslationManager.Instance["Status_TestSpeedOne"], s.Name));
-                         var speedResult = await SpeedTester.TestAsync(s, ct);
-                         Post(() => s.RecordSpeed(speedResult));
-                     }
-                     catch { Post(() => s.RecordSpeed(-2)); }
-                     finally { try { sem.Release(); } catch { } TickTestProgress(); }
-                 });
-                 try { await Task.WhenAll(tasks); }
-                 catch (OperationCanceledException) { }
-             }
+                     Post(() => Status = string.Format(TranslationManager.Instance["Status_TestSpeedOne"], s.Name));
+                     var speedResult = await SpeedTester.TestAsync(s, ct);
+                     Post(() => s.RecordSpeed(speedResult));
+                 }
+                 catch { Post(() => s.RecordSpeed(-2)); }
+                 finally { TickTestProgress(); }
+             });
              foreach (var s in targets)
                  if (s.DownloadMbps == -1) s.RecordSpeed(-2);
+             await SettleBeforeUiAsync(ct);
              AutoSortAfterTest("speed");
              EndTestProgress();
 

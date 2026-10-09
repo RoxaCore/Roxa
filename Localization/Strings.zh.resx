@@ -59,7 +59,7 @@
   <data name="Btn_Export" xml:space="preserve"><value>📦 导出</value></data>
   <data name="Btn_Import" xml:space="preserve"><value>📋 导入</value></data>
   <!-- Placeholders -->
-  <data name="Ph_ServerLink" xml:space="preserve"><value>服务器链接 (vmess://, vless://, ...)</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>服务器链接 (vmess://, vless://, ss://, trojan://)</value></data>
   <data name="Ph_SubName" xml:space="preserve"><value>名称</value></data>
   <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
   <!-- Sort -->
@@ -83,10 +83,6 @@
   <data name="Ctx_Delete" xml:space="preserve"><value>删除服务器</value></data>
   <data name="Ctx_ClearSel" xml:space="preserve"><value>清除选择</value></data>
   <!-- Add Menu -->
-  <data name="Add_VMess" xml:space="preserve"><value>🟢 添加 VMess</value></data>
-  <data name="Add_VLESS" xml:space="preserve"><value>🔵 添加 VLESS</value></data>
-  <data name="Add_SS" xml:space="preserve"><value>🟠 添加 Shadowsocks</value></data>
-  <data name="Add_Trojan" xml:space="preserve"><value>🔴 添加 Trojan</value></data>
   <data name="Add_Clipboard" xml:space="preserve"><value>📋 从剪贴板导入</value></data>
   <!-- Settings -->
   <data name="Set_Proxy" xml:space="preserve"><value>设置系统代理</value></data>
@@ -104,7 +100,6 @@
   <data name="Set_Every" xml:space="preserve"><value>每</value></data>
   <data name="Set_Hours" xml:space="preserve"><value>小时更新</value></data>
   <data name="Set_Advanced" xml:space="preserve"><value>高级设置</value></data>
-  <data name="Set_PingType" xml:space="preserve"><value>Ping 类型：</value></data>
   <data name="Set_GlobalSort" xml:space="preserve"><value>全局排序（测试后，最佳服务器从所有组中置顶）</value></data>
   <data name="Set_DNS" xml:space="preserve"><value>自定义 DNS</value></data>
   <data name="Set_DNSBtn" xml:space="preserve"><value>⚙  DNS 设置</value></data>
@@ -217,7 +212,6 @@
     <value>快捷键: Ctrl+Shift+C = 连接 | Ctrl+Shift+D = 断开 | Ctrl+Shift+S = 智能连接 | Ctrl+Shift+Q = 退出</value>
   </data>
 
-  <data name="Add_Link" xml:space="preserve"><value>添加</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>通过代理更新</value></data>
   <!-- Notifications -->
@@ -246,7 +240,75 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>剩余 {0} 小时</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 手动</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>未选择服务器</value></data>
+  <data name="Set_Reports" xml:space="preserve">
+    <value>漏洞与问题报告</value>
+  </data>
+  <data name="Set_Reports_Desc" xml:space="preserve">
+    <value>如果程序崩溃或您遇到问题，报告会自动发送给开发者。通过下方按钮，您也可以自行报告问题并附上可选描述；版本、操作系统、设备 ID、连接状态和最近日志会自动附加。</value>
+  </data>
+  <data name="Btn_ReportBug" xml:space="preserve">
+    <value>报告问题...</value>
+  </data>
+  <data name="Dlg_ReportTitle" xml:space="preserve">
+    <value>漏洞与问题报告</value>
+  </data>
+  <data name="Dlg_ReportHint" xml:space="preserve">
+    <value>描述问题（可选）：您做了什么、出现了什么...</value>
+  </data>
+  <data name="Btn_SendReport" xml:space="preserve">
+    <value>发送报告</value>
+  </data>
+  <data name="Rpt_AutoInfo" xml:space="preserve">
+    <value>程序自动收集的信息将无需您任何操作即被附加：
+版本 {0} • {1}
+设备 ID {2}
+状态：{3}</value>
+  </data>
+  <data name="Rpt_StateOn" xml:space="preserve">
+    <value>已连接到 {0}</value>
+  </data>
+  <data name="Rpt_StateOff" xml:space="preserve">
+    <value>未连接</value>
+  </data>
+  <data name="Log_ReportSent" xml:space="preserve">
+    <value>问题报告已发送</value>
+  </data>
+  <data name="Toast_ReportSent" xml:space="preserve">
+    <value>报告已发送 — 感谢</value>
+  </data>
+  <data name="Log_ReportFailed" xml:space="preserve">
+    <value>发送失败；报告已排队，将在下次启动时发送</value>
+  </data>
+  <data name="Log_ReportFlushed" xml:space="preserve">
+    <value>已发送 {0} 条排队报告</value>
+  </data>
   <data name="Home_NotConnected" xml:space="preserve"><value>未连接</value></data>
+  <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>网络正常：直连路径健康；切换网络后隧道无响应</value></data>
+  <data name="Set_Privacy" xml:space="preserve"><value>隐私</value></data>
+  <data name="Set_Stats" xml:space="preserve"><value>向面板发送连接统计</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>每60分钟将版本、语言、国家/地区和设备 ID 发送到面板以检查更新。关闭后仍会检查更新，但不会发送任何 ID 或统计信息；计算机名称永不发送。</value></data>
+  <data name="Set_DeviceId" xml:space="preserve"><value>设备 ID</value></data>
+  <data name="Set_DeviceId_Desc" xml:space="preserve"><value>程序为本系统生成的唯一 ID（不是计算机名称），在管理面板中显示。</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>发现上次运行残留的连接。&amp;#10;要完全清理，需要以管理员身份重新启动程序。</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>TUN 适配器未就绪。</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>已添加 TUN 路由。</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>添加 TUN 路由失败：{0}</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>连接引擎意外停止</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>即使无 TUN 也绕过 VPN</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>开启后，此列表中的应用即使 VPN 通过系统代理（无 TUN）连接，也使用系统直连网络而非 VPN。</value></data>
+  <data name="Set_KillSwitch" xml:space="preserve"><value>全局断网开关</value></data>
+  <data name="Set_KillSwitch_Desc" xml:space="preserve"><value>VPN 隧道断开时，所有互联网流量将被阻止直到 VPN 恢复，以防真实地址泄露。「TUN 排除列表」中的应用保持直连。</value></data>
+  <data name="Set_KillSwitch_Add" xml:space="preserve"><value>添加要保护的应用...</value></data>
+  <data name="Set_KillSwitch_Remove" xml:space="preserve"><value>从保护列表中移除</value></data>
+  <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>尚未添加受保护的应用</value></data>
+  <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>未连接——所有流量已阻止（{0} 个应用豁免）</value></data>
+  <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>VPN 连接已断开</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>互联网已被阻止，直到 VPN 重新连接（{0} 个应用豁免）。如未恢复，请按紧急放行按钮。</value></data>
+  <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>VPN 已重新连接</value></data>
+  <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>网络已恢复</value></data>
+  <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>紧急放行网络</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>即使按了放行按钮网络仍未恢复，问题不在断网开关——请检查 Wi-Fi/Windows 网络或重启系统。</value></data>
+  <data name="Home_SwitchingServer" xml:space="preserve"><value>正在连接到新服务器</value></data>
   <data name="LastUpdate_DayAgo" xml:space="preserve"><value>上次更新：{0} 天前</value></data>
   <data name="LastUpdate_HourAgo" xml:space="preserve"><value>上次更新：{0} 小时前</value></data>
   <data name="LastUpdate_MinAgo" xml:space="preserve"><value>上次更新：{0} 分钟前</value></data>
@@ -270,7 +332,11 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>安装</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>正在下载更新…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>下载完成；应用将关闭以进行安装</value></data>
+  <data name="Upd_Installing" xml:space="preserve"><value>正在安装更新…</value></data>
+  <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>更新下载失败</value></data>
+  <data name="Btn_FullTest" xml:space="preserve"><value>完整测试</value></data>
+  <data name="Status_GroupFullDone" xml:space="preserve"><value>{0} 的完整测试已完成</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>您必须安装新版本才能继续</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>关闭</value></data>
   <data name="Ann_View" xml:space="preserve"><value>查看</value></data>
@@ -284,7 +350,6 @@
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>删除</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>尚未添加任何应用</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>切换此应用的排除</value></data>
-  <data name="Status_ClipboardAdded" xml:space="preserve"><value>从剪贴板添加了 {0} 个服务器</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>剪贴板为空</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>无法访问剪贴板</value></data>
   <data name="Status_ConnectError" xml:space="preserve"><value>连接错误</value></data>
@@ -311,10 +376,8 @@
   <data name="Status_GroupSpeedDone" xml:space="preserve"><value>组测速完成（{0} 成功）</value></data>
   <data name="Status_GroupUpdate" xml:space="preserve"><value>正在更新组“{0}”（{1} 个服务器）...</value></data>
   <data name="Status_GroupUpdateDone" xml:space="preserve"><value>组更新完成（{0} 成功）</value></data>
-  <data name="Status_NewServerName" xml:space="preserve"><value>新服务器 ({0})</value></data>
   <data name="Status_NoServerFromSub" xml:space="preserve"><value>未从“{0}”获取服务器</value></data>
   <data name="Status_NoServers" xml:space="preserve"><value>没有服务器</value></data>
-  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>剪贴板中没有有效链接</value></data>
   <data name="Status_PingAll" xml:space="preserve"><value>正在 Ping {0} 个服务器...</value></data>
   <data name="Status_PingDoneCount" xml:space="preserve"><value>Ping 完成：{1} 个中 {0} 个响应</value></data>
   <data name="Status_PingSelDone" xml:space="preserve"><value>所选项 Ping 完成（{0} 成功）</value></data>
@@ -325,7 +388,6 @@
   <data name="Status_RealDoneCount" xml:space="preserve"><value>真实延迟测试完成：{1} 个中 {0} 个成功</value></data>
   <data name="Status_RealSelDone" xml:space="preserve"><value>所选项真实延迟测试完成（{0} 成功）</value></data>
   <data name="Status_RealSelected" xml:space="preserve"><value>对 {0} 个所选服务器真实延迟测试...</value></data>
-  <data name="Status_ServerAdded" xml:space="preserve"><value>已添加服务器“{0}”</value></data>
   <data name="Status_ServersAdded" xml:space="preserve"><value>已添加 {0} 个服务器</value></data>
   <data name="Status_SmartBest" xml:space="preserve"><value>智能连接：最佳服务器 → {0} ({1})</value></data>
   <data name="Status_SmartCancelled" xml:space="preserve"><value>智能连接已取消</value></data>
@@ -358,6 +420,7 @@
   <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>服务器链接已复制</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>没有可连接的服务器</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>本批次中没有服务器响应</value></data>
+  <data name="Toast_BatchAllInvalidDomains" xml:space="preserve"><value>此批次的域名无法解析；链接无效</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>没有服务器响应</value></data>
   <data name="Toast_RealDelayFailed" xml:space="preserve"><value>真实延迟测试失败</value></data>
   <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>真实延迟测试未确认任何服务器</value></data>
@@ -387,6 +450,7 @@
   <data name="Url_InvalidSs" xml:space="preserve"><value>无效的 Shadowsocks 链接</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>无效的 Trojan 链接</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>无效的 VLESS 链接</value></data>
+  <data name="Url_InvalidVmess" xml:space="preserve"><value>无效的 VMess 链接</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>仅支持 vmess / vless / ss / trojan</value></data>
   <data name="Url_UnsupportedTransport" xml:space="preserve"><value>不支持的传输方式：{0}</value></data>
   <data name="Url_InvalidParam" xml:space="preserve"><value>参数 {0} 的值无效：{1}</value></data>
@@ -395,6 +459,7 @@
   <data name="Log_FindNoMore" xml:space="preserve"><value>寻找更优：没有可测试的服务器了</value></data>
   <data name="Log_FindNoSelection" xml:space="preserve"><value>寻找更优：已阻止 — 未选择服务器</value></data>
   <data name="Log_FindNoSurvivors" xml:space="preserve"><value>寻找更优：TCP Ping 后无存活服务器</value></data>
+  <data name="Log_BatchDomainInvalid" xml:space="preserve"><value>域名解析失败：{0}</value></data>
   <data name="Log_FindNotConnected" xml:space="preserve"><value>寻找更优：已阻止 — 未连接</value></data>
   <data name="Log_FindRealBatch" xml:space="preserve"><value>寻找更优：通过批量 multi-outbound 测试 {0} 个存活</value></data>
   <data name="Log_FindRealFailedAll" xml:space="preserve"><value>寻找更优：所有真实延迟测试均失败</value></data>
@@ -462,4 +527,25 @@
 <data name="Hint_BypassTun" xml:space="preserve"><value>注意：测试在不应用 TUN 的情况下运行</value></data>
 <data name="Notify_TunOn" xml:space="preserve"><value>ROXA 已连接</value></data>
 <data name="Notify_TunOff" xml:space="preserve"><value>ROXA 已断开</value></data>
+  <data name="Set_Notifications" xml:space="preserve"><value>Windows 通知</value></data>
+  <data name="Set_Notifications_Desc" xml:space="preserve"><value>在连接、断开和错误时于 Windows 时钟旁显示通知气泡。</value></data>
+  <data name="Tray_Notifications" xml:space="preserve"><value>Windows 通知</value></data>
+  <data name="Stg_Cleanup" xml:space="preserve"><value>正在清理之前的连接 ...</value></data>
+  <data name="Stg_Routes" xml:space="preserve"><value>正在设置 TUN 路由 ...</value></data>
+  <data name="Stg_Dns" xml:space="preserve"><value>正在配置 DNS ...</value></data>
+  <data name="Stg_Engine" xml:space="preserve"><value>请稍候</value></data>
+  <data name="Toast_NoInternet" xml:space="preserve"><value>网络已断开</value></data>
+  <data name="SubFetch_Direct" xml:space="preserve"><value>直接获取（无代理）...</value></data>
+  <data name="SubFetch_Proxy" xml:space="preserve"><value>通过代理获取...</value></data>
+  <data name="SubFetch_SystemProxy" xml:space="preserve"><value>通过系统代理获取...</value></data>
+  <data name="Log_SubHealDns" xml:space="preserve"><value>已修复 {0} 个 TUN 残留 DNS 适配器</value></data>
+  <data name="Log_SubBypass" xml:space="preserve"><value>绕过 TUN 直接获取...</value></data>
+  <data name="Set_SingBox" xml:space="preserve"><value>启用 sing-box</value></data>
+  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box 内核已与当前引擎并列添加。目前启用仅保存设置，连接行为不会改变。</value></data>
+  <data name="Dlg_ConfirmTun" xml:space="preserve"><value>启用 TUN</value></data>
+  <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>启用 TUN 后，整个系统的流量都将通过隧道传输，并且应用程序需要管理员权限。确定继续吗？</value></data>
+  <data name="Set_Table" xml:space="preserve"><value>表格</value></data>
+  <data name="Set_ShowIp" xml:space="preserve"><value>显示 IP 地址列</value></data>
+  <data name="Set_ShowIp_Desc" xml:space="preserve"><value>启用后，服务器表格中将显示 IP 地址列。</value></data>
+<data name="Btn_Paste" xml:space="preserve"><value>从剪贴板粘贴</value></data>
 </root>

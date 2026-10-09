@@ -13,24 +13,44 @@ if ($c === null) {
     exit;
 }
 
+$tmpRows = [$c];
+ip_fill($tmpRows, 1, 3.0);
+$c = $tmpRows[0];
+
 $now = time();
 $t = strtotime((string)($c['last'] ?? '')) ?: 0;
 $f = strtotime((string)($c['first'] ?? '')) ?: 0;
 $status = 'غیرفعال';
 $statusCls = 'b-off';
-if ($t > 0 && $now - $t <= 86400) {
+if ($t > 0 && $now - $t <= 1200) {
+    $status = 'آنلاین';
+    $statusCls = 'b-live';
+} elseif ($t > 0 && $now - $t <= 86400) {
     $status = 'فعال (۲۴ ساعت)';
-    $statusCls = 'b-on';
+    $statusCls = 'b-info';
 } elseif ($t > 0 && $now - $t <= 604800) {
     $status = 'فعال (۷ روز)';
-    $statusCls = 'b-info';
+    $statusCls = 'b-warn';
 }
+
+$dev = (string)($c['dev'] ?? '');
+$isp = (string)($c['isp'] ?? '');
+$org = (string)($c['org'] ?? '');
+$asn = (int)($c['asn'] ?? 0);
+$conn = max(0, (int)($c['conn'] ?? 0));
 
 echo '<div class="card"><h2>اطلاعات کاربر <span class="badge ' . $statusCls . '">' . $status . '</span></h2>';
 echo '<div class="grid">';
+echo '<div class="stat"><div class="k">نام دستگاه</div><div class="v"><small>' . ($dev !== '' ? h($dev) : '—') . '</small></div></div>';
+echo '<div class="stat"><div class="k">تعداد اتصال</div><div class="v">' . ($conn > 0 ? (string)$conn : '—') . '</div></div>';
 echo '<div class="stat"><div class="k">سیستم‌عامل</div><div class="v"><small>' . ((string)($c['os'] ?? '') !== '' ? h($c['os']) : '—') . '</small></div></div>';
 echo '<div class="stat"><div class="k">IP (مستقیم)</div><div class="v"><small>' . ((string)($c['ip'] ?? '') !== '' ? h($c['ip']) : '—') . '</small></div></div>';
 echo '<div class="stat"><div class="k">IP آخرین درخواست</div><div class="v"><small>' . ((string)($c['ip_last'] ?? '') !== '' ? h($c['ip_last']) : '—') . '</small></div></div>';
+echo '<div class="stat"><div class="k">ISP</div><div class="v"><small>' . ($isp !== '' ? h($isp) : '—') . '</small></div></div>';
+echo '<div class="stat"><div class="k">ASN</div><div class="v"><small>' . ($asn > 0 ? 'AS' . $asn : '—') . '</small></div></div>';
+if ($org !== '' && $org !== $isp) {
+    echo '<div class="stat"><div class="k">سازمان</div><div class="v"><small>' . h($org) . '</small></div></div>';
+}
 echo '<div class="stat"><div class="k">کشور</div><div class="v">' . ((string)($c['country'] ?? '') !== '' ? h($c['country']) : '—') . '</div></div>';
 echo '<div class="stat"><div class="k">زبان برنامه</div><div class="v">' . ((string)($c['lang'] ?? '') !== '' ? h($c['lang']) : '—') . '</div></div>';
 echo '<div class="stat"><div class="k">نسخه نصب‌شده</div><div class="v">' . ((string)($c['ver'] ?? '') !== '' ? h($c['ver']) : '—') . '</div></div>';

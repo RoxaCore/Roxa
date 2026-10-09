@@ -113,7 +113,7 @@
 
   <!-- Placeholders -->
   <data name="Ph_ServerLink" xml:space="preserve">
-    <value>Sunucu bağlantısı (vmess://, vless://, ...)</value>
+    <value>Sunucu bağlantısı (vmess://, vless://, ss://, trojan://)</value>
   </data>
   <data name="Ph_SubName" xml:space="preserve">
     <value>Ad</value>
@@ -186,21 +186,6 @@
   </data>
 
   <!-- Add Methods -->
-  <data name="Add_Link" xml:space="preserve">
-    <value>🔗 Bağlantı ile Ekle</value>
-  </data>
-  <data name="Add_VMess" xml:space="preserve">
-    <value>➕ VMess Ekle</value>
-  </data>
-  <data name="Add_VLESS" xml:space="preserve">
-    <value>➕ VLESS Ekle</value>
-  </data>
-  <data name="Add_SS" xml:space="preserve">
-    <value>➕ Shadowsocks Ekle</value>
-  </data>
-  <data name="Add_Trojan" xml:space="preserve">
-    <value>➕ Trojan Ekle</value>
-  </data>
   <data name="Add_Clipboard" xml:space="preserve">
     <value>📋 Panodan İçe Aktar</value>
   </data>
@@ -250,9 +235,6 @@
   </data>
   <data name="Set_Advanced" xml:space="preserve">
     <value>🔧 Gelişmiş Ayarlar</value>
-  </data>
-  <data name="Set_PingType" xml:space="preserve">
-    <value>Ping türü:</value>
   </data>
   <data name="Set_GlobalSort" xml:space="preserve">
     <value>📊 Genel sıralama</value>
@@ -595,7 +577,75 @@ Gecikme: {1}</value></data>
   <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} saat kaldı</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 El ile</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>Sunucu seçilmedi</value></data>
+  <data name="Set_Reports" xml:space="preserve">
+    <value>Hata ve sorun bildirimi</value>
+  </data>
+  <data name="Set_Reports_Desc" xml:space="preserve">
+    <value>Uygulama çöktüyse veya bir sorunla karşılaştıysanız bildirim geliştiriciye otomatik gönderilir. Aşağıdaki düğmeyle isteğe bağlı açıklama ile siz de sorun bildirebilirsiniz; sürüm, işletim sistemi, cihaz kimliği, bağlantı durumu ve son günlük otomatik eklenir.</value>
+  </data>
+  <data name="Btn_ReportBug" xml:space="preserve">
+    <value>Sorun bildir...</value>
+  </data>
+  <data name="Dlg_ReportTitle" xml:space="preserve">
+    <value>Hata ve sorun bildirimi</value>
+  </data>
+  <data name="Dlg_ReportHint" xml:space="preserve">
+    <value>Sorunu açıklayın (isteğe bağlı): ne yaptınız ve ne oldu...</value>
+  </data>
+  <data name="Btn_SendReport" xml:space="preserve">
+    <value>Bildirimi gönder</value>
+  </data>
+  <data name="Rpt_AutoInfo" xml:space="preserve">
+    <value>Uygulamanın topladığı bilgiler sizin hiçbir işlem yapmadan eklenir:
+Sürüm {0} • {1}
+Cihaz kimliği {2}
+Durum: {3}</value>
+  </data>
+  <data name="Rpt_StateOn" xml:space="preserve">
+    <value>{0} bağlı</value>
+  </data>
+  <data name="Rpt_StateOff" xml:space="preserve">
+    <value>Bağlı değil</value>
+  </data>
+  <data name="Log_ReportSent" xml:space="preserve">
+    <value>Sorun bildirimi gönderildi</value>
+  </data>
+  <data name="Toast_ReportSent" xml:space="preserve">
+    <value>Bildirim gönderildi — teşekkürler</value>
+  </data>
+  <data name="Log_ReportFailed" xml:space="preserve">
+    <value>Gönderilemedi; bildirim kuyruğa alındı ve sonraki açılışta gönderilecek</value>
+  </data>
+  <data name="Log_ReportFlushed" xml:space="preserve">
+    <value>Kuyruktaki {0} bildirim gönderildi</value>
+  </data>
   <data name="Home_NotConnected" xml:space="preserve"><value>Bağlı değilsiniz</value></data>
+  <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>İnternet iyi: doğrudan yol sağlıklı, ağ değişiminden sonra tünel yanıt vermiyor</value></data>
+  <data name="Set_Privacy" xml:space="preserve"><value>Gizlilik</value></data>
+  <data name="Set_Stats" xml:space="preserve"><value>Bağlantı istatistiklerini panele gönder</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>Her 60 dakikada bir sürüm, dil, ülke ve cihaz kimliği güncelleme kontrolü için panele gönderilir. Kapatırsanız güncelleme kontrolü sürer ancak hiçbir kimlik veya istatistik gönderilmez; bilgisayar adınız asla gönderilmez.</value></data>
+  <data name="Set_DeviceId" xml:space="preserve"><value>Cihaz kimliği</value></data>
+  <data name="Set_DeviceId_Desc" xml:space="preserve"><value>Uygulamanın bu sistem için ürettiği tekil kimlik (bilgisayar adınız değil), yönetim panelinde görünür.</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>Önceki çalıştırmadan kalan bir bağlantı bulundu.&amp;#10;Tam temizlik için uygulamanın yönetici olarak yeniden başlatılması gerekiyor.</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>TUN adaptörü hazır değil.</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>TUN rotaları eklendi.</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>TUN rotaları eklenemedi: {0}</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>Bağlantı motoru beklenmedik şekilde durdu</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>TUN olmadan bile VPN'yi aş</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>Açıkken, bu listedeki uygulamalar VPN sistem proxy üzerinden (TUN olmadan) bağlıyken bile VPN yerine sistemin doğrudan internetini kullanır.</value></data>
+  <data name="Set_KillSwitch" xml:space="preserve"><value>Genel kill switch</value></data>
+  <data name="Set_KillSwitch_Desc" xml:space="preserve"><value>VPN tüneli düşerse, gerçek adresiniz asla sızmasın diye VPN dönene kadar tüm internet trafiği engellenir. "TUN hariç tutmaları" listesindeki uygulamalar doğrudan bağlı kalır.</value></data>
+  <data name="Set_KillSwitch_Add" xml:space="preserve"><value>Korumak için uygulama ekle...</value></data>
+  <data name="Set_KillSwitch_Remove" xml:space="preserve"><value>Koruma listesinden kaldır</value></data>
+  <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>Henüz korumaya uygulama eklenmedi</value></data>
+  <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>Bağlı değil — tüm trafik engellendi ({0} uygulama muaf)</value></data>
+  <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>VPN bağlantısı koptu</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>VPN yeniden bağlanana kadar internet engellendi ({0} uygulama muaf). Geri gelmezse acil serbest bırakma düğmesine basın.</value></data>
+  <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>VPN yeniden bağlandı</value></data>
+  <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>İnternet tekrar çalışıyor</value></data>
+  <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>Acil internet serbest bırakma</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>Serbest bırakma düğmesine rağmen internet geri gelmezse sorun kill switch'te değildir — Wi-Fi/Windows ağını kontrol edin veya sistemi yeniden başlatın.</value></data>
+  <data name="Home_SwitchingServer" xml:space="preserve"><value>Yeni sunucuya bağlanılıyor</value></data>
   <data name="LastUpdate_DayAgo" xml:space="preserve"><value>Son güncelleme: {0} gün önce</value></data>
   <data name="LastUpdate_HourAgo" xml:space="preserve"><value>Son güncelleme: {0} sa önce</value></data>
   <data name="LastUpdate_MinAgo" xml:space="preserve"><value>Son güncelleme: {0} dk önce</value></data>
@@ -619,7 +669,11 @@ Gecikme: {1}</value></data>
   <data name="Upd_Btn_Install" xml:space="preserve"><value>Yükle</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>Güncelleme indiriliyor…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>İndirme tamamlandı; kurulum için uygulama kapanacak</value></data>
+  <data name="Upd_Installing" xml:space="preserve"><value>Güncleme kuruluyor…</value></data>
+  <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>Güncelleme indirilemedi</value></data>
+  <data name="Btn_FullTest" xml:space="preserve"><value>Tam test</value></data>
+  <data name="Status_GroupFullDone" xml:space="preserve"><value>{0} için tam test tamamlandı</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>Devam etmek için yeni sürümü yüklemeniz gerekiyor</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>Kapat</value></data>
   <data name="Ann_View" xml:space="preserve"><value>Görüntüle</value></data>
@@ -633,7 +687,6 @@ Gecikme: {1}</value></data>
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>Kaldır</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>Henüz uygulama eklenmedi</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>Bu uygulamanın hariç tutulmasını değiştir</value></data>
-  <data name="Status_ClipboardAdded" xml:space="preserve"><value>Panodan {0} sunucu eklendi</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Pan boş</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Panoya erişilemiyor</value></data>
   <data name="Status_ConnectError" xml:space="preserve"><value>Bağlantı hatası</value></data>
@@ -660,10 +713,8 @@ Gecikme: {1}</value></data>
   <data name="Status_GroupSpeedDone" xml:space="preserve"><value>Grup hız testi bitti ({0} başarılı)</value></data>
   <data name="Status_GroupUpdate" xml:space="preserve"><value>"{0}" grubu güncelleniyor ({1} sunucu) ...</value></data>
   <data name="Status_GroupUpdateDone" xml:space="preserve"><value>Grup güncellemesi bitti ({0} başarılı)</value></data>
-  <data name="Status_NewServerName" xml:space="preserve"><value>Yeni sunucu ({0})</value></data>
   <data name="Status_NoServerFromSub" xml:space="preserve"><value>"{0}" sunucusundan sunucu alınamadı</value></data>
   <data name="Status_NoServers" xml:space="preserve"><value>Sunucu yok</value></data>
-  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>Panoda geçerli bir bağlantı yok</value></data>
   <data name="Status_PingAll" xml:space="preserve"><value>{0} sunucuya ping atılıyor ...</value></data>
   <data name="Status_PingDoneCount" xml:space="preserve"><value>Ping bitti: {1} sunucudan {0} yanıt verdi</value></data>
   <data name="Status_PingSelDone" xml:space="preserve"><value>Seçilenlerin pingi bitti ({0} başarılı)</value></data>
@@ -674,7 +725,6 @@ Gecikme: {1}</value></data>
   <data name="Status_RealDoneCount" xml:space="preserve"><value>Gerçek gecikme testi bitti: {1} sunucudan {0} başarılı</value></data>
   <data name="Status_RealSelDone" xml:space="preserve"><value>Seçilenlerin gerçek gecikme testi bitti ({0} başarılı)</value></data>
   <data name="Status_RealSelected" xml:space="preserve"><value>Seçili {0} sunucuda gerçek gecikme testi ...</value></data>
-  <data name="Status_ServerAdded" xml:space="preserve"><value>"{0}" sunucusu eklendi</value></data>
   <data name="Status_ServersAdded" xml:space="preserve"><value>{0} sunucu eklendi</value></data>
   <data name="Status_SmartBest" xml:space="preserve"><value>Akıllı bağlantı: en iyi sunucu → {0} ({1})</value></data>
   <data name="Status_SmartCancelled" xml:space="preserve"><value>Akıllı bağlantı iptal edildi</value></data>
@@ -707,6 +757,7 @@ Gecikme: {1}</value></data>
   <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>Sunucu bağlantıları kopyalandı</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>Bağlanılacak sunucu yok</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>Bu partideki hiçbir sunucu yanıt vermedi</value></data>
+  <data name="Toast_BatchAllInvalidDomains" xml:space="preserve"><value>Bu partinin alan adları çözümlenemedi; bağlantılar geçersiz</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>Hiçbir sunucu yanıt vermedi</value></data>
   <data name="Toast_RealDelayFailed" xml:space="preserve"><value>Gerçek gecikme testi başarısız oldu</value></data>
   <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>Gerçek gecikme testi hiçbir sunucuyu doğrulamadı</value></data>
@@ -736,6 +787,7 @@ Gecikme: {1}</value></data>
   <data name="Url_InvalidSs" xml:space="preserve"><value>Geçersiz Shadowsocks bağlantısı</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Geçersiz Trojan bağlantısı</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Geçersiz VLESS bağlantısı</value></data>
+  <data name="Url_InvalidVmess" xml:space="preserve"><value>Geçersiz VMess bağlantısı</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Yalnızca vmess / vless / ss / trojan desteklenir</value></data>
   <data name="Url_UnsupportedTransport" xml:space="preserve"><value>iletim yöntemi desteklenmiyor: {0}</value></data>
   <data name="Url_InvalidParam" xml:space="preserve"><value>{0} parametresi için geçersiz değer: {1}</value></data>
@@ -744,6 +796,7 @@ Gecikme: {1}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>Daha iyi bul: test edilecek sunucu kalmadı</value></data>
   <data name="Log_FindNoSelection" xml:space="preserve"><value>Daha iyi bul: engellendi — sunucu seçilmedi</value></data>
   <data name="Log_FindNoSurvivors" xml:space="preserve"><value>Daha iyi bul: TCP ping sonrası sağ kalan yok</value></data>
+  <data name="Log_BatchDomainInvalid" xml:space="preserve"><value>Alan adı çözümlenemedi: {0}</value></data>
   <data name="Log_FindNotConnected" xml:space="preserve"><value>Daha iyi bul: engellendi — bağlı değilsiniz</value></data>
   <data name="Log_FindRealBatch" xml:space="preserve"><value>Daha iyi bul: {0} sağ kalan batch multi-outbound ile test ediliyor</value></data>
   <data name="Log_FindRealFailedAll" xml:space="preserve"><value>Daha iyi bul: tüm gerçek gecikme testleri başarısız oldu</value></data>
@@ -811,4 +864,25 @@ Gecikme: {1}</value></data>
 <data name="Hint_BypassTun" xml:space="preserve"><value>Not: Testler TUN uygulanmadan çalışır</value></data>
 <data name="Notify_TunOn" xml:space="preserve"><value>ROXA bağlandı</value></data>
 <data name="Notify_TunOff" xml:space="preserve"><value>ROXA bağlantısı kesildi</value></data>
+  <data name="Set_Notifications" xml:space="preserve"><value>Windows bildirimleri</value></data>
+  <data name="Set_Notifications_Desc" xml:space="preserve"><value>Bağlanırken, bağlantı kesilirken ve hatalarda Windows saatinin yanında bildirim baloncuklarını göster.</value></data>
+  <data name="Tray_Notifications" xml:space="preserve"><value>Windows bildirimleri</value></data>
+  <data name="Stg_Cleanup" xml:space="preserve"><value>Önceki bağlantı temizleniyor ...</value></data>
+  <data name="Stg_Routes" xml:space="preserve"><value>TUN rotaları ayarlanıyor ...</value></data>
+  <data name="Stg_Dns" xml:space="preserve"><value>DNS yapılandırılıyor ...</value></data>
+  <data name="Stg_Engine" xml:space="preserve"><value>Lütfen bekleyin</value></data>
+  <data name="Toast_NoInternet" xml:space="preserve"><value>İnternet kesik</value></data>
+  <data name="SubFetch_Direct" xml:space="preserve"><value>Doğrudan alma (proxy yok)...</value></data>
+  <data name="SubFetch_Proxy" xml:space="preserve"><value>Proxy üzerinden alma...</value></data>
+  <data name="SubFetch_SystemProxy" xml:space="preserve"><value>Sistem proxy'si üzerinden alma...</value></data>
+  <data name="Log_SubHealDns" xml:space="preserve"><value>TUN'dan kalan {0} DNS adaptörü onarıldı</value></data>
+  <data name="Log_SubBypass" xml:space="preserve"><value>Doğrudan alma için TUN atlanıyor...</value></data>
+  <data name="Set_SingBox" xml:space="preserve"><value>sing-box etkinleştir</value></data>
+  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box çekirdeği mevcut motorun yanına eklendi. Şimdilik bunu etkinleştirmek yalnızca ayarı kaydeder; bağlantı davranışı değişmez.</value></data>
+  <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUN'u etkinleştir</value></data>
+  <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>TUN etkinleştirildiğinde tüm sistem trafiği tünelden geçer ve uygulama yönetici izni gerektirir. Emin misiniz?</value></data>
+  <data name="Set_Table" xml:space="preserve"><value>Tablo</value></data>
+  <data name="Set_ShowIp" xml:space="preserve"><value>IP adresi sütununu göster</value></data>
+  <data name="Set_ShowIp_Desc" xml:space="preserve"><value>Etkinleştirilirse, IP adresi sütunu sunucu tablosunda gösterilir.</value></data>
+<data name="Btn_Paste" xml:space="preserve"><value>Panodan yapıştır</value></data>
 </root>

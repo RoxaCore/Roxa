@@ -1,11 +1,11 @@
-﻿{
-    "latest": null,
+{
+    "latest": "3.0.6",
     "notes": "",
     "sha256": "",
-    "force": false,
-    "active": false,
-    "published": null,
-    "url": null,
+    "force": true,
+    "active": true,
+    "published": "2026-10-09T03:21:23+03:30",
+    "url": "https://up.roxacore.com/dl/roxa-3.0.6.zip",
     "file": null,
     "size": 0,
     "countries": "",

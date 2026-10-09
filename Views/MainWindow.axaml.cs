@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -12,6 +13,7 @@ namespace Roxa.Views;
 public partial class MainWindow : Window
 {
     private bool _forceClose = false;
+    private bool _startupTabApplied = false;
 
     public MainWindow()
     {
@@ -19,6 +21,9 @@ public partial class MainWindow : Window
         var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "roxa-icon.ico");
         if (System.IO.File.Exists(iconPath))
             Icon = new WindowIcon(iconPath);
+        // فشار روی هدر گروه اغلب توسط کنترل‌های داخلی (مثلاً دکمهٔ Expander) handle می‌شود؛
+        // باید با handledEventsToo ثبت شود تا درگ سربرگ‌ها کار کند.
+        AddHandler(InputElement.PointerPressedEvent, OnAnyPointerPressed, handledEventsToo: true);
         Opened += OnOpened;
         Activated += OnActivated;
         Closing += OnClosing;
@@ -48,7 +53,7 @@ public partial class MainWindow : Window
             var asyncData = (Avalonia.Input.IAsyncDataTransfer)vm.Clipboard;
             var text = await asyncData.TryGetTextAsync();
             if (string.IsNullOrWhiteSpace(text)) return;
-            var trimmed = text.Trim();
+            var trimmed = Core.UrlParser.UnwrapEncoded(text.Trim());
             if (!Core.UrlParser.IsProtocolLink(trimmed)) return;
             if (string.Equals(_lastClipboardLink, trimmed, StringComparison.Ordinal)) return;
             if (vm.Servers.Any(s => string.Equals(s.Link, trimmed, StringComparison.Ordinal))) return;
@@ -198,18 +203,21 @@ public partial class MainWindow : Window
         vm.ToastHandler = message => ShowToast(message);
         vm.FocusServerHandler = FocusServer;
         vm.SelectionRefreshHandler = ReapplyRowSelection;
-        vm.RestartRequested += () =>
+        vm.RestartRequested += (string extraArgs) =>
         {
             try
             {
                 var app = Application.Current as App;
                 app?.DisposeTray();
                 bool wasConnected = vm.IsConnected;
+                // عیب‌یابی اشتراکات: ری‌استارت باید بدون اتصال باشد، حتی اگر قبلاً وصل بوده.
+                var argList = extraArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+                bool noReconnect = argList.Remove("--no-reconnect");
                 var exe = Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "";
                 var psi = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = exe,
-                    Arguments = "--wait-exit" + (wasConnected ? " --reconnect" : ""),
+                    Arguments = "--wait-exit" + (wasConnected && !noReconnect ? " --reconnect" : "") + (argList.Count > 0 ? " " + string.Join(" ", argList) : ""),
                     UseShellExecute = true
                 };
                 if (Core.AdminHelper.IsRunningAsAdmin())
@@ -220,6 +228,20 @@ public partial class MainWindow : Window
             Environment.Exit(0);
         };
         vm.OpenDnsSettingsHandler = () => OpenDnsDialog();
+        // ری‌استارت با ‎--tab subscriptions‎ (عیب‌یابی اشتراکات): بازشدن در تب اشتراکات؛ فقط یک‌بار.
+        if (!_startupTabApplied)
+        {
+            var sargs = Program.StartupArgs;
+            for (int i = 0; i + 1 < sargs.Length; i++)
+            {
+                if (sargs[i] == "--tab" && sargs[i + 1] == "subscriptions")
+                {
+                    MainTabControl.SelectedItem = SubscriptionsTab;
+                    _startupTabApplied = true;
+                    break;
+                }
+            }
+        }
         vm.PickTunExcludedAppHandler = async () =>
         {
             var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
@@ -268,36 +290,57 @@ public partial class MainWindow : Window
             win.ShowDialog(this);
         };
         vm.UpdateShutdownRequested += () => (Application.Current as App)?.ExitApp();
-        vm.ShowUpdateRequiredHandler = () =>
+        vm.ShowBugReportHandler = (info, submit) =>
         {
             var tr = Localization.TranslationManager.Instance;
-            var btnInstall = new Button { Content = tr["Upd_Btn_Install"], Width = 120 };
+            var input = new TextBox
+            {
+                AcceptsReturn = true,
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                Height = 110,
+                FontSize = 13,
+                PlaceholderText = tr["Dlg_ReportHint"],
+            };
+            var btnSend = new Button { Content = tr["Btn_SendReport"], Padding = new Avalonia.Thickness(14, 6) };
+            var btnCancel = new Button { Content = tr["Dlg_Cancel"], Padding = new Avalonia.Thickness(14, 6) };
             var win = new Window
             {
-                Title = tr["Upd_Notify"],
-                Width = 420,
-                Height = 170,
+                Title = tr["Dlg_ReportTitle"],
+                Width = 460,
+                Height = 360,
+                CanResize = false,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Content = new StackPanel
                 {
-                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-                    Spacing = 15,
-                    Margin = new Avalonia.Thickness(20),
+                    Spacing = 10,
+                    Margin = new Avalonia.Thickness(16),
                     Children =
                     {
-                        new TextBlock { Text = tr["Upd_ForceMsg"], TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                        new TextBlock
+                        {
+                            Text = info,
+                            FontSize = 12,
+                            Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#9ca3af")),
+                            TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                        },
+                        input,
                         new StackPanel
                         {
                             Orientation = Avalonia.Layout.Orientation.Horizontal,
                             Spacing = 10,
-                            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-                            Children = { btnInstall }
+                            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                            Children = { btnSend, btnCancel }
                         }
                     }
                 }
             };
-            btnInstall.Click += (_, _) => { win.Close(); _ = vm.InstallUpdateCommand.ExecuteAsync(null); };
+            btnSend.Click += async (_, _) =>
+            {
+                btnSend.IsEnabled = false;
+                try { await submit(input.Text ?? ""); } catch { }
+                win.Close();
+            };
+            btnCancel.Click += (_, _) => win.Close();
             win.ShowDialog(this);
         };
         if (vm.TunDisabledNeedsAdmin || Core.TunRecovery.LeftoverNeedsAdmin)
@@ -341,6 +384,50 @@ public partial class MainWindow : Window
             await window.ShowDialog(this);
             return result;
         };
+        vm.ConfirmTunEnableHandler = async () =>
+        {
+            bool result = false;
+            var tr = Localization.TranslationManager.Instance;
+            var btnYes = new Button { Content = tr["Dlg_Yes"], Width = 80 };
+            var btnNo = new Button { Content = tr["Dlg_No"], Width = 80 };
+            
+            var window = new Window
+            {
+                Title = tr["Dlg_ConfirmTun"],
+                Width = 430,
+                Height = 180,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Content = new StackPanel
+                {
+                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                    Spacing = 15,
+                    Margin = new Avalonia.Thickness(20),
+                    Children =
+                    {
+                        new TextBlock
+                        {
+                            Text = tr["Dlg_ConfirmTun_Msg"],
+                            TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                            TextAlignment = Avalonia.Media.TextAlignment.Center
+                        },
+                        new StackPanel
+                        {
+                            Orientation = Avalonia.Layout.Orientation.Horizontal,
+                            Spacing = 10,
+                            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                            Children = { btnYes, btnNo }
+                        }
+                    }
+                }
+            };
+            
+            btnYes.Click += (s, e) => { result = true; window.Close(); };
+            btnNo.Click += (s, e) => { result = false; window.Close(); };
+            
+            await window.ShowDialog(this);
+            return result;
+        };
         
         await vm.OnStartedAsync();
     }
@@ -354,6 +441,104 @@ public partial class MainWindow : Window
             if (group != null && !group.IsExpanded)
                 group.IsExpanded = true;
         }
+    }
+
+    // --- درگ سربرگ گروه‌ها برای تغییر ترتیب تب‌ها ---
+    private ServerGroup? _dragGroup;
+    private bool _dragActive;
+    private Point _pressPoint;
+    private IPointer? _dragPointer;
+
+    private void OnAnyPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // هر فشاری (حتی handleشده توسط کنترل‌های داخلی) ابتدا وضعیت درگ قبلی را بازنشانی می‌کند
+        _dragGroup = null;
+        _dragActive = false;
+        if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed) return;
+        if (e.Source is not Visual src) return;
+
+        // پیمایش تا Expander؛ فشار داخل محتوا (جدول سرورها) یا روی کنترل‌های تعاملی رد می‌شود
+        Expander? expander = null;
+        bool skip = false;
+        for (var cur = src; cur != null; cur = cur.GetVisualParent())
+        {
+            if (cur is DataGrid or DataGridRow) { skip = true; break; }
+            if (cur is CheckBox or ComboBox or TextBox) { skip = true; break; }
+            if (cur is Button b && b is not Avalonia.Controls.Primitives.ToggleButton) { skip = true; break; }
+            if (cur is Expander ex) { expander = ex; break; }
+        }
+        if (skip || expander == null) return;
+        if (DataContext is not MainViewModel vm) return;
+        if (expander.DataContext is not ServerGroup group || !vm.Groups.Contains(group)) return;
+
+        _dragGroup = group;
+        _pressPoint = e.GetPosition(GroupsItemsControl);
+    }
+
+    private void GroupsItemsControl_PointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (_dragGroup == null) return;
+        if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
+        {
+            // دکمه بدون رویداد Released رها شد (رویداد توسط کنترل دیگری مصرف شده)
+            EndGroupDrag();
+            return;
+        }
+        var p = e.GetPosition(GroupsItemsControl);
+        if (!_dragActive)
+        {
+            if (Math.Abs(p.X - _pressPoint.X) < 6 && Math.Abs(p.Y - _pressPoint.Y) < 6) return;
+            _dragActive = true;
+            _dragPointer = e.Pointer;
+            e.Pointer.Capture(GroupsItemsControl);
+            GroupsItemsControl.Cursor = new Cursor(StandardCursorType.SizeAll);
+        }
+        if (DataContext is not MainViewModel vm) return;
+        int cur = vm.Groups.IndexOf(_dragGroup);
+        if (cur < 0) { EndGroupDrag(); return; }
+        int target = GroupIndexAt(e);
+        if (target >= 0 && target != cur)
+            vm.Groups.Move(cur, target);
+    }
+
+    private void GroupsItemsControl_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (_dragGroup == null) return;
+        EndGroupDrag();
+    }
+
+    private void GroupsItemsControl_PointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+    {
+        if (_dragGroup == null) { _dragActive = false; return; }
+        EndGroupDrag();
+    }
+
+    private void EndGroupDrag()
+    {
+        bool persist = _dragActive;
+        _dragGroup = null;
+        _dragActive = false;
+        GroupsItemsControl.Cursor = null;
+        if (_dragPointer != null)
+        {
+            try { _dragPointer.Capture(null!); } catch { }
+            _dragPointer = null;
+        }
+        if (persist && DataContext is MainViewModel vm)
+            vm.PersistGroupOrder();
+    }
+
+    private int GroupIndexAt(PointerEventArgs e)
+    {
+        if (GroupsItemsControl.ItemsPanelRoot is not Panel panel) return -1;
+        var p = e.GetPosition(panel);
+        for (int i = 0; i < panel.Children.Count; i++)
+        {
+            var b = panel.Children[i].Bounds;
+            if (p.X >= b.X && p.X <= b.X + b.Width && p.Y >= b.Y && p.Y <= b.Y + b.Height)
+                return i;
+        }
+        return -1;
     }
 
     private static ServerInfo? FindServerFromVisual(object? source)

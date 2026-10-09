@@ -18,6 +18,20 @@ public static class UrlParser
             || text.StartsWith("trojan://", StringComparison.OrdinalIgnoreCase);
     }
 
+    public static string UnwrapEncoded(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        string trimmed = input.Trim();
+        if (IsProtocolLink(trimmed)) return input;
+        try
+        {
+            string decoded = DecodeBase64(trimmed).Trim();
+            if (decoded.Contains("://")) return decoded;
+        }
+        catch (FormatException) { }
+        return input;
+    }
+
     public static ServerInfo Parse(string text)
     {
         text = text.Trim();
@@ -39,8 +53,18 @@ public static class UrlParser
 
     private static ServerInfo ParseVmess(string text)
     {
-        string jsonText = DecodeBase64(text["vmess://".Length..]);
-        using var doc = JsonDocument.Parse(jsonText);
+        string jsonText;
+        try
+        {
+            jsonText = DecodeBase64(text["vmess://".Length..]);
+        }
+        catch (FormatException ex)
+        {
+            LogTechnical($"vmess:// base64 decode failed: {ex.Message}");
+            throw new FormatException(TranslationManager.Get("Url_InvalidVmess"), ex);
+        }
+
+        using var doc = ParseVmessJson(jsonText);
         var r = doc.RootElement;
 
         string Get(string key)
@@ -86,6 +110,32 @@ public static class UrlParser
         if (string.IsNullOrEmpty(server.Name)) server.Name = server.Address;
         if (string.IsNullOrEmpty(server.Encryption)) server.Encryption = "auto";
         return server;
+    }
+
+    private static JsonDocument ParseVmessJson(string jsonText)
+    {
+        try
+        {
+            return JsonDocument.Parse(jsonText);
+        }
+        catch (JsonException ex)
+        {
+            LogTechnical($"vmess:// json parse failed: {ex.Message}");
+            throw new FormatException(TranslationManager.Get("Url_InvalidVmess"), ex);
+        }
+    }
+
+    private static void LogTechnical(string message)
+    {
+        try
+        {
+            string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+            Directory.CreateDirectory(dir);
+            string file = Path.Combine(dir, "parser.log");
+            if (File.Exists(file) && new FileInfo(file).Length > 4_000_000) File.WriteAllText(file, "");
+            File.AppendAllText(file, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}{Environment.NewLine}");
+        }
+        catch { }
     }
 
     private static ServerInfo ParseVless(string text)

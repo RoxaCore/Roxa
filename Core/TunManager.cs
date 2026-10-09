@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Roxa.Localization;
@@ -208,6 +209,15 @@ public static class TunManager
         long deadline = Environment.TickCount64 + CaptureTimeoutMs;
         while (true)
         {
+            // تا آداپتر roxa0 بالا نیامده netsh بیهوده پروسه می‌سازد (هر نوبت ۲ پروسه
+            // هر ۳۰۰ms) و رشتهٔ UI را هم پشت همین انتظار نگه می‌داشت؛ اول با
+            // GetIfIndex بومی چک می‌شود و فقط بعد از ظاهرشدن آداپتر route اضافه می‌شود.
+            if (IpRoute.GetIfIndex(TunAdapterName) == 0)
+            {
+                if (Environment.TickCount64 >= deadline) return false;
+                await Task.Delay(CaptureRetryDelayMs);
+                continue;
+            }
             bool allAdded = true;
             foreach (var (prefix, dest, mask) in _capturePrefixes)
             {
@@ -233,6 +243,16 @@ public static class TunManager
     {
         try
         {
+            // اولویت با گیت‌ویِ کارت شبکهٔ فیزیکی: وقتی TUN دیگری (مثل v2rayN) فعال است،
+            // مسیرِ پیش‌فرضِ کمترین metric مالِ اوست و قبلاً excl/test ما واردِ TUNِ بیگانه
+            // می‌شد؛ باید مستقیم به گیت‌وی واقعی برود.
+            string? physical = FindPhysicalDefaultGateway();
+            if (physical != null)
+            {
+                Log($"Default gateway via={physical} (physical)");
+                return physical;
+            }
+
             int code = RunTool("route.exe", "print -4 0.0.0.0", out string output);
             if (code != 0) return null;
             string? via = null;
@@ -262,6 +282,80 @@ public static class TunManager
             Log($"GetDefaultGatewayVia failed: {ex.Message}");
             return null;
         }
+    }
+
+    /// <summary>
+    /// گیت‌ویِ پیش‌فرضی که واقعاً به کارت شبکهٔ فیزیکی تعلق دارد: مسیر 0.0.0.0/0 با
+    /// NextHop غیرصفر، غیر از آداپترهای TUN (نام/شرح)، و دقیقاً همان گیت‌ویِ ثبت‌شده روی آداپتر.
+    /// </summary>
+    private static string? FindPhysicalDefaultGateway()
+    {
+        var table = IpRoute.GetTable();
+        if (table == null) return null;
+        var defaults = table
+            .Where(r => r.Dest == 0 && r.Mask == 0 && r.NextHop != 0)
+            .OrderBy(r => r.Metric1)
+            .ToList();
+        if (defaults.Count == 0) return null;
+
+        var nics = new Dictionary<uint, NetworkInterface>();
+        foreach (var nic in NetworkInterface.GetAllNetworkInterfaces())
+        {
+            try { uint idx = IpRoute.GetIfIndex(nic.Name); if (idx != 0) nics[idx] = nic; }
+            catch { }
+        }
+
+        foreach (var row in defaults)
+        {
+            if (!nics.TryGetValue(row.IfIndex, out var nic)) continue;
+            if (IsTunLike(nic.Name) || IsTunLike(nic.Description)) continue;
+            string hop = IpRoute.IpToString(row.NextHop);
+            bool ownsGateway;
+            try
+            {
+                ownsGateway = nic.GetIPProperties().GatewayAddresses.Any(g =>
+                    g.Address.AddressFamily == AddressFamily.InterNetwork &&
+                    string.Equals(g.Address.ToString(), hop, StringComparison.Ordinal));
+            }
+            catch { continue; }
+            if (ownsGateway) return hop;
+        }
+        return null;
+    }
+
+    private static bool IsTunLike(string s) =>
+        s.Contains("tun", StringComparison.OrdinalIgnoreCase) ||
+        s.Contains("tap", StringComparison.OrdinalIgnoreCase) ||
+        s.Contains("wireguard", StringComparison.OrdinalIgnoreCase) ||
+        s.Contains("roxa", StringComparison.OrdinalIgnoreCase) ||
+        s.Contains("sing", StringComparison.OrdinalIgnoreCase) ||
+        s.Contains("mihomo", StringComparison.OrdinalIgnoreCase) ||
+        s.Contains("clash", StringComparison.OrdinalIgnoreCase) ||
+        s.Contains("neko", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>آیا الان مسیر پیش‌فرضِ متعلق به یک TUN (بیگانه یا خودمان) هست؟
+    /// برای تصمیمِ «لازم است برای دریافت/تست دور بزنیم یا نه».</summary>
+    public static bool AnyTunDefaultRoute()
+    {
+        try
+        {
+            var table = IpRoute.GetTable();
+            if (table == null) return false;
+            var nics = new Dictionary<uint, NetworkInterface>();
+            foreach (var nic in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                try { uint idx = IpRoute.GetIfIndex(nic.Name); if (idx != 0) nics[idx] = nic; }
+                catch { }
+            }
+            foreach (var row in table)
+            {
+                if (row.Dest != 0 || row.Mask != 0) continue;
+                if (nics.TryGetValue(row.IfIndex, out var nic) &&
+                    (IsTunLike(nic.Name) || IsTunLike(nic.Description))) return true;
+            }
+            return false;
+        }
+        catch { return false; }
     }
 
     private static string? Subnet24(string ip)
@@ -324,6 +418,15 @@ public static class TunManager
         string dest = parts[1];
         string mask = parts[3];
         string? via = parts.Length > 4 ? parts[4] : null;
+
+        // ابتدا API بومی بدون هیچ پروسه‌ای؛ ۱۹۵ پروسهٔ route.exe در هر اتصال TUN ≈ ۱۵ ثانیه طول می‌کشید.
+        // (فقط برای مسیرهای استثنا با گیت‌وی مشخص؛ بقیهٔ مسیرها از همان مسیر route.exe می‌روند)
+        if (via != null && IpRoute.TryAddRoute(dest, mask, via, IpRoute.GetIfIndexForIp(via)))
+        {
+            lock (_routesLock) _routes.Add(new TunRouteRecord { Dest = dest, Mask = mask, Via = via });
+            return;
+        }
+
         string deleteArgs = $"delete {parts[1]} mask {parts[3]}";
         try { RunRoute(deleteArgs); }
         catch { }

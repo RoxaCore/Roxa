@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../lib.php';
 sess_start();
+security_headers();
 
 if (authed()) {
     header('Location: index.php');
@@ -15,7 +16,7 @@ $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
     if (!attempt_allowed()) {
-        $err = 'تلاش‌های ناموفق زیاد بود. لطفاً ۱۵ دقیقه دیگر دوباره تلاش کنید.';
+        $err = 'تلاش‌های ناموفق زیاد بود. کمی بعد دوباره تلاش کنید.';
     } else {
         $pw = (string)($_POST['password'] ?? '');
         $a = jread(auth_file(), []);

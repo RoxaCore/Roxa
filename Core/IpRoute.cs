@@ -35,6 +35,12 @@ public static class IpRoute
     [DllImport("iphlpapi.dll", SetLastError = true)]
     private static extern uint DeleteIpForwardEntry(ref Row row);
 
+    [DllImport("iphlpapi.dll", SetLastError = true)]
+    private static extern uint CreateIpForwardEntry(ref Row row);
+
+    [DllImport("iphlpapi.dll", SetLastError = true)]
+    private static extern uint GetBestInterface(uint destIp, out uint bestIfIndex);
+
     public static uint ParseIp(string? ip)
     {
         if (string.IsNullOrEmpty(ip)) return 0;
@@ -42,6 +48,54 @@ public static class IpRoute
             return 0;
         return BitConverter.ToUInt32(addr.GetAddressBytes(), 0);
     }
+
+    /// <summary>برعکسِ ParseIp: مقدار uint مسیر MIB را به رشتهٔ IP تبدیل می‌کند.</summary>
+    public static string IpToString(uint ip) => new IPAddress(BitConverter.GetBytes(ip)).ToString();
+
+    /// <summary>
+    /// ایندکس رابط شبکه‌ای که به مقصدِ ip می‌رسد (برای گرفتن IfIndex گیت‌وی پیش‌فرض).
+    /// </summary>
+    public static uint GetIfIndexForIp(string ip)
+    {
+        if (!OperatingSystem.IsWindows()) return 0;
+        uint dest = ParseIp(ip);
+        if (dest == 0) return 0;
+        try
+        {
+            return GetBestInterface(dest, out uint ifIndex) == NO_ERROR ? ifIndex : 0;
+        }
+        catch { return 0; }
+    }
+
+    /// <summary>
+    /// افزودن مسیر با API بومی بدون هیچ پروسه‌ای؛ خطای «از قبل موجود» (5010)
+    /// موفقیت حساب می‌شود. در شکست (دسترسی ادمین، مقدار نامعتبر) false و
+    /// فراخواننده به route.exe برمی‌گردد.
+    /// </summary>
+    public static bool TryAddRoute(string dest, string mask, string via, uint gatewayIfIndex, uint metric = 0xFFFF)
+    {
+        if (!OperatingSystem.IsWindows() || gatewayIfIndex == 0) return false;
+        uint d = ParseIp(dest), m = ParseIp(mask), v = ParseIp(via);
+        if (d == 0 || m == 0 || v == 0) return false;
+        var row = new Row
+        {
+            Dest = d,
+            Mask = m,
+            NextHop = v,
+            IfIndex = gatewayIfIndex,
+            Type = 3,   // MIB_IPROUTE_TYPE: indirect (next-hop ≠ destination)
+            Proto = 3,  // MIB_IPPROTO_NETMGMT (همان مقداری که route.exe می‌گذارد)
+            Metric1 = metric
+        };
+        try
+        {
+            uint err = CreateIpForwardEntry(ref row);
+            return err == NO_ERROR || err == ERROR_OBJECT_ALREADY_EXISTS;
+        }
+        catch { return false; }
+    }
+
+    private const uint ERROR_OBJECT_ALREADY_EXISTS = 5010;
 
     public static uint GetIfIndex(string name)
     {

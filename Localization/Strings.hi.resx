@@ -56,7 +56,7 @@
   <data name="Btn_RemoveDupes" xml:space="preserve"><value>🗑️ डुप्लिकेट हटाएं</value></data>
   <data name="Btn_Export" xml:space="preserve"><value>📦 एक्सपोर्ट</value></data>
   <data name="Btn_Import" xml:space="preserve"><value>📋 इम्पोर्ट</value></data>
-  <data name="Ph_ServerLink" xml:space="preserve"><value>सर्वर लिंक (vmess://, vless://, ...)</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>सर्वर लिंक (vmess://, vless://, ss://, trojan://)</value></data>
   <data name="Ph_SubName" xml:space="preserve"><value>नाम</value></data>
   <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
   <data name="Sort_None" xml:space="preserve"><value>कोई सॉर्ट नहीं</value></data>
@@ -76,10 +76,6 @@
   <data name="Ctx_TestSpeed" xml:space="preserve"><value>गति परीक्षण</value></data>
   <data name="Ctx_Delete" xml:space="preserve"><value>सर्वर हटाएं</value></data>
   <data name="Ctx_ClearSel" xml:space="preserve"><value>चयन साफ़ करें</value></data>
-  <data name="Add_VMess" xml:space="preserve"><value>🟢 VMess जोड़ें</value></data>
-  <data name="Add_VLESS" xml:space="preserve"><value>🔵 VLESS जोड़ें</value></data>
-  <data name="Add_SS" xml:space="preserve"><value>🟠 Shadowsocks जोड़ें</value></data>
-  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Trojan जोड़ें</value></data>
   <data name="Add_Clipboard" xml:space="preserve"><value>📋 क्लिपबोर्ड से इम्पोर्ट</value></data>
   <data name="Set_Proxy" xml:space="preserve"><value>सिस्टम प्रॉक्सी सेट करें</value></data>
   <data name="Set_AutoConnect" xml:space="preserve"><value>ऑटो कनेक्ट</value></data>
@@ -96,7 +92,6 @@
   <data name="Set_Every" xml:space="preserve"><value>हर</value></data>
   <data name="Set_Hours" xml:space="preserve"><value>घंटे अपडेट करें</value></data>
   <data name="Set_Advanced" xml:space="preserve"><value>उन्नत सेटिंग्स</value></data>
-  <data name="Set_PingType" xml:space="preserve"><value>पिंग प्रकार:</value></data>
   <data name="Set_GlobalSort" xml:space="preserve"><value>वैश्विक सॉर्ट (परीक्षण के बाद सभी ग्रुप का बेस्ट सर्वर ऊपर आएगा)</value></data>
   <data name="Set_DNS" xml:space="preserve"><value>कस्टम DNS</value></data>
   <data name="Set_DNSBtn" xml:space="preserve"><value>⚙ DNS सेटिंग्स</value></data>
@@ -201,7 +196,6 @@
     <value>शॉर्टकट: Ctrl+Shift+C = कनेक्ट | Ctrl+Shift+D = डिस्कनेक्ट | Ctrl+Shift+S = स्मार्ट कनेक्ट | Ctrl+Shift+Q = बाहर</value>
   </data>
 
-  <data name="Add_Link" xml:space="preserve"><value>जोड़ें</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>अपडेट के लिए प्रॉक्सी का उपयोग करें</value></data>
   <!-- Notifications -->
@@ -230,7 +224,75 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} घंटे शेष</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 मैनुअल</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>कोई सर्वर चयनित नहीं</value></data>
+  <data name="Set_Reports" xml:space="preserve">
+    <value>बग और समस्या रिपोर्ट</value>
+  </data>
+  <data name="Set_Reports_Desc" xml:space="preserve">
+    <value>यदि ऐप क्रैश हुआ या आपको कोई समस्या मिली, तो रिपोर्ट स्वतः डेवलपर को भेजी जाती है। नीचे दिए बटन से आप स्वयं भी वैकल्पिक विवरण के साथ समस्या रिपोर्ट कर सकते हैं; संस्करण, ऑपरेटिंग सिस्टम, डिवाइस ID, कनेक्शन स्थिति और हाल का लॉग स्वतः जुड़ जाते हैं।</value>
+  </data>
+  <data name="Btn_ReportBug" xml:space="preserve">
+    <value>समस्या रिपोर्ट करें...</value>
+  </data>
+  <data name="Dlg_ReportTitle" xml:space="preserve">
+    <value>बग और समस्या रिपोर्ट</value>
+  </data>
+  <data name="Dlg_ReportHint" xml:space="preserve">
+    <value>समस्या बताएँ (वैकल्पिक): आपने क्या किया और क्या हुआ...</value>
+  </data>
+  <data name="Btn_SendReport" xml:space="preserve">
+    <value>रिपोर्ट भेजें</value>
+  </data>
+  <data name="Rpt_AutoInfo" xml:space="preserve">
+    <value>ऐप की स्वतः एकत्र जानकारी आपके कुछ भी किए बिना जुड़ जाती है:
+संस्करण {0} • {1}
+डिवाइस ID {2}
+स्थिति: {3}</value>
+  </data>
+  <data name="Rpt_StateOn" xml:space="preserve">
+    <value>{0} से जुड़ा</value>
+  </data>
+  <data name="Rpt_StateOff" xml:space="preserve">
+    <value>डिस्कनेक्टेड</value>
+  </data>
+  <data name="Log_ReportSent" xml:space="preserve">
+    <value>समस्या रिपोर्ट भेजी गई</value>
+  </data>
+  <data name="Toast_ReportSent" xml:space="preserve">
+    <value>रिपोर्ट भेजी गई — धन्यवाद</value>
+  </data>
+  <data name="Log_ReportFailed" xml:space="preserve">
+    <value>भेजना विफल; रिपोर्ट कतार में रही और अगली बार लॉन्च पर भेजी जाएगी</value>
+  </data>
+  <data name="Log_ReportFlushed" xml:space="preserve">
+    <value>{0} कतारबद्ध रिपोर्ट भेजी गईं</value>
+  </data>
   <data name="Home_NotConnected" xml:space="preserve"><value>कनेक्टेड नहीं है</value></data>
+  <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>इंटरनेट ठीक है: सीधा रास्ता स्वस्थ है; नेटवर्क बदलने के बाद टनल जवाब नहीं दे रहा</value></data>
+  <data name="Set_Privacy" xml:space="preserve"><value>गोपनीयता</value></data>
+  <data name="Set_Stats" xml:space="preserve"><value>कनेक्शन आँकड़े पैनल को भेजें</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>हर 60 मिनट में ऐप संस्करण, भाषा, देश और डिवाइस ID अपडेट जाँच के लिए पैनल को भेजा जाता है। इसे बंद करने पर अपडेट जाँच चलती रहती है लेकिन कोई ID या आँकड़े नहीं भेजे जाते; आपका कंप्यूटर नाम कभी नहीं भेजा जाता।</value></data>
+  <data name="Set_DeviceId" xml:space="preserve"><value>डिवाइस ID</value></data>
+  <data name="Set_DeviceId_Desc" xml:space="preserve"><value>इस सिस्टम के लिए ऐप द्वारा बनाया गया अद्वितीय ID (आपका कंप्यूटर नाम नहीं), प्रबंधन पैनल में दिखता है।</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>पिछले रन से बचा हुआ कनेक्शन मिला।&amp;#10;पूरी सफाई के लिए ऐप को एडमिन के रूप में पुनः आरंभ करना होगा।</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>TUN एडेप्टर तैयार नहीं है।</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>TUN रूट जोड़े गए।</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>TUN रूट जोड़ने में विफल: {0}</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>कनेक्शन इंजन अप्रत्याशित रूप से रुक गया</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>TUN के बिना भी VPN बायपास</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>चालू होने पर, इस सूची के ऐप VPN के सिस्टम प्रॉक्सी (TUN के बिना) से जुड़े होने पर भी VPN के बजाय सिस्टम का सीधा इंटरनेट उपयोग करते हैं।</value></data>
+  <data name="Set_KillSwitch" xml:space="preserve"><value>ग्लोबल किल स्विच</value></data>
+  <data name="Set_KillSwitch_Desc" xml:space="preserve"><value>VPN टनल गिरने पर, आपका असली पता कभी लीक न हो इसके लिए VPN लौटने तक सारा इंटरनेट ट्रैफ़िक ब्लॉक हो जाता है। 'TUN अपवाद सूची' के ऐप सीधे जुड़े रहते हैं।</value></data>
+  <data name="Set_KillSwitch_Add" xml:space="preserve"><value>सुरक्षा के लिए ऐप जोड़ें...</value></data>
+  <data name="Set_KillSwitch_Remove" xml:space="preserve"><value>संरक्षित सूची से हटाएं</value></data>
+  <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>अभीतक सुरक्षा के लिए कोई ऐप नहीं जोड़ा गया</value></data>
+  <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>कनेक्टेड नहीं — सारा ट्रैफ़िक ब्लॉक है ({0} ऐप छूट)</value></data>
+  <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>VPN कनेक्शन टूट गया</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>VPN के दोबारा जुड़ने तक इंटरनेट ब्लॉक है ({0} ऐप छूट)। वापस न आए तो आपातकालीन रिलीज़ बटन दबाएं।</value></data>
+  <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>VPN फिर से कनेक्ट हुआ</value></data>
+  <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>इंटरनेट फिर से काम कर रहा है</value></data>
+  <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>आपातकालीन इंटरनेट रिलीज़</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>रिलीज़ बटन के बाद भी इंटरनेट वापस न आए तो समस्या किल स्विच की नहीं है — Wi-Fi/Windows नेटवर्क जांचें या सिस्टम रीस्टार्ट करें।</value></data>
+  <data name="Home_SwitchingServer" xml:space="preserve"><value>नए सर्वर से कनेक्ट हो रहा है</value></data>
   <data name="LastUpdate_DayAgo" xml:space="preserve"><value>अंतिम अपडेट: {0} दिन पहले</value></data>
   <data name="LastUpdate_HourAgo" xml:space="preserve"><value>अंतिम अपडेट: {0} घंटे पहले</value></data>
   <data name="LastUpdate_MinAgo" xml:space="preserve"><value>अंतिम अपडेट: {0} मिनट पहले</value></data>
@@ -254,7 +316,11 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>इंस्टॉल करें</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>अपडेट डाउनलोड हो रहा है…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>डाउनलोड पूरा हुआ; इंस्टॉल के लिए ऐप बंद होगा</value></data>
+  <data name="Upd_Installing" xml:space="preserve"><value>अपडेट इंस्टॉल हो रहा है…</value></data>
+  <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>अपडेट डाउनलोड विफल रहा</value></data>
+  <data name="Btn_FullTest" xml:space="preserve"><value>पूर्ण परीक्षण</value></data>
+  <data name="Status_GroupFullDone" xml:space="preserve"><value>{0} का पूर्ण परीक्षण समाप्त</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>जारी रखने के लिए नया संस्करण इंस्टॉल करें</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>बंद करें</value></data>
   <data name="Ann_View" xml:space="preserve"><value>देखें</value></data>
@@ -268,7 +334,6 @@
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>हटाएँ</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>अभी तक कोई ऐप जोड़ा नहीं गया है</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>इस ऐप को छूट देना टॉगल करें</value></data>
-  <data name="Status_ClipboardAdded" xml:space="preserve"><value>क्लिपबोर्ड से {0} सर्वर जोड़े गए</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>क्लिपबोर्ड खाली है</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>क्लिपबोर्ड तक पहुँच उपलब्ध नहीं है</value></data>
   <data name="Status_ConnectError" xml:space="preserve"><value>कनेक्शन त्रुटि</value></data>
@@ -295,10 +360,8 @@
   <data name="Status_GroupSpeedDone" xml:space="preserve"><value>समूह स्पीड टेस्ट पूरा ({0} सफल)</value></data>
   <data name="Status_GroupUpdate" xml:space="preserve"><value>समूह "{0}" अपडेट हो रहा है ({1} सर्वर) ...</value></data>
   <data name="Status_GroupUpdateDone" xml:space="preserve"><value>समूह अपडेट पूरा ({0} सफल)</value></data>
-  <data name="Status_NewServerName" xml:space="preserve"><value>नया सर्वर ({0})</value></data>
   <data name="Status_NoServerFromSub" xml:space="preserve"><value>"{0}" से कोई सर्वर प्राप्त नहीं हुआ</value></data>
   <data name="Status_NoServers" xml:space="preserve"><value>कोई सर्वर नहीं</value></data>
-  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>क्लिपबोर्ड में कोई वैध लिंक नहीं है</value></data>
   <data name="Status_PingAll" xml:space="preserve"><value>{0} सर्वर को पिंग किया जा रहा है ...</value></data>
   <data name="Status_PingDoneCount" xml:space="preserve"><value>पिंग पूरा: {1} में से {0} ने उत्तर दिया</value></data>
   <data name="Status_PingSelDone" xml:space="preserve"><value>चयनितों का पिंग पूरा ({0} सफल)</value></data>
@@ -309,7 +372,6 @@
   <data name="Status_RealDoneCount" xml:space="preserve"><value>वास्तविक विलंब परीक्षण पूरा: {1} में से {0} सफल</value></data>
   <data name="Status_RealSelDone" xml:space="preserve"><value>चयनितों का वास्तविक विलंब परीक्षण पूरा ({0} सफल)</value></data>
   <data name="Status_RealSelected" xml:space="preserve"><value>{0} चयनित सर्वर पर वास्तविक विलंब परीक्षण ...</value></data>
-  <data name="Status_ServerAdded" xml:space="preserve"><value>सर्वर "{0}" जोड़ा गया</value></data>
   <data name="Status_ServersAdded" xml:space="preserve"><value>{0} सर्वर जोड़े गए</value></data>
   <data name="Status_SmartBest" xml:space="preserve"><value>स्मार्ट कनेक्ट: सर्वोत्तम सर्वर → {0} ({1})</value></data>
   <data name="Status_SmartCancelled" xml:space="preserve"><value>स्मार्ट कनेक्ट रद्द किया गया</value></data>
@@ -342,6 +404,7 @@
   <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>सर्वर लिंक कॉपी हो गए</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>कनेक्ट करने के लिए कोई सर्वर उपलब्ध नहीं</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>इस बैच में किसी सर्वर ने उत्तर नहीं दिया</value></data>
+  <data name="Toast_BatchAllInvalidDomains" xml:space="preserve"><value>इस बैच के डोमेन resolve नहीं हुए; लिंक अमान्य हैं</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>किसी सर्वर ने उत्तर नहीं दिया</value></data>
   <data name="Toast_RealDelayFailed" xml:space="preserve"><value>वास्तविक विलंब परीक्षण विफल रहा</value></data>
   <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>वास्तविक विलंब परीक्षण ने किसी सर्वर की पुष्टि नहीं की</value></data>
@@ -371,6 +434,7 @@
   <data name="Url_InvalidSs" xml:space="preserve"><value>अमान्य Shadowsocks लिंक</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>अमान्य Trojan लिंक</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>अमान्य VLESS लिंक</value></data>
+  <data name="Url_InvalidVmess" xml:space="preserve"><value>अमान्य VMess लिंक</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>केवल vmess / vless / ss / trojan समर्थित हैं</value></data>
   <data name="Url_UnsupportedTransport" xml:space="preserve"><value>ट्रांसपोर्ट समर्थित नहीं है: {0}</value></data>
   <data name="Url_InvalidParam" xml:space="preserve"><value>पैरामीटर {0} के लिए अमान्य मान: {1}</value></data>
@@ -379,6 +443,7 @@
   <data name="Log_FindNoMore" xml:space="preserve"><value>बेहतर खोजें: परीक्षण के लिए और सर्वर नहीं बचे</value></data>
   <data name="Log_FindNoSelection" xml:space="preserve"><value>बेहतर खोजें: रोका गया — कोई सर्वर चयनित नहीं</value></data>
   <data name="Log_FindNoSurvivors" xml:space="preserve"><value>बेहतर खोजें: TCP पिंग से कोई बचा नहीं</value></data>
+  <data name="Log_BatchDomainInvalid" xml:space="preserve"><value>डोमेन resolve नहीं हुआ: {0}</value></data>
   <data name="Log_FindNotConnected" xml:space="preserve"><value>बेहतर खोजें: रोका गया — कनेक्टेड नहीं है</value></data>
   <data name="Log_FindRealBatch" xml:space="preserve"><value>बेहतर खोजें: बैच मल्टी-आउटबाउंड से {0} बचों का परीक्षण</value></data>
   <data name="Log_FindRealFailedAll" xml:space="preserve"><value>बेहतर खोजें: सभी वास्तविक विलंब परीक्षण विफल</value></data>
@@ -446,4 +511,25 @@
 <data name="Hint_BypassTun" xml:space="preserve"><value>नोट: परीक्षण TUN लागू किए बिना चलते हैं</value></data>
 <data name="Notify_TunOn" xml:space="preserve"><value>ROXA कनेक्टेड</value></data>
 <data name="Notify_TunOff" xml:space="preserve"><value>ROXA डिस्कनेक्टेड</value></data>
+  <data name="Set_Notifications" xml:space="preserve"><value>विंडोज़ सूचनाएँ</value></data>
+  <data name="Set_Notifications_Desc" xml:space="preserve"><value>कनेक्ट, डिस्कनेक्ट और त्रुटियों पर विंडोज़ घड़ी के पास सूचना बुलबुले दिखाएँ।</value></data>
+  <data name="Tray_Notifications" xml:space="preserve"><value>विंडोज़ सूचनाएँ</value></data>
+  <data name="Stg_Cleanup" xml:space="preserve"><value>पिछले कनेक्शन की सफाई ...</value></data>
+  <data name="Stg_Routes" xml:space="preserve"><value>TUN रूट सेट हो रहे हैं ...</value></data>
+  <data name="Stg_Dns" xml:space="preserve"><value>DNS कॉनफ़़िगर हो रहा है ...</value></data>
+  <data name="Stg_Engine" xml:space="preserve"><value>कृपया प्रतीक्षा करें</value></data>
+  <data name="Toast_NoInternet" xml:space="preserve"><value>इंटरनेट बंद है</value></data>
+  <data name="SubFetch_Direct" xml:space="preserve"><value>सीधी प्राप्ति (प्रॉक्सी के बिना)...</value></data>
+  <data name="SubFetch_Proxy" xml:space="preserve"><value>प्रॉक्सी से प्राप्ति...</value></data>
+  <data name="SubFetch_SystemProxy" xml:space="preserve"><value>सिस्टम प्रॉक्सी से प्राप्ति...</value></data>
+  <data name="Log_SubHealDns" xml:space="preserve"><value>TUN के अवशिष्ट {0} DNS एडेप्टर ठीक किए गए</value></data>
+  <data name="Log_SubBypass" xml:space="preserve"><value>सीधी प्राप्ति के लिए TUN को नज़रअंदाज़ किया जा रहा है...</value></data>
+  <data name="Set_SingBox" xml:space="preserve"><value>sing-box सक्षम करें</value></data>
+  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box कोर मौजूदा इंजन के साथ जोड़ दिया गया है। इसे सक्षम करने से फिलहाल केवल सेटिंग सहेजी जाती है; कनेक्शन व्यवहार नहीं बदलता।</value></data>
+  <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUN सक्षम करें</value></data>
+  <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>TUN सक्षम होने पर संपूर्ण सिस्टम ट्रैफ़िक टनल से गुज़रता है और ऐप को व्यवस्थापक अनुमति की आवश्यकता होगी। क्या आप सुनिश्चित हैं?</value></data>
+  <data name="Set_Table" xml:space="preserve"><value>तालिका</value></data>
+  <data name="Set_ShowIp" xml:space="preserve"><value>IP पता कॉलम दिखाएँ</value></data>
+  <data name="Set_ShowIp_Desc" xml:space="preserve"><value>सक्षम होने पर, सर्वर तालिका में IP पता कॉलम दिखाया जाता है।</value></data>
+<data name="Btn_Paste" xml:space="preserve"><value>क्लिपबोर्ड से पेस्ट करें</value></data>
 </root>

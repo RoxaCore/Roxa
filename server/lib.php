@@ -3,6 +3,53 @@ require_once __DIR__ . '/config.php';
 
 date_default_timezone_set(TZ);
 
+function ini_bytes(string $val): int
+{
+    $val = strtolower(trim($val));
+    if ($val === '' || $val === '-1' || $val === 'off' || $val === '0') {
+        return 0;
+    }
+    $n = (float)$val;
+    if (substr($val, -1) === 'g') {
+        $n *= 1073741824;
+    } elseif (substr($val, -1) === 'm') {
+        $n *= 1048576;
+    } elseif (substr($val, -1) === 'k') {
+        $n *= 1024;
+    }
+    return (int)$n;
+}
+
+function post_size_exceeded(): bool
+{
+    $max = ini_bytes((string)ini_get('post_max_size'));
+    if ($max <= 0) {
+        return false;
+    }
+    $len = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+    return $len > $max;
+}
+
+// چک زودهنگام: اگر POST بزرگ‌تر از post_max_size باشد، PHP $_POST را خالی می‌کند و
+// csrf_check به‌جای خطای درست، 419/CSRF یا زنجیرهٔ warning می‌دهد. زودتر از session خارج می‌شویم.
+if (post_size_exceeded()) {
+    // اگر PHP قبلاً Warning چاپ کرده باشد، headers_sent() درست است و دیگر نباید
+    // http_response_code/header صدا زده شود (وگرنه دو Warning اضافه تولید می‌شود).
+    if (!headers_sent()) {
+        http_response_code(413);
+        header('Content-Type: text/plain; charset=utf-8');
+    }
+    $limit = (string)ini_get('post_max_size');
+    $got = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+    $gotMb = $got > 0 ? number_format($got / 1048576, 1) . ' MB' : 'نامشخص';
+    exit(
+        'حجم درخواست POST (' . $gotMb . ') از محدودیت سرور (post_max_size = ' . $limit . ') بیشتر است.' . "\n" .
+        'برای انتشار نسخه یکی از کارهای زیر را انجام دهید:' . "\n" .
+        '  ۱) upload_max_filesize و post_max_size را در php.ini / .user.ini / پنل هاست بالا ببرید،' . "\n" .
+        '  ۲) یا در پنل «نسخه و آپدیت» به‌جای آپلود، از حالت «لینک مستقیم» استفاده کنید.' . "\n"
+    );
+}
+
 function sess_start(): void
 {
     if (session_status() === PHP_SESSION_ACTIVE) {
@@ -129,10 +176,30 @@ function attempts_file(): string
     return DATA_DIR . '/attempts.json';
 }
 
+function attempts_ip_file(): string
+{
+    return DATA_DIR . '/attempts_ip.json';
+}
+
+/**
+ * قفل ورود: شمارندهٔ per-IP (۲۰ تلاش ناموفق/ساعت از هر آدرس) + سقف سراسری
+ * (۱۰۰ تلاش/ساعت کل سایت برای مانع حملهٔ چند-IP).
+ * قبلاً فقط یک شمارندهٔ سراسری ۸/۱۵دقیقه بود که مهاجم با ۸ تلاش اشتباهِ ساده
+ * می‌توانست خودِ مدیر را قفل کند (login-DoS)؛ اکنون هر آدرس فقط خودش را قفل می‌کند.
+ */
 function attempt_allowed(): bool
 {
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+    $now = time();
+
+    $ipa = jread(attempts_ip_file(), ['k' => []]);
+    $e = $ipa['k'][$ip] ?? ['n' => 0, 'ts' => $now];
+    if ((int)$e['n'] >= 20 && $now - (int)$e['ts'] < 3600) {
+        return false;
+    }
+
     $a = jread(attempts_file(), ['n' => 0, 'ts' => 0]);
-    if ($a['n'] >= 8 && time() - $a['ts'] < 900) {
+    if ((int)$a['n'] >= 100 && $now - (int)$a['ts'] < 3600) {
         return false;
     }
     return true;
@@ -140,9 +207,30 @@ function attempt_allowed(): bool
 
 function attempt_fail(): void
 {
-    $a = jread(attempts_file(), ['n' => 0, 'ts' => time()]);
-    if (time() - $a['ts'] >= 900) {
-        $a = ['n' => 0, 'ts' => time()];
+    $now = time();
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+
+    $f = attempts_ip_file();
+    $st = jread($f, ['k' => []]);
+    if (!is_array($st['k'] ?? null)) {
+        $st['k'] = [];
+    }
+    $e = $st['k'][$ip] ?? ['n' => 0, 'ts' => $now];
+    if ($now - (int)$e['ts'] >= 3600) {
+        $e = ['n' => 0, 'ts' => $now];
+    }
+    $e['n'] = (int)$e['n'] + 1;
+    $st['k'][$ip] = $e;
+    foreach ($st['k'] as $kk => $vv) {
+        if ($now - (int)($vv['ts'] ?? 0) >= 3600) {
+            unset($st['k'][$kk]);
+        }
+    }
+    jwrite($f, $st);
+
+    $a = jread(attempts_file(), ['n' => 0, 'ts' => $now]);
+    if ($now - (int)$a['ts'] >= 3600) {
+        $a = ['n' => 0, 'ts' => $now];
     }
     $a['n'] = (int)$a['n'] + 1;
     jwrite(attempts_file(), $a);
@@ -151,6 +239,13 @@ function attempt_fail(): void
 function attempt_reset(): void
 {
     jwrite(attempts_file(), ['n' => 0, 'ts' => 0]);
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+    $f = attempts_ip_file();
+    $st = jread($f, ['k' => []]);
+    if (is_array($st['k'] ?? null) && isset($st['k'][$ip])) {
+        unset($st['k'][$ip]);
+        jwrite($f, $st);
+    }
 }
 
 function api_headers(): void
@@ -158,6 +253,66 @@ function api_headers(): void
     header('Content-Type: application/json; charset=utf-8');
     header('Cache-Control: no-store, no-cache, must-revalidate');
     header('Access-Control-Allow-Origin: *');
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: no-referrer');
+}
+
+/** هدرهای امنیتی صفحات HTML — قبل از هر خروجی فراخوانی شود. */
+function security_headers(): void
+{
+    if (headers_sent()) {
+        return;
+    }
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: DENY');
+    header('Referrer-Policy: no-referrer');
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src https://cdn.jsdelivr.net data:; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+}
+
+/**
+ * محدودیت نرخ per-IP برای نوشتن آمار؛ بدون آن هر کسی با GUID تصادفی
+ * می‌تواند stats.json را بی‌نهها رشد دهد (هر نوشتن = بازنویسی کل فایل).
+ */
+function rate_allow(string $ip, int $max, int $windowSec): bool
+{
+    if ($ip === '') {
+        return true;
+    }
+    $f = DATA_DIR . '/ratelimit.json';
+    $lock = @fopen(DATA_DIR . '/ratelimit.lock', 'c');
+    if ($lock) {
+        flock($lock, LOCK_EX);
+    }
+    try {
+        $now = time();
+        $st = jread($f, ['k' => []]);
+        if (!is_array($st['k'] ?? null)) {
+            $st['k'] = [];
+        }
+        foreach ($st['k'] as $kk => $vv) {
+            if ($now - (int)($vv['ts'] ?? 0) >= $windowSec) {
+                unset($st['k'][$kk]);
+            }
+        }
+        $e = $st['k'][$ip] ?? ['n' => 0, 'ts' => $now];
+        if ($now - (int)$e['ts'] >= $windowSec) {
+            $e = ['n' => 0, 'ts' => $now];
+        }
+        if ((int)$e['n'] >= $max) {
+            $st['k'][$ip] = $e;
+            jwrite($f, $st);
+            return false;
+        }
+        $e['n'] = (int)$e['n'] + 1;
+        $st['k'][$ip] = $e;
+        jwrite($f, $st);
+        return true;
+    } finally {
+        if ($lock) {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+        }
+    }
 }
 
 function ver_safe(string $v): string
@@ -301,6 +456,10 @@ function stats_touch(string $id, array $meta = []): void
         if (isset($st['clients'][$id]) && is_array($st['clients'][$id])) {
             $st['clients'][$id]['last'] = $now;
         } else {
+            // سقف ورودی‌ها: GUIDهای جعلی نمی‌توانند فایل را بی‌نهها رشد دهند.
+            if (count($st['clients']) >= 5000) {
+                return;
+            }
             $st['clients'][$id] = ['first' => $now, 'last' => $now];
         }
         foreach ($meta as $k => $v) {
@@ -357,12 +516,18 @@ function stats_summary(): array
     $installs = 0;
     $a24 = 0;
     $a7 = 0;
+    $online = 0;
+    $conns = 0;
     foreach (($st['clients'] ?? []) as $c) {
         if (!is_array($c)) {
             continue;
         }
         $installs++;
+        $conns += max(0, (int)($c['conn'] ?? 0));
         $t = strtotime((string)($c['last'] ?? '')) ?: 0;
+        if ($t > 0 && $now - $t <= 1200) {
+            $online++;
+        }
         if ($t > 0 && $now - $t <= 86400) {
             $a24++;
         }
@@ -370,7 +535,119 @@ function stats_summary(): array
             $a7++;
         }
     }
-    return ['installs' => $installs, 'active24' => $a24, 'active7' => $a7];
+    return [
+        'installs' => $installs,
+        'active24' => $a24,
+        'active7' => $a7,
+        'online' => $online,
+        'connections' => $conns,
+    ];
+}
+
+function stats_online(array $c, int $window = 1200): bool
+{
+    $t = strtotime((string)($c['last'] ?? '')) ?: 0;
+    return $t > 0 && time() - $t <= $window;
+}
+
+function ip_public(string $ip): bool
+{
+    if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
+        return false;
+    }
+    return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
+}
+
+function ip_info(string $ip): ?array
+{
+    if (!ip_public($ip)) {
+        return ['isp' => '', 'asn' => 0, 'org' => ''];
+    }
+    $ctx = stream_context_create([
+        'http' => [
+            'timeout' => 3,
+            'header' => "User-Agent: RoxaPanel/1.0\r\nAccept: application/json\r\n",
+            'ignore_errors' => true,
+        ],
+    ]);
+    $raw = @file_get_contents('https://ipwho.is/' . rawurlencode($ip), false, $ctx);
+    if ($raw === false || $raw === '') {
+        return null;
+    }
+    $j = json_decode($raw, true);
+    if (!is_array($j)) {
+        return null;
+    }
+    if (empty($j['success'])) {
+        return ['isp' => '', 'asn' => 0, 'org' => ''];
+    }
+    $conn = is_array($j['connection'] ?? null) ? $j['connection'] : [];
+    $isp = trim((string)($conn['isp'] ?? ''));
+    $org = trim((string)($conn['org'] ?? ''));
+    $asn = (int)($conn['asn'] ?? 0);
+    return ['isp' => str_cut($isp, 80), 'asn' => max(0, $asn), 'org' => str_cut($org, 80)];
+}
+
+function ip_info_save(string $id, array $info): void
+{
+    stats_touch($id, [
+        'isp_done' => 1,
+        'isp' => $info['isp'] !== '' ? $info['isp'] : null,
+        'asn' => $info['asn'] > 0 ? $info['asn'] : null,
+        'org' => $info['org'] !== '' ? $info['org'] : null,
+    ]);
+}
+
+/** سقف ساعتی فراخوانی ipwho.is؛ بدون آن هر شناسهٔ جعلیِ `id` یک درخواست سمت‌سرور می‌سازد. */
+function ipinfo_allow(): bool
+{
+    $f = DATA_DIR . '/ipinfo_quota.json';
+    $q = jread($f, ['h' => '', 'n' => 0]);
+    $h = gmdate('YmdH');
+    if ((string)($q['h'] ?? '') !== $h) {
+        $q = ['h' => $h, 'n' => 0];
+    }
+    if ((int)($q['n'] ?? 0) >= 60) {
+        return false;
+    }
+    $q['n'] = (int)($q['n'] ?? 0) + 1;
+    jwrite($f, $q);
+    return true;
+}
+
+function ip_fill(array &$rows, int $cap = 10, float $budget = 4.0): void
+{
+    $deadline = microtime(true) + $budget;
+    $done = 0;
+    foreach ($rows as &$c) {
+        if ($done >= $cap || microtime(true) >= $deadline) {
+            break;
+        }
+        $id = (string)($c['id'] ?? '');
+        $ip = (string)($c['ip'] ?? '');
+        if ($id === '' || !empty($c['isp_done'])) {
+            continue;
+        }
+        if ($ip === '') {
+            continue;
+        }
+        if (!ip_public($ip)) {
+            stats_touch($id, ['isp_done' => 1]);
+            $c['isp_done'] = 1;
+            continue;
+        }
+        $info = ip_info($ip);
+        if ($info === null) {
+            continue;
+        }
+        ip_info_save($id, $info);
+        $c['isp_done'] = 1;
+        $c['isp'] = $info['isp'];
+        $c['asn'] = $info['asn'];
+        $c['org'] = $info['org'];
+        $done++;
+    }
+    unset($c);
 }
 
 function str_cut(string $s, int $len): string

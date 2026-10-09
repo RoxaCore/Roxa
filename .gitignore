@@ -7,3 +7,15 @@ obj/
 *.snupkg
 installer/publish/
 installer/output/
+
+# ابزارهای توسعه (کش و حاشیه‌نویسی پروژه)
+.opencode/
+
+# بسته‌های انتشار: در پنل آپلود می‌شوند، جایی در تاریخچهٔ گیت ندارند
+upload-*.zip
+server/dl/*.zip
+
+# موتورهای بزرگ که در بستهٔ آپدیت نیستند و کد هم به آن‌ها ارجاع نمی‌دهد
+engine/sing-box.exe
+engine/libcronet.dll
+engine/LICENSE-sing-box.txt

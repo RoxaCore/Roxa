@@ -50,13 +50,6 @@ public static class Storage
                 json = Encoding.UTF8.GetString(raw);
             }
             var list = JsonSerializer.Deserialize<List<ServerInfo>>(json) ?? new List<ServerInfo>();
-            // ping/speed are session-only (JsonIgnore); reset any legacy cached values
-            foreach (var s in list)
-            {
-                s.LatencyMs = -1;
-                s.PingMs = -1;
-                s.DownloadMbps = -1;
-            }
             return list;
         }
         catch { return new List<ServerInfo>(); }

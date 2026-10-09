@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../lib.php';
+security_headers();
 
 function page_head(string $title, string $active): void
 {
@@ -8,6 +9,7 @@ function page_head(string $title, string $active): void
         'dash' => ['داشبورد', 'index.php'],
         'users' => ['کاربران', 'users.php'],
         'ann' => ['اعلان‌ها', 'announcements.php'],
+        'rep' => ['گزارش‌ها', 'reports.php'],
         'ver' => ['نسخه و آپدیت', 'version.php'],
         'pw' => ['تغییر رمز', 'password.php'],
     ];
@@ -66,6 +68,8 @@ th{color:var(--mut);font-weight:400;font-size:12px}
 .b-update{background:#2a1a3a;color:#c084fc}
 .b-on{background:#062a1c;color:#34d399}
 .b-off{background:#2a0e0e;color:#f87171}
+.b-live{background:#062a1c;color:#34d399;animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
 .msg{padding:11px 15px;border-radius:10px;margin-bottom:16px;font-size:13px}
 .msg.ok{background:#062a1c;color:#34d399;border:1px solid #0d4a33}
 .msg.err{background:#2a0e0e;color:#f87171;border:1px solid #4a0d0d}

@@ -59,7 +59,7 @@
   <data name="Btn_Export" xml:space="preserve"><value>📦 Export</value></data>
   <data name="Btn_Import" xml:space="preserve"><value>📋 Import</value></data>
   <!-- Placeholders -->
-  <data name="Ph_ServerLink" xml:space="preserve"><value>Server link (vmess://, vless://, ...)</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>Server link (vmess://, vless://, ss://, trojan://)</value></data>
   <data name="Ph_SubName" xml:space="preserve"><value>Name</value></data>
   <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
   <!-- Sort -->
@@ -83,10 +83,6 @@
   <data name="Ctx_Delete" xml:space="preserve"><value>Delete Server</value></data>
   <data name="Ctx_ClearSel" xml:space="preserve"><value>Clear Selection</value></data>
   <!-- Add Menu -->
-  <data name="Add_VMess" xml:space="preserve"><value>🟢 Add VMess</value></data>
-  <data name="Add_VLESS" xml:space="preserve"><value>🔵 Add VLESS</value></data>
-  <data name="Add_SS" xml:space="preserve"><value>🟠 Add Shadowsocks</value></data>
-  <data name="Add_Trojan" xml:space="preserve"><value>🔴 Add Trojan</value></data>
   <data name="Add_Clipboard" xml:space="preserve"><value>📋 Import from Clipboard</value></data>
   <!-- Settings -->
   <data name="Set_Proxy" xml:space="preserve"><value>Set System Proxy</value></data>
@@ -104,7 +100,6 @@
   <data name="Set_Every" xml:space="preserve"><value>Every</value></data>
   <data name="Set_Hours" xml:space="preserve"><value>hours, update</value></data>
   <data name="Set_Advanced" xml:space="preserve"><value>Advanced Settings</value></data>
-  <data name="Set_PingType" xml:space="preserve"><value>Ping type:</value></data>
   <data name="Set_GlobalSort" xml:space="preserve"><value>Global sort (after test, best server from all groups comes first)</value></data>
   <data name="Set_DNS" xml:space="preserve"><value>Custom DNS</value></data>
   <data name="Set_DNSBtn" xml:space="preserve"><value>⚙  DNS Settings</value></data>
@@ -218,7 +213,6 @@
     <value>Hotkeys: Ctrl+Shift+C = Connect | Ctrl+Shift+D = Disconnect | Ctrl+Shift+S = Smart Connect | Ctrl+Shift+Q = Exit</value>
   </data>
 
-  <data name="Add_Link" xml:space="preserve"><value>Add</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>Use proxy for updates</value></data>
 
@@ -249,7 +243,56 @@ Latency: {1}</value></data>
   <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} hours left</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 Manual</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>No server selected</value></data>
+  <data name="Set_Reports" xml:space="preserve">
+    <value>Bug and issue report</value>
+  </data>
+  <data name="Set_Reports_Desc" xml:space="preserve">
+    <value>If the app crashed or you hit a problem, a report is sent to the developer automatically. Use the button below to report a problem yourself with an optional description; the app version, OS, device ID, connection state and recent log are attached automatically.</value>
+  </data>
+  <data name="Btn_ReportBug" xml:space="preserve">
+    <value>Report a problem...</value>
+  </data>
+  <data name="Dlg_ReportTitle" xml:space="preserve">
+    <value>Bug and issue report</value>
+  </data>
+  <data name="Dlg_ReportHint" xml:space="preserve">
+    <value>Describe the problem (optional): what you did and what happened...</value>
+  </data>
+  <data name="Btn_SendReport" xml:space="preserve">
+    <value>Send report</value>
+  </data>
+  <data name="Rpt_AutoInfo" xml:space="preserve">
+    <value>Auto-collected app info attached without any action from you:
+Version {0} • {1}
+Device ID {2}
+State: {3}</value>
+  </data>
+  <data name="Rpt_StateOn" xml:space="preserve">
+    <value>Connected to {0}</value>
+  </data>
+  <data name="Rpt_StateOff" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="Log_ReportSent" xml:space="preserve">
+    <value>Problem report sent</value>
+  </data>
+  <data name="Toast_ReportSent" xml:space="preserve">
+    <value>Report sent — thank you</value>
+  </data>
+  <data name="Log_ReportFailed" xml:space="preserve">
+    <value>Sending the report failed; it was queued and will be sent on next launch</value>
+  </data>
+  <data name="Log_ReportFlushed" xml:space="preserve">
+    <value>{0} queued report(s) sent</value>
+  </data>
   <data name="Home_NotConnected" xml:space="preserve"><value>Not connected</value></data>
+  <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>Internet is fine: the direct path is healthy; the tunnel is not responding after the network change</value></data>
+  <data name="Set_Privacy" xml:space="preserve"><value>Privacy</value></data>
+  <data name="Set_Stats" xml:space="preserve"><value>Send connection stats to the panel</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>Every 60 minutes the app version, language, country and device ID are sent to the panel to check for updates. Turning this off keeps update checks working but no ID or stats are sent; your computer name is never sent.</value></data>
+  <data name="Set_DeviceId" xml:space="preserve"><value>Device ID</value></data>
+  <data name="Set_DeviceId_Desc" xml:space="preserve"><value>A unique ID generated by the app for this system (not your computer name), shown in the management panel.</value></data>
+  <data name="Home_SwitchingServer" xml:space="preserve"><value>Connecting to new server</value></data>
   <data name="LastUpdate_DayAgo" xml:space="preserve"><value>Last updated: {0} days ago</value></data>
   <data name="LastUpdate_HourAgo" xml:space="preserve"><value>Last updated: {0} hr ago</value></data>
   <data name="LastUpdate_MinAgo" xml:space="preserve"><value>Last updated: {0} min ago</value></data>
@@ -273,7 +316,11 @@ Latency: {1}</value></data>
   <data name="Upd_Btn_Install" xml:space="preserve"><value>Install</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>Downloading update…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>Download complete; the app will close to install</value></data>
+  <data name="Upd_Installing" xml:space="preserve"><value>Installing update…</value></data>
+  <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>Update download failed</value></data>
+  <data name="Btn_FullTest" xml:space="preserve"><value>Full test</value></data>
+  <data name="Status_GroupFullDone" xml:space="preserve"><value>Full test of {0} finished</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>You must install the new version to continue</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>Close</value></data>
   <data name="Ann_View" xml:space="preserve"><value>View</value></data>
@@ -301,7 +348,6 @@ Latency: {1}</value></data>
   <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>Internet is back online</value></data>
   <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>Emergency internet release</value></data>
   <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>If the emergency button does not restore internet, the kill switch is not the problem — check Wi-Fi/Windows network or restart the PC.</value></data>
-  <data name="Status_ClipboardAdded" xml:space="preserve"><value>{0} servers added from clipboard</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>Clipboard is empty</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>Clipboard access is not available</value></data>
   <data name="Status_ConnectError" xml:space="preserve"><value>Connection error</value></data>
@@ -328,10 +374,8 @@ Latency: {1}</value></data>
   <data name="Status_GroupSpeedDone" xml:space="preserve"><value>Group speed test done ({0} ok)</value></data>
   <data name="Status_GroupUpdate" xml:space="preserve"><value>Updating group "{0}" ({1} servers) ...</value></data>
   <data name="Status_GroupUpdateDone" xml:space="preserve"><value>Group update done ({0} ok)</value></data>
-  <data name="Status_NewServerName" xml:space="preserve"><value>New server ({0})</value></data>
   <data name="Status_NoServerFromSub" xml:space="preserve"><value>No servers received from "{0}"</value></data>
   <data name="Status_NoServers" xml:space="preserve"><value>No servers</value></data>
-  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>No valid link in the clipboard</value></data>
   <data name="Status_PingAll" xml:space="preserve"><value>Pinging {0} servers ...</value></data>
   <data name="Status_PingDoneCount" xml:space="preserve"><value>Ping done: {0} of {1} responded</value></data>
   <data name="Status_PingSelDone" xml:space="preserve"><value>Ping of selected done ({0} ok)</value></data>
@@ -342,7 +386,6 @@ Latency: {1}</value></data>
   <data name="Status_RealDoneCount" xml:space="preserve"><value>Real delay test done: {0} of {1} succeeded</value></data>
   <data name="Status_RealSelDone" xml:space="preserve"><value>Real delay test of selected done ({0} ok)</value></data>
   <data name="Status_RealSelected" xml:space="preserve"><value>Real delay test on {0} selected servers ...</value></data>
-  <data name="Status_ServerAdded" xml:space="preserve"><value>Server "{0}" added</value></data>
   <data name="Status_ServersAdded" xml:space="preserve"><value>{0} servers added</value></data>
   <data name="Status_SmartBest" xml:space="preserve"><value>Smart connect: best server → {0} ({1})</value></data>
   <data name="Status_SmartCancelled" xml:space="preserve"><value>Smart connect cancelled</value></data>
@@ -375,6 +418,7 @@ Latency: {1}</value></data>
   <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>Server links copied</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>No server available to connect</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>No server in this batch responded</value></data>
+  <data name="Toast_BatchAllInvalidDomains" xml:space="preserve"><value>Domain names in this batch could not be resolved; the links are invalid</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>No server responded</value></data>
   <data name="Toast_RealDelayFailed" xml:space="preserve"><value>Real delay test failed</value></data>
   <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>Real delay test did not confirm any server</value></data>
@@ -404,6 +448,7 @@ Latency: {1}</value></data>
   <data name="Url_InvalidSs" xml:space="preserve"><value>Invalid Shadowsocks link</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>Invalid Trojan link</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>Invalid VLESS link</value></data>
+  <data name="Url_InvalidVmess" xml:space="preserve"><value>Invalid VMess link</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>Only vmess / vless / ss / trojan are supported</value></data>
   <data name="Url_UnsupportedTransport" xml:space="preserve"><value>transport is not supported: {0}</value></data>
   <data name="Url_InvalidParam" xml:space="preserve"><value>invalid value for parameter {0}: {1}</value></data>
@@ -412,6 +457,7 @@ Latency: {1}</value></data>
   <data name="Log_FindNoMore" xml:space="preserve"><value>Find better: no more servers to test</value></data>
   <data name="Log_FindNoSelection" xml:space="preserve"><value>Find better: blocked — no server selected</value></data>
   <data name="Log_FindNoSurvivors" xml:space="preserve"><value>Find better: no survivors from TCP ping</value></data>
+  <data name="Log_BatchDomainInvalid" xml:space="preserve"><value>Domain failed to resolve: {0}</value></data>
   <data name="Log_FindNotConnected" xml:space="preserve"><value>Find better: blocked — not connected</value></data>
   <data name="Log_FindRealBatch" xml:space="preserve"><value>Find better: testing {0} survivors via batch multi-outbound</value></data>
   <data name="Log_FindRealFailedAll" xml:space="preserve"><value>Find better: all real delay tests failed</value></data>
@@ -482,4 +528,25 @@ Latency: {1}</value></data>
 <data name="Hint_BypassTun" xml:space="preserve"><value>Note: tests run without applying TUN</value></data>
 <data name="Notify_TunOn" xml:space="preserve"><value>ROXA connected</value></data>
 <data name="Notify_TunOff" xml:space="preserve"><value>ROXA disconnected</value></data>
+  <data name="Set_Notifications" xml:space="preserve"><value>Windows notifications</value></data>
+  <data name="Set_Notifications_Desc" xml:space="preserve"><value>Show notification balloons near the Windows clock on connect, disconnect and errors.</value></data>
+  <data name="Tray_Notifications" xml:space="preserve"><value>Windows notifications</value></data>
+  <data name="Stg_Cleanup" xml:space="preserve"><value>Cleaning previous connection ...</value></data>
+  <data name="Stg_Routes" xml:space="preserve"><value>Setting up TUN routes ...</value></data>
+  <data name="Stg_Dns" xml:space="preserve"><value>Configuring DNS ...</value></data>
+  <data name="Stg_Engine" xml:space="preserve"><value>Please wait</value></data>
+  <data name="Toast_NoInternet" xml:space="preserve"><value>Internet is disconnected</value></data>
+  <data name="SubFetch_Direct" xml:space="preserve"><value>Fetching directly (no proxy)...</value></data>
+  <data name="SubFetch_Proxy" xml:space="preserve"><value>Fetching via proxy...</value></data>
+  <data name="SubFetch_SystemProxy" xml:space="preserve"><value>Fetching via system proxy...</value></data>
+  <data name="Log_SubHealDns" xml:space="preserve"><value>Healed {0} stale TUN DNS adapter(s)</value></data>
+  <data name="Log_SubBypass" xml:space="preserve"><value>Bypassing TUN for direct fetch...</value></data>
+  <data name="Set_SingBox" xml:space="preserve"><value>Enable sing-box</value></data>
+  <data name="Set_SingBox_Desc" xml:space="preserve"><value>The sing-box core has been added alongside the current engine. Enabling this only saves the setting for now; connection behavior is unchanged.</value></data>
+  <data name="Dlg_ConfirmTun" xml:space="preserve"><value>Enable TUN</value></data>
+  <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>When TUN is enabled, all system traffic passes through the tunnel and the app will require administrator access. Are you sure?</value></data>
+  <data name="Set_Table" xml:space="preserve"><value>Table</value></data>
+  <data name="Set_ShowIp" xml:space="preserve"><value>Show IP address column</value></data>
+  <data name="Set_ShowIp_Desc" xml:space="preserve"><value>When enabled, the IP address column is shown in the servers table.</value></data>
+<data name="Btn_Paste" xml:space="preserve"><value>Paste from clipboard</value></data>
 </root>

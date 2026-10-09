@@ -91,23 +91,66 @@ public static class TunDns
             return false;
         }
 
+        // netsh بدون لودِ ماژول PowerShell: اجرای powershell برای Set-DnsClientServerAddress
+        // حدود ۸ ثانیه (استارت سرد + لود NetTCPIP) طول می‌کشید و بزرگ‌ترین گلوگاه اتصال TUN بود.
+        if (TryApplyNetsh(prev))
+        {
+            TunManager.Log($"DNS switched to {StubIp} on {prev.Count} adapter(s).");
+            return true;
+        }
+
+        // پشتیبان: همان powershell قدیمی اگر netsh به هر دلیلی شکست بخورد.
+        if (RunPowerShell(BuildApplyScript(prev)))
+        {
+            TunManager.Log($"DNS switched (powershell fallback) to {StubIp} on {prev.Count} adapter(s).");
+            return true;
+        }
+
+        prev.Clear();
+        return false;
+    }
+
+    private static bool TryApplyNetsh(List<TunDnsRecord> records)
+    {
+        try
+        {
+            foreach (var r in records)
+            {
+                int code = TunManager.RunNetsh(
+                    $"interface ipv4 set dnsservers name=\"{r.Alias}\" source=static address={StubIp} validate=no");
+                if (code != 0)
+                {
+                    TunManager.Log($"netsh set dns failed on '{r.Alias}' (code {code}); powershell fallback.");
+                    return false;
+                }
+            }
+            // معادل ipconfig /flushdns بدون پروسهٔ اضافه
+            try { DnsFlushResolverCache(); } catch { }
+            return true;
+        }
+        catch { return false; }
+    }
+
+    private static string BuildApplyScript(List<TunDnsRecord> records)
+    {
         var sb = new StringBuilder();
-        foreach (var r in prev)
+        foreach (var r in records)
             sb.Append($"Set-DnsClientServerAddress -InterfaceIndex {r.IfIndex} -ServerAddresses {StubIp}; ");
         sb.Append("ipconfig /flushdns | Out-Null");
-
-        if (!RunPowerShell(sb.ToString()))
-        {
-            prev.Clear();
-            return false;
-        }
-        TunManager.Log($"DNS switched to {StubIp} on {prev.Count} adapter(s).");
-        return true;
+        return sb.ToString();
     }
+
+    [System.Runtime.InteropServices.DllImport("dnsapi.dll")]
+    private static extern void DnsFlushResolverCache();
 
     public static void Restore(List<TunDnsRecord>? prev)
     {
         if (prev == null || prev.Count == 0 || !OperatingSystem.IsWindows()) return;
+        if (TryRestoreNetsh(prev))
+        {
+            TunManager.Log($"DNS restored on {prev.Count} adapter(s).");
+            return;
+        }
         var sb = new StringBuilder();
         foreach (var r in prev)
         {
@@ -118,9 +161,47 @@ public static class TunDns
         }
         sb.Append("ipconfig /flushdns | Out-Null");
         if (RunPowerShell(sb.ToString()))
-            TunManager.Log($"DNS restored on {prev.Count} adapter(s).");
+            TunManager.Log($"DNS restored (powershell fallback) on {prev.Count} adapter(s).");
         else
             TunManager.Log("DNS restore failed.");
+    }
+
+    private static bool TryRestoreNetsh(List<TunDnsRecord> records)
+    {
+        try
+        {
+            foreach (var r in records)
+            {
+                if (r.WasStatic && r.Servers.Count > 0)
+                {
+                    int code = TunManager.RunNetsh(
+                        $"interface ipv4 set dnsservers name=\"{r.Alias}\" source=static address={r.Servers[0]} validate=no");
+                    if (code != 0)
+                    {
+                        TunManager.Log($"netsh restore failed on '{r.Alias}' (code {code}); powershell fallback.");
+                        return false;
+                    }
+                    for (int i = 1; i < r.Servers.Count; i++)
+                    {
+                        code = TunManager.RunNetsh(
+                            $"interface ipv4 add dnsservers name=\"{r.Alias}\" address={r.Servers[i]} index={i + 1} validate=no");
+                        if (code != 0) return false;
+                    }
+                }
+                else
+                {
+                    int code = TunManager.RunNetsh($"interface ipv4 set dnsservers name=\"{r.Alias}\" source=dhcp");
+                    if (code != 0)
+                    {
+                        TunManager.Log($"netsh restore-dhcp failed on '{r.Alias}' (code {code}); powershell fallback.");
+                        return false;
+                    }
+                }
+            }
+            try { DnsFlushResolverCache(); } catch { }
+            return true;
+        }
+        catch { return false; }
     }
 
     public static void RestoreFromState(TunState? state = null)
@@ -299,16 +380,18 @@ public static class TunDns
     {
         try
         {
-            string b64 = Convert.ToBase64String(Encoding.Unicode.GetBytes(script));
             var psi = new ProcessStartInfo
             {
                 FileName = "powershell.exe",
-                Arguments = "-NoProfile -NonInteractive -EncodedCommand " + b64,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
             };
+            psi.ArgumentList.Add("-NoProfile");
+            psi.ArgumentList.Add("-NonInteractive");
+            psi.ArgumentList.Add("-Command");
+            psi.ArgumentList.Add(script);
             using var p = Process.Start(psi);
             if (p == null) return false;
 

@@ -7,6 +7,9 @@ public sealed class TestRouteScope : IDisposable
 
     internal void Track(string ip) { lock (_ips) _ips.Add(ip); }
 
+    /// <summary>آیا واقعاً مسیری برای دور زدن اضافه شده است؟ (برای نمایش پیام در لاگ/وضعیت)</summary>
+    public bool HasRoutes { get { lock (_ips) return _ips.Count > 0; } }
+
     public void Dispose()
     {
         if (_disposed) return;
@@ -40,14 +43,21 @@ public static class TestRouteBypass
 
     public static bool IsBypassing => !TestsViaTun && AdminHelper.IsRunningAsAdmin() && TunManager.IsCaptureActive;
 
-    public static async Task<TestRouteScope> BeginAsync(IEnumerable<string?>? hosts)
+    /// <param name="forceDirect">
+    /// برای تشخیص سلامت مسیر مستقیم (چک اینترنت): حتی وقتی «تست از مسیر تونل»
+    /// تنظیم شده هم بایپس ساخته شود، چون تونلِ بعد از تعویض شبکه ممکن است مرده باشد.
+    /// </param>
+    public static async Task<TestRouteScope> BeginAsync(IEnumerable<string?>? hosts, bool forceDirect = false)
     {
         var scope = new TestRouteScope();
         try
         {
-            if (TestsViaTun || hosts == null) return scope;
+            if ((!forceDirect && TestsViaTun) || hosts == null) return scope;
             if (!AdminHelper.IsRunningAsAdmin()) return scope;
-            if (!TunManager.IsCaptureActive) return scope;
+            // دور زدن لازم است وقتی TUN خودمان فعال باشد یا TUNِ بیگانه‌ای (مثل v2rayN)
+            // مسیر پیش‌فرض را بگیرد؛ در حالت عادی (بدون TUN) مسیرِ عادی همان مستقیم است
+            // و نیازی به اضافه‌کردن مسیر نیست.
+            if (!TunManager.IsCaptureActive && !TunManager.AnyTunDefaultRoute()) return scope;
 
             var wanted = new List<string>();
             foreach (var raw in hosts)

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -46,6 +47,22 @@ public static class GeoFlags
         char c1 = (char)(regionalA + (char.ToUpperInvariant(code[0]) - 'A'));
         char c2 = (char)(regionalA + (char.ToUpperInvariant(code[1]) - 'A'));
         return new string(new[] { c1, c2 });
+    }
+
+    /// <summary>نام کامل کشور به زبان فعلی رابط؛ اگر ترجمه نبود نام بومی، وگرنه کد.</summary>
+    public static string CountryName(string code)
+    {
+        if (string.IsNullOrEmpty(code) || code.Length != 2 || !IsoCodes.Contains(code)) return "";
+        string lang = Localization.TranslationManager.Instance.Culture.TwoLetterISOLanguageName;
+        string? localized = CountryNames.Get(code, lang);
+        if (!string.IsNullOrEmpty(localized)) return localized;
+        try
+        {
+            string native = new RegionInfo(code.ToUpperInvariant()).DisplayName;
+            if (!string.IsNullOrWhiteSpace(native)) return native;
+        }
+        catch (ArgumentException) { }
+        return code.ToUpperInvariant();
     }
 
     private static string FlagToCode(string text)

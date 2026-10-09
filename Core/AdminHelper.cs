@@ -23,6 +23,14 @@ public static class AdminHelper
         try
         {
             System.Diagnostics.Process.Start(psi);
+            // بعد از موفقیت Process.Start (اگر UAC رد شده باشد اینجا نمی‌آییم)؛
+            // آیکون سینی باید قبل از Environment.Exit روی رشتهٔ UI پاک شود.
+            try
+            {
+                if (Avalonia.Application.Current is Roxa.App app)
+                    app.DisposeTray();
+            }
+            catch { }
             Environment.Exit(0);
         }
         catch (System.ComponentModel.Win32Exception)

@@ -59,7 +59,7 @@
   <data name="Btn_Export" xml:space="preserve"><value>📦 تصدير</value></data>
   <data name="Btn_Import" xml:space="preserve"><value>📋 استيراد</value></data>
   <!-- Placeholders -->
-  <data name="Ph_ServerLink" xml:space="preserve"><value>رابط الخادم (vmess://, vless://, ...)</value></data>
+  <data name="Ph_ServerLink" xml:space="preserve"><value>رابط الخادم (vmess://, vless://, ss://, trojan://)</value></data>
   <data name="Ph_SubName" xml:space="preserve"><value>الاسم</value></data>
   <data name="Ph_SubUrl" xml:space="preserve"><value>https://...</value></data>
   <!-- Sort -->
@@ -83,10 +83,6 @@
   <data name="Ctx_Delete" xml:space="preserve"><value>حذف الخادم</value></data>
   <data name="Ctx_ClearSel" xml:space="preserve"><value>مسح التحديد</value></data>
   <!-- Add Menu -->
-  <data name="Add_VMess" xml:space="preserve"><value>🟢 إضافة VMess</value></data>
-  <data name="Add_VLESS" xml:space="preserve"><value>🔵 إضافة VLESS</value></data>
-  <data name="Add_SS" xml:space="preserve"><value>🟠 إضافة Shadowsocks</value></data>
-  <data name="Add_Trojan" xml:space="preserve"><value>🔴 إضافة Trojan</value></data>
   <data name="Add_Clipboard" xml:space="preserve"><value>📋 استيراد من الحافظة</value></data>
   <!-- Settings -->
   <data name="Set_Proxy" xml:space="preserve"><value>تعيين بروكسي النظام</value></data>
@@ -104,7 +100,6 @@
   <data name="Set_Every" xml:space="preserve"><value>كل</value></data>
   <data name="Set_Hours" xml:space="preserve"><value>ساعات، تحديث</value></data>
   <data name="Set_Advanced" xml:space="preserve"><value>إعدادات متقدمة</value></data>
-  <data name="Set_PingType" xml:space="preserve"><value>نوع بينج:</value></data>
   <data name="Set_GlobalSort" xml:space="preserve"><value>ترتيب عام (بعد الاختيار، يأتي أفضل خادم من جميع المجموعات أولاً)</value></data>
   <data name="Set_DNS" xml:space="preserve"><value>DNS مخصص</value></data>
   <data name="Set_DNSBtn" xml:space="preserve"><value>⚙  إعدادات DNS</value></data>
@@ -217,7 +212,6 @@
     <value>اختصارات: Ctrl+Shift+C = اتصال | Ctrl+Shift+D = قطع | Ctrl+Shift+S = اتصال ذكي | Ctrl+Shift+Q = خروج</value>
   </data>
 
-  <data name="Add_Link" xml:space="preserve"><value>إضافة</value></data>
 
   <data name="Sub_UseProxy" xml:space="preserve"><value>استخدام بروكسي للتحديث</value></data>
   <!-- Notifications -->
@@ -246,7 +240,75 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>متبقي {0} ساعة</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 يدوي</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>لم يتم اختيار خادم</value></data>
+  <data name="Set_Reports" xml:space="preserve">
+    <value>تقرير الأخطاء والمشاكل</value>
+  </data>
+  <data name="Set_Reports_Desc" xml:space="preserve">
+    <value>إذا تعطل البرنامج أو واجهت مشكلة، يُرسل التقرير للمطوّر تلقائيًا. باستخدام الزر بالأسفل يمكنك أنت أيضًا الإبلاغ عن مشكلة مع وصف اختياري؛ تُرفق إصدار البرنامج ونظام التشغيل ومعرّف الجهاز وحالة الاتصال وآخر سجل تلقائيًا.</value>
+  </data>
+  <data name="Btn_ReportBug" xml:space="preserve">
+    <value>الإبلاغ عن مشكلة...</value>
+  </data>
+  <data name="Dlg_ReportTitle" xml:space="preserve">
+    <value>تقرير الأخطاء والمشاكل</value>
+  </data>
+  <data name="Dlg_ReportHint" xml:space="preserve">
+    <value>صف المشكلة (اختياري): ماذا فعلت وماذا حدث...</value>
+  </data>
+  <data name="Btn_SendReport" xml:space="preserve">
+    <value>إرسال التقرير</value>
+  </data>
+  <data name="Rpt_AutoInfo" xml:space="preserve">
+    <value>تُرفق معلومات البرنامج التلقائية دون أي إجراء منك:
+الإصدار {0} • {1}
+المعرّف {2}
+الحالة: {3}</value>
+  </data>
+  <data name="Rpt_StateOn" xml:space="preserve">
+    <value>متصل بـ {0}</value>
+  </data>
+  <data name="Rpt_StateOff" xml:space="preserve">
+    <value>غير متصل</value>
+  </data>
+  <data name="Log_ReportSent" xml:space="preserve">
+    <value>أُرسل تقرير المشكلة</value>
+  </data>
+  <data name="Toast_ReportSent" xml:space="preserve">
+    <value>أُرسل التقرير — شكرًا لك</value>
+  </data>
+  <data name="Log_ReportFailed" xml:space="preserve">
+    <value>فشل إرسال التقرير؛ حُفظ في الطابور وسيُرسل عند التشغيل التالي</value>
+  </data>
+  <data name="Log_ReportFlushed" xml:space="preserve">
+    <value>أُرسل {0} تقرير محفوظ</value>
+  </data>
   <data name="Home_NotConnected" xml:space="preserve"><value>لستَ متصلًا</value></data>
+  <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>الإنترنت ليس مقطوعًا: المسار المباشر سليم لكن النفق لا يستجيب بعد تغيير الشبكة</value></data>
+  <data name="Set_Privacy" xml:space="preserve"><value>الخصوصية</value></data>
+  <data name="Set_Stats" xml:space="preserve"><value>إرسال إحصاءات الاتصال إلى اللوحة</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>كل 60 دقيقة تُرسل إصدار البرنامج واللغة والبلد ومعرّف الجهاز إلى اللوحة للتحقق من التحديثات. عند إيقاف ذلك يستمر فحص التحديثات لكن دون إرسال أي معرّف أو إحصاءات؛ ولا يُرسل اسم حاسوبك أبدًا.</value></data>
+  <data name="Set_DeviceId" xml:space="preserve"><value>معرّف الجهاز</value></data>
+  <data name="Set_DeviceId_Desc" xml:space="preserve"><value>معرّف فريد يولّده البرنامج لهذا النظام (وليس اسم حاسوبك) ويُعرض في لوحة الإدارة.</value></data>
+  <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>تم العثور على اتصال متبقٍّ من تشغيل سابق.&amp;#10;لإتمام التنظيف، يجب إعادة تشغيل البرنامج بصلاحيات المسؤول.</value></data>
+  <data name="Eng_TunAdapterMissing" xml:space="preserve"><value>محول TUN غير جاهز.</value></data>
+  <data name="Eng_TunRoutesAdded" xml:space="preserve"><value>تمت إضافة مسارات TUN.</value></data>
+  <data name="Eng_TunRoutesFailed" xml:space="preserve"><value>فشل إضافة مسارات TUN: {0}</value></data>
+  <data name="Notify_EngineDied" xml:space="preserve"><value>توقف محرك الاتصال بشكل غير متوقع</value></data>
+  <data name="Set_Bypass" xml:space="preserve"><value>تجاوز VPN حتى بدون TUN</value></data>
+  <data name="Set_Bypass_Desc" xml:space="preserve"><value>عند تفعيله، تستخدم التطبيقات في هذه القائمة إنترنت النظام المباشر حتى مع اتصال VPN عبر وكيل النظام (بدون TUN)، بدلًا من VPN.</value></data>
+  <data name="Set_KillSwitch" xml:space="preserve"><value>مفتاح الإيقاف العام</value></data>
+  <data name="Set_KillSwitch_Desc" xml:space="preserve"><value>عند سقوط نفق VPN، يُحجب كل حركة مرور الإنترنت حتى عودة VPN حتى لا يتسرب عنوانك الحقيقي أبدًا. تبقى التطبيقات في قائمة «استثناءات TUN» متصلة مباشرة.</value></data>
+  <data name="Set_KillSwitch_Add" xml:space="preserve"><value>إضافة تطبيق للحماية...</value></data>
+  <data name="Set_KillSwitch_Remove" xml:space="preserve"><value>إزالة من قائمة الحماية</value></data>
+  <data name="Set_KillSwitch_Empty" xml:space="preserve"><value>لم تتم إضافة أي تطبيق للحماية بعد</value></data>
+  <data name="Set_KillSwitch_Waiting" xml:space="preserve"><value>لا يوجد اتصال — كل حركة المرور محظورة ({0} تطبيق معفى)</value></data>
+  <data name="Set_KillSwitch_Blocked_Title" xml:space="preserve"><value>انقطع اتصال VPN</value></data>
+  <data name="Set_KillSwitch_Blocked_Msg" xml:space="preserve"><value>الإنترنت محظور حتى يعيد VPN الاتصال ({0} تطبيق معفى). إن لم يعد، اضغط زر الإفراج الطارئ.</value></data>
+  <data name="Set_KillSwitch_Restored_Title" xml:space="preserve"><value>أعيد اتصال VPN</value></data>
+  <data name="Set_KillSwitch_Restored_Msg" xml:space="preserve"><value>يعود الإنترنت للعمل مرة أخرى</value></data>
+  <data name="Set_KillSwitch_Emergency" xml:space="preserve"><value>إفراج الإنترنت الطارئ</value></data>
+  <data name="Set_KillSwitch_Hint" xml:space="preserve"><value>إذا لم يعد الإنترنت حتى بضغط زر الإفراج، فالمشكلة ليست في مفتاح الإيقاف — تحقق من Wi-Fi/شبكة Windows أو أعد تشغيل النظام.</value></data>
+  <data name="Home_SwitchingServer" xml:space="preserve"><value>جارٍ الاتصال بخادم جديد</value></data>
   <data name="LastUpdate_DayAgo" xml:space="preserve"><value>آخر تحديث: منذ {0} يوم</value></data>
   <data name="LastUpdate_HourAgo" xml:space="preserve"><value>آخر تحديث: منذ {0} ساعة</value></data>
   <data name="LastUpdate_MinAgo" xml:space="preserve"><value>آخر تحديث: منذ {0} دقيقة</value></data>
@@ -270,7 +332,11 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>تثبيت</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>جارٍ تنزيل التحديث…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>اكتمل التنزيل؛ سيتم إغلاق التطبيق للتثبيت</value></data>
+  <data name="Upd_Installing" xml:space="preserve"><value>جارً تثبیت التحدیث…</value></data>
+  <data name="Upd_Percent" xml:space="preserve"><value>{0}٪</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>فشل تنزيل التحديث</value></data>
+  <data name="Btn_FullTest" xml:space="preserve"><value>اختبار كامل</value></data>
+  <data name="Status_GroupFullDone" xml:space="preserve"><value>اكتمل الاختبار الكامل لـ {0}</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>يجب تثبيت الإصدار الجديد للمتابعة</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>إغلاق</value></data>
   <data name="Ann_View" xml:space="preserve"><value>عرض</value></data>
@@ -284,7 +350,6 @@
   <data name="Set_TunExclude_Remove" xml:space="preserve"><value>حذف</value></data>
   <data name="Set_TunExclude_Empty" xml:space="preserve"><value>لم تتم إضافة أي تطبيقات بعد</value></data>
   <data name="Set_TunExclude_Toggle" xml:space="preserve"><value>تشغيل/تعطيل استثناء هذا التطبيق</value></data>
-  <data name="Status_ClipboardAdded" xml:space="preserve"><value>تمت إضافة {0} خادم من الحافظة</value></data>
   <data name="Status_ClipboardEmpty" xml:space="preserve"><value>الحافظة فارغة</value></data>
   <data name="Status_ClipboardNoAccess" xml:space="preserve"><value>الوصول إلى الحافظة غير متاح</value></data>
   <data name="Status_ConnectError" xml:space="preserve"><value>خطأ في الاتصال</value></data>
@@ -311,10 +376,8 @@
   <data name="Status_GroupSpeedDone" xml:space="preserve"><value>انتهى اختبار سرعة المجموعة ({0} ناجح)</value></data>
   <data name="Status_GroupUpdate" xml:space="preserve"><value>تحديث المجموعة «{0}» ({1} خادم) ...</value></data>
   <data name="Status_GroupUpdateDone" xml:space="preserve"><value>انتهى تحديث المجموعة ({0} ناجح)</value></data>
-  <data name="Status_NewServerName" xml:space="preserve"><value>خادم جديد ({0})</value></data>
   <data name="Status_NoServerFromSub" xml:space="preserve"><value>لم يتم استلام خوادم من «{0}»</value></data>
   <data name="Status_NoServers" xml:space="preserve"><value>لا توجد خوادم</value></data>
-  <data name="Status_NoValidClipboardLink" xml:space="preserve"><value>لا يوجد رابط صالح في الحافظة</value></data>
   <data name="Status_PingAll" xml:space="preserve"><value>بينج {0} خادم ...</value></data>
   <data name="Status_PingDoneCount" xml:space="preserve"><value>انتهى البينج: استجاب {0} من {1}</value></data>
   <data name="Status_PingSelDone" xml:space="preserve"><value>انتهى بينج المحددين ({0} ناجح)</value></data>
@@ -325,7 +388,6 @@
   <data name="Status_RealDoneCount" xml:space="preserve"><value>انتهى اختبار التأخير الحقيقي: نجح {0} من {1}</value></data>
   <data name="Status_RealSelDone" xml:space="preserve"><value>انتهى اختبار التأخير الحقيقي للمحددين ({0} ناجح)</value></data>
   <data name="Status_RealSelected" xml:space="preserve"><value>اختبار تأخير حقيقي لـ {0} خادم محدد ...</value></data>
-  <data name="Status_ServerAdded" xml:space="preserve"><value>تمت إضافة الخادم «{0}»</value></data>
   <data name="Status_ServersAdded" xml:space="preserve"><value>تمت إضافة {0} خادم</value></data>
   <data name="Status_SmartBest" xml:space="preserve"><value>اتصال ذكي: أفضل خادم ← {0} ({1})</value></data>
   <data name="Status_SmartCancelled" xml:space="preserve"><value>تم إلغاء الاتصال الذكي</value></data>
@@ -358,6 +420,7 @@
   <data name="Toast_GroupLinksCopied" xml:space="preserve"><value>تم نسخ روابط الخوادم</value></data>
   <data name="Toast_NoServerForConnect" xml:space="preserve"><value>لا يوجد خادم للاتصال</value></data>
   <data name="Toast_NoServerInBatch" xml:space="preserve"><value>لم يستجب أي خادم في هذه الدفعة</value></data>
+  <data name="Toast_BatchAllInvalidDomains" xml:space="preserve"><value>تعذّر حل أسماء نطاقات هذه المجموعة؛ الروابط غير صالحة</value></data>
   <data name="Toast_NoServerResponded" xml:space="preserve"><value>لم يستجب أي خادم</value></data>
   <data name="Toast_RealDelayFailed" xml:space="preserve"><value>فشل اختبار التأخير الحقيقي</value></data>
   <data name="Toast_RealDelayNoConfirm" xml:space="preserve"><value>لم يؤكّد اختبار التأخير الحقيقي أي خادم</value></data>
@@ -387,6 +450,7 @@
   <data name="Url_InvalidSs" xml:space="preserve"><value>رابط Shadowsocks غير صالح</value></data>
   <data name="Url_InvalidTrojan" xml:space="preserve"><value>رابط Trojan غير صالح</value></data>
   <data name="Url_InvalidVless" xml:space="preserve"><value>رابط VLESS غير صالح</value></data>
+  <data name="Url_InvalidVmess" xml:space="preserve"><value>رابط VMess غير صالح</value></data>
   <data name="Url_Unsupported" xml:space="preserve"><value>يُدعم فقط vmess / vless / ss / trojan</value></data>
   <data name="Url_UnsupportedTransport" xml:space="preserve"><value>نوع النقل غير مدعوم: {0}</value></data>
   <data name="Url_InvalidParam" xml:space="preserve"><value>قيمة غير صالحة للمعامل {0}: {1}</value></data>
@@ -395,6 +459,7 @@
   <data name="Log_FindNoMore" xml:space="preserve"><value>البحث عن أفضل: لا يوجد خوادم أخرى للاختبار</value></data>
   <data name="Log_FindNoSelection" xml:space="preserve"><value>البحث عن أفضل: تم الحظر — لم يتم اختيار خادم</value></data>
   <data name="Log_FindNoSurvivors" xml:space="preserve"><value>البحث عن أفضل: لا يوجد ناجين من بينج TCP</value></data>
+  <data name="Log_BatchDomainInvalid" xml:space="preserve"><value>تعذّر حل اسم النطاق: {0}</value></data>
   <data name="Log_FindNotConnected" xml:space="preserve"><value>البحث عن أفضل: تم الحظر — لست متصلًا</value></data>
   <data name="Log_FindRealBatch" xml:space="preserve"><value>البحث عن أفضل: اختبار {0} ناجين عبر دفعة multi-outbound</value></data>
   <data name="Log_FindRealFailedAll" xml:space="preserve"><value>البحث عن أفضل: فشلت جميع اختبارات التأخير الحقيقي</value></data>
@@ -462,4 +527,25 @@
 <data name="Hint_BypassTun" xml:space="preserve"><value>ملاحظة: تُجرى الاختبارات بدون تطبيق TUN</value></data>
 <data name="Notify_TunOn" xml:space="preserve"><value>تم توصيل ROXA</value></data>
 <data name="Notify_TunOff" xml:space="preserve"><value>تم فصل ROXA</value></data>
+  <data name="Set_Notifications" xml:space="preserve"><value>إشعارات ويندوز</value></data>
+  <data name="Set_Notifications_Desc" xml:space="preserve"><value>عرض بالونات الإشعارات بجانب ساعة ويندوز عند الاتصال وقطع الاتصال والأخطاء.</value></data>
+  <data name="Tray_Notifications" xml:space="preserve"><value>إشعارات ويندوز</value></data>
+  <data name="Stg_Cleanup" xml:space="preserve"><value>تنظيف الاتصال السابق ...</value></data>
+  <data name="Stg_Routes" xml:space="preserve"><value>إعداد مسارات TUN ...</value></data>
+  <data name="Stg_Dns" xml:space="preserve"><value>تهيئة DNS ...</value></data>
+  <data name="Stg_Engine" xml:space="preserve"><value>الرجاء الانتظار</value></data>
+  <data name="Toast_NoInternet" xml:space="preserve"><value>الإنترنت منقطع</value></data>
+  <data name="SubFetch_Direct" xml:space="preserve"><value>الجلب المباشر (بدون وسيط)...</value></data>
+  <data name="SubFetch_Proxy" xml:space="preserve"><value>الجلب عبر الوسيط...</value></data>
+  <data name="SubFetch_SystemProxy" xml:space="preserve"><value>الجلب عبر وسيط النظام...</value></data>
+  <data name="Log_SubHealDns" xml:space="preserve"><value>تم إصلاح {0} من محولات DNS المتبقية من TUN</value></data>
+  <data name="Log_SubBypass" xml:space="preserve"><value>تجاوز من TUN للجلب المباشر...</value></data>
+  <data name="Set_SingBox" xml:space="preserve"><value>تفعيل sing-box</value></data>
+  <data name="Set_SingBox_Desc" xml:space="preserve"><value>تمت إضافة نواة sing-box بجانب المحرّك الحالي. تفعيل هذا الخيار يحفظ الإعداد فقط حاليًا دون تغيير سلوك الاتصال.</value></data>
+  <data name="Dlg_ConfirmTun" xml:space="preserve"><value>تفعيل TUN</value></data>
+  <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>عند تفعيل TUN يمر كامل حركة النظام عبر النفق وسيحتاج التطبيق إلى صلاحيات المسؤول. هل أنت متأكد؟</value></data>
+  <data name="Set_Table" xml:space="preserve"><value>الجدول</value></data>
+  <data name="Set_ShowIp" xml:space="preserve"><value>إظهار عمود عنوان IP</value></data>
+  <data name="Set_ShowIp_Desc" xml:space="preserve"><value>عند التمكين، يُعرض عمود عنوان IP في جدول الخوادم.</value></data>
+<data name="Btn_Paste" xml:space="preserve"><value>لصق من الحاظة</value></data>
 </root>

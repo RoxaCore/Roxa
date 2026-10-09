@@ -1,3 +1,8 @@
 auth.json
 attempts.json
+attempts_ip.json
+reports.json
 stats.lock
+ratelimit.json
+ratelimit.lock
+

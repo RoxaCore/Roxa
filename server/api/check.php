@@ -25,14 +25,41 @@ if ($id !== '') {
     $ipOk = filter_var($ipRemote, FILTER_VALIDATE_IP) !== false ? $ipRemote : '';
     $direct = isset($_GET['direct']) && $_GET['direct'] === '1';
     $os = trim((string)($_GET['os'] ?? ''));
-    stats_touch($id, [
-        'ip_last' => $ipOk,
-        'ip' => $direct ? $ipOk : '',
-        'os' => $os !== '' ? str_cut($os, 120) : '',
-        'country' => $cc,
-        'lang' => $lang,
-        'ver' => $current,
-    ]);
+
+    $dev = trim((string)($_GET['dev'] ?? ''));
+    $dev = str_cut(preg_replace('/[\x00-\x1F\x7F]/', '', $dev) ?? '', 64);
+
+    $conn = max(0, (int)($_GET['conn'] ?? 0));
+    if ($conn > 0) {
+        $prev = stats_find($id);
+        if (is_array($prev)) {
+            $conn = max($conn, (int)($prev['conn'] ?? 0));
+        }
+    }
+
+    // نوشتن آمار با سقف per-IP؛ پاسخ بهروزرسانی در هر صورت داده می‌شود.
+    if (rate_allow($ipOk !== '' ? $ipOk : 'unknown', 60, 60)) {
+        stats_touch($id, [
+            'ip_last' => $ipOk,
+            'ip' => $direct ? $ipOk : '',
+            'os' => $os !== '' ? str_cut($os, 120) : '',
+            'country' => $cc,
+            'lang' => $lang,
+            'ver' => $current,
+            'dev' => $dev !== '' ? $dev : null,
+            'conn' => $conn > 0 ? $conn : null,
+        ]);
+
+        if ($direct && $ipOk !== '') {
+            $row = stats_find($id);
+            if (is_array($row) && empty($row['isp_done']) && ipinfo_allow()) {
+                $info = ip_info($ipOk);
+                if ($info !== null) {
+                    ip_info_save($id, $info);
+                }
+            }
+        }
+    }
 }
 
 if (empty($ver['active']) || empty($ver['latest'])) {

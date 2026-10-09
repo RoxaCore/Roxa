@@ -1,1 +1,23 @@
 Options -Indexes
+
+# فایل تنظیمات PHP نباید مستقیم دانلود شود
+<FilesMatch "^\.user\.ini$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# جلوگیری از دانلود مستقیم فایل‌های داده (auth.json، stats.json و...)
+<FilesMatch "\.json$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>

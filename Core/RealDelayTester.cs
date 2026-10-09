@@ -24,6 +24,15 @@ public static class RealDelayTester
     private const int EngineStartTimeoutMs = 5000;
     private const int BatchHttpConcurrency = 8;
 
+    /// <summary>
+    /// همزمانیِ مسیر جایگزین (تک‌تک). این مسیر برای هر سرور یک پروسهٔ xray جداگانه بالا می‌آورد،
+    /// پس باید خیلی کمتر از BatchHttpConcurrency باشد تا CPU/رم یک‌باره اشباع نشود.
+    /// </summary>
+    private const int FallbackProcessConcurrency = 2;
+
+    /// <summary>مکث بین شروع سرورها در مسیر جایگزین (پلکانی‌شدن اتصال‌ها).</summary>
+    private const int FallbackStaggerMs = 75;
+
     private static readonly TimeSpan SessionUrlTtl = TimeSpan.FromSeconds(90);
     private static readonly object SessionUrlLock = new();
     private static string? _sessionUrl;
@@ -267,52 +276,60 @@ public static class RealDelayTester
         Action<ServerInfo, TestResult>? onResult,
         CancellationToken ct)
     {
-        using var sem = new SemaphoreSlim(BatchHttpConcurrency);
-        var tasks = servers.Select(async s =>
+        // برخلاف Task.WhenAll روی کل لیست، اینجا هر سرور پس از آزادشدن جای خالی
+        // و گذشت مکث کوتاه شروع می‌شود؛ چون هر کدام یک پروسهٔ xray بالا می‌آورد.
+        using var sem = new SemaphoreSlim(FallbackProcessConcurrency);
+        var tasks = new List<Task>(servers.Count);
+        foreach (var s in servers)
         {
-            if (results.ContainsKey(s.Id)) return;
+            if (results.ContainsKey(s.Id) || ct.IsCancellationRequested) continue;
             try { await sem.WaitAsync(ct); }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException) { break; }
+
+            var captured = s;
+            tasks.Add(Task.Run(async () =>
             {
-                var cancelled = TestResult.Cancelled();
-                lock (results) results[s.Id] = cancelled;
-                onResult?.Invoke(s, cancelled);
-                return;
-            }
-            try
-            {
-                if (ct.IsCancellationRequested)
+                try
+                {
+                    if (ct.IsCancellationRequested)
+                    {
+                        var cancelledEarly = TestResult.Cancelled();
+                        lock (results) results[captured.Id] = cancelledEarly;
+                        onResult?.Invoke(captured, cancelledEarly);
+                        return;
+                    }
+
+                    var r = await TestAsync(captured, ct);
+                    lock (results) results[captured.Id] = r;
+                    onResult?.Invoke(captured, r);
+                }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested)
                 {
                     var cancelled = TestResult.Cancelled();
-                    lock (results) results[s.Id] = cancelled;
-                    onResult?.Invoke(s, cancelled);
-                    return;
+                    lock (results) results[captured.Id] = cancelled;
+                    onResult?.Invoke(captured, cancelled);
                 }
-
-                var r = await TestAsync(s, ct);
-                lock (results) results[s.Id] = r;
-                onResult?.Invoke(s, r);
-            }
-            catch (OperationCanceledException) when (ct.IsCancellationRequested)
-            {
-                var cancelled = TestResult.Cancelled();
-                lock (results) results[s.Id] = cancelled;
-                onResult?.Invoke(s, cancelled);
-            }
-            catch (Exception ex)
-            {
-                var fail = TestResult.Fail(TestStatus.Error, new Dictionary<string, string>
+                catch (Exception ex)
                 {
-                    ["error"] = Trunc(ex.Message)
-                });
-                lock (results) results[s.Id] = fail;
-                onResult?.Invoke(s, fail);
-            }
-            finally
+                    var fail = TestResult.Fail(TestStatus.Error, new Dictionary<string, string>
+                    {
+                        ["error"] = Trunc(ex.Message)
+                    });
+                    lock (results) results[captured.Id] = fail;
+                    onResult?.Invoke(captured, fail);
+                }
+                finally
+                {
+                    try { sem.Release(); } catch { }
+                }
+            }, CancellationToken.None));
+
+            if (FallbackStaggerMs > 0)
             {
-                try { sem.Release(); } catch { }
+                try { await Task.Delay(FallbackStaggerMs, ct); }
+                catch (OperationCanceledException) { break; }
             }
-        });
+        }
         try { await Task.WhenAll(tasks); }
         catch (OperationCanceledException) { }
     }

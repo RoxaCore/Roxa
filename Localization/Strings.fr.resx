@@ -542,8 +542,6 @@ ID d'appareil {2}
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>Récupération via le proxy système...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>{0} adaptateur(s) DNS TUN résiduel(s) réparé(s)</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>Contournement du TUN pour récupération directe...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>Activer sing-box</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>Le cœur sing-box a été ajouté à côté du moteur actuel. L'activer enregistre seulement le réglage pour l'instant ; le comportement de connexion ne change pas.</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>Activer TUN</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>Lorsque TUN est activé, tout le trafic système passe par le tunnel et l'application nécessitera les droits administrateur. Êtes-vous sûr ?</value></data>
   <data name="Set_Table" xml:space="preserve"><value>Tableau</value></data>

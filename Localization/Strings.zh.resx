@@ -540,8 +540,6 @@
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>通过系统代理获取...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>已修复 {0} 个 TUN 残留 DNS 适配器</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>绕过 TUN 直接获取...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>启用 sing-box</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box 内核已与当前引擎并列添加。目前启用仅保存设置，连接行为不会改变。</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>启用 TUN</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>启用 TUN 后，整个系统的流量都将通过隧道传输，并且应用程序需要管理员权限。确定继续吗？</value></data>
   <data name="Set_Table" xml:space="preserve"><value>表格</value></data>

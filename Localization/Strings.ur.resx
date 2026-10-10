@@ -524,8 +524,6 @@
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>سسٹم پراکسی کے ذریعے حاصل...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>TUN کے باقی {0} DNS ایڈاپٹر مرمت ہوئے</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>براہِ راست حاصل کے لیے TUN سے بچ رہا ہے...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>sing-box فعال کریں</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box کور موجود انجن کے ساتھ شامل کر دیا گیا ہے۔ فی الحال اسے فعال کرنے صرف سیٹنگ محفوظ ہوتی ہے؛ کنکشن کا رویہ نہیں بدلتا۔</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUN فعال کریں</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>TUN فعال ہونے پر پورا سسٹم ٹریفک ٹنل سے گزرتا ہے اور ایپ کو ایڈمنسٹریٹر کی اجازت درکار ہوگی. کیا آپ پکے ہیں?</value></data>
   <data name="Set_Table" xml:space="preserve"><value>جدول</value></data>

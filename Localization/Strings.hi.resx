@@ -524,8 +524,6 @@
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>सिस्टम प्रॉक्सी से प्राप्ति...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>TUN के अवशिष्ट {0} DNS एडेप्टर ठीक किए गए</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>सीधी प्राप्ति के लिए TUN को नज़रअंदाज़ किया जा रहा है...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>sing-box सक्षम करें</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box कोर मौजूदा इंजन के साथ जोड़ दिया गया है। इसे सक्षम करने से फिलहाल केवल सेटिंग सहेजी जाती है; कनेक्शन व्यवहार नहीं बदलता।</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUN सक्षम करें</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>TUN सक्षम होने पर संपूर्ण सिस्टम ट्रैफ़िक टनल से गुज़रता है और ऐप को व्यवस्थापक अनुमति की आवश्यकता होगी। क्या आप सुनिश्चित हैं?</value></data>
   <data name="Set_Table" xml:space="preserve"><value>तालिका</value></data>

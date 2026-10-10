@@ -524,8 +524,6 @@ Status: {3}</value>
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>Abruf über Systemproxy...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>{0} verbliebene TUN-DNS-Adapter repariert</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>Umgehe TUN für direkten Abruf...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>sing-box aktivieren</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>Der sing-box-Kern wurde neben der aktuellen Engine hinzugefügt. Das Aktivieren speichert vorerst nur die Einstellung; das Verhalten der Verbindung bleibt unverändert.</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUN aktivieren</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>Wird TUN aktiviert, läuft der gesamte Systemverkehr durch den Tunnel und die App benötigt Administratorrechte. Sind Sie sicher?</value></data>
   <data name="Set_Table" xml:space="preserve"><value>Tabelle</value></data>

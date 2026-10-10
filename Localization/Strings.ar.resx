@@ -540,8 +540,6 @@
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>الجلب عبر وسيط النظام...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>تم إصلاح {0} من محولات DNS المتبقية من TUN</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>تجاوز من TUN للجلب المباشر...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>تفعيل sing-box</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>تمت إضافة نواة sing-box بجانب المحرّك الحالي. تفعيل هذا الخيار يحفظ الإعداد فقط حاليًا دون تغيير سلوك الاتصال.</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>تفعيل TUN</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>عند تفعيل TUN يمر كامل حركة النظام عبر النفق وسيحتاج التطبيق إلى صلاحيات المسؤول. هل أنت متأكد؟</value></data>
   <data name="Set_Table" xml:space="preserve"><value>الجدول</value></data>

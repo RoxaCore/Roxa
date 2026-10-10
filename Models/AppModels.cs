@@ -117,7 +117,6 @@ public class AppSettings
     public string? CustomDnsAdvancedJson { get; set; }
     public bool UseTunMode { get; set; }
     public bool TunConfirmed { get; set; }
-    public bool EnableSingBox { get; set; } = false;
     public bool LeaveSystemProxyAsIs { get; set; }
     public bool ClearProxyOnDisconnect { get; set; } = true;
     public bool UseProxyForSubscriptions { get; set; } = true;

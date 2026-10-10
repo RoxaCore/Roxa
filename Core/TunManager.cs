@@ -13,9 +13,20 @@ public static class TunManager
     private const int CaptureTimeoutMs = 15000;
     private const int CaptureRetryDelayMs = 300;
     private const int ResolveTimeoutMs = 2500;
+    // هر چند ثانیه گیت‌ویِ مسیرهای کپچر را چک کنیم و چند نوبتِ پایداری برای پذیرشِ
+    // گیت‌ویِ جدید لازم است (کارتِ در حال قطع‌شدن چند ثانیه هنوز مسیرِ کم‌metric دارد).
+    private const int GatewayWatchEvery = 5;
+    private const int GatewayStableTicks = 2;
 
     private static readonly object _routesLock = new();
     private static readonly List<TunRouteRecord> _routes = new();
+
+    private static string? _captureVia;
+    private static int _captureGen;
+    private static Timer? _gatewayTimer;
+    private static string? _watchCandidate;
+    private static int _watchStreak;
+    private static int _watchScanning;
 
     private static readonly (string Prefix, string Dest, string Mask)[] _capturePrefixes =
     [
@@ -149,6 +160,7 @@ public static class TunManager
 
             Log($"Route setup: via={via} gateway={tGateway - t0} resolve={tDns - tGateway} excl={tExcl - tDns} capture={tCapture - tExcl} total={tCapture - t0}ms excluded={serverIps.Count}");
             Log($"Capture routes added: {serverIps.Count} server ip(s) excluded.");
+            StartGatewayWatch(via);
             return true;
         }
         catch (Exception ex)
@@ -161,6 +173,8 @@ public static class TunManager
 
     public static bool RemoveCaptureRoutes()
     {
+        StopGatewayWatch();
+        _captureVia = null;
         List<TunRouteRecord> snapshot;
         lock (_routesLock)
         {
@@ -356,6 +370,153 @@ public static class TunManager
         {
             return true;
         }
+    }
+
+    /// <summary>
+    /// روشن کردنِ مشاهدهٔ گیت‌ویِ مسیرهای کپچر. این مسیرها (سرور VPN و شبکه‌های داخلی)
+    /// به گیت‌ویِ فیزیکی وابسته‌اند؛ اگر آداپتر یا اینترنت عوض شود، next-hop مرده می‌ماند
+    /// و سرور VPN از دسترس خارج می‌شود. قبلاً فقط هنگامِ راه‌اندازی بازسازی می‌شدند.
+    /// </summary>
+    private static void StartGatewayWatch(string via)
+    {
+        lock (_routesLock)
+        {
+            _captureVia = via;
+            _captureGen++;
+            _watchCandidate = null;
+            _watchStreak = 0;
+            if (_gatewayTimer != null) return;
+            _gatewayTimer = new Timer(_ => WatchGateway(), null,
+                GatewayWatchEvery * 1000, GatewayWatchEvery * 1000);
+        }
+        Log($"capture gateway watcher armed (via={via}).");
+    }
+
+    private static void StopGatewayWatch()
+    {
+        Timer? t;
+        lock (_routesLock)
+        {
+            // شمارهٔ نسل بالا می‌رود تا اگر بازاعمالِ مسیرها در میانهٔ کار باشد،
+            // مسیرهای تازه‌اش را خودش حذف کند و بعد از قطعِ اتصال جا نماند.
+            _captureGen++;
+            t = _gatewayTimer;
+            _gatewayTimer = null;
+            _watchCandidate = null;
+            _watchStreak = 0;
+        }
+        t?.Dispose();
+    }
+
+    private static void WatchGateway()
+    {
+        if (Interlocked.Exchange(ref _watchScanning, 1) == 1) return;
+        try
+        {
+            string? via;
+            bool active;
+            int gen;
+            lock (_routesLock) { via = _captureVia; active = _routes.Count > 0; gen = _captureGen; }
+            if (!active || via == null)
+            {
+                StopGatewayWatch();
+                return;
+            }
+
+            bool dead = !IsPhysicalGatewayPresent(via);
+            string? gw = GetDefaultGatewayVia();
+            if (gw == null) return;   // تعویض آداپتر؛ تا گیت‌ویِ معتبر داریم دست نزن.
+
+            if (!dead)
+            {
+                if (gw == via)
+                {
+                    lock (_routesLock) { _watchCandidate = null; _watchStreak = 0; }
+                    return;
+                }
+                // گیت‌ویِ پیشنهادی باید دو نوبت پشت‌سرهم پایدار باشد؛ کارتِ در حال
+                // قطع‌شدن چند ثانیه هنوز مسیرِ پیش‌فرضِ کم‌metric دارد.
+                lock (_routesLock)
+                {
+                    if (!string.Equals(_watchCandidate, gw, StringComparison.Ordinal))
+                    {
+                        _watchCandidate = gw;
+                        _watchStreak = 1;
+                        return;
+                    }
+                    if (++_watchStreak < GatewayStableTicks) return;
+                }
+            }
+
+            Log($"capture gateway {via} -> {gw} ({(dead ? "old gateway is gone" : "changed")}); re-applying routes");
+            ReapplyCaptureRoutes(gw, gen);
+        }
+        catch (Exception ex)
+        {
+            Log($"capture gateway watch failed: {ex.Message}");
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _watchScanning, 0);
+        }
+    }
+
+    /// <summary>
+    /// ساختنِ دوبارهٔ همهٔ مسیرهای کپچر با گیت‌ویِ تازه. حذفِ مسیرِ کهنه باید
+    /// <b>قبل</b> از افزودنِ جدید انجام شود؛ CreateIpForwardEntry خطای «از قبل موجود»
+    /// را موفقیت حساب می‌کند، وگرنه next-hopِ مرده سرِ جایش می‌ماند.
+    /// </summary>
+    private static void ReapplyCaptureRoutes(string newVia, int gen)
+    {
+        List<TunRouteRecord> old;
+        lock (_routesLock)
+        {
+            if (gen != _captureGen) return;   // اتصال در این فاصله قطع شده
+            old = _routes.ToList();
+        }
+        if (old.Count == 0) return;
+
+        var fresh = new List<TunRouteRecord>();
+        foreach (var rec in old)
+        {
+            try { RunRoute($"delete {rec.Dest} mask {rec.Mask} {rec.Via}"); }
+            catch { /* ممکن است از قبل رفته باشد */ }
+            if (string.Equals(rec.Via, newVia, StringComparison.Ordinal)) continue;
+            try
+            {
+                if (!IpRoute.TryAddRoute(rec.Dest, rec.Mask, newVia, IpRoute.GetIfIndexForIp(newVia)))
+                {
+                    int code = RunRoute($"add {rec.Dest} mask {rec.Mask} {newVia}");
+                    if (code != 0) throw new InvalidOperationException($"route add exited with {code}");
+                }
+                fresh.Add(new TunRouteRecord { Dest = rec.Dest, Mask = rec.Mask, Via = newVia });
+            }
+            catch (Exception ex) { Log($"capture re-route failed for {rec.Dest}: {ex.Message}"); }
+        }
+
+        bool raced;
+        lock (_routesLock)
+        {
+            raced = gen != _captureGen;
+            if (!raced)
+            {
+                _routes.Clear();
+                _routes.AddRange(fresh);
+                _captureVia = newVia;
+                _watchCandidate = null;
+                _watchStreak = 0;
+            }
+        }
+        if (raced)
+        {
+            // قطعِ اتصال همزمان انجام شد؛ مسیرهای تازهٔ خودمان را هم پاک کن تا بعد از
+            // خروج، مسیرِ گیت‌ویِ مرده روی سیستم جا نماند. (بیرون از قفل؛ route.exe کند است)
+            foreach (var r in fresh)
+                try { RunRoute($"delete {r.Dest} mask {r.Mask} {r.Via}"); }
+                catch { }
+            return;
+        }
+        Log($"capture routes moved to gateway {newVia} ({fresh.Count}/{old.Count} route(s)).");
     }
 
     private static bool IsTunLike(string s) =>

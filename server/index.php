@@ -203,7 +203,7 @@ $shaShort = $ver['sha256'] !== '' ? substr((string)$ver['sha256'], 0, 16) . '…
 <meta property="og:type" content="website">
 <meta property="og:title" content="<?= $e($T['meta_title']) ?>">
 <meta property="og:description" content="<?= $e($T['meta_desc']) ?>">
-<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+<link href="/fonts/vazirmatn.css" rel="stylesheet">
 <style>
 :root{
   --bg:#070a12;--bg2:#0b0f1a;--card:#111827;--card2:#0d1322;--line:#1f2937;

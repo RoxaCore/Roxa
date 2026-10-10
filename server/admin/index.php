@@ -13,7 +13,7 @@ if (!is_file(auth_file())) {
         echo '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">';
         echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
         echo '<title>راه‌اندازی بسته — ' . h(APP_NAME) . ' Panel</title>';
-        echo '<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">';
+        echo '<link href="/fonts/vazirmatn.css" rel="stylesheet">';
         echo '<style>
 :root{--bg:#0b0f1a;--card:#141a2a;--line:#1f2937;--tx:#e5e7eb;--mut:#9ca3af}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -59,7 +59,7 @@ code{background:#0d1322;border:1px solid var(--line);border-radius:6px;padding:1
     echo '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">';
     echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
     echo '<title>راه‌اندازی — ' . h(APP_NAME) . '</title>';
-    echo '<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">';
+    echo '<link href="/fonts/vazirmatn.css" rel="stylesheet">';
     echo '<style>
 :root{--bg:#0b0f1a;--card:#141a2a;--line:#1f2937;--tx:#e5e7eb;--mut:#9ca3af;--ac:#7c3aed}
 *{box-sizing:border-box;margin:0;padding:0}

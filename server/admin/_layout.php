@@ -20,8 +20,7 @@ function page_head(string $title, string $active): void
     echo '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">';
     echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
     echo '<title>' . h($title) . ' — ' . h(APP_NAME) . ' Panel</title>';
-    echo '<link rel="preconnect" href="https://cdn.jsdelivr.net">';
-    echo '<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">';
+    echo '<link href="/fonts/vazirmatn.css" rel="stylesheet">';
     echo '<style>
 :root{--bg:#0b0f1a;--side:#0e1424;--card:#141a2a;--line:#1f2937;--tx:#e5e7eb;--mut:#9ca3af;--ac:#7c3aed;--ac2:#a78bfa;--ok:#10b981;--er:#ef4444;--wn:#f59e0b}
 *{box-sizing:border-box;margin:0;padding:0}

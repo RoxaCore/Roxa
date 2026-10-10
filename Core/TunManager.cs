@@ -323,6 +323,41 @@ public static class TunManager
         return null;
     }
 
+    /// <summary>
+    /// آیا هنوز یک مسیر 0.0.0.0/0 با این next-hop روی کارتِ شبکهٔ غیر-TUN وجود دارد؟
+    /// برای تشخیصِ اینکه گیت‌ویِ فعلیِ مسیرهای سنجاق‌شدهٔ «معافیت TUN» هنوز زنده است یا
+    /// آداپتر عوض شده و آن مسیرها به سیاه‌چاله تبدیل شده‌اند. ویندوز مسیرهای /32 را
+    /// نگه می‌دارد، ولی next-hopِ مرده را حذف نمی‌کند.
+    /// در شکِ تشخیص، گیت‌وی زنده فرض می‌شود تا بی‌جهت مسیرها پاک نشوند.
+    /// </summary>
+    public static bool IsPhysicalGatewayPresent(string gateway)
+    {
+        if (string.IsNullOrWhiteSpace(gateway)) return false;
+        try
+        {
+            var table = IpRoute.GetTable();
+            if (table == null) return true;
+            var nics = new Dictionary<uint, NetworkInterface>();
+            foreach (var nic in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                try { uint idx = IpRoute.GetIfIndex(nic.Name); if (idx != 0) nics[idx] = nic; }
+                catch { }
+            }
+            foreach (var row in table)
+            {
+                if (row.Dest != 0 || row.Mask != 0 || row.NextHop == 0) continue;
+                if (!nics.TryGetValue(row.IfIndex, out var nic)) continue;
+                if (IsTunLike(nic.Name) || IsTunLike(nic.Description)) continue;
+                if (string.Equals(IpRoute.IpToString(row.NextHop), gateway, StringComparison.Ordinal)) return true;
+            }
+            return false;
+        }
+        catch
+        {
+            return true;
+        }
+    }
+
     private static bool IsTunLike(string s) =>
         s.Contains("tun", StringComparison.OrdinalIgnoreCase) ||
         s.Contains("tap", StringComparison.OrdinalIgnoreCase) ||

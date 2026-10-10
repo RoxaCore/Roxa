@@ -13,6 +13,9 @@ public static class TunExclusion
     private const uint PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
     private const int ScanIntervalMs = 1000;
     private const int GatewayCheckEvery = 5;
+    // گیت‌ویِ پیشنهادی باید این‌قدر نوبت پشت‌سرهم پایدار باشد تا بپذیریمش؛ در لحظهٔ
+    // تعویض آداپتر، کارتِ در حال قطع‌شدن چند ثانیه مسیرِ پیش‌فرضِ کم‌metric دارد.
+    private const int GatewayStableTicks = 2;
     private const int MaxNewPinsPerScan = 10;
     private const long PidCacheTtlMs = 15000;
     private const string RulePrefix = "RoxaTunExcl_";
@@ -51,6 +54,8 @@ public static class TunExclusion
     private static readonly HashSet<uint> _pinned = new();
     private static readonly HashSet<(int Pid, uint Dst)> _rstPairs = new();
     private static string? _gateway;
+    private static string? _candidateGateway;
+    private static int _candidateStreak;
     private static Timer? _timer;
     private static int _scanTick;
     private static int _scanning;
@@ -121,6 +126,8 @@ public static class TunExclusion
             ClearPinnedLocked();
             _pidCache.Clear();
             _gateway = null;
+            _candidateGateway = null;
+            _candidateStreak = 0;
             _scanTick = 0;
         }
         Task.Factory.StartNew(() => SyncRules(gen, null), TaskCreationOptions.LongRunning);
@@ -158,16 +165,7 @@ public static class TunExclusion
             {
                 if (_timer == null || _excluded.Count == 0) return;
                 if (_scanTick % GatewayCheckEvery == 0)
-                {
-                    string? gw = TunManager.GetDefaultGatewayVia();
-                    if (gw == null) return;
-                    if (_gateway != null && _gateway != gw)
-                    {
-                        TunManager.Log($"exclusion gateway changed {_gateway} -> {gw}; repinning");
-                        ClearPinnedLocked();
-                    }
-                    _gateway = gw;
-                }
+                    RefreshGatewayLocked();
                 _scanTick++;
             }
             if (_gateway == null) return;
@@ -187,6 +185,99 @@ public static class TunExclusion
         {
             Interlocked.Exchange(ref _scanning, 0);
         }
+    }
+
+    /// <summary>
+    /// به‌روزرسانیِ گیت‌ویِ معتبر برای سنجاق کردن مسیرها.
+    /// ۱) اگر گیت‌ویِ فعلی دیگر روی هیچ کارتِ غیر-TUN نیست (آداپتر عوض شده)، مسیرهای
+    ///    سنجاق‌شده به سیاه‌چاله تبدیل شده‌اند و باید همین حالا حذف شوند، نه اینکه
+    ///    تا یافتنِ جایگزین منتظر بمانند.
+    /// ۲) گیت‌ویِ جدید فقط بعد از پایداری چند نوبتِ پیاپی پذیرفته می‌شود، چون کارتِ
+    ///    در حال قطع‌شدن چند ثانیه هنوز مسیرِ پیش‌فرضِ کم‌metric دارد.
+    /// ۳) اگر تشخیص خالی برگشت، گیت‌ویِ قبلی حفظ می‌شود تا اسکن از کار نیفتد.
+    /// </summary>
+    private static void RefreshGatewayLocked()
+    {
+        if (_gateway != null && !TunManager.IsPhysicalGatewayPresent(_gateway))
+        {
+            TunManager.Log($"exclusion gateway {_gateway} no longer present; dropping stale pins");
+            ClearPinnedLocked();
+            _gateway = null;
+            _candidateGateway = null;
+            _candidateStreak = 0;
+        }
+
+        string? gw = TunManager.GetDefaultGatewayVia();
+        if (gw == null)
+        {
+            // تشخیص گیت‌وی هنگام تعویض آداپتر گاهی چند نوبت خالی برمی‌گردد؛ تا گیت‌ویِ
+            // معتبر نداریم چیزی سنجاق نمی‌کنیم، ولی اسکن نباید متوقف شود.
+            if (_gateway == null)
+                TunManager.Log("exclusion gateway detection empty; pinning deferred");
+            return;
+        }
+
+        if (_gateway == gw)
+        {
+            _candidateGateway = null;
+            _candidateStreak = 0;
+            ReconcilePinsLocked();
+            return;
+        }
+        if (_gateway == null)
+        {
+            TunManager.Log($"exclusion gateway acquired {gw}");
+            _gateway = gw;
+            _candidateGateway = null;
+            _candidateStreak = 0;
+            ReconcilePinsLocked();
+            return;
+        }
+        if (!string.Equals(_candidateGateway, gw, StringComparison.Ordinal))
+        {
+            _candidateGateway = gw;
+            _candidateStreak = 1;
+            return;
+        }
+        if (++_candidateStreak < GatewayStableTicks) return;
+        TunManager.Log($"exclusion gateway changed {_gateway} -> {gw}; repinning");
+        ClearPinnedLocked();
+        _gateway = gw;
+        _candidateGateway = null;
+        _candidateStreak = 0;
+    }
+
+    /// <summary>
+    /// تطبیقِ مسیرهای سنجاق‌شده با جدول مسیر واقعی. ویندوز هنگام تعویض آداپتر یا تجدید
+    /// DHCP مسیرهای /32 را حذف می‌کند، ولی <c>_pinned</c> هنوز فکر می‌کند سرِ جایشان
+    /// هستند و دیگر هرگز دوباره ساخته نمی‌شوند → ترافیکِ برنامهٔ معاف به TUN می‌رود
+    /// یا پشتِ گیت‌ویِ مرده گیر می‌کند.
+    /// </summary>
+    private static void ReconcilePinsLocked()
+    {
+        if (_pinned.Count == 0) return;
+        // FilterPresent در شکِ route print همه را «حاضر» برمی‌گرداند؛ یعنی فقط وقتی
+        // مطمئنیم مسیر رفته، آن را حذف می‌کنیم.
+        var present = FilterPresent(_pinned.Select(IpText).ToList());
+        var missing = _pinned.Where(v => !present.Contains(IpText(v))).ToList();
+        if (missing.Count == 0) return;
+        foreach (var ip in missing)
+        {
+            _pinned.Remove(ip);
+            DropRstForDestLocked(ip);
+        }
+        PersistPinsLocked();
+        TunManager.Log($"exclusion reconcile dropped {missing.Count} vanished pin(s); will re-pin");
+    }
+
+    /// <summary>
+    /// فراموش‌کردنِ resetهای انجام‌شده برای یک مقصد، تا بعد از ساختنِ مسیرِ تازه همان
+    /// اتصال دوباره reset شود و برنامه واقعاً از مسیرِ سالم استفاده کند.
+    /// </summary>
+    private static void DropRstForDestLocked(uint dst)
+    {
+        foreach (var key in _rstPairs.Where(k => k.Dst == dst).ToList())
+            _rstPairs.Remove(key);
     }
 
     private static List<TcpRow> ReadTcpTable()
@@ -251,6 +342,9 @@ public static class TunExclusion
                 _pinned.Add(row.RemoteIp);
                 newPins++;
                 PersistPinsLocked();
+                // مسیرِ تازه فقط با resetِ دوبارهٔ همان اتصال به برنامه می‌رسد؛ وگرنه
+                // سوکتِ کهنه روی گیت‌ویِ مرده می‌ماند و برنامه «قطع» دیده می‌شود.
+                DropRstForDestLocked(row.RemoteIp);
                 TunManager.Log($"exclusion pin {IpText(row.RemoteIp)} via {_gateway}");
             }
             if (_rstPairs.Add((row.Pid, row.RemoteIp)))

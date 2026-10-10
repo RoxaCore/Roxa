@@ -16,13 +16,6 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty] private bool _showAdvancedDns;
     [ObservableProperty] private bool _useTunMode;
-    [ObservableProperty] private bool _enableSingBox;
-
-    partial void OnEnableSingBoxChanged(bool value)
-    {
-        _settings.EnableSingBox = value;
-        SaveSettings();
-    }
 
     [ObservableProperty] private bool _useProxyForSubscriptions;
 

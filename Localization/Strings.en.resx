@@ -541,8 +541,6 @@ State: {3}</value>
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>Fetching via system proxy...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>Healed {0} stale TUN DNS adapter(s)</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>Bypassing TUN for direct fetch...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>Enable sing-box</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>The sing-box core has been added alongside the current engine. Enabling this only saves the setting for now; connection behavior is unchanged.</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>Enable TUN</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>When TUN is enabled, all system traffic passes through the tunnel and the app will require administrator access. Are you sure?</value></data>
   <data name="Set_Table" xml:space="preserve"><value>Table</value></data>

@@ -524,8 +524,6 @@
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>システムプロキシ経由で取得...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>TUNの残存DNSアダプター{0}件を修復しました</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>TUNを迂回して直接取得...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>sing-box を有効にする</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box コアが既存のエンジンに加わりました。今のところ有効化しても設定の保存のみで、接続の動作は変わりません。</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUNを有効化</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>TUNを有効にすると、システム全体のトラフィックがトンネルを通過し、アプリに管理者権限が必要になります。よろしいですか？</value></data>
   <data name="Set_Table" xml:space="preserve"><value>テーブル</value></data>

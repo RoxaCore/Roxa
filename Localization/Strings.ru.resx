@@ -540,8 +540,6 @@ ID устройства {2}
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>Загрузка через системный прокси...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>Восстановлено {0} устаревших DNS-адаптеров TUN</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>Обход TUN для прямой загрузки...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>Включить sing-box</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>Ядро sing-box добавлено рядом с текущим движком. Включение пока только сохраняет настройку; поведение подключения не меняется.</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>Включить TUN</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>Когда TUN включён, весь системный трафик идёт через туннель, и приложению потребуются права администратора. Вы уверены?</value></data>
   <data name="Set_Table" xml:space="preserve"><value>Таблица</value></data>

@@ -819,16 +819,6 @@
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="8">
                 <StackPanel Orientation="Horizontal" Spacing="10">
-                  <ToggleSwitch IsChecked="{Binding EnableSingBox}"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_SingBox}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
-                </StackPanel>
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_SingBox_Desc}" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
-              </StackPanel>
-            </Border>
-
-            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
-              <StackPanel Spacing="8">
-                <StackPanel Orientation="Horizontal" Spacing="10">
                   <ToggleSwitch IsChecked="{Binding UseTunMode}"/>
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_TUN}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
                 </StackPanel>

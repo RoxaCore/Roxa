@@ -524,8 +524,6 @@
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>시스템 프록시로 가져오기...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>TUN 잔여 DNS 어댑터 {0}개 복구됨</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>TUN을 우회하여 직접 가져오는 중...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>sing-box 사용</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box 코어가 기존 엔진에 추가되었습니다. 지금은 켜도 설정만 저장될 뿐 연결 동작은 바뀌지 않습니다.</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUN 활성화</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>TUN을 활성화하면 전체 시스템 트래픽이 터널을 통해 전송되며 앱에 관리자 권한이 필요합니다. 계속하시겠습니까?</value></data>
   <data name="Set_Table" xml:space="preserve"><value>표</value></data>

@@ -877,8 +877,6 @@ Durum: {3}</value>
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>Sistem proxy'si üzerinden alma...</value></data>
   <data name="Log_SubHealDns" xml:space="preserve"><value>TUN'dan kalan {0} DNS adaptörü onarıldı</value></data>
   <data name="Log_SubBypass" xml:space="preserve"><value>Doğrudan alma için TUN atlanıyor...</value></data>
-  <data name="Set_SingBox" xml:space="preserve"><value>sing-box etkinleştir</value></data>
-  <data name="Set_SingBox_Desc" xml:space="preserve"><value>sing-box çekirdeği mevcut motorun yanına eklendi. Şimdilik bunu etkinleştirmek yalnızca ayarı kaydeder; bağlantı davranışı değişmez.</value></data>
   <data name="Dlg_ConfirmTun" xml:space="preserve"><value>TUN'u etkinleştir</value></data>
   <data name="Dlg_ConfirmTun_Msg" xml:space="preserve"><value>TUN etkinleştirildiğinde tüm sistem trafiği tünelden geçer ve uygulama yönetici izni gerektirir. Emin misiniz?</value></data>
   <data name="Set_Table" xml:space="preserve"><value>Tablo</value></data>

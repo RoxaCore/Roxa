@@ -203,21 +203,36 @@ public partial class MainWindow : Window
         vm.ToastHandler = message => ShowToast(message);
         vm.FocusServerHandler = FocusServer;
         vm.SelectionRefreshHandler = ReapplyRowSelection;
-        vm.RestartRequested += (string extraArgs) =>
+        vm.RestartRequested += async (string extraArgs) =>
         {
             try
             {
                 var app = Application.Current as App;
-                app?.DisposeTray();
-                bool wasConnected = vm.IsConnected;
-                // عیب‌یابی اشتراکات: ری‌استارت باید بدون اتصال باشد، حتی اگر قبلاً وصل بوده.
                 var argList = extraArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
                 bool noReconnect = argList.Remove("--no-reconnect");
+                bool disconnectFirst = argList.Remove("--disconnect");
+
+                bool wasConnected = vm.IsConnected;
+                bool disconnected = false;
+                if (disconnectFirst && wasConnected)
+                {
+                    // ری‌استارت وسطِ اتصال ممنوع: اول تا آخر قطع می‌کنیم تا نمونهٔ
+                    // بعدی روی آداپتور/مسیر/WFPِ نیمه‌کاره بالا نیاید، و بعد هم
+                    // با --no-autoconnect جلوی وصل شدنِ خودکار گرفته می‌شود.
+                    await vm.PrepareRestartAsync();
+                    disconnected = true;
+                    wasConnected = false;
+                }
+
+                app?.DisposeTray();
                 var exe = Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "";
                 var psi = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = exe,
-                    Arguments = "--wait-exit" + (wasConnected && !noReconnect ? " --reconnect" : "") + (argList.Count > 0 ? " " + string.Join(" ", argList) : ""),
+                    Arguments = "--wait-exit"
+                        + (wasConnected && !noReconnect ? " --reconnect" : "")
+                        + (disconnected ? " --no-autoconnect" : "")
+                        + (argList.Count > 0 ? " " + string.Join(" ", argList) : ""),
                     UseShellExecute = true
                 };
                 if (Core.AdminHelper.IsRunningAsAdmin())

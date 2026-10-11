@@ -224,6 +224,23 @@ public partial class MainViewModel : ViewModelBase
         try { await t; } catch { }
     }
 
+    private static readonly TimeSpan RestartCleanupTimeout = TimeSpan.FromSeconds(15);
+
+    /// <summary>
+    /// قطعِ کاملِ اتصال پیش از ری‌استارت. DisconnectCore پاکسازی را در پس‌زمینه رها
+    /// می‌کند و بلافاصله برمی‌گردد؛ اینجا تا پایانِ حذفِ مسیرها، بازگردانیِ DNS و
+    /// بستنِ موتور صبر می‌کنیم تا نمونهٔ بعدی روی TUN و WFPِ نیمه‌کاره بالا نیاید.
+    /// سقفِ زمانی دارد تا ری‌استارت هرگز به خاطرِ گیر کردنِ پاکسازی متوقف نشود.
+    /// </summary>
+    public async Task PrepareRestartAsync()
+    {
+        if (IsConnected) DisconnectCore(false);
+        var t = _cleanupTask;
+        if (t == null || t.IsCompleted) return;
+        try { await Task.WhenAny(t, Task.Delay(RestartCleanupTimeout)); }
+        catch { }
+    }
+
     [RelayCommand]
     private async Task Reconnect()
     {

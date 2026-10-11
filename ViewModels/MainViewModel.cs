@@ -393,7 +393,10 @@ public partial class MainViewModel : ViewModelBase
                     await UpdateSubscriptions();
             }
             bool restartReconnect = Program.StartupArgs.Length > 0 && Array.Exists(Program.StartupArgs, a => a == "--reconnect");
-            if ((AutoConnect || restartReconnect) && !IsConnected)
+            // ری‌استارتِ بعد از قطعِ عمدی (مثلاً عوض کردن زبان) نباید دوباره وصل شود؛
+            // AutoConnect فقط برای اجرای عادیِ برنامه است، نه برای این اجرا.
+            bool noAutoConnect = Program.StartupArgs.Length > 0 && Array.Exists(Program.StartupArgs, a => a == "--no-autoconnect");
+            if ((restartReconnect || (AutoConnect && !noAutoConnect)) && !IsConnected)
             {
                 if (SelectedServer != null)
                     await Connect();

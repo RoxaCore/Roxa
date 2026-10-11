@@ -239,6 +239,9 @@ public partial class MainWindow : Window
                 };
                 if (Core.AdminHelper.IsRunningAsAdmin())
                     psi.Verb = "runas";
+                // ذخیرهٔ تنظیماتِ معلّق (مثلاً زبانِ تازه) پیش از ری‌استارت؛ نمونهٔ
+                // بعدی همین فایل را می‌خواند و نباید نسخهٔ کهنه را ببیند.
+                try { vm.FlushPendingSettings(); } catch { }
                 System.Diagnostics.Process.Start(psi);
             }
             catch { }

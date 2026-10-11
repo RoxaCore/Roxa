@@ -139,16 +139,58 @@ public sealed class XrayEngine : IDisposable
         catch { }
     }
 
+    private static readonly object _engineLogGate = new();
+    private static readonly System.Text.StringBuilder _engineLogBuf = new();
+    private static System.Threading.Timer? _engineLogTimer;
+    private const int EngineLogFlushThreshold = 8 * 1024;
+    private const long EngineLogMaxBytes = 4_000_000;
+
     private void Log(string message)
     {
         Output?.Invoke(message);
         try
         {
+            bool flushNow;
+            lock (_engineLogGate)
+            {
+                _engineLogBuf.Append('[').Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                             .Append("] ").Append(message).Append(Environment.NewLine);
+                if (_engineLogTimer == null)
+                    _engineLogTimer = new System.Threading.Timer(_ => FlushEngineLog(), null, 1000, 1000);
+                flushNow = _engineLogBuf.Length >= EngineLogFlushThreshold;
+            }
+            if (flushNow) FlushEngineLog();
+        }
+        catch { }
+    }
+
+    /// <summary>
+    /// بافرِ لاگِ موتور را می‌نویسد. قبلاً هر خطِ خروجیِ xray یعنی CreateDirectory +
+    /// File.Exists + FileInfo.Length + AppendAllText؛ چهار عملیاتِ فایل روی همان
+    /// رشته‌ای که خروجیِ لوله را می‌خواند و ایستادنِ آن موتور را هم می‌گیرد.
+    /// </summary>
+    public static void FlushEngineLog()
+    {
+        try
+        {
+            string chunk;
+            lock (_engineLogGate)
+            {
+                if (_engineLogBuf.Length == 0) return;
+                chunk = _engineLogBuf.ToString();
+                _engineLogBuf.Clear();
+            }
+
             string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
             Directory.CreateDirectory(dir);
             string file = Path.Combine(dir, "engine.log");
-            if (File.Exists(file) && new FileInfo(file).Length > 4_000_000) File.WriteAllText(file, "");
-            File.AppendAllText(file, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}{Environment.NewLine}");
+            try
+            {
+                var fi = new FileInfo(file);
+                if (fi.Exists && fi.Length + chunk.Length > EngineLogMaxBytes) File.WriteAllText(file, "");
+            }
+            catch { }
+            File.AppendAllText(file, chunk);
         }
         catch { }
     }

@@ -50,6 +50,26 @@ sealed class Program
         }
 
         bool waitExit = Array.Exists(args, a => a == "--wait-exit");
+
+        // نمونهٔ قبلی که در حالِ خروج است را صبر می‌کنیم تا واقعاً بمیرد. فقط با یک
+        // حلقهٔ ثابتِ mutex نمی‌شد فهمید آیا کند است یا اصلاً نمرده؛ در حالتِ دوم
+        // نمونهٔ جدید بعد از ۱۰ ثانیه بی‌صدا می‌مرد و برنامه ناپدید می‌شد.
+        if (waitExit)
+        {
+            int waitPid = 0;
+            for (int i = 0; i + 1 < args.Length; i++)
+                if (args[i] == "--wait-pid" && int.TryParse(args[i + 1], out int p)) waitPid = p;
+            if (waitPid > 0 && waitPid != Environment.ProcessId)
+            {
+                try
+                {
+                    using var oldProc = System.Diagnostics.Process.GetProcessById(waitPid);
+                    if (!oldProc.HasExited) oldProc.WaitForExit(30_000);
+                }
+                catch { /* پروسه از قبل رفته یا دسترسی نیست؛ mutex همین حالا آزاد است */ }
+            }
+        }
+
         Mutex? mutex = null;
         bool createdNew = false;
         int tries = waitExit ? 100 : 1;

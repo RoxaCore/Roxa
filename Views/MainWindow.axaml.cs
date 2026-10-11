@@ -229,7 +229,9 @@ public partial class MainWindow : Window
                 var psi = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = exe,
-                    Arguments = "--wait-exit"
+                    // --wait-pid: نمونهٔ جدید منتظر می‌ماند تا این نمونه واقعاً از
+                    // بین برود، به‌جای حدس زدن با یک حلقهٔ ثابتِ mutex.
+                    Arguments = "--wait-exit --wait-pid " + Environment.ProcessId
                         + (wasConnected && !noReconnect ? " --reconnect" : "")
                         + (disconnected ? " --no-autoconnect" : "")
                         + (argList.Count > 0 ? " " + string.Join(" ", argList) : ""),

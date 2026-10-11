@@ -30,7 +30,9 @@ public partial class MainViewModel : ViewModelBase
             Localization.TranslationManager.Instance.SetCulture(match.code);
             _settings.Language = match.code;
             SaveSettings();
-            RestartRequested?.Invoke("");
+            // --disconnect: ری‌استارتِ بعد از تغییر زبان باید اول اتصال را کامل قطع
+            // کند و بعد از بالا آمدن، دوباره وصل نشود.
+            RestartRequested?.Invoke("--disconnect");
         }
     }
 

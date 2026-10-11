@@ -141,6 +141,12 @@ public static class TunManager
                 AddRoute($"add 10.0.0.0 mask 255.0.0.0 {via}");
                 AddRoute($"add 172.16.0.0 mask 255.240.0.0 {via}");
                 AddRoute($"add 192.168.0.0 mask 255.255.0.0 {via}");
+                // لینک‌لوکال. آداپتورِ TUN آدرسِ 169.254.x.x دارد، پس ویندوز بِرودکستِ
+                // همان زیرشبکه (169.254.255.255 روی پورت‌های 138/1947) را به تونل
+                // می‌فرستاد؛ در یک نوبت ۲۳۲۱ بسته در ۸ ثانیه ثبت شد و xray به‌ازایِ
+                // هر کدام یک خط لاگ نوشت. TunExclusion.IsPrivate همین دامنه را
+                // محلی حساب می‌کند، ولی اینجا جا افتاده بود.
+                AddRoute($"add 169.254.0.0 mask 255.255.0.0 {via}");
             }, TaskCreationOptions.LongRunning);
             long tExcl = Environment.TickCount64;
 
@@ -253,6 +259,9 @@ public static class TunManager
         }
     }
 
+    /// <summary>آخرین گیت‌ویِ در لاگ آمده؛ تا پایشِ هر ۵ ثانیه یک خطِ تکراری ننویسد.</summary>
+    private static string? _lastLoggedGateway;
+
     public static string? GetDefaultGatewayVia()
     {
         try
@@ -263,7 +272,7 @@ public static class TunManager
             string? physical = FindPhysicalDefaultGateway();
             if (physical != null)
             {
-                Log($"Default gateway via={physical} (physical)");
+                LogGatewayOnce(physical, "physical");
                 return physical;
             }
 
@@ -288,7 +297,7 @@ public static class TunManager
                 }
             }
             if (via == null) return null;
-            Log($"Default gateway via={via} (metric={bestMetric})");
+            LogGatewayOnce(via, $"metric={bestMetric}");
             return via;
         }
         catch (Exception ex)
@@ -296,6 +305,21 @@ public static class TunManager
             Log($"GetDefaultGatewayVia failed: {ex.Message}");
             return null;
         }
+    }
+
+    /// <summary>
+    /// لاگِ گیت‌وی فقط وقتی مقدار واقعاً عوض شده. پایشِ هر چند ثانیه همان یک
+    /// خطِ «Default gateway via=… (physical)» را بی‌قید و شرط می‌نوشت — تا ۱۸ بار
+    /// در دقیقه، برایِ ساعت‌ها، در حالی که هیچ چیزی عوض نشده بود.
+    /// </summary>
+    private static void LogGatewayOnce(string via, string detail)
+    {
+        lock (_routesLock)
+        {
+            if (string.Equals(_lastLoggedGateway, via, StringComparison.Ordinal)) return;
+            _lastLoggedGateway = via;
+        }
+        Log($"Default gateway via={via} ({detail})");
     }
 
     /// <summary>
@@ -404,6 +428,8 @@ public static class TunManager
             _gatewayTimer = null;
             _watchCandidate = null;
             _watchStreak = 0;
+            // در اتصالِ بعدی، گیتِوی دوباره در لاگ بیاید.
+            _lastLoggedGateway = null;
         }
         t?.Dispose();
     }

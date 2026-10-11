@@ -214,26 +214,45 @@ public partial class App : Application
             // آیتم‌ها null می‌مانند و این تایمر هر ۲ ثانیه برنامه را crash می‌کرد.
             if (_trayIcon == null || _smartItem == null || _proxyItem == null || _notifItem == null) return;
 
+            // فقط وقتی مقدار واقعاً عوض شده می‌نویسیم؛ نوشتنِ بی‌قید و شرط هر ۲ ثانیه
+            // پنجرهٔ سینیِ ویندوز را هربار به‌روزرسانی می‌کرد و رویدادِ پیامِ سینی می‌ساخت.
             if (vm.IsSmartConnecting)
             {
-                _smartItem.Header = TranslationManager.Get("Tray_Stop");
-                _trayIcon.ToolTipText = $"Roxa - {TranslationManager.Get("Tray_Searching")}";
+                SetIfChanged(ref _smartHeader, TranslationManager.Get("Tray_Stop"), v => _smartItem.Header = v);
+                SetTooltip($"Roxa - {TranslationManager.Get("Tray_Searching")}");
             }
             else if (vm.IsConnected)
             {
-                _smartItem.Header = TranslationManager.Get("Tray_FindBetter");
-                _trayIcon.ToolTipText = $"Roxa - {string.Format(TranslationManager.Get("Tray_ConnectedTo"), vm.SelectedServer?.Name)}";
+                SetIfChanged(ref _smartHeader, TranslationManager.Get("Tray_FindBetter"), v => _smartItem.Header = v);
+                SetTooltip($"Roxa - {string.Format(TranslationManager.Get("Tray_ConnectedTo"), vm.SelectedServer?.Name)}");
             }
             else
             {
-                _smartItem.Header = TranslationManager.Get("Tray_SmartConnect");
-                _trayIcon.ToolTipText = "Roxa";
+                SetIfChanged(ref _smartHeader, TranslationManager.Get("Tray_SmartConnect"), v => _smartItem.Header = v);
+                SetTooltip("Roxa");
             }
 
-            _proxyItem.IsChecked = vm.SetSystemProxy;
-            _notifItem.IsChecked = vm.NotificationsEnabled;
+            if (_proxyItem.IsChecked != vm.SetSystemProxy) _proxyItem.IsChecked = vm.SetSystemProxy;
+            if (_notifItem.IsChecked != vm.NotificationsEnabled) _notifItem.IsChecked = vm.NotificationsEnabled;
         };
         _traySyncTimer.Start();
+    }
+
+    private string? _smartHeader;
+    private string? _smartTooltip;
+
+    private static void SetIfChanged(ref string? field, string value, Action<string> apply)
+    {
+        if (string.Equals(field, value, StringComparison.Ordinal)) return;
+        field = value;
+        apply(value);
+    }
+
+    private void SetTooltip(string value)
+    {
+        if (string.Equals(_smartTooltip, value, StringComparison.Ordinal)) return;
+        _smartTooltip = value;
+        _trayIcon!.ToolTipText = value;
     }
 
     internal void ShowMainWindow()

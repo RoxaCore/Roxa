@@ -244,12 +244,20 @@ public partial class MainViewModel : ViewModelBase
 
         _blinkTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
         _blinkTimer.Tick += (_, _) => BlinkTick();
-        _blinkTimer.Start();
+        // آغاز/توقف در OnIsConnectedChanged؛ در حالتِ قطع بودن، این تایمر فقط
+        // رشتهٔ UI را ۱۰ بار در ثانیه بیدار می‌کرد تا opacity را ۱ بگذارد.
+        if (IsConnected) _blinkTimer.Start();
     }
 
     private void BlinkTick()
     {
-        if (!IsConnected) { SpeedBlinkOpacity = 1.0; _blinkPhase = 0; return; }
+        if (!IsConnected)
+        {
+            if (SpeedBlinkOpacity != 1.0) SpeedBlinkOpacity = 1.0;
+            _blinkPhase = 0;
+            _blinkTimer?.Stop();
+            return;
+        }
         _blinkPhase += 0.45;
         if (_blinkPhase > Math.PI * 2) _blinkPhase -= Math.PI * 2;
         SpeedBlinkOpacity = 0.45 + 0.55 * (0.5 + 0.5 * Math.Cos(_blinkPhase));
@@ -284,7 +292,39 @@ public partial class MainViewModel : ViewModelBase
         catch { }
     }
 
+    private const long NicCacheMs = 5000;
+    private static System.Net.NetworkInformation.NetworkInterface? _cachedNic;
+    private static long _cachedNicAt;
+    private static readonly object _nicGate = new();
+
+    /// <summary>
+    /// پیمایشِ کاملِ کارت‌های شبکه (به‌همراهِ دو بار GetIPStatistics برای هر کارت) هر ۳
+    /// ثانیه و روی رشتهٔ UI گران تمام می‌شد؛ نتیجه را ۵ ثانیه نگه می‌داریم و فقط وقتی
+    /// کارتِ ذخیره‌شده از کار افتاده باشد دوباره می‌گردیم.
+    /// </summary>
     private static System.Net.NetworkInformation.NetworkInterface? FindActiveNetworkInterface()
+    {
+        lock (_nicGate)
+        {
+            var cached = _cachedNic;
+            if (cached != null && Environment.TickCount64 - _cachedNicAt < NicCacheMs)
+            {
+                try
+                {
+                    if (cached.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up)
+                        return cached;
+                }
+                catch { }
+            }
+        }
+
+        System.Net.NetworkInformation.NetworkInterface? found = null;
+        try { found = ResolveActiveNetworkInterface(); } catch { }
+        lock (_nicGate) { _cachedNic = found; _cachedNicAt = Environment.TickCount64; }
+        return found;
+    }
+
+    private static System.Net.NetworkInformation.NetworkInterface? ResolveActiveNetworkInterface()
     {
         var ni = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
             .Where(n => n.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
@@ -362,6 +402,13 @@ public partial class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(ShowDisconnectedStatus));
         RefreshConnectionFlags();
         RefreshTestsBypassingTun();
+        if (value) _blinkTimer?.Start();
+        else
+        {
+            _blinkTimer?.Stop();
+            SpeedBlinkOpacity = 1.0;
+            _blinkPhase = 0;
+        }
         if (!value)
         {
             LiveDownSpeed = "0 B/s";

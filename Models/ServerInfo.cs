@@ -206,7 +206,7 @@ public partial class ServerInfo : ObservableObject
                 return cnOnly.Length > 0 ? cnOnly : (CountryCode.Length == 2 ? CountryCode : "Unknown");
             }
 
-            string shortName = RemoveCommonParts(name);
+            string shortName = RemoveCommonParts();
 
             if (!string.IsNullOrEmpty(CountryCode))
             {
@@ -236,17 +236,40 @@ public partial class ServerInfo : ObservableObject
         }
     }
 
-    private string RemoveCommonParts(string name)
+    private string[]? _nameTokens;
+    private string? _nameTokensFor;
+
+    /// <summary>
+    /// توکن‌های اسمِ همین سرور، فقط وقتی Name عوض شود دوباره ساخته می‌شود. قبلاً
+    /// برای هر بارِ خواندنِ ShortName، اسمِ همهٔ سرورهای هم‌اشتراک از نو Split
+    /// می‌شد؛ با لیستِ چندصدتایی یعنی صدها آرایهٔ جدید به‌ازای هر سلولی که رندر
+    /// می‌شود، روی همان رشته‌ای که رابط را می‌کِشد.
+    /// </summary>
+    private string[] NameTokens
     {
-        var myTokens = name.Split(Core.GeoFlags.SplitChars, StringSplitOptions.RemoveEmptyEntries);
-        if (myTokens.Length <= 1) return name;
+        get
+        {
+            string name = Name;
+            if (_nameTokens == null || !string.Equals(_nameTokensFor, name, StringComparison.Ordinal))
+            {
+                _nameTokensFor = name;
+                _nameTokens = name.Split(Core.GeoFlags.SplitChars, StringSplitOptions.RemoveEmptyEntries);
+            }
+            return _nameTokens;
+        }
+    }
+
+    private string RemoveCommonParts()
+    {
+        var myTokens = NameTokens;
+        if (myTokens.Length <= 1) return Name;
 
         var noCc = myTokens.Where(t => !IsCountryToken(t)).ToArray();
-        if (noCc.Length == 0) return name;
+        if (noCc.Length == 0) return Name;
 
         var siblings = Owner?.Servers?
             .Where(s => s != this && s.SubscriptionName == SubscriptionName)
-            .Select(s => s.Name.Split(Core.GeoFlags.SplitChars, StringSplitOptions.RemoveEmptyEntries))
+            .Select(s => s.NameTokens)
             .ToList();
 
         if (siblings == null || siblings.Count == 0) return string.Join(" ", noCc);
@@ -265,13 +288,13 @@ public partial class ServerInfo : ObservableObject
 
         int keepFrom = prefixLen;
         int keepTo = myTokens.Length - suffixLen;
-        if (keepTo <= keepFrom) return name;
+        if (keepTo <= keepFrom) return Name;
 
         var kept = myTokens[keepFrom..keepTo]
             .Where(t => !IsCountryToken(t))
             .ToArray();
 
-        return kept.Length > 0 ? string.Join(" ", kept) : name;
+        return kept.Length > 0 ? string.Join(" ", kept) : Name;
     }
 
     private bool IsCountryToken(string token)

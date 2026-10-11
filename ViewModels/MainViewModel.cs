@@ -553,7 +553,39 @@ public partial class MainViewModel : ViewModelBase
 
     private static void Enrich(ServerInfo s) => s.CountryCode = GeoFlags.DetectCountry(s.Name, s.Address);
     private void SaveServers() => Storage.SaveServers(Servers.ToList());
-    private void SaveSettings() => Storage.SaveSettings(_settings);
+
+    private readonly object _settingsSaveGate = new();
+    private System.Threading.Timer? _settingsSaveTimer;
+    private const int SettingsSaveDelayMs = 500;
+
+    private void SaveSettings()
+    {
+        // ذخیره را ۵۰۰ میلی‌ثانیه عقب می‌اندازیم؛ قبلاً هر یک از حدود ۲۵ setter
+        // (حتی انتخابِ هر سرور) بلافاصله سریالایز و روی دیسک نوشته می‌شد و با
+        // حرکتِ سریع در رابط ده‌ها نوشتنِ پشت‌سرهم داشتیم.
+        lock (_settingsSaveGate)
+        {
+            _settingsSaveTimer ??= new System.Threading.Timer(
+                _ => SaveSettingsNow(), null, -1, -1);
+            _settingsSaveTimer.Change(SettingsSaveDelayMs, -1);
+        }
+    }
+
+    /// <summary>
+    /// فوری‌کردنِ ذخیرهٔ به‌تعویق‌افتاده. خروجِ برنامه این را صدا می‌زند تا آخرین
+    /// تغییرِ تنظیمات در ۵۰۰ میلی‌ثانیهٔ آخر گم نشود.
+    /// </summary>
+    private void SaveSettingsNow()
+    {
+        System.Threading.Timer? pending;
+        lock (_settingsSaveGate)
+        {
+            pending = _settingsSaveTimer;
+            _settingsSaveTimer = null;
+        }
+        try { pending?.Dispose(); } catch { }
+        try { Storage.SaveSettings(_settings); } catch { }
+    }
     private void SaveSubs() => Storage.SaveSubscriptions(Subscriptions.ToList());
 
      partial void OnIsTestingChanged(bool value) => ConnectCommand.NotifyCanExecuteChanged();
@@ -574,6 +606,11 @@ public partial class MainViewModel : ViewModelBase
 
       public void Shutdown()
       {
+          // رویدادِ static را رها می‌کنیم؛ وگرنه نمونهٔ قبلیِ ViewModel با کلِ
+          // نمودارِ اشیایش برای همیشه نگه داشته می‌شود.
+          try { TunKillSwitch.StateChanged -= OnKillSwitchStateChanged; } catch { }
+          // ذخیرهٔ به‌تعویق‌افتادهٔ تنظیمات را همین‌جا می‌ریزیم تا گم نشود.
+          SaveSettingsNow();
           try { SaveServers(); } catch { }
           _engine.Dispose();
       }

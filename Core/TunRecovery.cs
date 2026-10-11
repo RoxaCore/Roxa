@@ -112,6 +112,9 @@ public static class TunRecovery
             TunState.Delete();
         }
         catch { }
+        // آخرین خطوطِ لاگ را پیش از پایانِ پروسه روی دیسک می‌ریزیم؛ بافرِ لاگ
+        // حداکثر یک ثانیه عقب است و نباید موقعِ کرش/خروج گم شود.
+        try { TunManager.FlushLog(); } catch { }
     }
 
     private static HashSet<string> GuardedDests(TunState? state)

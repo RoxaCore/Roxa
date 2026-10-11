@@ -709,13 +709,62 @@ public static class TunManager
         }
     }
 
+    private static readonly object _logGate = new();
+    private static readonly System.Text.StringBuilder _logBuf = new();
+    private static System.Threading.Timer? _logTimer;
+    private const int LogFlushThreshold = 16 * 1024;
+    private const long LogMaxBytes = 2L * 1024 * 1024;
+
+    /// <summary>
+    /// لاگِ تونل را بافر می‌کند. قبلاً هر فراخوانی یک Directory.CreateDirectory و یک
+    /// File.AppendAllTextِ کامل (باز/بستنِ فایل، هر بار اسکنِ آنتی‌ویروس) بود؛ حالا
+    /// حداکثر یک بار در ثانیه و در یک نوشتنِ واحد انجام می‌شود. اگر بافر بزرگ شود
+    /// همان لحظه می‌نویسیم تا در دوره‌های پُرلاگ چیزی گم نشود.
+    /// </summary>
     public static void Log(string message)
     {
         try
         {
+            bool flushNow;
+            lock (_logGate)
+            {
+                _logBuf.Append('[').Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                       .Append("] ").Append(message).Append(Environment.NewLine);
+                if (_logTimer == null)
+                    _logTimer = new Timer(_ => FlushLog(), null, 1000, 1000);
+                flushNow = _logBuf.Length >= LogFlushThreshold;
+            }
+            if (flushNow) FlushLog();
+        }
+        catch { }
+    }
+
+    /// <summary>
+    /// نوشتنِ یک‌جاِ بافر و برشِ فایلِ لاگ. فراخوانی چندباره بی‌خطر است؛ روی مسیرِ
+    /// خروج هم صدا زده می‌شود تا آخرین خطوط قبل از پایانِ پروسه روی دیسک باشند.
+    /// </summary>
+    public static void FlushLog()
+    {
+        try
+        {
+            string chunk;
+            lock (_logGate)
+            {
+                if (_logBuf.Length == 0) return;
+                chunk = _logBuf.ToString();
+                _logBuf.Clear();
+            }
+
             Directory.CreateDirectory(_logDir);
             string logFile = Path.Combine(_logDir, "tun.log");
-            File.AppendAllText(logFile, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}{Environment.NewLine}");
+            try
+            {
+                var fi = new FileInfo(logFile);
+                if (fi.Exists && fi.Length + chunk.Length > LogMaxBytes)
+                    File.Move(logFile, logFile + ".old", true);
+            }
+            catch { }
+            File.AppendAllText(logFile, chunk);
         }
         catch { }
     }

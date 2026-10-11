@@ -12,7 +12,7 @@ public static class TunExclusion
     private const uint MIB_TCP_STATE_DELETE_TCB = 12;
     private const uint PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
     private const int ScanIntervalMs = 1000;
-    private const int GatewayCheckEvery = 5;
+    private const int GatewayCheckEvery = 10;
     // گیت‌ویِ پیشنهادی باید این‌قدر نوبت پشت‌سرهم پایدار باشد تا بپذیریمش؛ در لحظهٔ
     // تعویض آداپتر، کارتِ در حال قطع‌شدن چند ثانیه مسیرِ پیش‌فرضِ کم‌metric دارد.
     private const int GatewayStableTicks = 2;
@@ -32,6 +32,31 @@ public static class TunExclusion
 
     [DllImport("iphlpapi.dll", SetLastError = true)]
     private static extern uint SetTcpEntry(ref MibTcpRow pTcpRow);
+
+    private const int AF_INET = 2;
+    private const int TCP_TABLE_OWNER_PID_ALL = 5;
+    private const uint NoError = 0;
+    private const uint ErrorInsufficientBuffer = 122;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MibTcpRowOwnerPid
+    {
+        public uint State;
+        public uint LocalAddr;
+        public uint LocalPort;
+        public uint RemoteAddr;
+        public uint RemotePort;
+        public uint OwningPid;
+    }
+
+    /// <summary>
+    /// جدول TCP به‌همراه PIDِ مالک، مستقیم از iphlpapi. جایگزینِ netstat.exe شد چون
+    /// فراخوانیِ هر ثانیه‌ایِ آن ۶۰ پروسه در دقیقه می‌ساخت و سیستم را کند می‌کرد.
+    /// آدرس‌ها و پورت‌ها در همان ترتیبِ بایتِ شبکه‌اند که SetTcpEntry انتظار دارد.
+    /// </summary>
+    [DllImport("iphlpapi.dll", SetLastError = true)]
+    private static extern uint GetExtendedTcpTable(
+        IntPtr pTcpTable, ref int pdwSize, bool bOrder, int ulAf, int tableClass, uint reserved);
 
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern IntPtr OpenProcess(uint dwDesiredAccess, bool bInheritHandle, int dwProcessId);
@@ -198,7 +223,14 @@ public static class TunExclusion
     /// </summary>
     private static void RefreshGatewayLocked()
     {
-        if (_gateway != null && !TunManager.IsPhysicalGatewayPresent(_gateway))
+        // اول گیت‌ویِ سالم را پیدا می‌کنیم؛ بررسیِ «آیا گیت‌ویِ قدیمی هنوز هست» فقط
+        // وقتی لازم است که گیت‌ویِ فعلی فرق کرده باشد. اگر GetDefaultGatewayVia همان
+        // قبلی را برگرداند، خودِ آن ثابت کرده روی کارتِ فیزیکی هست و فراخوانیِ دوم
+        // صرفاً یک پیمایشِ تکراریِ کارت‌های شبکه است.
+        string? gw = TunManager.GetDefaultGatewayVia();
+
+        if (_gateway != null && !string.Equals(gw, _gateway, StringComparison.Ordinal)
+            && !TunManager.IsPhysicalGatewayPresent(_gateway))
         {
             TunManager.Log($"exclusion gateway {_gateway} no longer present; dropping stale pins");
             ClearPinnedLocked();
@@ -207,7 +239,6 @@ public static class TunExclusion
             _candidateStreak = 0;
         }
 
-        string? gw = TunManager.GetDefaultGatewayVia();
         if (gw == null)
         {
             // تشخیص گیت‌وی هنگام تعویض آداپتر گاهی چند نوبت خالی برمی‌گردد؛ تا گیت‌ویِ
@@ -283,47 +314,39 @@ public static class TunExclusion
     private static List<TcpRow> ReadTcpTable()
     {
         var rows = new List<TcpRow>();
-        var psi = new ProcessStartInfo
-        {
-            FileName = "netstat.exe",
-            Arguments = "-ano -p tcp",
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            CreateNoWindow = true
-        };
-        using var proc = Process.Start(psi);
-        if (proc == null) return rows;
-        using var reader = proc.StandardOutput;
-        string? line;
-        while ((line = reader.ReadLine()) != null)
-        {
-            var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length < 5) continue;
-            if (!parts[0].Equals("TCP", StringComparison.OrdinalIgnoreCase)) continue;
-            if (!TryParseEndpoint(parts[1], out uint lip, out uint lport)) continue;
-            if (!TryParseEndpoint(parts[2], out uint rip, out uint rport)) continue;
-            if (!int.TryParse(parts[^1], out int pid) || pid <= 0) continue;
-            if (rip == 0 || IsPrivate(rip)) continue;
-            rows.Add(new TcpRow(pid, lip, lport, rip, rport));
-        }
-        proc.WaitForExit(3000);
-        return rows;
-    }
+        int size = 0;
+        uint rc = GetExtendedTcpTable(IntPtr.Zero, ref size, false, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
+        if (rc != ErrorInsufficientBuffer && rc != NoError) return rows;
 
-    private static bool TryParseEndpoint(string text, out uint ip, out uint portNet)
-    {
-        ip = 0;
-        portNet = 0;
-        int ci = text.LastIndexOf(':');
-        if (ci <= 0 || ci == text.Length - 1) return false;
-        string host = text[..ci];
-        if (host.Contains(':')) return false;
-        if (!int.TryParse(text[(ci + 1)..], out int port) || port < 0 || port > 65535) return false;
-        if (!IPAddress.TryParse(host, out var addr) || addr.AddressFamily != AddressFamily.InterNetwork) return false;
-        byte[] b = addr.GetAddressBytes();
-        ip = (uint)(b[0] | (b[1] << 8) | (b[2] << 16) | (b[3] << 24));
-        portNet = (uint)(((port & 0xFF) << 8) | ((port >> 8) & 0xFF));
-        return true;
+        IntPtr buf = Marshal.AllocHGlobal(size);
+        try
+        {
+            rc = GetExtendedTcpTable(buf, ref size, false, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
+            if (rc != NoError) return rows;
+
+            // ستون اول تعداد ردیف است، بعد از آن آرایهٔ ردیفها با اندازهٔ ثابت.
+            int count = Marshal.ReadInt32(buf);
+            IntPtr ptr = IntPtr.Add(buf, sizeof(int));
+            int stride = Marshal.SizeOf<MibTcpRowOwnerPid>();
+            for (int i = 0; i < count; i++)
+            {
+                var row = Marshal.PtrToStructure<MibTcpRowOwnerPid>(ptr);
+                ptr += stride;
+                if (row.OwningPid == 0 || row.OwningPid == (uint)_ourPid) continue;
+                if (row.RemoteAddr == 0 || IsPrivate(row.RemoteAddr)) continue;
+                rows.Add(new TcpRow(
+                    (int)row.OwningPid, row.LocalAddr, row.LocalPort, row.RemoteAddr, row.RemotePort));
+            }
+        }
+        catch (Exception ex)
+        {
+            TunManager.Log($"exclusion tcp table read failed: {ex.Message}");
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(buf);
+        }
+        return rows;
     }
 
     private static void ProcessRowsLocked(List<TcpRow> rows)
@@ -399,15 +422,17 @@ public static class TunExclusion
         var present = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         try
         {
-            // اگر route print اجرا نشد یا خروجی خالی داد، نباید نتیجه بگیریم که هیچ
-            // پینی باقی نمانده؛ وگرنه فایل پین‌ها به‌اشتباه حذف می‌شود.
-            int code = TunManager.RunRoute("print -4", out string output);
-            if (code != 0 || string.IsNullOrWhiteSpace(output)) return want;
-            foreach (var line in output.Split('\n'))
+            // از جدولِ بومی می‌خوانیم نه از خروجیِ route print؛ اجرایِ پروسه در هر نوبت
+            // یعنی ساختِ پروسه + اسکنِ آنتی‌ویروس، و این چک هر چند ثانیه تکرار می‌شود.
+            // اگر خواندن شکست خورد نباید نتیجه بگیریم که هیچ پینی باقی نمانده؛
+            // وگرنه فایل پین‌ها به‌اشتباه حذف می‌شود.
+            var table = IpRoute.GetTable();
+            if (table == null) return want;
+            foreach (var row in table)
             {
-                var parts = line.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 3 || parts[1] != "255.255.255.255") continue;
-                if (want.Contains(parts[0])) present.Add(parts[0]);
+                if (row.Mask != uint.MaxValue) continue;   // فقط مسیرهای /32
+                string dst = IpRoute.IpToString(row.Dest);
+                if (want.Contains(dst)) present.Add(dst);
             }
         }
         catch

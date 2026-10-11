@@ -423,17 +423,24 @@ public static class TunManager
                 return;
             }
 
-            bool dead = !IsPhysicalGatewayPresent(via);
             string? gw = GetDefaultGatewayVia();
             if (gw == null) return;   // تعویض آداپتر؛ تا گیت‌ویِ معتبر داریم دست نزن.
 
+            if (gw == via)
+            {
+                // GetDefaultGatewayVia گیت‌وی را از روی خودِ کارتِ فیزیکی خوانده، پس
+                // حضورش ثابت شده؛ فراخوانیِ IsPhysicalGatewayPresent اینجا فقط یک
+                // پیمایشِ تکراریِ کارت‌های شبکه است و عمداً حذف شد.
+                lock (_routesLock) { _watchCandidate = null; _watchStreak = 0; }
+                return;
+            }
+
+            // فقط وقتی گیت‌وی عوض شده لازم است بفهمیم قدیمی اصلاً رفته یا نه؛
+            // «رفته» یعنی بی‌درنگ بازسازی کن، وگرنه دو نوبت پایداری صبر کن.
+            bool dead = !IsPhysicalGatewayPresent(via);
+
             if (!dead)
             {
-                if (gw == via)
-                {
-                    lock (_routesLock) { _watchCandidate = null; _watchStreak = 0; }
-                    return;
-                }
                 // گیت‌ویِ پیشنهادی باید دو نوبت پشت‌سرهم پایدار باشد؛ کارتِ در حال
                 // قطع‌شدن چند ثانیه هنوز مسیرِ پیش‌فرضِ کم‌metric دارد.
                 lock (_routesLock)

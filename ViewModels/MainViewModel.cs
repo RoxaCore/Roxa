@@ -517,15 +517,23 @@ public partial class MainViewModel : ViewModelBase
     {
         _visibleLines.Clear();
         int start = Math.Max(0, _allLogLines.Count - 100);
+
+        // فیلتر را یک‌بار در هر بازسازی حل می‌کنیم، نه به‌ازای هر خط؛ قبلاً هر
+        // نوبت چند صد جست‌وجوی ResourceManager روی رشتهٔ UI انجام می‌شد.
+        string filter = LogFilter;
+        bool showAll = true, errorsOnly = false, connectionOnly = false;
+        if (string.Equals(filter, TranslationManager.Instance["Filter_Errors"], StringComparison.Ordinal))
+        { showAll = false; errorsOnly = true; }
+        else if (string.Equals(filter, TranslationManager.Instance["Filter_Connection"], StringComparison.Ordinal))
+        { showAll = false; connectionOnly = true; }
+
         for (int i = start; i < _allLogLines.Count; i++)
         {
             var l = _allLogLines[i];
-            bool show = LogFilter switch
-            {
-                var f when f == TranslationManager.Instance["Filter_Errors"] => LogMatches(l, "Status_Error") || l.Contains("error", StringComparison.OrdinalIgnoreCase),
-                var f when f == TranslationManager.Instance["Filter_Connection"] => LogMatches(l, "Status_Connected") || LogMatches(l, "Status_Disconnected") || LogMatches(l, "Log_Connected") || LogMatches(l, "Log_Disconnected") || LogMatches(l, "Ctx_Connect") || l.Contains("connect", StringComparison.OrdinalIgnoreCase),
-                _ => true
-            };
+            bool show;
+            if (errorsOnly) show = LogMatches(l, "Status_Error") || l.Contains("error", StringComparison.OrdinalIgnoreCase);
+            else if (connectionOnly) show = LogMatches(l, "Status_Connected") || LogMatches(l, "Status_Disconnected") || LogMatches(l, "Log_Connected") || LogMatches(l, "Log_Disconnected") || LogMatches(l, "Ctx_Connect") || l.Contains("connect", StringComparison.OrdinalIgnoreCase);
+            else show = showAll;
             if (show) _visibleLines.Add(l);
         }
         while (_visibleLines.Count > MaxVisibleLines)

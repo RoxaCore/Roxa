@@ -29,7 +29,11 @@ public partial class MainViewModel : ViewModelBase
         {
             Localization.TranslationManager.Instance.SetCulture(match.code);
             _settings.Language = match.code;
-            SaveSettings();
+            // ذخیرهٔ فوری، نه debounce: ری‌استارتِ زبان همین حالا شروع می‌شود و اگر
+            // برنامه وصل نباشد کلِ خروج کمتر از ۵۰۰ میلی‌ثانیه طول می‌کشد؛ تایمرِ
+            // debounce فرصتِ نوشتن پیدا نمی‌کرد و نمونهٔ بعدی همان زبانِ قبلی را
+            // می‌خواند («فارسی زدم، عربی بالا آمد»).
+            SaveSettingsNow();
             // --disconnect: ری‌استارتِ بعد از تغییر زبان باید اول اتصال را کامل قطع
             // کند و بعد از بالا آمدن، دوباره وصل نشود.
             RestartRequested?.Invoke("--disconnect");

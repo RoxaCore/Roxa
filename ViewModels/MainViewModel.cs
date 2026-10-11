@@ -575,6 +575,12 @@ public partial class MainViewModel : ViewModelBase
     /// فوری‌کردنِ ذخیرهٔ به‌تعویق‌افتاده. خروجِ برنامه این را صدا می‌زند تا آخرین
     /// تغییرِ تنظیمات در ۵۰۰ میلی‌ثانیهٔ آخر گم نشود.
     /// </summary>
+    /// <summary>
+    /// برای مسیرهایی که بلافاصله ری‌استارت یا خروج دارند. نباید منتظرِ ذخیرهٔ
+    /// debounce شده بمانند، چون نمونهٔ بعدی همین فایل را می‌خواند.
+    /// </summary>
+    public void FlushPendingSettings() => SaveSettingsNow();
+
     private void SaveSettingsNow()
     {
         System.Threading.Timer? pending;

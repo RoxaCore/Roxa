@@ -19,6 +19,9 @@ public static class TunExclusion
     private const int MaxNewPinsPerScan = 10;
     private const long PidCacheTtlMs = 15000;
     private const string RulePrefix = "RoxaTunExcl_";
+    // پسوندِ جدا برای قواعدِ IPv6؛ باید با همان RulePrefix شروع شود تا هنگام
+    // پاک‌سازیِ قواعدِ کهنه هم دیده شود و قاعدهٔ یتیم نماند.
+    private const string RulePrefix6 = "RoxaTunExcl_6_";
 
     [StructLayout(LayoutKind.Sequential)]
     private struct MibTcpRow
@@ -53,6 +56,22 @@ public static class TunExclusion
     private static readonly Dictionary<int, PidPath> _pidCache = new();
     private static readonly HashSet<uint> _pinned = new();
     private static readonly HashSet<(int Pid, uint Dst)> _rstPairs = new();
+
+    // مسیرهایِ ایستا برای برنامه‌هایی که کشفِ منفعلانه به‌تنهایی کافی نیست. تلگرام
+    // دیتاسنترهایش را از پیش دارد و هر بار IP تازه نمی‌گیرد؛ منتظر ماندنِ netstat
+    // یعنی هر اتصالِ اولِ همیشه از تونل می‌رود و برنامه «فیلترنشده» دیده می‌شود.
+    private static readonly List<(string Network, string Mask)> _staticPins = new();
+
+    private static readonly (string App, string Network, string Mask)[] _knownRanges =
+    [
+        ("telegram.exe", "91.105.192.0",  "255.255.254.0"),   // 91.105.192.0/23
+        ("telegram.exe", "91.108.0.0",    "255.255.224.0"),   // 91.108.0.0/19
+        ("telegram.exe", "91.108.56.0",   "255.255.252.0"),   // 91.108.56.0/22
+        ("telegram.exe", "95.161.64.0",   "255.255.240.0"),   // 95.161.64.0/20
+        ("telegram.exe", "149.154.160.0", "255.255.240.0"),   // 149.154.160.0/20
+        ("telegram.exe", "185.76.151.0",  "255.255.255.0"),   // 185.76.151.0/24
+    ];
+
     private static string? _gateway;
     private static string? _candidateGateway;
     private static int _candidateStreak;
@@ -106,7 +125,11 @@ public static class TunExclusion
         }
         Task.Factory.StartNew(() =>
         {
-            lock (_lock) ClearPinnedLocked();
+            lock (_lock)
+            {
+                ClearPinnedLocked();
+                ClearStaticPinsLocked();
+            }
             SyncRules(gen, snapshot.Count > 0 ? snapshot : null);
         }, TaskCreationOptions.LongRunning);
     }
@@ -124,6 +147,7 @@ public static class TunExclusion
                 _timer = null;
             }
             ClearPinnedLocked();
+            ClearStaticPinsLocked();
             _pidCache.Clear();
             _gateway = null;
             _candidateGateway = null;
@@ -165,7 +189,10 @@ public static class TunExclusion
             {
                 if (_timer == null || _excluded.Count == 0) return;
                 if (_scanTick % GatewayCheckEvery == 0)
+                {
                     RefreshGatewayLocked();
+                    ApplyStaticPinsLocked();
+                }
                 _scanTick++;
             }
             if (_gateway == null) return;
@@ -202,6 +229,7 @@ public static class TunExclusion
         {
             TunManager.Log($"exclusion gateway {_gateway} no longer present; dropping stale pins");
             ClearPinnedLocked();
+            ClearStaticPinsLocked();
             _gateway = null;
             _candidateGateway = null;
             _candidateStreak = 0;
@@ -242,6 +270,7 @@ public static class TunExclusion
         if (++_candidateStreak < GatewayStableTicks) return;
         TunManager.Log($"exclusion gateway changed {_gateway} -> {gw}; repinning");
         ClearPinnedLocked();
+        ClearStaticPinsLocked();
         _gateway = gw;
         _candidateGateway = null;
         _candidateStreak = 0;
@@ -361,6 +390,73 @@ public static class TunExclusion
         TunManager.RunRoute($"delete {dest} mask 255.255.255.255");
         int code = TunManager.RunRoute($"add {dest} mask 255.255.255.255 {_gateway}");
         return code == 0;
+    }
+
+    /// <summary>
+    /// ساختن/به‌روزرسانیِ مسیرهای ایستای برنامه‌های معاف با گیت‌ویِ فعلی. این مسیرها
+    /// جایگزینِ «صبر کردن تا netstat مقصد را نشان دهد» نیستند، بلکه پوششِ فوریِ
+    /// دامنه‌هایی‌اند که از پیش معلوم است (دیتاسنترهای تلگرام). بدون آن‌ها، تلگرام
+    /// هر بار از تونل وصل می‌شود و فقط بعداً سنجاق می‌خورد.
+    /// </summary>
+    private static void ApplyStaticPinsLocked()
+    {
+        if (_gateway == null || _excluded.Count == 0)
+        {
+            ClearStaticPinsLocked();
+            return;
+        }
+
+        var desired = _knownRanges
+            .Where(r => _excluded.Contains(r.App))
+            .Select(r => (r.Network, r.Mask))
+            .ToList();
+
+        foreach (var stale in _staticPins.Where(p => !desired.Contains(p)).ToList())
+        {
+            TryDeleteStaticPin(stale.Network, stale.Mask);
+            _staticPins.Remove(stale);
+        }
+
+        int added = 0;
+        foreach (var want in desired)
+        {
+            if (_staticPins.Contains(want)) continue;
+            try
+            {
+                // حذفِ قبل از افزودن؛ route add روی مسیرِ موجود خطا می‌دهد.
+                TunManager.RunRoute($"delete {want.Network} mask {want.Mask}");
+                int code = TunManager.RunRoute($"add {want.Network} mask {want.Mask} {_gateway}");
+                if (code != 0)
+                {
+                    TunManager.Log($"exclusion static route failed ({code}) {want.Network} mask {want.Mask}");
+                    continue;
+                }
+            }
+            catch (Exception ex)
+            {
+                TunManager.Log($"exclusion static route failed {want.Network} mask {want.Mask}: {ex.Message}");
+                continue;
+            }
+            _staticPins.Add(want);
+            added++;
+        }
+
+        if (added > 0)
+            TunManager.Log($"exclusion static routes applied via {_gateway} ({added} new, {_staticPins.Count} total)");
+    }
+
+    private static void ClearStaticPinsLocked()
+    {
+        if (_staticPins.Count == 0) return;
+        foreach (var (net, mask) in _staticPins) TryDeleteStaticPin(net, mask);
+        TunManager.Log($"exclusion static routes removed ({_staticPins.Count})");
+        _staticPins.Clear();
+    }
+
+    private static void TryDeleteStaticPin(string net, string mask)
+    {
+        try { TunManager.RunRoute($"delete {net} mask {mask}"); }
+        catch { }
     }
 
     private static void ClearPinnedLocked()
@@ -546,24 +642,33 @@ public static class TunExclusion
             try
             {
                 var previous = ReadRulesFile();
-                var desired = new List<(string Name, string Path)>();
+                var desired = new List<(string Name, string Name6, string Path)>();
                 if (paths != null)
                     foreach (var raw in paths)
                     {
                         if (string.IsNullOrWhiteSpace(raw)) continue;
                         string p = raw.Trim();
                         string name = RuleNameFor(p);
-                        if (!desired.Any(d => d.Name == name)) desired.Add((name, p));
+                        if (!desired.Any(d => d.Name == name)) desired.Add((name, RuleName6For(p), p));
                     }
-                var cleanup = previous.Union(desired.Select(d => d.Name), StringComparer.OrdinalIgnoreCase).ToList();
+                var cleanup = previous
+                    .Union(desired.Select(d => d.Name), StringComparer.OrdinalIgnoreCase)
+                    .Union(desired.Select(d => d.Name6), StringComparer.OrdinalIgnoreCase)
+                    .ToList();
                 foreach (var name in cleanup)
                     TunManager.RunNetsh($"advfirewall firewall delete rule name=\"{name}\"");
-                foreach (var (name, path) in desired)
+                foreach (var (name, name6, path) in desired)
                 {
                     int code = TunManager.RunNetsh($"advfirewall firewall add rule name=\"{name}\" dir=out action=block protocol=UDP remoteport=443 program=\"{path}\"");
                     if (code != 0) TunManager.Log($"exclusion udp-block add failed ({code}) {path}");
+                    // معافیتِ IPv4 به‌تنهایی کافی نیست: netstat فقط ردیف‌های IPv4 را پارس
+                    // می‌کند، پس ترافیکِ IPv6ِ برنامه اصلاً دیده نمی‌شود و بی‌سروصدا از
+                    // کنارِ سنجاق‌ها می‌رود. IPv6ِ خروجیِ آن را می‌بندیم تا ناچار به IPv4
+                    // شود؛ همان‌جایی که مسیرها را کنترل می‌کنیم.
+                    int code6 = TunManager.RunNetsh($"advfirewall firewall add rule name=\"{name6}\" dir=out action=block remoteip=::/0 program=\"{path}\"");
+                    if (code6 != 0) TunManager.Log($"exclusion ipv6-block add failed ({code6}) {path}");
                 }
-                WriteRulesFile(desired.Select(d => d.Name).ToList());
+                WriteRulesFile(desired.SelectMany(d => new[] { d.Name, d.Name6 }).ToList());
                 if (desired.Count > 0)
                     TunManager.Log($"exclusion udp-block applied for {desired.Count} app(s)");
                 else if (previous.Count > 0)
@@ -581,6 +686,13 @@ public static class TunExclusion
         using var md5 = MD5.Create();
         byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(path.Trim().ToLowerInvariant()));
         return RulePrefix + Convert.ToHexString(hash.AsSpan(0, 8));
+    }
+
+    private static string RuleName6For(string path)
+    {
+        using var md5 = MD5.Create();
+        byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(path.Trim().ToLowerInvariant()));
+        return RulePrefix6 + Convert.ToHexString(hash.AsSpan(0, 8));
     }
 
     private static HashSet<string> ReadRulesFile()

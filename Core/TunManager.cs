@@ -479,9 +479,11 @@ public static class TunManager
         var fresh = new List<TunRouteRecord>();
         foreach (var rec in old)
         {
+            // حذف و افزودن برایِ همهٔ مسیرها، حتی وقتی گیت‌ویِ تازه با قدیمی یکی است؛
+            // سیستم ممکن است خودش مسیر را در میانهٔ تعویضِ آداپتر پاک کرده باشد و
+            // «ادامه بدون افزودن» آن را برایِ همیشه گم کند.
             try { RunRoute($"delete {rec.Dest} mask {rec.Mask} {rec.Via}"); }
             catch { /* ممکن است از قبل رفته باشد */ }
-            if (string.Equals(rec.Via, newVia, StringComparison.Ordinal)) continue;
             try
             {
                 if (!IpRoute.TryAddRoute(rec.Dest, rec.Mask, newVia, IpRoute.GetIfIndexForIp(newVia)))

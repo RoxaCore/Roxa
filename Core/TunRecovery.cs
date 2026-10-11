@@ -5,6 +5,7 @@ namespace Roxa.Core;
 public static class TunRecovery
 {
     public static bool LeftoverNeedsAdmin { get; private set; }
+    private static int _cleanupDone;
 
     public static void RecoverOnStartup()
     {
@@ -90,6 +91,11 @@ public static class TunRecovery
 
     public static void EmergencyCleanup()
     {
+        // هم روی ProcessExit و هم روی ShutdownRequested ثبت شده است؛ بدون این سد، کلِ
+        // پاکسازی (کشتنِ موتور، حذفِ مسیرها، بازگردانیِ DNS) دو بار اجرا می‌شد و
+        // زمانِ خروج — یعنی همان پنجره‌ای که نمونهٔ بعدی منتظرش می‌ماند — دو برابر
+        // می‌شد. UnhandledException هم همین متد را صدا می‌زند.
+        if (Interlocked.Exchange(ref _cleanupDone, 1) == 1) return;
         if (!OperatingSystem.IsWindows()) return;
         try
         {

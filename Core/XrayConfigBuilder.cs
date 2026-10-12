@@ -55,7 +55,7 @@ public static class XrayConfigBuilder
                     {
                         ["type"] = "field",
                         ["network"] = "udp",
-                        ["port"] = "137|138|1900|5353|5355|1947",
+                        ["port"] = "137,138,1900,5353,5355,1947",
                         ["outboundTag"] = "block"
                     },
                     new JsonObject
@@ -486,7 +486,7 @@ public static class XrayConfigBuilder
             {
                 ["type"] = "field",
                 ["network"] = "udp",
-                ["port"] = "137|138|1900|5353|5355|1947",
+                ["port"] = "137,138,1900,5353,5355,1947",
                 ["outboundTag"] = "block"
             },
             new JsonObject

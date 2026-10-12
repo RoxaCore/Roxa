@@ -34,6 +34,45 @@ public static class TunManager
         ("128.0.0.0/1", "128.0.0.0", "128.0.0.0"),
     ];
 
+    /// <summary>
+    /// آدرسِ ثابتِ آداپتورِ TUN. Wintun بدونِ آدرسِ تعریف‌شده خودش یک APIPA
+    /// (169.254.x.x) می‌گیرد و آن‌وقت ویندوز 169.254.255.255 را «بِرودکستِ همان
+    /// زیرشبکهٔ خودِ آداپتور» حساب می‌کند و کلِ NBNS/LLMNR/mDNS را — بی‌آنکه سرِ
+    /// جدولِ مسیر برود — مستقیم داخلِ تونل می‌ریزد. برایِ همین هیچ مسیرِ استثنایی
+    /// فایده نداشت: این تصمیم از رویِ آدرسِ آداپتور گرفته می‌شود، نه از رویِ
+    /// مسیر. در یک نوبت ۱۶۳۰۹ بستهٔ NBNS روی پورت ۱۳۷ در یک دقیقه ثبت شد و
+    /// حافظهٔ xray تا ۹۴۱ مگابایت بالا رفت. با آدرسِ ثابت، آداپتور دیگر
+    /// لینک‌لوکال نیست و آن بِرودکست‌ها اصلاً ساخته نمی‌شوند. v2rayN هم همین کار
+    /// را می‌کند (آداپتورش singbox_tun آدرسِ 172.19.0.1/30 دارد). دامنهٔ
+    /// 198.18.0.0/15 برایِ سنجشِ شبکه رزرو شده (RFC 2544) و رویِ شبکه‌های واقعی
+    /// استفاده نمی‌شود؛ /30 هم یعنی آداپتور فقط یک همسایه دارد.
+    /// </summary>
+    private const string TunAddress = "198.18.0.1";
+    private const string TunAddressMask = "255.255.255.252";
+    private static int _tunAddressSet;
+
+    /// <summary>
+    /// آدرسِ ثابت را رویِ آداپتورِ TUN می‌گذارد. فقط یک‌بار در هر نوبتِ اتصال
+    /// اجرا می‌شود؛ اگر آداپتور تازه بالا آمده باشد netsh ممکن است یکی دو بار
+    /// جواب ندهد، پس کوتاه تکرار می‌کنیم.
+    /// </summary>
+    private static bool EnsureTunAddress()
+    {
+        if (Interlocked.Exchange(ref _tunAddressSet, 1) == 1) return true;
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            int code = RunNetsh($"interface ipv4 set address name=\"{TunAdapterName}\" static {TunAddress} {TunAddressMask}");
+            if (code == 0)
+            {
+                Log($"TUN address set to {TunAddress}/30 on {TunAdapterName}.");
+                return true;
+            }
+            Thread.Sleep(150);
+        }
+        Log($"Could not set TUN address on {TunAdapterName}; it may fall back to APIPA (169.254.x.x) and attract broadcasts.");
+        return false;
+    }
+
     private static readonly string _wintunDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "engine");
     private static readonly string _wintunPath = Path.Combine(_wintunDirectory, "wintun.dll");
     private static readonly string _logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
@@ -194,6 +233,9 @@ public static class TunManager
     {
         StopGatewayWatch();
         _captureVia = null;
+        // آداپتور با قطعِ اتصال از بین می‌رود؛ پرچم را هم ریست می‌کنیم تا در
+        // اتصالِ بعدی دوباره آدرسِ ثابت گذاشته شود.
+        Interlocked.Exchange(ref _tunAddressSet, 0);
         List<TunRouteRecord> snapshot;
         lock (_routesLock)
         {
@@ -251,6 +293,9 @@ public static class TunManager
                 await Task.Delay(CaptureRetryDelayMs);
                 continue;
             }
+            // آداپتر بالا آمد. قبل از افزودنِ مسیرها آدرسِ ثابت را می‌گذاریم تا
+            // لینک‌لوکال نشود؛ این کار فقط یک‌بار در هر نوبتِ اتصال انجام می‌شود.
+            await Task.Run(EnsureTunAddress);
             bool allAdded = true;
             foreach (var (prefix, dest, mask) in _capturePrefixes)
             {

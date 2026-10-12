@@ -40,6 +40,24 @@ public static class XrayConfigBuilder
                 ["domainStrategy"] = "AsIs",
                 ["rules"] = new JsonArray
                 {
+                    // پورت‌های کشفِ شبکه را از همان اول می‌بندیم. این‌ها بِرودکستِ
+                    // لوکال‌اند و نباید هرگز واردِ تونل شوند: 137/138 (NBNS)،
+                    // 1900 (SSDP)، 5353 (mDNS)، 5355 (LLMNR) و 1947 (بِرودکستِ
+                    // دانگِلِ HASP). مسیریابیِ ویندوز را نمی‌شد به‌طورِ قطعی
+                    // درستش کرد — subnet-broadcast از رویِ آدرسِ آداپتور محاسبه
+                    // می‌شود، نه از رویِ جدولِ مسیر — و هر بار که آن بسته‌ها
+                    // وارد می‌شدند xray به‌ازایِ هر کدام یک نشستِ UDP باز می‌کرد:
+                    // در یک نوبت ۱۶٬۳۰۹ بسته در یک دقیقه ثبت شد و حافظه‌اش تا
+                    // ۹۴۱ مگابایت با ۱۶٬۷۰۰ هندل بالا رفت. اینجا قبل از هر قانونِ
+                    // دیگری می‌آیند تا blackhole آن‌ها را بی‌آنکه socketی باز کند
+                    // دور بریزد.
+                    new JsonObject
+                    {
+                        ["type"] = "field",
+                        ["network"] = "udp",
+                        ["port"] = "137|138|1900|5353|5355|1947",
+                        ["outboundTag"] = "block"
+                    },
                     new JsonObject
                     {
                         ["type"] = "field",
@@ -462,6 +480,15 @@ public static class XrayConfigBuilder
 
         var routingRules = new JsonArray
         {
+            // همان قانونِ بستنِ بِرودکست‌های کشفِ شبکه (NBNS/SSDP/mDNS/LLMNR/HASP)
+            // که در سازندهٔ تک‌سرور هم هست؛ اینجا هم لازم است.
+            new JsonObject
+            {
+                ["type"] = "field",
+                ["network"] = "udp",
+                ["port"] = "137|138|1900|5353|5355|1947",
+                ["outboundTag"] = "block"
+            },
             new JsonObject
             {
                 ["type"] = "field",

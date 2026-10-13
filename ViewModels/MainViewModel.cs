@@ -242,6 +242,10 @@ public partial class MainViewModel : ViewModelBase
         _speedTimer.Tick += (_, _) => UpdateLiveSpeed();
         _speedTimer.Start();
 
+        // گوش‌دادن به تغییرِ شبکه (خاموش/روشن‌کردنِ وای‌فای، عوض‌شدنِ مودم) تا بعد از
+        // برگشتنِ اینترنت، وصلِ مجددِ خودکار به همان سرورِ قبلی انجام شود.
+        StartNetworkWatcher();
+
         _blinkTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
         _blinkTimer.Tick += (_, _) => BlinkTick();
         // آغاز/توقف در OnIsConnectedChanged؛ در حالتِ قطع بودن، این تایمر فقط

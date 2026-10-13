@@ -544,6 +544,10 @@
   <data name="Stg_Dns" xml:space="preserve"><value>پیکربندی DNS ...</value></data>
   <data name="Stg_Engine" xml:space="preserve"><value>لطفا صبر کنید</value></data>
   <data name="Toast_NoInternet" xml:space="preserve"><value>اینترنت قطع است</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>شبکه تغییر کرد؛ بررسی و اتصال مجدد...</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>اتصال مجدد خودکار به «{0}» پس از تغییر شبکه</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>اتصال مجدد خودکار بیش از حد تلاش کرد؛ برای ادامه دوباره وصل شوید</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>شبکه تغییر کرد و اتصال خودکار ممکن نشد؛ دوباره وصل شوید</value></data>
   <data name="SubFetch_Direct" xml:space="preserve"><value>دریافت مستقیم (بدون پروکسی)...</value></data>
   <data name="SubFetch_Proxy" xml:space="preserve"><value>دریافت از طریق پروکسی...</value></data>
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>دریافت از طریق پروکسی سیستم...</value></data>

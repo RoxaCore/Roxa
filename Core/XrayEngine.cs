@@ -821,6 +821,43 @@ public sealed class XrayEngine : IDisposable
         try { if (configPath != null && File.Exists(configPath)) File.Delete(configPath); } catch { }
     }
 
+    /// <summary>
+    /// کانفیگ‌های موقتِ نشست‌های قبلی را از %TEMP% جارو می‌کند.
+    /// کانفیگِ نشستِ جاری عمداً برایِ عیب‌یابی می‌ماند («Keep temp config for
+    /// diagnosis»)، ولی شناسهٔ سرور با هر بار به‌روزرسانیِ اشتراک عوض می‌شود و
+    /// فایلِ تازه‌ای به‌جا می‌ماند؛ بدونِ این جاروکشی تعدادشان بی‌نهایت می‌شود
+    /// (روی یک سیستم ۱۷۰ فایلِ کهنه جمع شده بود). فقط فایل‌های قدیمی‌تر از
+    /// ۲۴ ساعت پاک می‌شوند تا نشستِ در حالِ اجرا و نشستِ تازه‌بسته‌شده
+    /// دست‌نخورده بمانند. فایل‌های مربوط بهِ آپدیت عمداً در فهرست نیستند.
+    /// </summary>
+    public static void SweepTempConfigs(int maxAgeHours = 24)
+    {
+        string temp;
+        try { temp = Path.GetTempPath(); } catch { return; }
+        if (string.IsNullOrEmpty(temp) || !Directory.Exists(temp)) return;
+
+        string[] patterns = ["roxa-config-*.json", "roxa-test-*.json", "roxa-multi-*.json", "roxa-speed.json"];
+        DateTime cutoff = DateTime.UtcNow.AddHours(-maxAgeHours);
+        int removed = 0;
+        foreach (var pattern in patterns)
+        {
+            string[] files = Array.Empty<string>();
+            try { files = Directory.GetFiles(temp, pattern); } catch { }
+            foreach (var file in files)
+            {
+                try
+                {
+                    var fi = new FileInfo(file);
+                    if (!fi.Exists || fi.LastWriteTimeUtc > cutoff) continue;
+                    fi.Delete();
+                    removed++;
+                }
+                catch { }
+            }
+        }
+        if (removed > 0) TunManager.Log($"swept {removed} stale temp config(s) older than {maxAgeHours}h from {temp}");
+    }
+
     private static void RestrictTempFile(string path)
     {
         try

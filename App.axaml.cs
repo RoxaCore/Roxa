@@ -33,6 +33,13 @@ public partial class App : Application
         TranslationManager.Instance.SetCulture(lang);
         TunRecovery.RecoverOnStartup();
         TunKillSwitch.CleanupLeftovers();
+        // قانون‌های RoxaTunExcl_ هم باید جاروب شوند؛ SyncRules فقط هنگامِ
+        // اتصالِ TUN اجرا می‌شود و اگر برنامه هنگامِ وصل کرش کرده باشد، این
+        // قانون‌ها برنامهٔ کاربر را تا اتصالِ بعدی بدونِ هیچ توضیحی کند می‌کنند.
+        try { TunExclusion.CleanupLeftovers(); } catch { }
+        // فایل‌های کانفیگِ موقتِ نشست‌های قبلی (که شناسهٔ سرور در نامشان هست و
+        // با هر بار به‌روزرسانیِ اشتراک تازه‌ای می‌ماند) باید از اینجا جمع شوند.
+        try { XrayEngine.SweepTempConfigs(); } catch { }
         AppDomain.CurrentDomain.ProcessExit += (_, _) =>
         {
             // آیکون سینی اول پاک شود؛ اگر کار دیگری کند/خطا بدهد نباید شبح بماند.

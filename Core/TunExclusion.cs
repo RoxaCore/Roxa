@@ -158,6 +158,36 @@ public static class TunExclusion
         Task.Factory.StartNew(() => SyncRules(gen, null), TaskCreationOptions.LongRunning);
     }
 
+    /// <summary>
+    /// قانون‌هایی را که از نشستِ قبلی مانده‌اند پاک می‌کند.
+    /// SyncRules فقط هنگامِ اتصالِ TUN اجرا می‌شود و Stop هم در مسیرِ عادیِ
+    /// قطع اتصال صدا می‌خورد؛ اما اگر برنامه هنگامِ وصل کرش کند یا از مسیرِ
+    /// ProcessExit/UnhandledException بیرون برود (که TunExclusion.Stop را صدا
+    /// نمی‌زند)، این قانون‌ها می‌مانند. هر کدام «dir=out action=block UDP 443»
+    /// رویِ یک برنامهٔ مشخص است، یعنی از دیدِ کاربر همان «این برنامه
+    /// اینترنتش کنده» — بی‌آنکه چیزی به Roxa اشاره کند و تا اتصالِ بعدیِ TUN
+    /// هم باقی می‌ماند. در شروعِ برنامه نشستِ فعالی وجود ندارد (تک‌نمونه‌ای
+    /// بودنِ برنامه با mutex در Program.cs تضمین شده)، پس هرچه در RulesFile
+    /// ثبت است باقی‌مانده است. الگو دقیقاً همانِ TunKillSwitch.CleanupLeftovers
+    /// است که کنارش صدا زده می‌شود.
+    /// </summary>
+    public static void CleanupLeftovers()
+    {
+        try
+        {
+            var names = ReadRulesFile();
+            if (names.Count == 0) return;
+            foreach (var name in names)
+                TunManager.RunNetsh($"advfirewall firewall delete rule name=\"{name}\"");
+            try { if (File.Exists(RulesFile)) File.Delete(RulesFile); } catch { }
+            TunManager.Log($"exclusion leftovers removed ({names.Count})");
+        }
+        catch (Exception ex)
+        {
+            TunManager.Log($"exclusion cleanup failed: {ex.Message}");
+        }
+    }
+
     private static bool ApplyExcludedLocked(IEnumerable<string>? excludedPaths)
     {
         var nextNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

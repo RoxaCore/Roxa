@@ -59,18 +59,85 @@ public static class TunManager
     private static bool EnsureTunAddress()
     {
         if (Interlocked.Exchange(ref _tunAddressSet, 1) == 1) return true;
+        string address = PickTunAddress();
         for (int attempt = 0; attempt < 3; attempt++)
         {
-            int code = RunNetsh($"interface ipv4 set address name=\"{TunAdapterName}\" static {TunAddress} {TunAddressMask}");
+            int code = RunNetsh($"interface ipv4 set address name=\"{TunAdapterName}\" static {address} {TunAddressMask}");
             if (code == 0)
             {
-                Log($"TUN address set to {TunAddress}/30 on {TunAdapterName}.");
+                Log($"TUN address set to {address}/30 on {TunAdapterName}.");
                 return true;
             }
             Thread.Sleep(150);
         }
         Log($"Could not set TUN address on {TunAdapterName}; it may fall back to APIPA (169.254.x.x) and attract broadcasts.");
         return false;
+    }
+
+    /// <summary>
+    /// آدرسِ پیش‌فرض را برمی‌گرداند، مگر اینکه آداپتورِ دیگری همان‌جا را
+    /// اشغال کرده باشد؛ آن‌وقت اولین /30ِ خالیِ داخلِ همان /15 را برمی‌گرداند.
+    /// دلیل: 198.18.0.1 دقیقاً آدرسِ پیش‌فرضِ TUN در clash/mihomo است
+    /// (fake-ip-range پیش‌فرضِشان 198.18.0.0/16 است و آدرسِ TUN هم از همینجا
+    /// گرفته می‌شود). اگر کاربر clash را روشن داشته باشد دو آداپتور یک IP
+    /// می‌گیرند و مسیریابی به‌هم می‌ریزد. هر آدرسی که همین‌جا انتخاب شود
+    /// داخلِ 198.18.0.0/15 می‌ماند، پس همان معنایِ PrivateIpCidrs و همان
+    /// جلوگیری از broadcast لینک‌لوکال دست‌نخورده می‌ماند. اگر چیزی گرفته
+    /// نشده یا جدولِ مسیر در دسترس نبود، دقیقاً همان رفتارِ امروزی برمی‌گردد.
+    /// </summary>
+    private static string PickTunAddress()
+    {
+        try
+        {
+            var table = IpRoute.GetTable();
+            if (table == null || table.Count == 0) return TunAddress;
+
+            uint tunIf = IpRoute.GetIfIndex(TunAdapterName);
+            // ParseIp و مقادیرِ MIB هر دو در نمایِ بایتِ جابه‌جا‌شده‌اند (همان
+            // قراردادی که MatchesRecord با آن کار می‌کند)، پس مقایسهٔ عددي
+            // با < و > بی‌معناست: مثلاً 192.168.1.0 در این نما از 198.18.0.0
+            // «بزرگ‌تر» درمی‌آید و فیلترِ دامنه خطا می‌کرد. عضویت در دامنه را
+            // باید با ماسک سنجید. ماسکِ /15 در بایت 255.254.0.0 است، نه
+            // 255.255.0.0، چون دامنه 198.18 و 198.19 را می‌پوشاند.
+            uint base15 = IpRoute.ParseIp("198.18.0.0");
+            uint mask15 = IpRoute.ParseIp("255.254.0.0");
+            uint m30 = IpRoute.ParseIp("255.255.255.252");
+
+            // مسیرهایی که داخلِ دامنهٔ ما نشسته‌اند و مالِ خودِ TUN نیستند.
+            var taken = new List<(uint Net, uint Mask)>();
+            foreach (var row in table)
+            {
+                if (tunIf != 0 && row.IfIndex == tunIf) continue;
+                uint net = row.Dest & row.Mask;
+                if ((net & mask15) != base15) continue;
+                taken.Add((net, row.Mask));
+            }
+            if (taken.Count == 0) return TunAddress;
+
+            // کلِ /15 یعنی 198.18 و 198.19؛ هر چهار آدرس یک /30 است.
+            for (uint second = 18; second <= 19; second++)
+            {
+                for (uint third = 0; third < 256; third += 4)
+                {
+                    uint cand = IpRoute.ParseIp($"198.{second}.{third}.0");
+                    bool busy = false;
+                    foreach (var (net, mask) in taken)
+                    {
+                        // دو زیرشبکه وقتی هم‌پوشانی دارند که یکی داخلِ دیگری باشد.
+                        if ((net & m30) == cand || (cand & mask) == net) { busy = true; break; }
+                    }
+                    if (busy) continue;
+
+                    string addr = IpRoute.IpToString(cand | 1u);
+                    if (addr == TunAddress) return TunAddress;
+                    Log($"TUN address {TunAddress} is already in use on this machine; using {addr} instead.");
+                    return addr;
+                }
+            }
+        }
+        catch { }
+        // هیچ جای خالی پیدا نشد (یا هر خطایی رخ داد): همان آدرسِ پیش‌فرض.
+        return TunAddress;
     }
 
     private static readonly string _wintunDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "engine");

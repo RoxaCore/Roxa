@@ -23,11 +23,34 @@ public static class XrayConfigBuilder
     private static JsonArray PrivateIpArray() =>
         new(PrivateIpCidrs.Select(c => (JsonNode)c).ToArray());
 
+    /// <summary>
+    /// ثانیه‌های بی‌حرکتی پیش از بسته‌شدن یک اتصال/نشست در موتور.
+    /// پیش‌فرضِ xray سیصد ثانیه است؛ در حالت TUN نشست‌های UDP کشفِ شبکه
+    /// تا آن موقع باز می‌مانند و هندل/حافظه انباشته می‌کنند.
+    /// مقدار عمداً شصت ثانیه گذاشته شده تا QUIC/HTTP3 (که فاصله‌های
+    /// بی‌حرکتِ طبیعی دارد) آسیب نبیند.
+    /// </summary>
+    private const int ConnIdleSeconds = 60;
+
+    /// <summary>فقط <c>connIdle</c> تنظیم می‌شود؛ بقیهٔ فیلدها پیش‌فرض خودِ موتور می‌مانند.</summary>
+    private static JsonObject BuildPolicy() =>
+        new()
+        {
+            ["levels"] = new JsonObject
+            {
+                ["0"] = new JsonObject
+                {
+                    ["connIdle"] = ConnIdleSeconds
+                }
+            }
+        };
+
     public static string Build(ServerInfo server, int socksPort, int httpPort, AppSettings? settings = null, bool? useTunOverride = null)
     {
         var config = new JsonObject
         {
             ["log"] = new JsonObject { ["loglevel"] = "warning" },
+            ["policy"] = BuildPolicy(),
             ["inbounds"] = new JsonArray(),
             ["outbounds"] = new JsonArray
             {
@@ -509,6 +532,7 @@ public static class XrayConfigBuilder
         var config = new JsonObject
         {
             ["log"] = new JsonObject { ["loglevel"] = "none" },
+            ["policy"] = BuildPolicy(),
             ["inbounds"] = inbounds,
             ["outbounds"] = outbounds,
             ["routing"] = new JsonObject

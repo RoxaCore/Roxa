@@ -305,6 +305,10 @@ public partial class MainViewModel : ViewModelBase
             KillSwitchStatus = engaged
                 ? string.Format(TranslationManager.Instance["Set_KillSwitch_Waiting"], count)
                 : "";
+            // قطعِ عمدیِ خودِ برنامه (تعویضِ سرور، قطعِ دستی، وصلِ مجددِ خودکارِ
+            // بعد از تغییرِ شبکه) بلاکِ WFP درست راه می‌اندازد، ولی اعلانش فقط اضطراب است؛
+            // فقط از دستِ رفتنِ واقعیِ تونل باید خبر بدهیم.
+            if (TunKillSwitch.LastTransitionExpected) return;
             if (engaged)
                 NotificationHelper.Show(
                     TranslationManager.Get("Set_KillSwitch_Blocked_Title"),

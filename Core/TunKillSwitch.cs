@@ -8,7 +8,11 @@ public static class TunKillSwitch
     private const string RulePrefix = "RoxaKillSw_";
     private const int ProbeIntervalMs = 1000;
     private const int HttpProbeEvery = 5;
-    private const int MaxHttpFails = 2;
+    // هر پروبِ HTTP ۸ ثانیه فرصت دارد؛ با آستانهٔ قبلی (۳ ثانیه) ترافیکِ کاملاً سالمِ ایران
+    // هم «خوانده‌نشده» حساب می‌شد و کیل‌سوییچ کلِ اینترنت را چند ثانیه مسدود می‌کرد.
+    private const int HttpProbeTimeoutMs = 8000;
+    // سه شکستِ متوالیِ HTTP لازم است تا اصلاً «بد» حساب شود (≈۱۵ ثانیه).
+    private const int MaxHttpFails = 3;
     private const int MaxBadTicks = 6;
     private const int GoodTicksToRecover = 5;
     private const int GoodTicksToResetBad = 3;
@@ -79,11 +83,13 @@ public static class TunKillSwitch
             }
             timerOn = _timer != null;
         }
-        if (enabled)
-        {
-            int fw = TunManager.RunNetsh("advfirewall set allprofiles state on");
-            if (fw != 0) TunManager.Log($"kill-switch: firewall profiles enable failed ({fw})");
-        }
+        // عمداً فایروالِ ویندوز را دست نمی‌زنیم:
+        // کیل‌سوییچِ Roxa کاملاً با WFP (لایهٔ کِرنل) کار می‌کند و به فایروالِ ویندوز نیازی ندارد.
+        // قبلاً اینجا «netsh advfirewall set allprofiles state on» می‌زدیم؛ دستورِ روشن‌کردنِ فایروال
+        // هیچ‌وقت بازگردانده نمی‌شد و سیستمِ کاربر را برای همیشه تغییر می‌داد — رویِ بعضی سیستم‌ها
+        // (پروفایلِ خروجیِ مسدود، یا AVِ جایگزین) هم کلِ اینترنت را می‌انداخت.
+        // قانون‌های TunExclusion فقط وقتی اثر دارند که فایروالِ خودِ کاربر روشن باشد؛ اگر خاموش است،
+        // چیزی هم برای مسدودکردن وجود ندارد، پس الزامی‌کردنِ آن لازم نیست.
         TunManager.Log($"kill-switch configure enabled={enabled} paths={n} timer={timerOn} gen={gen}");
         Apply(gen);
     }
@@ -466,7 +472,10 @@ public static class TunKillSwitch
             _goodStreak = 0;
             if (!up) return;
 
-            _badTicks += fail == "http-stale" ? 1 : fail.StartsWith("http:") ? 2 : critical ? 2 : 1;
+            // «http-stale» عمداً صفر است: فقط وضعیتِ بد را نگه می‌دارد و ثانیه‌به‌ثانیه شمارش را بالا نمی‌برد.
+            // باآستانهٔ قبلی، پروبِ HTTP هر ۵ ثانیه اجرا می‌شد ولی بینِ آن‌ها هر ثانیه +۱ می‌خورد؛
+            // نتیجه این بود که یک تایم‌اوتِ تنها ظرفِ ~۵ ثانیه کلِ ترافیک را مسدود و ~۶ ثانیه بعد رها می‌کرد.
+            _badTicks += fail == "http-stale" ? 0 : fail.StartsWith("http:") ? 3 : critical ? 2 : 1;
             TunManager.Log($"kill-switch probe ({_badTicks}/{MaxBadTicks}): {fail} port={port}");
             if (_badTicks < MaxBadTicks) return;
 
@@ -537,7 +546,7 @@ public static class TunKillSwitch
         try
         {
             using var handler = new HttpClientHandler { Proxy = new System.Net.WebProxy($"http://127.0.0.1:{port}"), UseProxy = true };
-            using var http = new HttpClient(handler) { Timeout = TimeSpan.FromMilliseconds(3000) };
+            using var http = new HttpClient(handler) { Timeout = TimeSpan.FromMilliseconds(HttpProbeTimeoutMs) };
             using var resp = http.GetAsync("https://www.gstatic.com/generate_204").GetAwaiter().GetResult();
             if (resp.IsSuccessStatusCode) return null;
             return "status" + (int)resp.StatusCode;

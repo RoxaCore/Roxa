@@ -536,6 +536,10 @@ State: {3}</value>
   <data name="Stg_Dns" xml:space="preserve"><value>Configuring DNS ...</value></data>
   <data name="Stg_Engine" xml:space="preserve"><value>Please wait</value></data>
   <data name="Toast_NoInternet" xml:space="preserve"><value>Internet is disconnected</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>Network changed; checking and reconnecting...</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>Auto-reconnecting to "{0}" after a network change</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>Auto-reconnect tried too many times; please reconnect manually</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>The network changed and auto-reconnect was not possible; please reconnect</value></data>
   <data name="SubFetch_Direct" xml:space="preserve"><value>Fetching directly (no proxy)...</value></data>
   <data name="SubFetch_Proxy" xml:space="preserve"><value>Fetching via proxy...</value></data>
   <data name="SubFetch_SystemProxy" xml:space="preserve"><value>Fetching via system proxy...</value></data>

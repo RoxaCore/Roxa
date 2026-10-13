@@ -49,6 +49,18 @@ public static class TunKillSwitch
     private static int _appliedGen;
     private static int _appliedEngaged;
 
+    // وقتی خودِ برنامه عمداً اتصال را قطع می‌کند (تعویضِ سرور، قطعِ دستی، وصلِ مجددِ
+    // خودکارِ بعد از تغییرِ شبکه)، بلاکِ WFP درست است ولی اعلانِ «اینترنت مسدود شد»
+    // چیزی جز اضطراب نیست — کاربر خودش دکمه زده و می‌داند چه خبر است.
+    // فقط از دستِ رفتنِ واقعیِ تونل (تشخیصِ پروب) باید خبر بدهد.
+    private static volatile bool _expectedDown;
+
+    /// <summary>
+    /// آیا آخرینِ تغییرِ وضعیتِ بلاک، نتیجهٔ قطعِ عمدیِ خودِ برنامه بوده؟
+    /// UI بر اساسِ آن تصمیم می‌گیرد اعلان نشان بدهد یا نه.
+    /// </summary>
+    public static bool LastTransitionExpected => _expectedDown;
+
     public static event Action<bool, int>? StateChanged;
 
     private static string RulesFile =>
@@ -98,6 +110,9 @@ public static class TunKillSwitch
     {
         int gen;
         int portNow;
+        // بالا رفتنِ تونل یعنی از این به بعد هر قطعیِ تونل غیرمنتظره است؛
+        // پایین آمدنش از همین‌جا یعنی خودِ برنامه عمداً قطع کرده (قطع/تعویض سرور/وصل مجدد).
+        _expectedDown = !up;
         lock (_lock)
         {
             if (probePort > 0) _probePort = probePort;
@@ -480,6 +495,9 @@ public static class TunKillSwitch
             if (_badTicks < MaxBadTicks) return;
 
             TunManager.Log("kill-switch: tunnel lost, engaging");
+            // از دست رفتنِ تونل را خودِ پروب تشخیص داده؛ یعنی واقعی و غیرمنتظره است
+            // و ارزشِ خبر دارد (برخلافِ قطعِ عمدیِ خودِ برنامه).
+            _expectedDown = false;
             int gen;
             lock (_lock)
             {

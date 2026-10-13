@@ -202,6 +202,9 @@ public partial class MainViewModel : ViewModelBase
         // می‌گرفت. اکنون در پس‌زمینهٔ LongRunning اجرا می‌شود و گیت داخلی Stop()
         // هم‌زمانی آن با پاکسازی StartAsync را سریالایز می‌کند.
         _cleanupTask = Task.Factory.StartNew(() => { try { _engine.StopAndCleanupTun(); } catch { } }, TaskCreationOptions.LongRunning);
+        // حذفِ مسیرها و بازگردانیِ DNS رویدادِ شبکه شلیک می‌کند؛ بدونِ این پنجره،
+        // گوشِ شبکه همان «شبکه عوض شد» تفسیرش می‌کرد و وصلِ مجددِ خودکار راه می‌افتاد.
+        SuppressNetworkWatcher(NetSelfChangeSuppressMs);
         TunKillSwitch.SetTunnelUp(false, 0);
         IsConnected = false;
         RefreshConnectionFlags();

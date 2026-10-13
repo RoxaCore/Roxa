@@ -38,11 +38,25 @@ public partial class MainViewModel
     // وگرنه دو قطعِ وای‌فای در دو ساعتِ مختلف، همدیگر را از سِقف می‌انداختند.
     private const long NetTryWindowMs = 120000;
 
+    // بعد از هر قطع/وصلِ خودِ برنامه، رویدادِ شبکه را اینقدر نادیده بگیر؛
+    // مسیرها و DNS در همین پنجره عوض می‌شوند و رویدادِ کاذب می‌سازند.
+    private const int NetSelfChangeSuppressMs = 20000;
+
     private long _netEventTick;
     private long _netLastTryTick;
+    // خودِ قطع/وصلِ ما مسیر و DNS را عوض می‌کند و همین رویدادِ شبکه را شلیک می‌کند؛
+    // بدونِ این پنجره، وصلِ مجددِ خودکار بلافاصله یک وصلِ مجددِ دیگر راه می‌انداخت
+    // (حلقهٔ قطع+وصل هر ~۱۲ ثانیه، با اعلانِ «اینترنت مسدود شد» در هر حلقه).
+    private long _netSuppressUntil;
     private int _netRecoverRunning;
     private int _netReconnects;
     private bool _netWatcherStarted;
+
+    /// <summary>
+    /// رویدادهایِ شبکه را برایِ مدتِ کوتاهِ بعد از هر تغییرِ مسیرِ خودِ برنامه نادیده می‌گیرد.
+    /// </summary>
+    private void SuppressNetworkWatcher(int ms) =>
+        Interlocked.Exchange(ref _netSuppressUntil, Environment.TickCount64 + ms);
 
     /// <summary>
     /// به تغییرِ شبکه (خاموش/روشن‌کردنِ وای‌فای، عوض‌شدنِ مودم، گرفتنِ آدرسِ تازه) گوش می‌دهد.
@@ -72,6 +86,10 @@ public partial class MainViewModel
     {
         if (!IsConnected) return;
 
+        // تغییرِ مسیرِ خودِ برنامه (قطع/وصل، تعویضِ سرور) رویدادِ شبکه شلیک می‌کند؛
+        // نباید آن را «شبکه عوض شد» تفسیر کرد.
+        if (Environment.TickCount64 < Interlocked.Read(ref _netSuppressUntil)) return;
+
         long now = Environment.TickCount64;
         if (now - Interlocked.Read(ref _netLastTryTick) > NetTryWindowMs)
             Interlocked.Exchange(ref _netReconnects, 0);
@@ -99,6 +117,7 @@ public partial class MainViewModel
             if (!IsConnected) return;
 
             AppendLog(TranslationManager.Instance["Log_NetChanged"]);
+            TunManager.Log("net-change: recovery starting");
 
             // ۳) گیت‌ویِ فیزیکی باید برگردد؛ بدون آن وصل‌کردن بیهوده است.
             // این خواندنِ محلیِ جدولِ مسیر است و بلاکِ WFPِ کیل‌سوییچ رویش اثری ندارد.
@@ -148,6 +167,7 @@ public partial class MainViewModel
             Interlocked.Exchange(ref _netLastTryTick, Environment.TickCount64);
 
             AppendLog(string.Format(TranslationManager.Instance["Log_NetReconnecting"], server.Name));
+            TunManager.Log($"net-change: reconnecting to {server.Name} (try {tries}/{NetMaxReconnects})");
             DisconnectCore(false);
             await AwaitCleanupAsync();
             if (IsConnecting || IsTesting || IsSwitchingServer) return;

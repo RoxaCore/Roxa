@@ -109,6 +109,12 @@ public partial class MainViewModel : ViewModelBase
             await _engine.StartAsync(server, SetSystemProxy, _settings, tunExclusionHosts: Servers.Select(s => s.Address),
                 progress: s => Post(() => Status = s));
             IsConnected = true;
+            // خودِ اتصال رویدادِ شبکه شلیک می‌کند (ساختِ TUN، عوض‌شدنِ مسیرها، سوییچِ DNS).
+            // ویندوز آن را با تأخیرِ کم اعلام می‌کند — یعنی وقتی IsConnected تازه true شده
+            // هنوز در صفِ تحویل است. اگر پنجرهٔ محافظ همین‌جا شروع نشود، گوشِ شبکه همان
+            // رویداد را «شبکه عوض شد» می‌فهمد و چند ثانیه بعد وصلِ مجددِ خودکار راه
+            // می‌انداخت: هم در اتصالِ اولِ هر اجرای برنامه، هم بعد از تعویضِ سرور.
+            SuppressNetworkWatcher(NetSelfChangeSuppressMs);
             TunKillSwitch.SetTunnelUp(true, _engine.HttpPort);
             if (!IsTesting && SetSystemProxy && !LeaveSystemProxyAsIs && !_engine.IsTunActive)
                 ApplySystemProxyEndpoint();

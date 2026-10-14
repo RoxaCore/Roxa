@@ -42,6 +42,10 @@ public partial class MainViewModel
     // مسیرها و DNS در همین پنجره عوض می‌شوند و رویدادِ کاذب می‌سازند.
     private const int NetSelfChangeSuppressMs = 20000;
 
+    // برایِ اینکه بفهمیم «واقعاً مشکلی هست؟» یا فقط رویدادِ کاذبِ شبکه است،
+    // از مسیرِ خودِ تونل یک پروب می‌زنیم؛ اینقدر فرصت می‌دهیم.
+    private const int NetTunnelCheckMs = 4000;
+
     private long _netEventTick;
     private long _netLastTryTick;
     // خودِ قطع/وصلِ ما مسیر و DNS را عوض می‌کند و همین رویدادِ شبکه را شلیک می‌کند؛
@@ -115,6 +119,26 @@ public partial class MainViewModel
             // ۲) چند ثانیه دیگر هم صبر کن تا DHCP/لینک تثبیت شود.
             await Task.Delay(NetSettleMs);
             if (!IsConnected) return;
+
+            // ۲٫۵) اصلاً مشکلی داریم؟ اگر همین حالا از مسیرِ خودِ تونل به اینترنت
+            // می‌رسیم، پس تونل سالم است و آن رویدادِ شبکه چیزی جز هیاهو نبوده:
+            // خودِ اتصال (ساختِ TUN، عوض‌شدنِ مسیرها و DNS)، تعویضِ سرور، یا یک
+            // رویدادِ بی‌اهمیتِ دیگر. دست‌زدن به اتصالِ سالم یعنی قطعِ چند ثانیه‌ایِ
+            // بی‌جهت — دقیقاً همان چیزی که کاربر از آن شکایت داشت.
+            // پروب باید از خودِ پورتِ موتور برود نه مستقیم؛ وگرنه اگر تونل مرده ولی
+            // اینترنتِ مستقیم سالم باشد، اشتباه «سالم» می‌خواندیمش و بازیابی را می‌پراندیم.
+            int tunnelPort = _engine.HttpPort;
+            if (tunnelPort > 0)
+            {
+                bool tunnelHealthy;
+                try { tunnelHealthy = await NetHealth.IsInternetAvailableAsync(NetTunnelCheckMs, tunnelPort); }
+                catch { tunnelHealthy = false; }
+                if (tunnelHealthy)
+                {
+                    TunManager.Log("net-change: tunnel still healthy; ignoring network event");
+                    return;
+                }
+            }
 
             AppendLog(TranslationManager.Instance["Log_NetChanged"]);
             TunManager.Log("net-change: recovery starting");

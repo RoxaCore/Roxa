@@ -35,7 +35,7 @@
   <data name="Tab_Servers" xml:space="preserve"><value>Серверы</value></data>
   <data name="Tab_Subscription" xml:space="preserve"><value>Подписка</value></data>
   <data name="Tab_Log" xml:space="preserve"><value>Лог</value></data>
-  <data name="Tab_Settings" xml:space="preserve"><value>⚙ Настройки</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>Настройки</value></data>
   <!-- Buttons -->
   <data name="Btn_Connect" xml:space="preserve"><value>▶ Подключить</value></data>
   <data name="Btn_Disconnect" xml:space="preserve"><value>Отключить</value></data>
@@ -240,6 +240,7 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>Осталось {0} ч</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 Вручную</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>Сервер не выбран</value></data>
+  <data name="Set_Version" xml:space="preserve"><value>Версия</value></data>
   <data name="Set_Reports" xml:space="preserve">
     <value>Отчёт об ошибке и проблеме</value>
   </data>

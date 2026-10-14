@@ -34,7 +34,7 @@
   <data name="Tab_Servers" xml:space="preserve"><value>サーバー</value></data>
   <data name="Tab_Subscription" xml:space="preserve"><value>サブスクリプション</value></data>
   <data name="Tab_Log" xml:space="preserve"><value>ログ</value></data>
-  <data name="Tab_Settings" xml:space="preserve"><value>⚙ 設定</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>設定</value></data>
   <data name="Btn_Connect" xml:space="preserve"><value>▶ 接続</value></data>
   <data name="Btn_Disconnect" xml:space="preserve"><value>切断</value></data>
   <data name="Btn_Reconnect" xml:space="preserve"><value>再接続</value></data>
@@ -224,6 +224,7 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>残り {0} 時間</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 手動</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>サーバー未選択</value></data>
+  <data name="Set_Version" xml:space="preserve"><value>バージョン</value></data>
   <data name="Set_Reports" xml:space="preserve">
     <value>バグ・問題レポート</value>
   </data>

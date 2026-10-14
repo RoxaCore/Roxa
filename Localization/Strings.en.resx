@@ -35,7 +35,7 @@
   <data name="Tab_Servers" xml:space="preserve"><value>Servers</value></data>
   <data name="Tab_Subscription" xml:space="preserve"><value>Subscription</value></data>
   <data name="Tab_Log" xml:space="preserve"><value>Log</value></data>
-  <data name="Tab_Settings" xml:space="preserve"><value>⚙ Settings</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>Settings</value></data>
   <!-- Buttons -->
   <data name="Btn_Connect" xml:space="preserve"><value>▶ Connect</value></data>
   <data name="Btn_Disconnect" xml:space="preserve"><value>Disconnect</value></data>
@@ -243,6 +243,7 @@ Latency: {1}</value></data>
   <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} hours left</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 Manual</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>No server selected</value></data>
+  <data name="Set_Version" xml:space="preserve"><value>Version</value></data>
   <data name="Set_Reports" xml:space="preserve">
     <value>Bug and issue report</value>
   </data>

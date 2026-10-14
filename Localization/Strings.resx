@@ -43,7 +43,7 @@
   <data name="Tab_Servers" xml:space="preserve"><value>سرورها</value></data>
   <data name="Tab_Subscription" xml:space="preserve"><value>اشتراک</value></data>
   <data name="Tab_Log" xml:space="preserve"><value>لاگ</value></data>
-  <data name="Tab_Settings" xml:space="preserve"><value>⚙ تنظیمات</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>تنظیمات</value></data>
   <!-- Buttons -->
   <data name="Btn_Connect" xml:space="preserve"><value>▶ اتصال</value></data>
   <data name="Btn_Disconnect" xml:space="preserve"><value>قطع اتصال</value></data>
@@ -251,6 +251,7 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} ساعت باقی‌مانده</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 دستی</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>سروری انتخاب نشده</value></data>
+  <data name="Set_Version" xml:space="preserve"><value>نسخه</value></data>
   <data name="Set_Reports" xml:space="preserve">
     <value>گزارش باگ و مشکل</value>
   </data>

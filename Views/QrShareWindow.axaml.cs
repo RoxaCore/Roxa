@@ -22,6 +22,12 @@ public partial class QrShareWindow : Window
         this.FindControl<TextBox>("LinkBox")!.Text = link;
         this.FindControl<Button>("CopyBtn")!.Content = tr["Dlg_CopyLink"];
         this.FindControl<Button>("CloseBtn")!.Content = tr["Dlg_Close"];
+        // XAML این پنجره را ثابت RightToLeft کرده بود؛ باید از زبانِ فعال بیاید.
+        // enum را واجد می‌نویسیم چون FlowDirection رویِ خودِ Window هم پراپرتی است
+        // و در Avalonia.Media تعریف شده (نه Avalonia.Layout).
+        FlowDirection = tr.IsRightToLeft
+            ? Avalonia.Media.FlowDirection.RightToLeft
+            : Avalonia.Media.FlowDirection.LeftToRight;
         RenderQr(link);
     }
 

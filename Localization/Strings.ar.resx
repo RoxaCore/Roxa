@@ -546,4 +546,8 @@
   <data name="Set_ShowIp" xml:space="preserve"><value>إظهار عمود عنوان IP</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>عند التمكين، يُعرض عمود عنوان IP في جدول الخوادم.</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>لصق من الحاظة</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>تغيّرت الشبكة؛ جارٍ الفحص وإعادة الاتصال...</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>إعادة الاتصال تلقائيًا بـ «{0}» بعد تغيّر الشبكة</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>فشلت إعادة الاتصال التلقائية مرات كثيرة؛ يرجى إعادة الاتصال يدويًا</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>تغيّرت الشبكة ولم تكن إعادة الاتصال التلقائية ممكنة؛ يرجى إعادة الاتصال</value></data>
 </root>

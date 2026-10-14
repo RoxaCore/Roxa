@@ -546,4 +546,8 @@ ID устройства {2}
   <data name="Set_ShowIp" xml:space="preserve"><value>Показывать столбец IP-адреса</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>Если включено, столбец IP-адреса отображается в таблице серверов.</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>Вставить из буфера обмена</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>Сеть изменилась; проверка и переподключение...</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>Автоматическое переподключение к «{0}» после изменения сети</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>Автоматическое переподключение не удалось слишком много раз; подключитесь вручную</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>Сеть изменилась, и автоматическое переподключение невозможно; подключитесь снова</value></data>
 </root>

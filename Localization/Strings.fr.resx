@@ -548,4 +548,8 @@ ID d'appareil {2}
   <data name="Set_ShowIp" xml:space="preserve"><value>Afficher la colonne d'adresse IP</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>Lorsqu'elle est activée, la colonne d'adresse IP s'affiche dans le tableau des serveurs.</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>Coller depuis le presse-papiers</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>Réseau modifié ; vérification et reconnexion…</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>Reconnexion automatique à « {0} » après un changement de réseau</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>La reconnexion automatique a échoué trop de fois ; veuillez vous reconnecter manuellement</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>Le réseau a changé et la reconnexion automatique n'a pas été possible ; veuillez vous reconnecter</value></data>
 </root>

@@ -127,7 +127,10 @@ public class AppSettings
     public int ShownAnnouncementCount { get; set; }
     public string Country { get; set; } = "";
     public string ClientId { get; set; } = "";
-    public bool SendUsageStats { get; set; } = true;
+    // پیش‌فرضِ off: یک نصبِ تازه بدونِ هیچ رضایتی نباید چیزی بفرستد. گیتِ ارسالِ
+    // گزارشِ کرش (BugReport.ConsentAllowsSend) به همین بستگی دارد؛ روشن‌شدنش
+    // باید انتخابِ خودِ کاربر باشد.
+    public bool SendUsageStats { get; set; }
     public int ConnectCount { get; set; }
     public List<string> TunExcludedApps { get; set; } = new();
     public List<string> TunExcludedAppsDisabled { get; set; } = new();

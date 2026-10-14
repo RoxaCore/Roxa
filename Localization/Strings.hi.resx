@@ -530,4 +530,8 @@
   <data name="Set_ShowIp" xml:space="preserve"><value>IP पता कॉलम दिखाएँ</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>सक्षम होने पर, सर्वर तालिका में IP पता कॉलम दिखाया जाता है।</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>क्लिपबोर्ड से पेस्ट करें</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>नेटवर्क बदल गया; जाँच और पुनः कनेक्ट हो रहा है...</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>नेटवर्क बदलने के बाद "{0}" को स्वतः पुनः कनेक्ट किया जा रहा है</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>स्वतः पुनः कनेक्ट बहुत बार विफल रहा; कृपया स्वयं पुनः कनेक्ट करें</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>नेटवर्क बदल गया और स्वतः पुनः कनेक्ट संभव नहीं हुआ; कृपया पुनः कनेक्ट करें</value></data>
 </root>

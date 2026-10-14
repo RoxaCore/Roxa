@@ -530,4 +530,8 @@
   <data name="Set_ShowIp" xml:space="preserve"><value>IP پتہ کالم دکھائیں</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>فعال ہونے پر، سروس ٹیبل میں IP پتہ کالم دکھایا جاتا ہے۔</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>کلپ بورد سے پیسٹ کریں</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>نیٹ ورک تبدیل ہو گیا؛ جانچ اور دوبارہ جوڑا جا رہا ہے...</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>نیٹ ورک تبدیل ہونے کے بعد "{0}" کو خودکار دوبارہ جوڑا جا رہا ہے</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>خودکار دوبارہ جوڑنا بہت بار ناکام ہوا؛ براہِ مہربانی خود دوبارہ جوڑیں</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>نیٹ ورک تبدیل ہو گیا اور خودکار دوبارہ جوڑنا ممکن نہیں ہو سکا؛ براہِ مہربانی دوبارہ جوڑیں</value></data>
 </root>

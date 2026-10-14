@@ -61,6 +61,23 @@ public static class BugReport
 
     public static Payload Create(string type) => new() { Type = type, Os = OsInfo(), Id = DeviceId() };
 
+    /// <summary>
+    /// آیا فرستادنِ گزارش مجاز است؟
+    ///
+    /// نوشتنِ محلی در صف همیشه انجام می‌شود — بی‌ضرر است و اگر کاربر بعداً رضایت
+    /// داد، گزارشِ کرشِ همان نخستین اجرا (که ارزشمندترینشان است) گم نمی‌شود.
+    /// این کلید فقط «رفتن به سرور» را کنترل می‌کند.
+    ///
+    /// بدونِ این گیت، خطا و stack و ۴۰ خطِ آخرِ لاگ و ClientId برخلافِ آنچه در
+    /// تنظیمات به کاربر گفته بودیم، بی‌صدا ارسال می‌شد — گزارشِ کرش از مسیرِ
+    /// FlushPendingAsync هم می‌گذشت و اصلاً به تنظیمات نگاه نمی‌کرد.
+    /// </summary>
+    private static bool ConsentAllowsSend()
+    {
+        try { return Storage.LoadSettings().SendUsageStats; }
+        catch { return false; } // نتوانستیم رضایت را بخوانیم ⇒ رضایت نداریم ⇒ نمی‌فرستیم
+    }
+
     /// <summary>کرش: فایل در صف نوشته می‌شود و ارسال فوری بهترین-تلاش انجام می‌گیرد.</summary>
     public static void ReportCrash(Exception? ex, string logTail = "")
     {
@@ -70,6 +87,7 @@ public static class BugReport
         p.Log = Cut(logTail, 4000);
         string? file = Enqueue(p);
         if (file == null) return;
+        if (!ConsentAllowsSend()) return; // در صف می‌ماند؛ فقط اگر کاربر رضایت بدهد می‌رود
         _ = Task.Run(async () =>
         {
             try
@@ -126,9 +144,18 @@ public static class BugReport
         }
     }
 
-    /// <summary>ارسال همهٔ گزارش‌های در صف؛ با اولین شکست (قطعی شبکه) متوقف می‌شود.</summary>
+    /// <summary>
+    /// ارسال همهٔ گزارش‌های در صف؛ با اولین شکست (قطعی شبکه) متوقف می‌شود.
+    ///
+    /// این مهم‌ترین نقطهٔ کنترلِ رضایت است: هم در شروعِ برنامه و هم بعد از هر
+    /// اتصال صدا زده می‌شود، پس اگر اینجا گیت نداشته باشد، کلِ گزارشِ کرش بدونِ
+    /// توجه به چک‌باکسِ تنظیمات بیرون می‌رود — دقیقاً همان چیزی که به کاربر
+    /// گفته بودیم جزوِ آمار و اطلاعات است. بدونِ رضایت، فقط صف را می‌شماریم.
+    /// </summary>
     public static async Task<int> FlushPendingAsync(int? proxyPort)
     {
+        if (!ConsentAllowsSend()) return 0;
+
         int sent = 0;
         try
         {

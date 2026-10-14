@@ -530,4 +530,8 @@
   <data name="Set_ShowIp" xml:space="preserve"><value>IPアドレス列を表示</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>有効にすると、サーバーテーブルにIPアドレス列が表示されます。</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>クリップボードから貼り付け</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>ネットワークが変更されました。確認して再接続しています...</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>ネットワークの変更後、「{0}」に自動で再接続しています</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>自動再接続の試行回数が上限に達しました。手動で再接続してください</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>ネットワークが変更され、自動で再接続できませんでした。再接続してください</value></data>
 </root>

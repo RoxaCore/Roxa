@@ -1,13 +1,19 @@
 ﻿using Avalonia;
+using Avalonia.Media;
 using System.Threading;
 
 namespace Roxa;
 
 sealed class Program
 {
-    private const string MutexName = "Roxa唯一的实例";
-    private const string ShowSignalName = "RoxaShowSignal";
-    private const string ExitSignalName = "RoxaExitSignal";
+    // نام‌هایِ بینِ پروسه‌ای، همه در فضایِ Global.
+    //
+    // بدونِ `Global\`، هر سشن (Fast User Switching، RDP) نمونهٔ خودش را می‌دید و
+    // کاربر با یک نصب، دو برنامهٔ همزمان داشت که هرکدام می‌خواستند TUN و پروکسیِ
+    // سیستم را بگیرند.
+    private const string MutexName = @"Global\Roxa唯一的实例";
+    private const string ShowSignalName = @"Global\RoxaShowSignal";
+    private const string ExitSignalName = @"Global\RoxaExitSignal";
 
     public static string[] StartupArgs = [];
 
@@ -44,6 +50,8 @@ sealed class Program
         {
             try { Core.TunRecovery.RecoverOnStartup(); } catch { }
             try { Core.TunExclusion.CleanupLeftovers(); } catch { }
+            try { Core.TunKillSwitch.CleanupLeftovers(); } catch { }
+            try { Core.TestRouteBypass.ReleaseOrphanedHostRoutes(); } catch { }
             try { Core.TunRecovery.EmergencyCleanup(); } catch { }
             try { Core.TunManager.FlushLog(); } catch { }
             return;
@@ -111,13 +119,24 @@ sealed class Program
 
         if (!createdNew)
         {
+            bool handedOff = false;
             try
             {
                 using var signal = EventWaitHandle.OpenExisting(ShowSignalName);
                 signal.Set();
+                handedOff = true;
             }
             catch { }
             mutex?.Dispose();
+
+            // نمونهٔ دیگری اجراست و پنجره‌اش را آوردیم — پس چیزی برای گفتن نیست.
+            // ولی اگر تحویل هم نشد (مثلاً نمونهٔ متعلق به کاربرِ دیگر، یا مالکِ mutex
+            // دسترسی نمی‌دهد)، کاربر دابل‌کلیک می‌زند و هیچ اتفاقی نمی‌افتد: نه
+            // پنجره، نه خطا، نه حتی سرنخی برای فهمیدن چرا. این پیام دقیقاً همان
+            // یک درصدِ کور است که قبلاً بی‌صدا بلعیده می‌شد.
+            if (!handedOff)
+                WarnInstanceBlocked();
+
             return;
         }
 
@@ -155,6 +174,39 @@ sealed class Program
         }
     }
 
+    /// <summary>
+    /// وقتی نمونهٔ دیگری mutex را دارد ولی نتوانستیم سیگنالِ نمایشِ پنجره را به آن
+    /// برسانیم، کاربر هیچ چیزی نمی‌بیند: نه پنجره، نه خطا، نه سرنخی. این تنها
+    /// حالتِ واقعاً «کورِ» اجرای برنامه است و باید دیده شود.
+    ///
+    /// پیش از Avalonia بالا می‌آییم، پس به یک پیامِ سیستمی نیاز است — نه MessageBox
+    /// که به WPF/WinForms وابسته باشد. همین user32 کافی است.
+    /// </summary>
+    private static void WarnInstanceBlocked()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try
+        {
+            string text;
+            try { text = Localization.TranslationManager.Get("Msg_InstanceBlocked"); }
+            catch { text = "Another instance of Roxa is already running and its window could not be brought up."; }
+
+            const uint MB_OK = 0x0;
+            const uint MB_ICONWARNING = 0x30;
+            const uint MB_SETFOREGROUND = 0x10000;
+            MessageBoxW(IntPtr.Zero, text, "Roxa", MB_OK | MB_ICONWARNING | MB_SETFOREGROUND);
+        }
+        catch { /* نمایشِ پیام هم شکست خورد؛ اشکالی نیست، فقط نباید کرش کند */ }
+    }
+
+    // ExactSpelling لازم است: پیش‌فرضِ false باعث می‌شود runtime نامِ ورودی را به
+    // "MessageBoxWW" تبدیل کند و پیدایش نکند — یعنی پیامِ ما بی‌صدا گم می‌شود.
+    // Unicode هم لازم است چون متنِ پیام فارسی/عربی است.
+    [System.Runtime.InteropServices.DllImport("user32.dll",
+        CharSet = System.Runtime.InteropServices.CharSet.Unicode,
+        ExactSpelling = true)]
+    private static extern int MessageBoxW(IntPtr hWnd, string text, string caption, uint type);
+
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
@@ -162,5 +214,31 @@ sealed class Program
             .WithDeveloperTools()
 #endif
             .WithInterFont()
+            // گلیف‌هایی که در فونتِ اصلی نیستند از اینجا پُر می‌شوند.
+            //
+            // Vazirmatn فقط لاتین و عربی/فارسی دارد؛ چینی، ژاپنی، کره‌ای، روسی و هندی
+            // را ندارد و بدونِ این، کلِ متنِ آن زبان‌ها مربع نشان داده می‌شد (□□□).
+            //
+            // عمداً کام‌گذاری‌شده داخلِ خودِ FontFamily نیست: Avalonia از fallbackِ
+            // چندفونتیِ درونِ FontFamily پشتیبانی نمی‌کند و آن لیست بی‌صدا دور ریخته
+            // می‌شود (AvaloniaUI/Avalonia#19362). FontManagerOptions راهِ درست است:
+            // برایِ هر گلیفِ ناموجود، به‌ترتیب از میانِ اینها می‌گردد و اولینی را که
+            // کاراکتر را دارد برمی‌دارد. اگر فونتی رویِ سیستمِ کاربر نباشد، رد می‌شود.
+            //
+            // ترتیب مهم است: Segoe UI اول چون کریلیش و یونانی و لاتین را دارد؛ فونت‌های
+            // CJK و هندی فقط برایِ کاراکترهایِ خودشان خوانده می‌شوند، پس فارسی و
+            // انگلیسی همچنان Vazirmatn می‌مانند.
+            .With(new FontManagerOptions
+            {
+                FontFallbacks = new[]
+                {
+                    new FontFallback { FontFamily = new FontFamily("Segoe UI") },
+                    new FontFallback { FontFamily = new FontFamily("Microsoft YaHei UI") },
+                    new FontFallback { FontFamily = new FontFamily("Microsoft JhengHei UI") },
+                    new FontFallback { FontFamily = new FontFamily("Yu Gothic UI") },
+                    new FontFallback { FontFamily = new FontFamily("Malgun Gothic") },
+                    new FontFallback { FontFamily = new FontFamily("Nirmala UI") },
+                },
+            })
             .LogToTrace();
 }

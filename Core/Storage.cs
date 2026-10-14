@@ -52,7 +52,7 @@ public static class Storage
             var list = JsonSerializer.Deserialize<List<ServerInfo>>(json) ?? new List<ServerInfo>();
             return list;
         }
-        catch { return new List<ServerInfo>(); }
+        catch { Quarantine(ServersFile); return new List<ServerInfo>(); }
     }
 
     public static void SaveServers(List<ServerInfo> servers)
@@ -64,11 +64,11 @@ public static class Storage
 #pragma warning disable CA1416
             byte[] protectedBytes = ProtectedData.Protect(plain, ServersEntropy, DataProtectionScope.CurrentUser);
 #pragma warning restore CA1416
-            File.WriteAllBytes(ServersFile, protectedBytes);
+            WriteAtomic(ServersFile, protectedBytes);
         }
         else
         {
-            File.WriteAllBytes(ServersFile, plain);
+            WriteAtomic(ServersFile, plain);
         }
     }
 
@@ -79,11 +79,11 @@ public static class Storage
             if (!File.Exists(SubscriptionsFile)) return new List<SubscriptionInfo>();
             return JsonSerializer.Deserialize<List<SubscriptionInfo>>(File.ReadAllText(SubscriptionsFile)) ?? new List<SubscriptionInfo>();
         }
-        catch { return new List<SubscriptionInfo>(); }
+        catch { Quarantine(SubscriptionsFile); return new List<SubscriptionInfo>(); }
     }
 
     public static void SaveSubscriptions(List<SubscriptionInfo> subs)
-        => File.WriteAllText(SubscriptionsFile, JsonSerializer.Serialize(subs, Options));
+        => WriteAtomic(SubscriptionsFile, JsonSerializer.Serialize(subs, Options));
 
     public static AppSettings LoadSettings()
     {
@@ -92,9 +92,42 @@ public static class Storage
             if (!File.Exists(SettingsFile)) return new AppSettings();
             return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(SettingsFile)) ?? new AppSettings();
         }
-        catch { return new AppSettings(); }
+        catch { Quarantine(SettingsFile); return new AppSettings(); }
     }
 
     public static void SaveSettings(AppSettings settings)
-        => File.WriteAllText(SettingsFile, JsonSerializer.Serialize(settings, Options));
+        => WriteAtomic(SettingsFile, JsonSerializer.Serialize(settings, Options));
+
+    /// <summary>
+    /// نوشتنِ اتمیک: اول در فایلِ موقت، بعد جایگزینیِ اتمیک.
+    ///
+    /// File.WriteAllText معمولی اول طولِ فایلِ مقصد را صفر می‌کند و بعد می‌نویسد؛
+    /// پس یک کرش یا kill در همان لحظه یک فایلِ ناقص می‌گذارد و Load در سکوت
+    /// همه‌چیز را به پیش‌فرض برمی‌گرداند — یعنی زبان، کلیدها، سرورها، اشتراک‌ها و
+    /// تنظیماتِ کیل‌سوییچِ کاربر بی‌صدا گم می‌شد و کسی هم خبر نمی‌شد.
+    /// </summary>
+    private static void WriteAtomic(string path, byte[] content)
+    {
+        string tmp = path + ".tmp";
+        File.WriteAllBytes(tmp, content);
+        File.Move(tmp, path, true);
+    }
+
+    private static void WriteAtomic(string path, string content)
+        => WriteAtomic(path, Encoding.UTF8.GetBytes(content));
+
+    /// <summary>
+    /// فایلِ خراب را دور نمی‌ریزیم؛ کنارِ خودش نگه می‌داریم تا قابلِ بررسی و
+    /// بازیابی باشد. بی‌صدا حذف‌کردنِ دادهٔ کاربر قابلِ قبول نیست.
+    /// </summary>
+    private static void Quarantine(string path)
+    {
+        try
+        {
+            if (!File.Exists(path)) return;
+            File.Copy(path, path + ".bad", true);
+            TunManager.Log($"Storage: '{Path.GetFileName(path)}' was unreadable; kept a copy as '.bad'.");
+        }
+        catch { }
+    }
 }

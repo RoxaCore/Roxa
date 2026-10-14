@@ -479,6 +479,8 @@
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>اتصال به {0} {1} ...</value></data>
   <data name="Eng_DigestMismatch" xml:space="preserve"><value>Digest دانلود Roxa نادرست است: انتظار {0}، دریافت {1}.</value></data>
   <data name="Eng_Downloading" xml:space="preserve"><value>دانلود Roxa ...</value></data>
+  <data name="Eng_DirNotWritable" xml:space="preserve"><value>پوشهٔ برنامه قابلِ نوشتن نیست (احتمالاً در Program Files نصب شده). برنامه را دوباره بدونِ «Run as administrator» نصب کنید.</value></data>
+  <data name="Msg_InstanceBlocked" xml:space="preserve"><value>یک نسخهٔ دیگر از Roxa از قبل در حال اجراست و نتوانستیم پنجرهٔ آن را باز کنیم. اگر آیکونی در سینیِ سیستم نمی‌بینید، Roxa را از Task Manager ببندید و دوباره اجرا کنید.</value></data>
   <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>موتور Roxa به‌صورت غیرمنتظره خارج شد.</value></data>
   <data name="Eng_IntegrityFailed" xml:space="preserve"><value>بررسی سالم‌بودن موتور Roxa ناموفق بود.</value></data>
   <data name="Eng_IntegrityRetry" xml:space="preserve"><value>بررسی سالم‌بودن موتور ناموفق بود — دانلود مجدد ...</value></data>

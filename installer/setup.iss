@@ -1,5 +1,5 @@
 ﻿#define MyAppName "Roxa"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "3.0.7"
 #define MyAppExeName "Roxa.exe"
 #define DotNetUrl "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.31/windowsdesktop-runtime-8.0.31-win-x64.exe"
 #define DotNetSha256 "c375dfd80a967405cfeff634912c1fccc56261ce3d9209ea473f60a21184d1cc"
@@ -9,7 +9,12 @@ AppId={{8F2C6A19-4B7E-4D0B-9C3A-5E1D2F8B7A64}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppName}
-DefaultDirName={autopf}\{#MyAppName}
+; همیشه در پوشهٔ کاربر نصب می‌شود، نه Program Files. نصاب با PrivilegesRequired=lowest
+; اجرا می‌شود، پس {autopf} فقط وقتی به Program Files می‌رفت که کاربر عمداً نصاب را
+; «Run as administrator» می‌زد — و آن موقع خودِ برنامه (asInvoker) در پوشهٔ خودش حقِ
+; نوشتن نداشت: لاگ گم می‌شد، دانلودِ موتور و وینتین شکست می‌خورد و آپدیت اعمال
+; می‌شد ولی برنامه دیگر برنمی‌گشت. {localappdata}\Programs همیشه قابلِ نوشتن است.
+DefaultDirName={localappdata}\Programs\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest

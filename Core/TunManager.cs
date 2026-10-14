@@ -869,6 +869,33 @@ public static class TunManager
         return set;
     }
 
+    /// <summary>
+    /// گیت‌ویِ مسیرِ /32 که الان برایِ این IP رویِ سیستم هست؛ null یعنی مسیری نیست.
+    ///
+    /// برایِ حفظِ مسیرِ ازپیش‌موجودِ خودِ کاربر لازم است. مسیرِ /32ِ مقصد یکتاست،
+    /// پس برایِ گذاشتنِ مسیرِ خودمان بایدِ قبلی را حذف کنیم — و اگر ندانیم چیزی
+    /// آنجا بوده، آن را هرگز برنمی‌گردانیم.
+    /// </summary>
+    public static string? GetHostRouteVia(string ip)
+    {
+        try
+        {
+            if (!System.Net.IPAddress.TryParse(ip, out _)) return null;
+            if (RunTool("route.exe", $"print -4 {ip}", out string output) != 0) return null;
+            foreach (var line in output.Split('\n'))
+            {
+                var parts = line.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 5) continue;
+                if (parts[0] != ip || parts[1] != "255.255.255.255") continue;
+                // ستونِ سوم گیت‌وی است. ممکن است "On-link" باشد که بازسازی‌اش با
+                // route.exe ممکن نیست؛ صریع همان را برمی‌گردانیم تا صاحبش تصمیم بگیرد.
+                return parts[2];
+            }
+        }
+        catch { }
+        return null;
+    }
+
     public static Task<List<string>> ResolveIpsAsync(IEnumerable<string>? hosts) => ResolveServerIpsAsync(hosts);
 
     public static int RunNetsh(string args) => RunTool("netsh.exe", args, out _);
@@ -954,18 +981,16 @@ public static class TunManager
     /// </summary>
     public static void FlushLog()
     {
+        string? chunk = null;
         try
         {
-            string chunk;
             lock (_logGate)
             {
                 if (_logBuf.Length == 0) return;
                 chunk = _logBuf.ToString();
-                _logBuf.Clear();
             }
 
-            Directory.CreateDirectory(_logDir);
-            string logFile = Path.Combine(_logDir, "tun.log");
+            string logFile = Path.Combine(ResolveLogDir(), "tun.log");
             try
             {
                 var fi = new FileInfo(logFile);
@@ -974,7 +999,63 @@ public static class TunManager
             }
             catch { }
             File.AppendAllText(logFile, chunk);
+
+            // فقط بعد از نوشتنِ واقعی از بافر بردار. کدِ قبلی اول بافر را خالی می‌کرد و
+            // بعد می‌نوشت؛ یک خطای دیسک در همان گذار، همان خطوط را برایِ همیشه می‌ساخت.
+            lock (_logGate)
+            {
+                bool stillThere = _logBuf.Length >= chunk.Length
+                    && string.CompareOrdinal(_logBuf.ToString(0, chunk.Length), chunk) == 0;
+                if (stillThere) _logBuf.Remove(0, chunk.Length);
+            }
         }
-        catch { }
+        catch
+        {
+            // نوشتن شکست (پوشهٔ غیرقابلِ نوشتن یا دیسکِ پر). با فلَشِ بعدی دوباره تلاش
+            // می‌شود؛ ولی اگر بی‌نهایت رشد کند برنامه را خفه می‌کند، پس سقف می‌گذاریم.
+            lock (_logGate)
+            {
+                if (_logBuf.Length > LogMaxBytes)
+                    _logBuf.Remove(0, _logBuf.Length - LogFlushThreshold);
+            }
+        }
     }
+
+    // نصبِ برنامه در Program Files فقط با ارتقا ممکن است، ولی خودِ برنامه asInvoker
+    // اجرا می‌شود و در پوشهٔ خودش حقِ نوشتن ندارد. بدونِ این مسیرِ جایگزین، کلِ لاگ
+    // بی‌صدا گم می‌شد — و بعد هیچ‌کس نمی‌توانست اشکالِ گزارش‌شده را بررسی کند، چون
+    // همان لاگ تنها سندِ موجود بود.
+    private static string? _logDirResolved;
+
+    private static string FallbackLogDir =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Roxa", "logs");
+
+    /// <summary>
+    /// اولین مسیری که واقعاً قابلِ نوشتن باشد را انتخاب و برایِ همین اجرا نگه می‌داریم؛
+    /// اسکنِ مجدد در هر فلَشِ لاگ هزینهٔ بیهوده است.
+    /// </summary>
+    private static string ResolveLogDir()
+    {
+        if (_logDirResolved != null) return _logDirResolved;
+        foreach (var dir in new[] { _logDir, FallbackLogDir })
+        {
+            try
+            {
+                Directory.CreateDirectory(dir);
+                string probe = Path.Combine(dir, ".write-probe");
+                File.WriteAllText(probe, "ok");
+                File.Delete(probe);
+                _logDirResolved = dir;
+                if (!string.Equals(dir, _logDir, StringComparison.OrdinalIgnoreCase))
+                    Log($"install directory is not writable; logs go to {dir}");
+                return dir;
+            }
+            catch { }
+        }
+        _logDirResolved = FallbackLogDir;
+        return _logDirResolved;
+    }
+
+    /// <summary>مسیرِ واقعاً قابلِ نوشتن برایِ لاگ‌ها؛ لاگِ موتور هم همین‌جا می‌نویسد.</summary>
+    public static string LogDirectory => ResolveLogDir();
 }

@@ -34,7 +34,7 @@
   <data name="Tab_Servers" xml:space="preserve"><value>서버</value></data>
   <data name="Tab_Subscription" xml:space="preserve"><value>구독</value></data>
   <data name="Tab_Log" xml:space="preserve"><value>로그</value></data>
-  <data name="Tab_Settings" xml:space="preserve"><value>⚙ 설정</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>설정</value></data>
   <data name="Btn_Connect" xml:space="preserve"><value>▶ 연결</value></data>
   <data name="Btn_Disconnect" xml:space="preserve"><value>연결 해제</value></data>
   <data name="Btn_Reconnect" xml:space="preserve"><value>다시 연결</value></data>
@@ -224,6 +224,7 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>{0}시간 남음</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 수동</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>서버 선택 안 됨</value></data>
+  <data name="Set_Version" xml:space="preserve"><value>버전</value></data>
   <data name="Set_Reports" xml:space="preserve">
     <value>버그 및 문제 신고</value>
   </data>

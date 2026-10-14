@@ -35,7 +35,7 @@
   <data name="Tab_Servers" xml:space="preserve"><value>服务器</value></data>
   <data name="Tab_Subscription" xml:space="preserve"><value>订阅</value></data>
   <data name="Tab_Log" xml:space="preserve"><value>日志</value></data>
-  <data name="Tab_Settings" xml:space="preserve"><value>⚙ 设置</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>设置</value></data>
   <!-- Buttons -->
   <data name="Btn_Connect" xml:space="preserve"><value>▶ 连接</value></data>
   <data name="Btn_Disconnect" xml:space="preserve"><value>断开</value></data>
@@ -240,6 +240,7 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>剩余 {0} 小时</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 手动</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>未选择服务器</value></data>
+  <data name="Set_Version" xml:space="preserve"><value>版本</value></data>
   <data name="Set_Reports" xml:space="preserve">
     <value>漏洞与问题报告</value>
   </data>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -9,20 +9,33 @@
     <Product>Roxa</Product>
     <AssemblyTitle>Roxa</AssemblyTitle>
     <Company>Roxa</Company>
-    <Version>3.0.7</Version>
+    <Version>3.0.8</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\roxa-icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Models\" />
-    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Assets\**" Exclude="Assets\Fonts\OFL-*.txt" />
     <None Update="Assets\roxa-icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <ItemGroup>
+    <!--
+     These two must be real files inside the installer, not embedded in the
+     assembly. MPL-2.0 section 3.2(b) requires telling recipients where the
+     Xray-core source lives, and SIL OFL-1.1 condition 2 requires the licence
+     text to accompany every copy of the fonts. A user cannot read either one
+     out of a compiled assembly.
+    -->
+    <Content Include="THIRD-PARTY-NOTICES.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\OFL-*.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="engine\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

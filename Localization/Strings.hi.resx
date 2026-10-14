@@ -34,7 +34,7 @@
   <data name="Tab_Servers" xml:space="preserve"><value>सर्वर</value></data>
   <data name="Tab_Subscription" xml:space="preserve"><value>सब्सक्रिप्शन</value></data>
   <data name="Tab_Log" xml:space="preserve"><value>लॉग</value></data>
-  <data name="Tab_Settings" xml:space="preserve"><value>⚙ सेटिंग्स</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>सेटिंग्स</value></data>
   <data name="Btn_Connect" xml:space="preserve"><value>▶ कनेक्ट</value></data>
   <data name="Btn_Disconnect" xml:space="preserve"><value>डिस्कनेक्ट</value></data>
   <data name="Btn_Reconnect" xml:space="preserve"><value>पुनः कनेक्ट करें</value></data>
@@ -224,6 +224,7 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>{0} घंटे शेष</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 मैनुअल</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>कोई सर्वर चयनित नहीं</value></data>
+  <data name="Set_Version" xml:space="preserve"><value>संस्करण</value></data>
   <data name="Set_Reports" xml:space="preserve">
     <value>बग और समस्या रिपोर्ट</value>
   </data>

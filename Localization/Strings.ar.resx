@@ -35,7 +35,7 @@
   <data name="Tab_Servers" xml:space="preserve"><value>الخوادم</value></data>
   <data name="Tab_Subscription" xml:space="preserve"><value>الاشتراكات</value></data>
   <data name="Tab_Log" xml:space="preserve"><value>السجل</value></data>
-  <data name="Tab_Settings" xml:space="preserve"><value>⚙ الإعدادات</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>الإعدادات</value></data>
   <!-- Buttons -->
   <data name="Btn_Connect" xml:space="preserve"><value>▶ اتصال</value></data>
   <data name="Btn_Disconnect" xml:space="preserve"><value>قطع الاتصال</value></data>
@@ -240,6 +240,7 @@
   <data name="Expire_HoursLeft" xml:space="preserve"><value>متبقي {0} ساعة</value></data>
   <data name="Group_Manual" xml:space="preserve"><value>📝 يدوي</value></data>
   <data name="Home_NoServer" xml:space="preserve"><value>لم يتم اختيار خادم</value></data>
+  <data name="Set_Version" xml:space="preserve"><value>الإصدار</value></data>
   <data name="Set_Reports" xml:space="preserve">
     <value>تقرير الأخطاء والمشاكل</value>
   </data>

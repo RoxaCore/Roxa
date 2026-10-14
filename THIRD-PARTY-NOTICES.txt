@@ -1,0 +1,239 @@
+Roxa - Third-Party Notices
+================================================================
+
+Roxa bundles or downloads the third-party software listed below.
+Each item identifies the component, its version, its license, and
+where its source code can be obtained.
+
+This file is shipped inside the installer as THIRD-PARTY-NOTICES.txt,
+next to Roxa.exe.
+
+
+1. Xray-core
+================================================================
+
+  Version   26.3.27 (commit d2758a0, built with go1.26.1, windows/amd64)
+  File      engine\xray.exe
+  License   Mozilla Public License, Version 2.0 (MPL-2.0)
+  Copyright Copyright (c) XTLS and Xray-core contributors
+  Source    https://github.com/XTLS/Xray-core
+  License   Full license text at engine\LICENSE in this distribution
+
+  The bundled xray.exe is the unmodified upstream binary. Roxa does
+  not alter Xray-core and does not recompile it.
+
+  Pursuant to MPL-2.0 section 3.2(b), this notice informs recipients
+  that the Source of this Covered Work is available at the URL above.
+  Roxa itself is not derived from Xray-core and is not licensed
+  under the MPL; it only launches xray.exe as a separate process.
+
+  When Roxa downloads a newer Xray-core release, it verifies the
+  SHA-256 digest published by upstream before extracting it.
+
+
+2. Wintun
+================================================================
+
+  Version   0.14.1
+  File      engine\wintun.dll
+  License   Wintun Prebuilt Binaries License
+  Copyright Copyright (c) WireGuard LLC
+  Source    https://www.wintun.net
+  License   Full license text at engine\LICENSE-wintun.txt
+
+  Wintun is the virtual network adapter driver used by TUN mode.
+  Roxa also verifies the SHA-256 of the official wintun-0.14.1.zip
+  against a value pinned in the source before installing it.
+
+  Wintun is a trademark of WireGuard LLC.
+
+
+3. .NET Desktop Runtime
+================================================================
+
+  Version   8.0.31 (win-x64)
+  License   MIT License
+  Copyright (c) .NET Foundation and contributors
+  Source    https://github.com/dotnet/runtime
+  Download  https://dotnet.microsoft.com/download/dotnet/8.0
+
+  Roxa is framework-dependent and does not bundle the runtime. If it
+  is missing, the installer downloads the official Microsoft package
+  and verifies its SHA-256 (pinned in installer\setup.iss) before
+  running it. The runtime is installed system-wide by Microsoft's
+  own installer under its own license terms.
+
+
+4. NuGet packages
+================================================================
+
+  Every managed dependency of Roxa is MIT licensed. The MIT license
+  requires the copyright notice and the permission notice to be
+  included in all copies or substantial portions of the software, so
+  both are reproduced below, once per copyright holder.
+
+  4.1 Avalonia
+
+    Avalonia                  12.1.2
+    Avalonia.Desktop          12.1.2
+    Avalonia.Themes.Fluent    12.1.2
+    Avalonia.Fonts.Inter      12.1.2
+    Avalonia.Controls.DataGrid 12.1.2
+
+    Copyright (c) 2013-2026 The AvaloniaUI Project
+    Source: https://avaloniaui.net
+
+    MIT LICENSE
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+
+  4.2 CommunityToolkit.Mvvm 8.4.2
+
+    Copyright (c) .NET Foundation and Contributors. All rights
+    reserved.
+    Source: https://github.com/CommunityToolkit/dotnet
+
+    MIT LICENSE
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+
+  4.3 QRCoder 1.6.0
+
+    Copyright (c) Raffael Herrmann
+    Source: https://github.com/codebude/QRCoder
+
+    MIT LICENSE
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+
+  4.4 System.Security.Cryptography.ProtectedData 8.0.0
+      System.IO.FileSystem.AccessControl 5.0.0
+
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Source: https://github.com/dotnet/runtime
+
+    MIT LICENSE
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+
+  Not shipped in the installer, referenced only while building:
+
+    AvaloniaUI.DiagnosticsSupport 2.2.3
+      Excluded from Release builds by the project file
+      (IncludeAssets=None / PrivateAssets=All when Configuration
+      is not Debug).
+
+
+5. Fonts
+================================================================
+
+  Both fonts used by Roxa are licensed under the SIL Open Font License,
+  Version 1.1. OFL condition 2 requires that every copy of the Font
+  Software carry the copyright notice and the license text. Those are
+  shipped with the fonts at:
+
+    Assets\Fonts\OFL-Vazirmatn.txt
+    Assets\Fonts\OFL-Inter.txt
+
+  Vazirmatn
+    Files     Assets\Fonts\Vazirmatn-{Regular,Medium,SemiBold,Bold}.ttf
+              server\fonts\*.woff2 (website panel only)
+    License   SIL Open Font License 1.1
+    Copyright Copyright (c) 2015 The Vazirmatn Project Authors
+    Source    https://github.com/rastikerdar/vazirmatn
+    Used for  Persian, Arabic, Urdu and Hindi script rendering
+
+  Inter
+    License   SIL Open Font License 1.1
+    Copyright Copyright (c) 2016 The Inter Project Authors
+    Source    https://github.com/rsms/inter
+    Used for  Latin script rendering
+
+    Inter is not stored as a file in this repository; it is embedded into
+    the compiled application by the Avalonia.Fonts.Inter package. The
+    package code is MIT, but the font itself remains OFL-1.1, and because
+    the font is redistributed inside Roxa.exe the OFL notice is included
+    above.
+
+  Neither font is modified, so no Reserved Font Name restriction is
+  triggered.
+
+
+================================================================
+Questions about licensing: see README.md, section "License".

@@ -25,10 +25,10 @@ writes the sites you visit to disk. Test configurations use `loglevel: none`.
 
 | Destination | Sent | Received | When |
 |---|---|---|---|
-| `up.roxacore.com/api/check.php` | App version, interface language, country code, install identifier | Available update, announcements | On start, then every 12 hours |
-| `up.roxacore.com/api/announcements.php` | Last-seen announcement id, language, country code | Announcements | On start |
+| `up.roxacore.com/api/check.php` | App version, interface language, country code, **install identifier**, and (only if *Send usage statistics* is on) the number of connections you have made | Available update, announcements | On start, then **every 60 minutes** |
+| `up.roxacore.com/api/announcements.php` | Last-seen announcement id, language, country code | Announcements | On start, then every 60 minutes |
 | `up.roxacore.com/api/report.php` | Crash report: exception, up to 4 000 characters of log tail, install identifier | — | **Only if you turn on "Send crash reports"** |
-| `get.geojs.io`, `ipwho.is` | Your IP address (implicitly) | Country code | Used to target announcements to a country |
+| `get.geojs.io`, `ipwho.is` | Your IP address (implicitly — you cannot ask for a country without revealing it) | Country code | On every check **while you are not connected**. The result is cached in `settings.json` and is not requested again while the tunnel is up |
 | `api.github.com/repos/XTLS/Xray-core/releases/latest` | — | Xray-core release metadata | When checking for an engine update |
 | `gh-proxy.com` | — | Xray-core binary | When downloading an engine update |
 | `www.wintun.net` | — | Wintun driver archive | First time TUN mode is used |
@@ -43,10 +43,16 @@ you ask for them, or automatically if you enable *Auto-update subscriptions*.
 ## The install identifier
 
 A random GUID is generated on first run and stored in `settings.json`. It is
-sent with the version check and, if you enable crash reporting, with crash
-reports. It contains no personal information and cannot be traced to you by
-itself. You can remove it by deleting the `ClientId` entry from
-`settings.json` while Roxa is closed; a new one is generated on the next start.
+**not tied to crash reporting** — it is sent with every version check, which
+happens on start and then every 60 minutes, and additionally with crash
+reports if you have enabled those. The server therefore knows how many
+installs are checking in and how often, but nothing else about you.
+
+It contains no personal information and cannot be traced to you by itself.
+You can remove it by deleting the `ClientId` entry from `settings.json` while
+Roxa is closed; a new one is generated on the next start. Note that the old
+one has already been seen by the server, so this prevents future correlation
+rather than erasing past ones.
 
 ## Crash reporting is opt-in
 

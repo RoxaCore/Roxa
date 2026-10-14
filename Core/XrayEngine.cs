@@ -417,20 +417,25 @@ public sealed class XrayEngine : IDisposable
             if (useTun && XrayConfigBuilder.LastDnsStub)
             {
                 Stage("Stg_Dns");
-                // اجرای powershell (Set-DnsClientServerAddress) چند ثانیه طول می‌کشد؛ در پس‌زمینه.
-                var (dnsApplied, dnsPrev) = await Task.Factory.StartNew(() =>
-                {
-                    bool ok = TunDns.TryApply(out var prev);
-                    return (ok, prev);
-                }, TaskCreationOptions.LongRunning);
-                if (dnsApplied)
+                // ترتیب مهم است: اول عکسِ DNS فعلی گرفته و در TunState ثبت می‌شود،
+                // بعد سیستم عوض می‌شود. اگر برعکس باشد و برنامه در همین بازه بمیرد
+                // (کرش یا kill از Task Manager)، هیچ‌کس نمی‌ماند بداند DNS کاربر قبلاً
+                // چه بوده و جاروبِ بعدی تنظیمِ استاتیکِ دستیِ او را بی‌صدا به DHCP
+                // تبدیل می‌کرد؛ یعنی تنظیمی که خودش دستی وارد کرده برای همیشه گم می‌شد.
+                var snap = await Task.Run(TunDns.PrepareApply);
+                if (snap != null)
                 {
                     UpdateState(process, st =>
                     {
                         st.DnsApplied = true;
-                        st.DnsPrev = dnsPrev;
+                        st.DnsPrev = snap;
                     });
-                    Log("DNS -> 127.0.0.1 (local stub)");
+                    // اعمال خودش هم ممکن است چند ثانیه طول بکشد (fallback به powershell).
+                    bool applied = await Task.Run(() => TunDns.TryApply(snap));
+                    if (applied)
+                        Log("DNS -> 127.0.0.1 (local stub)");
+                    else
+                        UpdateState(process, st => { st.DnsApplied = false; st.DnsPrev = null; });
                 }
             }
 
@@ -457,8 +462,11 @@ public sealed class XrayEngine : IDisposable
                     _prevProxyOverride = prevOverride;
                     _proxyValue = proxyValue;
                 }
-                SystemProxy.Set(proxyValue);
-                _proxyActive = true;
+                // اول ثبت، بعد تغییرِ سیستم. RestoreProxyIfOurs مقدارِ فعلیِ رجیستری را
+                // با ProxySet می‌سنجد، پس این ثبتِ زودهنگام اگر هنوز چیزی عوض نشده
+                // باشد بی‌اثر است؛ ولی اگر برعکس باشد و برنامه بینِ تغییر و ثبت بمیرد،
+                // پروکسیِ قبلیِ کاربر (مثلاً پروکسیِ سازمانی‌اش) برای همیشه گم می‌شد و
+                // فقط ProxyEnable صفر می‌شد.
                 UpdateState(process, st =>
                 {
                     st.ProxySet = proxyValue;
@@ -466,6 +474,8 @@ public sealed class XrayEngine : IDisposable
                     st.ProxyPrevServer = prevServer;
                     st.ProxyPrevOverride = prevOverride;
                 });
+                SystemProxy.Set(proxyValue);
+                _proxyActive = true;
             }
 
             var routeSnapshot = TunManager.SnapshotRoutes();

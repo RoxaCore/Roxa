@@ -144,6 +144,16 @@ public static class TunManager
     private static readonly string _wintunPath = Path.Combine(_wintunDirectory, "wintun.dll");
     private static readonly string _logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
 
+    // وینتین از نسخهٔ ۰٫۱۴٫۱ فقط یک بستهٔ واحد منتشر می‌کند که شاملِ DLL هر چهار
+    // معماری (amd64/x86/arm64/arm) است. آدرس‌هایِ قدیمیِ جداگانه مثلِ
+    // wintun-amd64-0.14.1.zip از سایت حذف شده‌اند و هر دو ۴۰۴ می‌دهند؛ کدِ قبلی همان
+    // آدرسِ مرده را می‌گرفت و هشِ یک فایلِ واحد را رویِ بستهٔ معماریِ خاص می‌سنجید،
+    // پس همیشه شکست می‌خورد و حالتِ TUN بی‌صدا به پروکسی برمی‌گشت.
+    private const string WintunUrl = "https://www.wintun.net/builds/wintun-0.14.1.zip";
+
+    // هشِ منتشرشده در سایتِ رسمی برایِ همان یک فایل؛ برایِ هر دو معماری درست است.
+    private const string WintunSha256 = "07c256185d6ee3652e09fa55c0b673e2624b565e02c4b9091c79ca7d2f24ef51";
+
     public static string WintunDirectory => _wintunDirectory;
     public static string WintunPath => _wintunPath;
     public static string AdapterName => TunAdapterName;
@@ -166,18 +176,15 @@ public static class TunManager
         try
         {
             Directory.CreateDirectory(WintunDirectory);
-            string arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "amd64";
-            string url = $"https://www.wintun.net/builds/wintun-{arch}-0.14.1.zip";
-            const string expectedSha256 = "07c256185d6ee3652e09fa55c0b673e2624b565e02c4b9091c79ca7d2f24ef51";
             string zipPath = Path.Combine(WintunDirectory, "wintun.zip");
 
             using var http = new HttpClient();
-            var data = await http.GetByteArrayAsync(url);
+            var data = await http.GetByteArrayAsync(WintunUrl);
 
             string actual = BitConverter.ToString(System.Security.Cryptography.SHA256.HashData(data)).Replace("-", "").ToLowerInvariant();
-            if (!string.Equals(actual, expectedSha256, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(actual, WintunSha256, StringComparison.OrdinalIgnoreCase))
             {
-                Log($"wintun hash mismatch: expected {expectedSha256}, got {actual}");
+                Log($"wintun hash mismatch: expected {WintunSha256}, got {actual}");
                 log?.Invoke(TranslationManager.Get("Tun_HashBad"));
                 return false;
             }
@@ -185,16 +192,16 @@ public static class TunManager
             await File.WriteAllBytesAsync(zipPath, data);
 
             System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, WintunDirectory, true);
-            File.Delete(zipPath);
+            try { File.Delete(zipPath); } catch { }
 
-            if (!File.Exists(_wintunPath))
+            // بستهٔ واحد شاملِ هر چهار معماری است؛ باید معماریِ همین سیستم را انتخاب کنیم.
+            if (!File.Exists(_wintunPath) && !PickWintunDllForThisArch())
             {
-                var extracted = Directory.GetFiles(WintunDirectory, "wintun*.dll")
-                    .FirstOrDefault(f => !Path.GetFileName(f).Equals("wintun.dll", StringComparison.OrdinalIgnoreCase));
-                if (extracted != null)
-                    File.Move(extracted, _wintunPath, true);
+                Log($"wintun archive contained no DLL for {RuntimeInformation.OSArchitecture}.");
+                return false;
             }
 
+            CleanupExtractedWintunTree();
             Log("wintun driver downloaded successfully.");
             log?.Invoke(TranslationManager.Get("Tun_DriverDownloaded"));
             return true;
@@ -205,6 +212,57 @@ public static class TunManager
             log?.Invoke(string.Format(TranslationManager.Get("Tun_DownloadError"), ex.Message));
             return false;
         }
+    }
+
+    /// <summary>
+    /// از بینِ همهٔ wintun.dll هایِ استخراج‌شده، نسخهٔ معماریِ همین سیستم را به
+    /// engine\wintun.dll منتقل می‌کند. به ساختارِ دقیقِ بسته وابسته نیست: دنبالِ
+    /// نامِ فایل و نامِ پوشهٔ معماری می‌گردد، پس هم برایِ بستهٔ امروز درست است
+    /// و هم اگر ساختارِ داخلی عوض شد از کار نمی‌افتد.
+    /// </summary>
+    private static bool PickWintunDllForThisArch()
+    {
+        try
+        {
+            string fullTarget = Path.GetFullPath(_wintunPath);
+            var dlls = Directory.GetFiles(WintunDirectory, "wintun.dll", SearchOption.AllDirectories)
+                .Where(f => !string.Equals(Path.GetFullPath(f), fullTarget, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            if (dlls.Length == 0) return false;
+
+            string want = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "amd64";
+            string sep = Path.DirectorySeparatorChar.ToString();
+            string? chosen =
+                dlls.FirstOrDefault(f => f.Contains($"{sep}{want}{sep}", StringComparison.OrdinalIgnoreCase))
+                ?? dlls.FirstOrDefault(f => f.Contains(want, StringComparison.OrdinalIgnoreCase))
+                ?? (dlls.Length == 1 ? dlls[0] : null);
+            if (chosen == null) return false;
+
+            File.Copy(chosen, _wintunPath, true);
+            Log($"wintun.dll picked for {RuntimeInformation.OSArchitecture}: {Path.GetRelativePath(WintunDirectory, chosen)}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Log($"wintun dll pick failed: {ex.Message}");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// فایلِ نهایی جا‌به‌جا شد؛ درختِ استخراج‌شده (bin\amd64\… و wintun.h) دیگر لازم
+    /// نیست. فقط چیزی را حذف می‌کنیم که همین الان خودِ بسته ساخته است.
+    /// </summary>
+    private static void CleanupExtractedWintunTree()
+    {
+        try
+        {
+            string bin = Path.Combine(WintunDirectory, "bin");
+            if (Directory.Exists(bin)) Directory.Delete(bin, true);
+            foreach (var header in Directory.GetFiles(WintunDirectory, "wintun.h"))
+                File.Delete(header);
+        }
+        catch { /* بهترین تلاش؛ فایلِ زائد فقط شلوغ است و آسیبی نمی‌زند */ }
     }
 
     public static async Task<bool> AddCaptureRoutesAsync(IEnumerable<string>? hosts, Action<string>? log = null)

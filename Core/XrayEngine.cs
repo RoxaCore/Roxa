@@ -43,6 +43,23 @@ public sealed class XrayEngine : IDisposable
 
     public static string EnginePath => Path.Combine(EngineDir, EngineBinary);
 
+    /// <summary>
+    /// آیا این پوشه واقعاً قابلِ نوشتن است؟ فقط وجودِ پوشه کافی نیست: در Program Files
+    /// پوشه هست ولی کاربرِ غیر-ارتقاشده حقِ نوشتن ندارد.
+    /// </summary>
+    private static bool IsDirWritable(string dir)
+    {
+        try
+        {
+            Directory.CreateDirectory(dir);
+            string probe = Path.Combine(dir, ".write-probe");
+            File.WriteAllText(probe, "ok");
+            File.Delete(probe);
+            return true;
+        }
+        catch { return false; }
+    }
+
     public bool IsRunning
     {
         get { lock (_lock) return _process is { HasExited: false }; }
@@ -171,33 +188,68 @@ public sealed class XrayEngine : IDisposable
     /// </summary>
     public static void FlushEngineLog()
     {
+        string? chunk = null;
         try
         {
-            string chunk;
             lock (_engineLogGate)
             {
                 if (_engineLogBuf.Length == 0) return;
                 chunk = _engineLogBuf.ToString();
-                _engineLogBuf.Clear();
             }
 
-            string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
-            Directory.CreateDirectory(dir);
+            // مسیرِ لاگِ تونل را تکرار نمی‌کنیم: همان ResolveLogDir می‌داند پوشهٔ
+            // برنامه قابلِ نوشتن هست یا نه (نصبِ در Program Files).
+            string dir = TunManager.LogDirectory;
             string file = Path.Combine(dir, "engine.log");
             try
             {
                 var fi = new FileInfo(file);
-                if (fi.Exists && fi.Length + chunk.Length > EngineLogMaxBytes) File.WriteAllText(file, "");
+                // جایگزینی با .old به‌جایِ صفرکردنِ کامل: پاک‌کردنِ فایل یعنی از بین
+                // رفتنِ تمامِ تاریخچه، و تاریخچه دقیقاً همان چیزی است که وقتِ بررسیِ
+                // یک اشکالِ گزارش‌شده لازم است.
+                if (fi.Exists && fi.Length + chunk.Length > EngineLogMaxBytes)
+                    File.Move(file, file + ".old", true);
             }
             catch { }
             File.AppendAllText(file, chunk);
+
+            // فقط بعد از نوشتنِ واقعی از بافر بردار؛ وگرنه یک خطای دیسک همان خطوط
+            // را برایِ همیشه می‌ساخت.
+            lock (_engineLogGate)
+            {
+                bool stillThere = _engineLogBuf.Length >= chunk.Length
+                    && string.CompareOrdinal(_engineLogBuf.ToString(0, chunk.Length), chunk) == 0;
+                if (stillThere) _engineLogBuf.Remove(0, chunk.Length);
+            }
         }
-        catch { }
+        catch
+        {
+            // نوشتن شکست؛ با فلَشِ بعدی دوباره تلاش می‌شود، ولی سقفی هم هست تا
+            // برنامه با انباشته‌شدنِ بافر خفه نشود.
+            lock (_engineLogGate)
+            {
+                if (_engineLogBuf.Length > EngineLogMaxBytes)
+                    _engineLogBuf.Remove(0, _engineLogBuf.Length - EngineLogFlushThreshold);
+            }
+        }
     }
 
     public async Task EnsureEngineAsync(bool force = false, CancellationToken ct = default)
     {
         if (!force && File.Exists(EnginePath)) return;
+
+        // دانلودِ موتور داخلِ پوشهٔ برنامه می‌نشیند. اگر کاربر برنامه را در Program
+        // Files نصب کرده باشد (نصابِ اجراشده با «Run as administrator») و خودِ برنامه
+        // asInvoker باشد، اینجا نوشتن ممکن نیست. قبلاً همان UnauthorizedAccessException
+        // کلِ زنجیرهٔ اتصال را می‌شکست و کاربر فقط یک خطای مبهم می‌دید؛ حالا دلیل و
+        // راه‌حلش را هم می‌گوید.
+        if (!IsDirWritable(EngineDir))
+        {
+            string msg = TranslationManager.Get("Eng_DirNotWritable");
+            Log(msg);
+            throw new IOException(msg);
+        }
+
         Directory.CreateDirectory(EngineDir);
         Log(TranslationManager.Get("Eng_Downloading"));
         using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(180) };

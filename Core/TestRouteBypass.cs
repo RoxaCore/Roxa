@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace Roxa.Core;
 
 public sealed class TestRouteScope : IDisposable
@@ -32,12 +34,24 @@ public static class TestRouteBypass
     {
         public string Via = "";
         public int Refs;
+
+        // مسیرِ ازپیش‌موجودِ خودِ کاربر برایِ همین IP، اگر قبل از ما آنجا بوده.
+        //
+        // بدونِ این، delete در خطِ افزودن و باز هم delete در Release یعنی نابودیِ
+        // دائمیِ مسیری که هیچ‌کس نمی‌دانسته وجود داشته — کاربر ممکن است برایِ یک
+        // میزبانِ خاص مسیرِ ثابتِ دستی گذاشته باشد و ما بی‌خبر آن را پاک می‌کنیم.
+        // null یعنی چیزی نبوده، یا چیزی بوده که قابلِ بازسازی نیست (مثلاً On-link).
+        public string? OriginalVia;
     }
 
     private static readonly object _lock = new();
     private static readonly Dictionary<string, Held> _held = new(StringComparer.OrdinalIgnoreCase);
     private static string? _via;
     private static long _viaAt;
+
+    private static readonly string HeldFile = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Roxa", "test-routes.txt");
 
     public static bool TestsViaTun { get; set; }
 
@@ -92,11 +106,23 @@ public static class TestRouteBypass
                         }
                         else
                         {
+                            // قبل از دست‌زدن ببین خودِ کاربر مسیری برایِ این IP
+                            // دارد یا نه؛ اگر داشته باشد باید بعداً برگردانده شود.
+                            string? original = TunManager.GetHostRouteVia(ip);
+
                             TunManager.RunRoute($"delete {ip} mask 255.255.255.255");
                             if (TunManager.RunRoute($"add {ip} mask 255.255.255.255 {via}") == 0)
                             {
-                                _held[ip] = new Held { Via = via, Refs = 1 };
+                                _held[ip] = new Held { Via = via, Refs = 1, OriginalVia = original };
+                                SaveHeld();
                                 ours = true;
+                            }
+                            else if (original != null)
+                            {
+                                // مسیرِ کاربر را پاک کردیم ولی مسیرِ خودمان ساخته
+                                // نشد؛ بی‌صدا رهایش نکن.
+                                try { TunManager.RunRoute($"add {ip} mask 255.255.255.255 {original}"); } catch { }
+                                TunManager.Log($"host route restore failed for {ip} -> {original}");
                             }
                         }
                     }
@@ -116,9 +142,106 @@ public static class TestRouteBypass
             held.Refs--;
             if (held.Refs > 0) return;
             _held.Remove(ip);
+            SaveHeld();
             if (TunManager.CaptureHostRoutes().Contains(ip)) return;
             if (TunExclusion.IsPinned(ip)) return;
             try { TunManager.RunRoute($"delete {ip} mask 255.255.255.255"); } catch { }
+            RestoreOriginal(ip, held.OriginalVia);
+        }
+    }
+
+    /// <summary>
+    /// مسیرِ خودِ کاربر را برمی‌گرداند. فقط وقتی یک گیت‌ویِ واقعی داشته؛ On-link و
+    /// هر چیزِ دیگر قابلِ بازسازی با route.exe نیست و لاگ می‌شود تا حداقل معلوم باشد
+    /// چه چیزی از دست رفته.
+    /// </summary>
+    private static void RestoreOriginal(string ip, string? original)
+    {
+        if (original == null) return;
+        if (!IPAddress.TryParse(original, out _))
+        {
+            TunManager.Log($"pre-existing host route {ip} had non-restorable gateway '{original}'");
+            return;
+        }
+        try
+        {
+            if (TunManager.RunRoute($"add {ip} mask 255.255.255.255 {original}") == 0)
+                TunManager.Log($"restored pre-existing host route {ip} -> {original}");
+        }
+        catch { }
+    }
+
+    /// <summary>
+    /// بازنویسیِ فایلِ پشتیبان از رویِ وضعیتِ فعلی. باید داخلِ _lock صدا زده شود.
+    /// </summary>
+    private static void SaveHeld()
+    {
+        try
+        {
+            string? dir = Path.GetDirectoryName(HeldFile);
+            if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+            var lines = new List<string>(_held.Count);
+            foreach (var kv in _held)
+                lines.Add($"{kv.Key}\t{kv.Value.Via}\t{kv.Value.OriginalVia ?? ""}");
+            File.WriteAllLines(HeldFile, lines);
+        }
+        catch { /* اگر نوشتِ نشد، فقط شبکهٔ امنِ بعد از کرش را از دست می‌دهیم */ }
+    }
+
+    /// <summary>
+    /// مسیرهایِ /32 که از اجرایِ قبلی جا مانده‌اند را پاک می‌کند و مسیرِ خودِ کاربر
+    /// را برمی‌گرداند. هم در شروعِ برنامه و هم در <c>--cleanup</c> (هنگامِ حذف) صدا
+    /// زده می‌شود.
+    ///
+    /// دلیلش فقط کرش نیست: <see cref="TestRouteScope.Dispose"/> آزادسازی را در
+    /// پس‌زمینه می‌گذارد، پس اگر برنامه بلافاصله بعد از تست بسته شود، آن تَک هرگز
+    /// تمام نمی‌شود و مسیرها می‌مانند. اگر بعداً شبکه عوض شود، گیت‌ویِ مرده سرِ جایش
+    /// می‌ماند و IPِ سرور — دقیقاً چیزی که برایِ اتصالِ بعدی لازم است — غیرقابلِ
+    /// دسترس می‌شود.
+    /// </summary>
+    public static void ReleaseOrphanedHostRoutes()
+    {
+        string[] lines;
+        try
+        {
+            if (!File.Exists(HeldFile)) return;
+            lines = File.ReadAllLines(HeldFile);
+        }
+        catch { return; }
+
+        foreach (var line in lines)
+        {
+            try
+            {
+                var parts = line.Split('\t');
+                if (parts.Length == 0 || !IPAddress.TryParse(parts[0], out _)) continue;
+                string ip = parts[0];
+                string original = parts.Length > 2 ? parts[2] : "";
+
+                lock (_lock)
+                {
+                    if (_held.ContainsKey(ip)) continue;   // همین حالا زنده و نگه‌داشته شده
+                }
+
+                try { TunManager.RunRoute($"delete {ip} mask 255.255.255.255"); } catch { }
+                RestoreOriginal(ip, string.IsNullOrEmpty(original) ? null : original);
+            }
+            catch { }
+        }
+
+        // فقط وقتی فایل را پاک کن که چیزِ زنده‌ای نمانده. وگرنه رکوردِ مسیرهایِ
+        // همین حالا نگه‌داشته‌شده را هم می‌سوزانیم و اگر همان لحظه کرش کنیم، همان
+        // مسیرها بی‌صاحب می‌شوند.
+        lock (_lock)
+        {
+            if (_held.Count > 0)
+            {
+                SaveHeld();
+            }
+            else
+            {
+                try { File.Delete(HeldFile); } catch { }
+            }
         }
     }
 

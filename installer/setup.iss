@@ -31,7 +31,7 @@ UninstallDisplayName={#MyAppName}
 CloseApplications=yes
 
 [Tasks]
-Name: "desktopicon"; Description: "میانبر روی دسکتاپ"; GroupDescription: "میانبرها:"
+Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional tasks:"
 
 [Files]
 Source: "publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -41,20 +41,132 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "اجرای {#MyAppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent
 
 ; حذفِ برنامه نباید سیستمِ کاربر را ول کند. اگر کاربر قبلِ حذف کرش کرده یا اتصال
 ; باز مانده باشد، DNS روی 127.0.0.1 و پروکسیِ loopback و مسیرهای یتیم و قواعدِ
 ; فایروالِ RoxaTunExcl_* می‌مانند و بعد از رفتنِ برنامه دیگر هیچ‌کس پاکشان نمی‌کند.
 ; waituntilterminated لازم است تا پاکسازی پیش از حذفِ فایل‌ها تمام شود.
+; waituntilterminated پیش‌فرض است ولی صریح نوشته شده. املای skipifdoesntexist
+; دقیقاً همانِ نامِ flag در Inno Setup است؛ با «doesnot» ناشناخته است و کلِ کامپایل
+; نصب‌کننده را با خطای «Flags includes an unknown flag» می‌اندازد. بدونِ این flag،
+; اگر هنگام حذف Roxa.exe از قبل رفته باشد، ویندوز هشدار «some elements could
+; not be removed» نشان می‌دهد.
 [UninstallRun]
-Filename: "{app}\{#MyAppExeName}"; Parameters: "--cleanup"; RunOnceID: "RoxaCleanup"; Flags: runhidden waituntilterminated skipifdoesnotexist
+Filename: "{app}\{#MyAppExeName}"; Parameters: "--cleanup"; RunOnceID: "RoxaCleanup"; Flags: runhidden waituntilterminated skipifdoesntexist
 
 [UninstallDelete]
 ; لاگ‌ها و حالتِ تونل جزوِ خروجیِ برنامه‌اند و بعد از حذف بی‌ارزش‌اند.
 Type: filesandordirs; Name: "{app}\logs"
 
 [Code]
+// ---------------------------------------------------------------------------
+// گیتِ نسخهٔ ویندوز — باید نخستین چیزی باشد که اجرا می‌شود.
+//
+// برنامه به .NET Desktop Runtime 8 نیاز دارد و کفِ پشتیبانیِ رسمیِ آن ویندوز ۱۰
+// نسخهٔ ۱۶۰۷ (build 14393) است. روی ویندوز ۷/۸/۸٫۱ همان نصب‌کنندهٔ رانتایم هم
+// اصلاً نصب نمی‌شود، پس رفتارِ قبلی یعنی دانلودِ چند مگابایت و بعد خطای
+// «نصب رانتایم کامل نشد، دوباره تلاش کنید» — پیامی کاملاً بی‌ربط و گمراه‌کننده
+// بود. جلوی این می‌گیریم.
+//
+// نکته‌ها:
+//  - ویندوز ۱۱ همچنان Major=10 و Build>=22000 را گزارش می‌دهد، پس همان شرط
+//    آن را هم درست می‌پذیرد.
+//  - GetWindowsVersionEx یک procedure است و همیشه رکورد را پر می‌کند؛ در
+//    Pascal Scriptِ Inno تابعِ بولی نیست.
+//  - Windows Server 2012 R2 (build 9600) با این گیت رد می‌شود هرچند .NET 8
+//    فنیاً آن را می‌پذیرد — این برنامه یک کلاینتِ دسکتاپ است. سرورهای جدیدتر
+//    (۲۰۱۶ و بالاتر، build>=14393) همچنان پذیرفته می‌شوند.
+//  - کامنت در [Code] باید از نوعِ Pascal باشد: // یا { } یا ( * * ).
+//    کاراکترِ نقطه‌ویرگول فقط در بخش‌های دیگرِ اسکریپت کامنت است و اینجا آن را
+//    به‌عنوانِ کد پارس می‌کند و کلِ کامپایل با «'BEGIN' expected» می‌شکند.
+// ---------------------------------------------------------------------------
+const
+  MinWindowsMajor = 10;
+  MinWindowsBuild = 14393;
+
+function IsSupportedWindows: Boolean;
+var
+  V: TWindowsVersion;
+begin
+  Result := False;
+  GetWindowsVersionEx(V);
+
+  if V.Major > MinWindowsMajor then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  Result := (V.Major = MinWindowsMajor) and (V.Build >= MinWindowsBuild);
+end;
+
+// ---------------------------------------------------------------------------
+// Windows Server Core را کنار می‌گذاریم.
+//
+// خودِ .NET 8 Server Core را در ماتریسِ پشتیبانی دارد، پس نصبِ رانتایم شکست
+// نمی‌خورد — ولی برنامه عملاً غیرقابلِ استفاده می‌شود: نشستِ دسکتاپی وجود
+// ندارد که پنجره یا tray icon در آن نمایش داده شود. بدونِ این بررسی، کاربرِ
+// Server Core چند ده مگابایت دانلود می‌کند و بعد یک خطای گمراه‌کننده دربارهٔ
+// رانتایم می‌گیرد، در حالی که مشکل اصلاً رانتایم نیست.
+//
+// explorer.exe نشانهٔ قابلِ اتکاست: Server Core آن را نصب نمی‌کند، و رویِ
+// ویندوزِ دسکتاپِ سالم همیشه هست. ProductType هم از همان رکوردِ
+// GetWindowsVersionEx می‌آید (VER_NT_WORKSTATION یعنی نسخهٔ دسکتاپ).
+// ---------------------------------------------------------------------------
+function IsServerEdition: Boolean;
+var
+  V: TWindowsVersion;
+begin
+  GetWindowsVersionEx(V);
+  // صفر یعنی نتوانسته تشخیص دهد؛ در آن حالت چیزی را رد نکن.
+  Result := (V.ProductType <> 0) and (V.ProductType <> VER_NT_WORKSTATION);
+end;
+
+function HasDesktopShell: Boolean;
+begin
+  Result := FileExists(ExpandConstant('{win}\explorer.exe'));
+end;
+
+function InitializeSetup: Boolean;
+var
+  V: TWindowsVersion;
+  Found: String;
+begin
+  Result := True;
+
+  if not IsSupportedWindows then
+  begin
+    Result := False;
+    GetWindowsVersionEx(V);
+    Found := Format('%d.%d (build %d)', [V.Major, V.Minor, V.Build]);
+    SuppressibleMsgBox(
+      '{#MyAppName} cannot be installed on this version of Windows.' + #13#10 + #13#10 +
+      'This application requires the .NET Desktop Runtime 8, and Microsoft no ' +
+      'longer supports this Windows version. That runtime will neither install ' +
+      'nor run here.' + #13#10 + #13#10 +
+      'Required: Windows 10 version 1607 (build ' + IntToStr(MinWindowsBuild) +
+      ') or newer, including Windows 11.' + #13#10 +
+      'Detected on this PC: ' + Found + #13#10 + #13#10 +
+      'Nothing was installed.',
+      mbCriticalError, MB_OK, IDOK);
+    Exit;
+  end;
+
+  if IsServerEdition and (not HasDesktopShell) then
+  begin
+    Result := False;
+    SuppressibleMsgBox(
+      '{#MyAppName} cannot be installed on Windows Server Core.' + #13#10 + #13#10 +
+      'Roxa is a desktop application with a window and a tray icon, and Server ' +
+      'Core has no desktop session to show them in, so it would never be usable.' + #13#10 + #13#10 +
+      'Install Windows Server with the Desktop Experience option, or use ' +
+      'Windows 10/11 instead.' + #13#10 + #13#10 + 'Nothing was installed.',
+      mbCriticalError, MB_OK, IDOK);
+    Exit;
+  end;
+end;
+
 function DirHasVersion8(const BaseDir: String): Boolean;
 var
   FindRec: TFindRec;
@@ -95,16 +207,21 @@ begin
   if IsDotNetDesktopInstalled then
     Exit;
 
-  MsgBox('.NET Desktop Runtime 8 روی سیستم شما نصب نیست.' + #13#10 +
-         'برای ادامه نصب، دانلود و نصب خودکار آن انجام می‌شود (نیاز به اینترنت است).',
-         mbInformation, MB_OK);
+  // SuppressibleMsgBox تا در حالتِ /SILENT آویزان نماند و خودش IDOK برگرداند.
+  SuppressibleMsgBox(
+    'The .NET Desktop Runtime 8 is not installed on this PC.' + #13#10 +
+    'Setup will download and install it automatically to continue ' +
+    '(an internet connection is required).',
+    mbInformation, MB_OK, IDOK);
 
   RuntimePath := ExpandConstant('{tmp}\windowsdesktop-runtime.exe');
   try
     Downloaded := DownloadTemporaryFile('{#DotNetUrl}', 'windowsdesktop-runtime.exe', '{#DotNetSha256}', nil);
   except
     ShellExec('open', 'https://dotnet.microsoft.com/download/dotnet/8.0', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
-    Result := 'دانلود رانتایم .NET ممکن نشد. اتصال اینترنت را بررسی کنید یا از لینک بازشده دستی نصب کنید و سپس دوباره این ستاپ را اجرا کنید.';
+    Result := 'The .NET runtime could not be downloaded. Check your internet ' +
+              'connection, or install it manually from the page that just opened ' +
+              'and then run this setup again.';
     Exit;
   end;
 
@@ -116,5 +233,6 @@ begin
       Exit;
   end;
 
-  Result := 'نصب رانتایم .NET کامل نشد. دوباره تلاش کنید و هنگام پرسش UAC گزینه «بله» را بزنید.';
+  Result := 'The .NET runtime was not installed successfully. Try again and ' +
+            'click "Yes" when Windows asks for permission (UAC).';
 end;

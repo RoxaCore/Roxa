@@ -38,6 +38,17 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "اجرای {#MyAppName}"; Flags: nowait postinstall skipifsilent
 
+; حذفِ برنامه نباید سیستمِ کاربر را ول کند. اگر کاربر قبلِ حذف کرش کرده یا اتصال
+; باز مانده باشد، DNS روی 127.0.0.1 و پروکسیِ loopback و مسیرهای یتیم و قواعدِ
+; فایروالِ RoxaTunExcl_* می‌مانند و بعد از رفتنِ برنامه دیگر هیچ‌کس پاکشان نمی‌کند.
+; waituntilterminated لازم است تا پاکسازی پیش از حذفِ فایل‌ها تمام شود.
+[UninstallRun]
+Filename: "{app}\{#MyAppExeName}"; Parameters: "--cleanup"; RunOnceID: "RoxaCleanup"; Flags: runhidden waituntilterminated skipifdoesnotexist
+
+[UninstallDelete]
+; لاگ‌ها و حالتِ تونل جزوِ خروجیِ برنامه‌اند و بعد از حذف بی‌ارزش‌اند.
+Type: filesandordirs; Name: "{app}\logs"
+
 [Code]
 function DirHasVersion8(const BaseDir: String): Boolean;
 var

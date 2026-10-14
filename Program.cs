@@ -34,6 +34,21 @@ sealed class Program
             return;
         }
 
+        // پاکسازیِ هنگامِ حذفِ برنامه. نصاب این را پیش از پاک‌کردنِ فایل‌ها اجرا می‌کند.
+        // بدونِ آن، اگر کاربر درست قبلِ حذف کرش کرده باشد یا اتصال باز مانده باشد،
+        // DNS روی 127.0.0.1، پروکسیِ loopback، مسیرهای یتیم و قواعدِ فایروالِ
+        // RoxaTunExcl_* برای همیشه رویِ سیستم می‌مانند؛ و بعد از حذفِ برنامه دیگر
+        // هیچ‌کس آن‌ها را پاک نخواهد کرد — کاربر فقط می‌ماند با اینترنتِ مرده.
+        // عمداً پیش از mutex: نصاب ممکن است در حالی اجرا شود که نمونه‌ای در کار نیست.
+        if (Array.Exists(args, a => a == "--cleanup"))
+        {
+            try { Core.TunRecovery.RecoverOnStartup(); } catch { }
+            try { Core.TunExclusion.CleanupLeftovers(); } catch { }
+            try { Core.TunRecovery.EmergencyCleanup(); } catch { }
+            try { Core.TunManager.FlushLog(); } catch { }
+            return;
+        }
+
         // خروج آرام از راه دور: بدون kill کردن (kill آیکون سینی را شبح می‌کند).
         if (Array.Exists(args, a => a == "--exit"))
         {

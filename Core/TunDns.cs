@@ -75,21 +75,39 @@ public static class TunDns
         return list;
     }
 
-    public static bool TryApply(out List<TunDnsRecord> prev)
+    /// <summary>
+    /// شرایطِ اعمال را می‌سنجد و اگر ممکن بود، عکسِ فوریِ DNS فعلی را برمی‌گرداند،
+    /// بی‌آنکه چیزی را عوض کرده باشد.
+    ///
+    /// این جداسازی عمداً است. کدِ قبلی اول سیستم را عوض می‌کرد و بعد مقدارِ قبلی را
+    /// می‌خواند و در TunState ثبت می‌کرد؛ اگر برنامه در همین بازه می‌مرد (کرش، یا kill
+    /// از Task Manager) هیچ‌کس نمی‌ماند بداند DNS کاربر قبلاً چه بوده، و جاروبِ بعدی
+    /// تنظیمِ استاتیکِ دستیِ او را بی‌صدا به DHCP تبدیل می‌کرد.
+    /// </summary>
+    public static List<TunDnsRecord>? PrepareApply()
     {
-        prev = new List<TunDnsRecord>();
-        if (!OperatingSystem.IsWindows()) return false;
+        if (!OperatingSystem.IsWindows()) return null;
         if (!IsStubListening())
         {
             TunManager.Log("DNS stub not listening on 127.0.0.1:53, system DNS left untouched.");
-            return false;
+            return null;
         }
-        prev = Snapshot();
+        var prev = Snapshot();
         if (prev.Count == 0)
         {
             TunManager.Log("DNS snapshot empty, system DNS left untouched.");
-            return false;
+            return null;
         }
+        return prev;
+    }
+
+    /// <summary>
+    /// عکسِ از پیش گرفته‌شده را رویِ سیستم اعمال می‌کند. فراخواننده باید خودش
+    /// عکس را قبل از این فراخوانی ذخیره کرده باشد.
+    /// </summary>
+    public static bool TryApply(List<TunDnsRecord> prev)
+    {
+        if (!OperatingSystem.IsWindows() || prev == null || prev.Count == 0) return false;
 
         // netsh بدون لودِ ماژول PowerShell: اجرای powershell برای Set-DnsClientServerAddress
         // حدود ۸ ثانیه (استارت سرد + لود NetTCPIP) طول می‌کشید و بزرگ‌ترین گلوگاه اتصال TUN بود.
@@ -106,7 +124,6 @@ public static class TunDns
             return true;
         }
 
-        prev.Clear();
         return false;
     }
 
@@ -263,9 +280,41 @@ public static class TunDns
             needsAdmin = true;
             return 0;
         }
+        // مقدارِ واقعیِ قبلی را از TunState بخوان، نه از رویِ لیستِ فعلی حدس بزن.
+        // حدسِ قبلی این بود که «هر سرورِ به‌جز 127.0.0.1 را نگه دار؛ اگر چیزی
+        // نماند DHCP». ولی ما کلِ لیست را جایگزین می‌کنیم، پس وقتی تنظیمِ استاتیکِ
+        // کاربر دقیقاً 127.0.0.1 بوده یا در لیستِ فعلی چیزی جز آن نمانده، keep خالی
+        // می‌شد و تنظیمِ دستیِ او بی‌صدا به DHCP تبدیل می‌شد.
+        var prevByIfIndex = new Dictionary<int, TunDnsRecord>();
+        try
+        {
+            var st = TunState.Load();
+            foreach (var p in st?.DnsPrev ?? new List<TunDnsRecord>())
+                prevByIfIndex[p.IfIndex] = p;
+        }
+        catch { }
+
         var sb = new StringBuilder();
         foreach (var r in dead)
         {
+            if (prevByIfIndex.TryGetValue(r.IfIndex, out var known) && known != null)
+            {
+                if (!known.WasStatic)
+                {
+                    // قبلاً هم خودکار (DHCP) بوده؛ همان را برگردان.
+                    sb.Append($"Set-DnsClientServerAddress -InterfaceIndex {r.IfIndex} -ResetServerAddresses; ");
+                    continue;
+                }
+                var original = known.Servers
+                    .Where(s => !string.Equals(s, StubIp, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (original.Count > 0)
+                {
+                    sb.Append($"Set-DnsClientServerAddress -InterfaceIndex {r.IfIndex} -ServerAddresses @({string.Join(",", original.Select(Quote))}); ");
+                    continue;
+                }
+            }
+
+            // فایلِ وضعیت در دست نیست (مثلاً بعد از حذفِ برنامه)؛ بهترین حدسِ ممکن.
             var keep = r.Servers.Where(s => !string.Equals(s, StubIp, StringComparison.OrdinalIgnoreCase)).ToList();
             if (keep.Count > 0)
                 sb.Append($"Set-DnsClientServerAddress -InterfaceIndex {r.IfIndex} -ServerAddresses @({string.Join(",", keep.Select(Quote))}); ");

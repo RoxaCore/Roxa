@@ -37,6 +37,10 @@ public partial class App : Application
         // اتصالِ TUN اجرا می‌شود و اگر برنامه هنگامِ وصل کرش کرده باشد، این
         // قانون‌ها برنامهٔ کاربر را تا اتصالِ بعدی بدونِ هیچ توضیحی کند می‌کنند.
         try { TunExclusion.CleanupLeftovers(); } catch { }
+        // مسیرهایِ /32 که از اجرایِ قبلی جا مانده‌اند (کرش یا خروجِ وسطِ تست). بدونِ
+        // این، اگر شبکه عوض شود گیت‌ویِ مرده سرِ جایش می‌ماند و IPِ سرور غیرقابلِ
+        // دسترس می‌شود.
+        try { TestRouteBypass.ReleaseOrphanedHostRoutes(); } catch { }
         // فایل‌های کانفیگِ موقتِ نشست‌های قبلی (که شناسهٔ سرور در نامشان هست و
         // با هر بار به‌روزرسانیِ اشتراک تازه‌ای می‌ماند) باید از اینجا جمع شوند.
         try { XrayEngine.SweepTempConfigs(); } catch { }
@@ -51,32 +55,69 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
         {
             // گزارش کرش: بخش خودکار (exception + stack + لاگ اخیر) در صف نوشته می‌شود
-            // و یا همین‌جا ارسال می‌شود یا در اجرای بعدی برنامه.
-            try
-            {
-                string tail = "";
-                try
-                {
-                    if (MainWindow?.DataContext is ViewModels.MainViewModel vm)
-                        tail = vm.GetLogTail(40);
-                }
-                catch { }
-                BugReport.ReportCrash(e.ExceptionObject as Exception, tail);
-            }
+            // و یا همین‌جا ارسال می‌شود یا در اجرای بعدی برنامه. ارسالش به رضایتِ
+            // کاربر (SendUsageStats) وابسته است؛ نوشتنِ محلی همیشه انجام می‌شود.
+            try { BugReport.ReportCrash(e.ExceptionObject as Exception, SafeLogTail()); }
             catch { }
             try { DisposeTray(); } catch { }
             try { NotificationHelper.Cleanup(); } catch { }
             try { TunKillSwitch.Shutdown(); } catch { }
             TunRecovery.EmergencyCleanup();
         };
+
+        // خطاهایِ رابطِ کاربری از همین‌جا می‌گذرند، نه از AppDomain. بدونِ این هندلر،
+        // یک استثنایِ عادی در UI کلِ برنامه را می‌کُشت — و چون خروجِ براثرِ استثنایِ
+        // مهارنشده تضمینی برایِ اجرای ProcessExit ندارد، DNS و پروکسی و TUN را همان
+        // وسطِ حالِ سیستم کاربر رها می‌کرد. اینجا ثبت می‌شود و اجازهٔ ادامه می‌دهیم
+        // تا کاربر بتواند تمیز قطع کند یا حداقل سینیِ سیستم سرِ جایش باشد.
+        Dispatcher.UIThread.UnhandledException += (_, e) =>
+        {
+            try { TunManager.Log($"UI exception: {e.Exception}"); }
+            catch { }
+            try { BugReport.ReportCrash(e.Exception, SafeLogTail()); }
+            catch { }
+            e.Handled = true;
+        };
+
+        // استثنایِ یک Task که هیچ‌کس منتظرش نبود فقط موقعِ جمع‌آوریِ زباله منفجر می‌شود
+        // و طبقِ رفتارِ .NET کلِ پروسه را می‌کُشد — ساعت‌ها بعد، بی‌آنکه سرِ کاری
+        // باشد که کاربر می‌فهمد. باید ثبت و خنثی شود.
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            var agg = e.Exception;
+            try { e.SetObserved(); } catch { }
+            try
+            {
+                if (agg == null) return;
+                foreach (var ex in agg.InnerExceptions)
+                    TunManager.Log($"Unobserved task exception: {ex}");
+            }
+            catch { }
+        };
+    }
+
+    /// <summary>
+    /// ۴۰ خطِ آخرِ لاگ برایِ ضمیمه به گزارش. جدا شد چون هر سه هندلرِ بالا به همان
+    /// نیاز داشتند و تکرارش سه‌بار یعنی سه‌جا برایِ از‌دست‌رفتنِ سکوت.
+    /// </summary>
+    private string SafeLogTail()
+    {
+        try
+        {
+            if (MainWindow?.DataContext is ViewModels.MainViewModel vm)
+                return vm.GetLogTail(40);
+        }
+        catch { }
+        return "";
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var lang = TranslationManager.Instance.Culture.Name;
-            bool isRtl = lang is "fa" or "ar";
+            // از دانشنامهٔ زبان می‌پرسیم، نه از فهرستِ دستی؛ وگرنه زبانی مثلِ اردو
+            // که راست‌به‌چپ است جا می‌ماند و با چیدمانِ چپ‌به‌راست نشان داده می‌شد.
+            bool isRtl = TranslationManager.Instance.IsRightToLeft;
 
             MainWindow = new MainWindow
             {

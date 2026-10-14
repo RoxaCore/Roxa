@@ -28,6 +28,27 @@ public partial class ServerEditorWindow : Window
     public ServerEditorWindow()
     {
         InitializeComponent();
+        ApplyFlowDirection();
+    }
+
+    /// <summary>
+    /// جهتِ پنجره را از زبانِ فعال می‌سازد. در XAML این پنجره به‌صورتِ ثابت
+    /// RightToLeft نوشته شده بود و اگر زبان انگلیسی یا اردو انتخاب می‌شد، چیدمان
+    /// در همان حالت راست‌به‌چپ می‌ماند — یا برعکس، اردو با چپ‌به‌راست نشان داده
+    /// می‌شد. اینجا بعد از LoadComponent مقدار نهایی را ست می‌کنیم.
+    /// </summary>
+    private void ApplyFlowDirection()
+    {
+        try
+        {
+            // «FlowDirection» رویِ خودِ Window هم پراپرتی است، پس این شناسه به
+            // همان پراپرتی می‌چسبد و دسترسی به RightToLeft خطای CS0176 می‌دهد.
+            // enum در Avalonia.Media تعریف شده (نه Avalonia.Layout).
+            FlowDirection = Localization.TranslationManager.Instance.IsRightToLeft
+                ? Avalonia.Media.FlowDirection.RightToLeft
+                : Avalonia.Media.FlowDirection.LeftToRight;
+        }
+        catch { }
     }
 
     protected override void OnOpened(EventArgs e)

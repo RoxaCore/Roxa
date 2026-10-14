@@ -530,4 +530,8 @@ Estado: {3}</value>
   <data name="Set_ShowIp" xml:space="preserve"><value>Mostrar columna de dirección IP</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>Si está activada, la columna de dirección IP se muestra en la tabla de servidores.</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>Pegar desde el portapapeles</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>La red cambió; comprobando y reconectando...</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>Reconexión automática a "{0}" tras un cambio de red</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>La reconexión automática falló demasiadas veces; reconecta manualmente</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>La red cambió y no fue posible la reconexión automática; reconecta</value></data>
 </root>

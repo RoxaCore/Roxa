@@ -883,4 +883,8 @@ Durum: {3}</value>
   <data name="Set_ShowIp" xml:space="preserve"><value>IP adresi sütununu göster</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>Etkinleştirilirse, IP adresi sütunu sunucu tablosunda gösterilir.</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>Panodan yapıştır</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>Ağ değişti; kontrol ediliyor ve yeniden bağlanılıyor...</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>Ağ değişikliğinden sonra "{0}" otomatik yeniden bağlanıyor</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>Otomatik yeniden bağlanma çok kez başarısız oldu; lütfen elle yeniden bağlanın</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>Ağ değişti ve otomatik yeniden bağlanma mümkün olmadı; lütfen yeniden bağlanın</value></data>
 </root>

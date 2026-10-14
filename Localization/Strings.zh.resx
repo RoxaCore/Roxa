@@ -546,4 +546,8 @@
   <data name="Set_ShowIp" xml:space="preserve"><value>显示 IP 地址列</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>启用后，服务器表格中将显示 IP 地址列。</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>从剪贴板粘贴</value></data>
+  <data name="Log_NetChanged" xml:space="preserve"><value>网络已更改；正在检查并重新连接...</value></data>
+  <data name="Log_NetReconnecting" xml:space="preserve"><value>网络更改后正在自动重新连接到“{0}”</value></data>
+  <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>自动重连尝试次数过多；请手动重新连接</value></data>
+  <data name="Toast_NetDownReconnect" xml:space="preserve"><value>网络已更改，无法自动重新连接；请重新连接</value></data>
 </root>

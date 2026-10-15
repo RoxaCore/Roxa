@@ -34,6 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   path or query, a UUID, and an IPv4 address become `<url>`, `<uuid>` and
   `<ip>`. Loopback addresses are kept. The text a user types into a manual
   report is not altered.
+- Opening an announcement link requires https. The server already refuses to
+  store anything else, but the client accepted http as well and handed the
+  value straight to the shell, which launches whatever scheme it is given.
 
 ## [3.0.8] - 2026-10-15
 

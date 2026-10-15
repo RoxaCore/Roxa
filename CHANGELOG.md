@@ -43,6 +43,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   checked in. The report and the row stay; only the label goes. Previously
   these hashes were kept as long as the record did, which PRIVACY.md stated
   plainly but which no passage of time ever shortened.
+- The login delay under global pressure is capped at 2 seconds, and past 400
+  failed attempts in an hour the panel answers 429 instead of waiting at all.
+  The previous ladder topped out at 20 seconds of `sleep` per request, and each
+  one holds a PHP worker for that long, so a few hundred parallel guesses could
+  have taken the whole panel down — the exact outage a global lockout was
+  meant to prevent. The per-IP lockout of 20 failures an hour is unchanged.
 
 ## [3.0.8] - 2026-10-15
 

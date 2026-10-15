@@ -25,11 +25,17 @@ using Roxa.Models;
 
 namespace Roxa.Core;
 
-/// <summary>ذخیره‌سازی JSON در پوشه AppData/Roxa. servers.json با DPAPI (CurrentUser) رمزنگاری می‌شود.</summary>
+/// <summary>
+/// ذخیره‌سازی JSON در پوشه AppData/Roxa.
+/// servers.json و subscriptions.json با DPAPI (CurrentUser) رمزنگاری می‌شوند؛
+/// settings.json متنِ ساده است (پرتنظیمات، و شناسهٔ نصب باید پیش از بارگذاریِ
+/// موتور قابلِ خواندن باشد).
+/// </summary>
 public static class Storage
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
     private static readonly byte[] ServersEntropy = Encoding.UTF8.GetBytes("Roxa.servers.dpapi.v1");
+    private static readonly byte[] SubscriptionsEntropy = Encoding.UTF8.GetBytes("Roxa.subscriptions.dpapi.v1");
 
     private static readonly string _dataDir;
     static Storage()
@@ -92,18 +98,93 @@ public static class Storage
         }
     }
 
+    /// <summary>
+    /// تشخیصِ اینکه آیا بایت‌ها از رویِ عادتِ JSON شروع می‌شوند.
+    ///
+    /// این تشخیص‌دهندهٔ ما بینِ «نسخهٔ قدیمیِ متنی» و «متنِ رمزنگاری‌شده» است، و
+    /// برایِ همین باید قطعی باشد: یک blobِ DPAPI هیچ‌وقت با `[` یا `{` شروع
+    /// نمی‌شود، پس اگر اینطور بود، فایل متنی است و باید مهاجرت کند.
+    /// </summary>
+    private static bool LooksLikeJson(byte[] raw)
+    {
+        foreach (byte b in raw)
+        {
+            if (b is (byte)' ' or (byte)'\t' or (byte)'\r' or (byte)'\n') continue;
+            return b is (byte)'[' or (byte)'{';
+        }
+        return false;
+    }
+
     public static List<SubscriptionInfo> LoadSubscriptions()
     {
         try
         {
             if (!File.Exists(SubscriptionsFile)) return new List<SubscriptionInfo>();
-            return JsonSerializer.Deserialize<List<SubscriptionInfo>>(File.ReadAllText(SubscriptionsFile)) ?? new List<SubscriptionInfo>();
+            byte[] raw = File.ReadAllBytes(SubscriptionsFile);
+            if (raw.Length == 0) return new List<SubscriptionInfo>();
+
+            string json;
+            // فایلِ قدیمی متنی است؛ بارگذاریِ موفق یعنی باید همین الان رمزنگاری شود،
+            // وگرنه لینکِ اشتراک (که توکن دارد) به شکلِ متنِ ساده روی دیسک می‌ماند.
+            bool migrate = false;
+
+            if (OperatingSystem.IsWindows() && !LooksLikeJson(raw))
+            {
+#pragma warning disable CA1416
+                try
+                {
+                    byte[] plain = ProtectedData.Unprotect(raw, SubscriptionsEntropy, DataProtectionScope.CurrentUser);
+                    json = Encoding.UTF8.GetString(plain);
+                }
+                catch (CryptographicException)
+                {
+                    // نه متنِ ماست نه رمزِ ما — مثلاً کپیِ پروفایل از کاربر یا
+                    // ماشینِ دیگر. آن را همچنان متن می‌خوانیم؛ اگر JSON نبود
+                    // catchِ بیرونی قرنطینه می‌کند و کپی را نگه می‌دارد.
+                    json = Encoding.UTF8.GetString(raw);
+                }
+#pragma warning restore CA1416
+            }
+            else
+            {
+                json = Encoding.UTF8.GetString(raw);
+                migrate = OperatingSystem.IsWindows();
+            }
+
+            var list = JsonSerializer.Deserialize<List<SubscriptionInfo>>(json) ?? new List<SubscriptionInfo>();
+            if (migrate) SaveSubscriptions(list);
+            return list;
         }
         catch { Quarantine(SubscriptionsFile); return new List<SubscriptionInfo>(); }
     }
 
     public static void SaveSubscriptions(List<SubscriptionInfo> subs)
-        => WriteAtomic(SubscriptionsFile, JsonSerializer.Serialize(subs, Options));
+    {
+        string json = JsonSerializer.Serialize(subs, Options);
+        byte[] plain = Encoding.UTF8.GetBytes(json);
+        if (!OperatingSystem.IsWindows())
+        {
+            WriteAtomic(SubscriptionsFile, plain);
+            return;
+        }
+#pragma warning disable CA1416
+        byte[] protectedBytes;
+        try
+        {
+            protectedBytes = ProtectedData.Protect(plain, SubscriptionsEntropy, DataProtectionScope.CurrentUser);
+        }
+        catch (CryptographicException)
+        {
+            // از دست‌دادنِ لینکِ اشتراکِ کاربر بدتر از نوشتنِ متنی است. متنی
+            // می‌نویسیم، هشدار می‌گذاریم، و ذخیرهٔ موفقِ بعدی دوباره رمزنگاری
+            // می‌کند — مهاجرتِ قدیمی همین مسیر را طی می‌کند.
+            TunManager.Log("Storage: DPAPI failed for subscriptions.json; wrote it in plain text. It will be re-encrypted on the next successful save.");
+            WriteAtomic(SubscriptionsFile, plain);
+            return;
+        }
+#pragma warning restore CA1416
+        WriteAtomic(SubscriptionsFile, protectedBytes);
+    }
 
     public static AppSettings LoadSettings()
     {

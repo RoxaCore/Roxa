@@ -472,7 +472,7 @@ State: {3}</value>
   <data name="Eng_ConnectingTo" xml:space="preserve"><value>Connecting to {0} {1} ...</value></data>
   <data name="Eng_DigestMismatch" xml:space="preserve"><value>Roxa download digest mismatch: expected {0}, got {1}.</value></data>
   <data name="Eng_Downloading" xml:space="preserve"><value>Downloading Roxa engine ...</value></data>
-  <data name="Eng_DirNotWritable" xml:space="preserve"><value>The application folder is not writable (it is probably installed in Program Files). Reinstall the app without "Run as administrator".</value></data>
+  <data name="Eng_DirNotWritable" xml:space="preserve"><value>The engine folder is read-only and Roxa is not elevated, so nothing will be downloaded. Run Roxa as administrator to repair it.</value></data>
   <data name="Msg_InstanceBlocked" xml:space="preserve"><value>Another instance of Roxa is already running and its window could not be brought up. If you do not see a tray icon, close Roxa from Task Manager and start it again.</value></data>
   <data name="Eng_ExitedUnexpectedly" xml:space="preserve"><value>Roxa engine exited unexpectedly.</value></data>
   <data name="Eng_IntegrityFailed" xml:space="preserve"><value>Roxa engine failed integrity verification.</value></data>
@@ -484,6 +484,7 @@ State: {3}</value>
   <data name="Eng_NoDigest" xml:space="preserve"><value>Cannot verify Roxa download via mirror without GitHub digest.</value></data>
   <data name="Eng_NotFound" xml:space="preserve"><value>Engine not found, downloading ...</value></data>
   <data name="Eng_PortNotUp" xml:space="preserve"><value>Proxy port did not come up.</value></data>
+  <data name="Eng_ReadOnlyRepair" xml:space="preserve"><value>The engine binary failed its integrity check and Roxa is not elevated, so it was not repaired. Run Roxa as administrator to download it again.</value></data>
   <data name="Eng_Ready" xml:space="preserve"><value>Roxa {0} ready.</value></data>
   <data name="Eng_Stopped" xml:space="preserve"><value>Engine stopped.</value></data>
   <data name="Eng_TestExited" xml:space="preserve"><value>Roxa test engine exited unexpectedly.</value></data>

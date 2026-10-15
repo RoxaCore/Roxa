@@ -399,13 +399,25 @@ public sealed class XrayEngine : IDisposable
         await Task.Factory.StartNew(Stop, TaskCreationOptions.LongRunning);
         Stage("Stg_Engine");
         _settings = settings;
+        // نصب در Program Files یعنی پوشهٔ موتور برای کاربرِ عادی فقط-خواندنی است.
+        // پس ترمیمِ موتور فقط با ارتقا مجاز است. بدونِ آن، به‌جایِ دانلودِ دوباره که
+        // اصلاً ممکن نیست و فقط یک شکستِ مبهم در میانهٔ اتصال می‌ساخت، خطای واضح
+        // می‌دهیم و می‌ایستیم؛ این‌جا حتی واردِ شبکه هم نمی‌شویم.
         if (!File.Exists(EnginePath))
         {
+            // EnsureEngineAsync پیش از هر دانلودی قابلِ نوشتن بودن را می‌سنجد و با
+            // Eng_DirNotWritable می‌ایستد، پس غیرِارتقاشده هرگز دانلود نمی‌کند.
             Log(TranslationManager.Get("Eng_NotFound"));
             await EnsureEngineAsync(false, ct);
         }
         else if (!await Task.Run(() => VerifyEngineIntegrity(requireSidecar: AdminHelper.IsRunningAsAdmin())))
         {
+            if (!AdminHelper.IsRunningAsAdmin())
+            {
+                string corrupt = TranslationManager.Get("Eng_ReadOnlyRepair");
+                Log(corrupt);
+                throw new InvalidDataException(corrupt);
+            }
             Log(TranslationManager.Get("Eng_IntegrityRetry"));
             await EnsureEngineAsync(true, ct);
             if (!await Task.Run(() => VerifyEngineIntegrity(requireSidecar: true)))

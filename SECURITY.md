@@ -10,7 +10,8 @@ Report it privately through one of these channels:
   public, use the *Security* tab and click *Report a vulnerability*. This is
   the preferred channel because it reaches the maintainers directly and keeps
   the report out of public view until it is fixed.
-- **Email** — `security@roxacore.com`
+- **Email** — `info@roxacore.com`
+
 ### What to include
 
 - The Roxa version (shown at the bottom of the Settings page).

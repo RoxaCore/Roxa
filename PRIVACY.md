@@ -81,6 +81,12 @@ are overwritten as they age out. Longer-lived records — the install
 identifier's row in the client list, and any crash report — carry the hash of
 the source as a label, which is why the panel says *source* and not *IP*.
 
+That label has a deadline of its own: **90 days**. A report loses its source
+hash 90 days after it was filed, and an install identifier's row loses its
+source hash 90 days after that install last checked in. The report itself and
+the row stay — the connection history is what makes a report useful, and the
+address is in neither of them. Only the label is dropped.
+
 **What this does not hide:** sending a request at all reveals your IP to the
 server for the duration of that request, and the third-party services in the
 table above (`get.geojs.io`, `ipwho.is`, `api.github.com`, `gh-proxy.com`)

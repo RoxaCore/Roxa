@@ -124,19 +124,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to `%LOCALAPPDATA%\Roxa\logs`.
 - Exclusion routes (`/32`) survived a crash and stayed in the routing table
   forever. They are now persisted and swept on the next start.
-- Setup could hang on "Preparing to Install" forever on a PC that had never
-  had .NET. The runtime download was synchronous with no timeout, no progress
-  and no Cancel, and it ran over WinHTTP, which ignores the per-user proxy a
-  browser uses — so on a slow, filtered or proxied network nothing appeared
-  to happen and there was no way out. The runtime now ships inside setup:
-  the only network traffic at install time is none.
+- Setup could sit on "Preparing to Install" forever on a PC that had never
+  had .NET: the runtime download was synchronous with no timeout, no progress
+  and no Cancel, so nothing appeared to happen and there was no way out. There
+  are now two installers built from one script. `Roxa-Setup-<version>.exe`
+  carries the runtime and needs no network at all. `Roxa-Setup-<version>-online.exe`
+  is 19 MiB and fetches it from Microsoft during install through Inno's own
+  `DownloadTemporaryFile`, which shows a live megabyte counter and keeps Cancel
+  working, verifies the pinned SHA-256 before the file is ever run, and is
+  aborted after 10 minutes or after 90 seconds without progress. Every failure
+  opens `https://dotnet.microsoft.com/download/dotnet/8.0` — a channel URL that
+  does not rotate when Microsoft ships a new patch, unlike a pinned file URL.
 - The exit code 3010 ("success, reboot required") from the runtime installer
   was reported as a failure.
+- Reading the wizard UI during install can no longer break a silent install:
+  status text goes through one guarded helper.
 
 ### Security
 
-- The .NET runtime that ships inside the installer is verified against a
-  SHA-256 pinned in `setup.iss`; the hash is never fetched over the network.
+- The .NET runtime — packed into the offline installer, and downloaded by the
+  online installer — is verified against a SHA-256 pinned in `setup.iss`; the
+  hash is never fetched over the network, so neither Microsoft nor anyone on
+  the path can substitute a different binary for the one setup will run.
 - The app never downloads or executes an update itself any more. The
   staging and rollback path is still compiled but has no caller:
   `--update-apply` removes whatever was staged and exits non-zero, so the

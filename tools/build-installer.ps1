@@ -93,12 +93,33 @@ Set-Content -Path "$engineExe.sha256" -Value $engineHash -Encoding ascii -NoNewl
 if (-not (Test-Path $iscc)) { throw "ISCC not found at $iscc" }
 if (Test-Path $out) { Remove-Item $out -Recurse -Force }
 
-& $iscc (Join-Path $root "installer\setup.iss")
-if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
+# Two installers from one script.
+#
+#   Roxa-Setup-<ver>.exe         carries the runtime: installing needs no network
+#   Roxa-Setup-<ver>-online.exe  leaves it out and downloads it at install time
+#                                from the URL and SHA-256 pinned in setup.iss
+#
+# The online build is where the old hang lived: a download with no progress, no
+# Cancel and no deadline sat on "Preparing to Install" forever. It now runs
+# through Inno's own DownloadTemporaryFile with a progress callback (which also
+# keeps Cancel alive), a 10-minute deadline, a 90-second no-progress abort and
+# Inno's SHA-256 verification, and any failure opens Microsoft's channel page
+# -- https://dotnet.microsoft.com/download/dotnet/8.0 -- which is a channel
+# URL, not a file URL, so it does not rot when Microsoft ships a new patch.
+$issPath = Join-Path $root "installer\setup.iss"
+& $iscc $issPath
+if ($LASTEXITCODE -ne 0) { throw "ISCC failed (bundled installer)" }
+& $iscc "/DOnline" $issPath
+if ($LASTEXITCODE -ne 0) { throw "ISCC failed (online installer)" }
 
-$setup = Get-ChildItem $out -Filter "*.exe" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 $pubSize = (Get-ChildItem $pub -Recurse -File | Measure-Object Length -Sum).Sum
-$setupSize = $setup.Length
 "publish_MB = " + [math]::Round($pubSize / 1MB, 1)
-"setup_MB   = " + [math]::Round($setupSize / 1MB, 1)
-"setup_path = " + $setup.FullName
+
+Get-ChildItem $out -Filter "*.exe" | Sort-Object Name | ForEach-Object {
+    "setup_file = " + $_.Name
+    "setup_bytes = " + $_.Length
+    "setup_mib = " + [math]::Round($_.Length / 1MB, 2)
+    "setup_sha256 = " + (Get-FileHash -Algorithm SHA256 -Path $_.FullName).Hash.ToLowerInvariant()
+    "setup_path = " + $_.FullName
+    ""
+}

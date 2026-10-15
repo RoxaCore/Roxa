@@ -106,6 +106,12 @@ discarding are local deletions; neither one uploads anything. If you want a
 queued report gone before then, empty the `reports-pending` folder while Roxa
 is closed.
 
+The parts a report collects automatically are scrubbed before they leave the
+machine: a URL that carries a path or a query becomes `<url>`, a UUID becomes
+`<uuid>`, and an IPv4 address becomes `<ip>` — in the file on disk as well as
+in what is sent. Loopback addresses are left alone. Description text you typed
+yourself is sent as you wrote it.
+
 ## What Roxa does not do
 
 - No telemetry, analytics, crash analytics, or usage statistics.

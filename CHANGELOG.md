@@ -29,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Turning *Send crash reports* off now empties the queue immediately instead
   of leaving already-collected reports waiting for a consent that was just
   declined.
+- What a crash report collects automatically is scrubbed before it leaves the
+  machine, and before it is written to the pending queue: a URL carrying a
+  path or query, a UUID, and an IPv4 address become `<url>`, `<uuid>` and
+  `<ip>`. Loopback addresses are kept. The text a user types into a manual
+  report is not altered.
 
 ## [3.0.8] - 2026-10-15
 

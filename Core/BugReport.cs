@@ -21,6 +21,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Roxa.Core;
 
@@ -141,7 +142,9 @@ public static class BugReport
                 files.RemoveAt(0);
             }
             string file = Path.Combine(PendingDir, $"{DateTime.Now:yyyyMMddHHmmssfff}-{p.Type}.json");
-            File.WriteAllText(file, JsonSerializer.Serialize(p, JsonOptions), Encoding.UTF8);
+            // رویِ دیسک هم نسخهٔ پاک‌شده می‌ماند؛ مبادا خودِ فایلِ صف بعداً
+            // کسی را لو بدهد، بی‌آنکه کسی آن را فرستاده باشد.
+            File.WriteAllText(file, JsonSerializer.Serialize(Sanitized(p), JsonOptions), Encoding.UTF8);
             return file;
         }
         catch
@@ -207,7 +210,7 @@ public static class BugReport
             }
             using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(8) };
             http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Roxa/3.0");
-            using var content = new StringContent(JsonSerializer.Serialize(p, JsonOptions), Encoding.UTF8, "application/json");
+            using var content = new StringContent(JsonSerializer.Serialize(Sanitized(p), JsonOptions), Encoding.UTF8, "application/json");
             using var resp = await http.PostAsync($"{RemoteConfig.BaseUrl}/api/report.php", content, ct);
             if (!resp.IsSuccessStatusCode) return false;
             string body = await resp.Content.ReadAsStringAsync(ct);
@@ -265,4 +268,87 @@ public static class BugReport
     }
 
     private static string Cut(string s, int max) => s.Length <= max ? s : s[..max];
+
+    private static readonly Regex UrlRe = new(
+        @"\bhttps?://[^\s""'<>]+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex UuidRe = new(
+        @"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b",
+        RegexOptions.Compiled);
+
+    private static readonly Regex Ipv4Re = new(
+        @"\b\d{1,3}(?:\.\d{1,3}){3}\b", RegexOptions.Compiled);
+
+    /// <summary>
+    /// حذفِ چیزهایی که گزارشِ کرش نباید ببرد: لینکِ اشتراک (که توکن در مسیرش است)،
+    /// UUID (شناسهٔ سرور) و آدرسِ IP.
+    ///
+    /// رویِ Log و Error اعمال می‌شود، نه رویِ Message: متنِ دستیِ کارب را تغییر
+    /// نمی‌دهیم، چون کسی که خودش چیزی نوشته ممکن است برایِ خطایابی دقیقاً همان
+    /// را بخواهد بفرستد — و SECURITY.md هم صریحاً از او خواسته چنین چیزی ننویسد.
+    /// برایِ گزارشِ کرش هم Message خالی است، پس این دو بخش همان کلِ گزارش‌اند.
+    ///
+    /// نکته‌ها:
+    ///  - لینک فقط وقتی پاک می‌شود که مسیرِ غیرِ خالی یا query داشته باشد؛
+    ///    یک لینکِ خانگی مثلِ https://example.com که در لاگ برایِ خطایابیِ
+    ///    آپدیت ارزشمند است می‌ماند، ولی هر مسیری که بتواند توکنِ اشتراک
+    ///    باشد می‌رود.
+    ///  - 127.x.x.x و 0.0.0.0 حذف نمی‌شوند: لوپ‌بک آدرسِ کسی نیست و بدونِ آن
+    ///    خطای پروکسیِ محلیِ رایج‌ترین چیزی است که در گزارش می‌آید.
+    ///  - IPv6 عمداً حذف نمی‌شود. یک الگویِ قابلِ اعتماد برایِ آن نمی‌شود
+    ///    نوشت که متنِ کوتاهِ سه‌بخشیِ زمان (07:11:53) را هم نگیرد، و حذفِ
+    ///    اشتباهیِ زمان‌ها از یک گزارشِ خطایابی هزینه‌ای واقعی است. اگر راهی
+    ///    قطعی پیدا شد باید اضافه شود.
+    /// </summary>
+    public static string Scrub(string s)
+    {
+        if (string.IsNullOrEmpty(s)) return s;
+        s = UrlRe.Replace(s, static m => IsSecretUrl(m.Value) ? "<url>" : m.Value);
+        s = UuidRe.Replace(s, "<uuid>");
+        s = Ipv4Re.Replace(s, static m => IsPublicIpv4(m.Value) ? "<ip>" : m.Value);
+        return s;
+    }
+
+    /// <summary>لینکِ دارایِ مسیر یا query ⇒ می‌تواند توکنِ اشتراک باشد.</summary>
+    private static bool IsSecretUrl(string raw)
+    {
+        string t = raw.TrimEnd('.', ',', ')', ']', ';', '>', '"');
+        if (!Uri.TryCreate(t, UriKind.Absolute, out var u)) return false;
+        string path = u.AbsolutePath;
+        return !string.IsNullOrEmpty(u.Query) || (path.Length > 1 && path != "/");
+    }
+
+    /// <summary>IPv4ِ معنادار و غیرِ لوپ‌بک ⇒ آدرسی است که باید برود.</summary>
+    private static bool IsPublicIpv4(string s)
+    {
+        var parts = s.Split('.');
+        if (parts.Length != 4) return false;
+        int first = -1;
+        foreach (var p in parts)
+        {
+            if (!int.TryParse(p, out int v) || v > 255) return false;
+            if (first < 0) first = v;
+        }
+        return first is not (0 or 127);
+    }
+
+    /// <summary>
+    /// نسخهٔ پاک‌شدهٔ گزارش پیش از سریال‌سازی. خودِ Payload را تغییر نمی‌دهیم
+    /// تا فراخواننده همان چیزی را ببیند که داده بود؛ فقط آنچه رویِ دیسک یا
+    /// شبکه می‌رود پاک می‌شود.
+    /// </summary>
+    private static Payload Sanitized(Payload p)
+    {
+        if (p.Error.Length == 0 && p.Log.Length == 0) return p;
+        return new Payload
+        {
+            Type = p.Type,
+            Ver = p.Ver,
+            Os = p.Os,
+            Id = p.Id,
+            Message = p.Message,
+            Error = Scrub(p.Error),
+            Log = Scrub(p.Log),
+        };
+    }
 }

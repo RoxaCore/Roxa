@@ -23,6 +23,13 @@ Please do **not** include your server addresses, subscription links, UUIDs or
 keys in a report. If a report cannot be reproduced without them, say so and a
 private exchange can be arranged.
 
+The automatically collected parts are scrubbed before they leave the machine:
+URLs carrying a path or query, UUIDs and IPv4 addresses become `<url>`,
+`<uuid>` and `<ip>` — in the queued file as well as on the wire. Loopback
+addresses are kept, because losing `127.0.0.1:8080` from a report costs more
+diagnostically than it protects. The text you type is **not** altered, so if
+you paste a subscription link into the description it will go out as written.
+
 ## Supported versions
 
 Only the latest released version receives security fixes. There is no

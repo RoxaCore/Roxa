@@ -210,17 +210,7 @@
                        Foreground="{Binding BannerForeground}" TextTrimming="CharacterEllipsis"/>
             <TextBlock Text="{Binding BannerBody}" FontSize="12" Foreground="{Binding BannerForeground}" Opacity="0.85"
                        TextWrapping="Wrap" IsVisible="{Binding BannerBody, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-            <!-- آپدیت: نوار پیشرفت دانلود، سپس نشانگر نصب -->
-            <StackPanel Spacing="4" Margin="0,6,0,0" IsVisible="{Binding IsUpdateProgressVisible}">
-              <ProgressBar Minimum="0" Maximum="100" Height="6"
-                           Value="{Binding UpdateProgress, Mode=OneWay}"
-                           IsIndeterminate="{Binding IsUpdateProgressIndeterminate}"
-                           Foreground="{Binding BannerForeground}" Background="#F0EDFB"/>
-              <TextBlock Text="{Binding UpdateProgressText}" FontSize="11" FontWeight="SemiBold"
-                         HorizontalAlignment="Right" Foreground="{Binding BannerForeground}" Opacity="0.8"
-                         IsVisible="{Binding UpdateProgressText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-            </StackPanel>
-          </StackPanel>
+           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="14,0,0,0">
             <Button Content="{Binding BannerActionText}" IsVisible="{Binding BannerHasAction}"
                     IsEnabled="{Binding IsBannerBusy, Converter={StaticResource Not}}"
@@ -928,17 +918,6 @@
                   <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Hours}" VerticalAlignment="Center"/>
                 </StackPanel>
                 <TextBlock Text="{Binding LastUpdateDisplay}" FontSize="11" Foreground="{StaticResource TextSecondary}" IsVisible="{Binding AutoUpdateSubs}"/>
-              </StackPanel>
-            </Border>
-
-            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
-              <StackPanel Spacing="12">
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AppUpdate}" FontWeight="Bold" FontSize="13"/>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <CheckBox IsChecked="{Binding AutoUpdate}" VerticalAlignment="Center"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdateApp}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdateApp_Desc}" FontSize="11" Foreground="#888888" Margin="24,0,0,0"/>
               </StackPanel>
             </Border>
 

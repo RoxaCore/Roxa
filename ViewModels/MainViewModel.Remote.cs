@@ -92,11 +92,9 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             var lang = string.IsNullOrWhiteSpace(_settings.Language) ? "fa" : _settings.Language;
-            if (string.IsNullOrWhiteSpace(_settings.ClientId))
-            {
-                _settings.ClientId = Guid.NewGuid().ToString("D");
-                SaveSettings();
-            }
+            // شناسه همین‌جا ساخته نمی‌شود: سازندهٔ اصلی در MainViewModel هنگام
+            // ساخته شدنِ ViewModel کار می‌کند و DeviceId را هم اطلاع می‌دهد؛
+            // تکرارش اینجا فقط نسخهٔ ناقص‌تری بود که OnPropertyChanged را صدا نمی‌زد.
             if (!IsConnected)
             {
                 var cc = await Task.Run(() => RemoteConfig.DetectCountryAsync());

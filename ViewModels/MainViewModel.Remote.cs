@@ -249,9 +249,12 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void AnnBannerAction()
     {
+        // فقط https. سرور لینکِ اعلان را با همین قاعده می‌نویسد، ولی سمتِ کلاینت
+        // هم باید همین را بخواهد: UseShellExecute یک URI را به هر دست‌کارِ آن
+        // می‌سپارد، و چیزی که از شبکه آمده باید پیش از باز شدن همین‌جا رد شود.
         if (_currentAnnouncement is { } ann && !string.IsNullOrWhiteSpace(ann.Url)
             && Uri.TryCreate(ann.Url, UriKind.Absolute, out var uri)
-            && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp))
+            && uri.Scheme == Uri.UriSchemeHttps)
         {
             try
             {

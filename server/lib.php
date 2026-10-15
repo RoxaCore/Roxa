@@ -72,12 +72,26 @@ function sess_start(): void
     }
 }
 
+/**
+ * خواندنِ زیرِ قفلِ اشتراکی. بدونِ این، خوانندهٔ همزمان می‌تواند بینِ truncate
+ * و write فایلِ ناقص ببیند.
+ */
 function jread(string $file, array $default): array
 {
     if (!is_file($file)) {
         return $default;
     }
-    $raw = @file_get_contents($file);
+    $fp = @fopen($file, 'rb');
+    if (!$fp) {
+        return $default;
+    }
+    try {
+        flock($fp, LOCK_SH);
+        $raw = stream_get_contents($fp);
+    } finally {
+        flock($fp, LOCK_UN);
+        fclose($fp);
+    }
     if ($raw === false || $raw === '') {
         return $default;
     }
@@ -85,23 +99,73 @@ function jread(string $file, array $default): array
     return is_array($data) ? $data : $default;
 }
 
+/**
+ * نوشتنِ اتمیک: فایلِ موقتِ همنام + rename. خوانندهٔ همزمان یا نسخهٔ قبلی را
+ * می‌بیند یا بعدی را — هیچ‌وقت ناقص را.
+ */
 function jwrite(string $file, array $data): void
 {
     $dir = dirname($file);
     if (!is_dir($dir)) {
-        @mkdir($dir, 0755, true);
+        @mkdir($dir, 0700, true);
     }
-    $fp = @fopen($file, 'c+');
-    if (!$fp) {
+    $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    if ($json === false) {
+        throw new RuntimeException('encode failed');
+    }
+    $tmp = $dir . '/.' . basename($file) . '.' . bin2hex(random_bytes(6)) . '.tmp';
+    if (file_put_contents($tmp, $json, LOCK_EX) === false) {
         throw new RuntimeException('write failed');
     }
-    flock($fp, LOCK_EX);
-    ftruncate($fp, 0);
-    rewind($fp);
-    fwrite($fp, json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-    fflush($fp);
-    flock($fp, LOCK_UN);
-    fclose($fp);
+    @chmod($tmp, 0600);
+    if (!rename($tmp, $file)) {
+        @unlink($tmp);
+        throw new RuntimeException('rename failed');
+    }
+}
+
+/**
+ * خواندن، تغییر و نوشتنِ زیرِ یک قفلِ واحد.
+ *
+ * کالبک آرایه را می‌گیرد و **باید** صریح یکی از این‌ها را برگرداند:
+ *   - آرایهٔ تغییریافته: نوشته می‌شود
+ *   - false: هیچ‌چیز نوشته نشود (مثلاً سقف پر است یا شرطی برقرار نیست)
+ *
+ * چون آرایه در PHP مقداری است، تغییرِ محلیِ پارامتر به بیرون منتقل نمی‌شود.
+ * برگرداندنِ null (یعنی کالبکِ بدونِ return) خطا می‌دهد، چون رایج‌ترین راهِ
+ * خراب‌کردنِ ساکتِ این تابع همین است: فراموش کردنِ return و نوشته‌شدنِ همان
+ * ورودیِ بی‌تغییر.
+ *
+ * قفل رویِ فایلِ جداگانهٔ `.lock` گرفته می‌شود تا read-modify-writeِ چند
+ * درخواستِ همزمان از دست نرود و آیتم گم یا تکراری نشود.
+ */
+function jupdate(string $file, callable $mutator)
+{
+    $dir = dirname($file);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0700, true);
+    }
+    $lock = @fopen($file . '.lock', 'c');
+    if (!$lock) {
+        throw new RuntimeException('lock failed');
+    }
+    flock($lock, LOCK_EX);
+    try {
+        $data = jread($file, []);
+        $out = $mutator($data);
+        if ($out === false) {
+            return false;
+        }
+        if (!is_array($out)) {
+            throw new InvalidArgumentException('jupdate mutator must return an array or false');
+        }
+        $data = $out;
+        jwrite($file, $data);
+        return true;
+    } finally {
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
 }
 
 function h(?string $s): string
@@ -182,77 +246,153 @@ function attempts_ip_file(): string
 }
 
 /**
- * قفل ورود: شمارندهٔ per-IP (۲۰ تلاش ناموفق/ساعت از هر آدرس) + سقف سراسری
- * (۱۰۰ تلاش/ساعت کل سایت برای مانع حملهٔ چند-IP).
- * قبلاً فقط یک شمارندهٔ سراسری ۸/۱۵دقیقه بود که مهاجم با ۸ تلاش اشتباهِ ساده
- * می‌توانست خودِ مدیر را قفل کند (login-DoS)؛ اکنون هر آدرس فقط خودش را قفل می‌کند.
+ * IP فقط از REMOTE_ADDR. هیچ هدرِ قابلِ جعلی (X-Forwarded-For، X-Real-IP،
+ * HTTP_CLIENT_IP، Forwarded) خوانده نمی‌شود؛ پشتِ CDN هم همان IPِ لبه ثبت
+ * می‌شود که برایِ نرخ‌限额 کافی است.
+ */
+function client_ip(): string
+{
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+    return filter_var($ip, FILTER_VALIDATE_IP) !== false ? $ip : '';
+}
+
+/**
+ * نمکِ ثابت برای هش کردن IP. در فایلِ خارج از git (DATA_DIR/.salt) نگه
+ * داشته می‌شود؛ بدونِ آن هشِ IP قابلِ برگشتِ آفلاین است و حفاظتِ حریم
+ * خصوصی وجود ندارد.
+ */
+function rate_salt(): string
+{
+    static $salt = null;
+    if ($salt !== null) {
+        return $salt;
+    }
+    $f = DATA_DIR . '/.salt';
+    if (is_file($f)) {
+        $raw = @file_get_contents($f);
+        if (is_string($raw) && strlen($raw) >= 32) {
+            $salt = $raw;
+            return $salt;
+        }
+    }
+    $salt = bin2hex(random_bytes(32));
+    if (!is_dir(DATA_DIR)) {
+        @mkdir(DATA_DIR, 0700, true);
+    }
+    @file_put_contents($f, $salt, LOCK_EX);
+    @chmod($f, 0600);
+    return $salt;
+}
+
+/**
+ * کلیدِ شمارندهها: نمی‌گذاریم IPِ خام در هیچ فایلِ داده ذخیره شود. کلیدِ
+ * ۳۲ کاراکتریِ HMAC-SHA256 برای نرخ‌限额 کافی است و قابلِ برگشت نیست.
+ */
+function ip_key(string $ip): string
+{
+    // حتی IPِ خالی هم هش می‌شود تا همهٔ درخواست‌هایِ بدونِ آدرس در یک سطلِ واحد
+    // جمع نشوند و بی‌دلیل همدیگر را از سقفِ نرخ خارج نکنند.
+    return substr(hash_hmac('sha256', $ip, rate_salt()), 0, 32);
+}
+
+/**
+ * قفلِ ورود: فقط per-IP (۲۰ تلاش ناموفق/ساعت از هر آدرس).
+ *
+ * سقفِ سراسری عمداً قفلِ کامل نمی‌شود: اگر بشود، مهاجم با چند ده تلاشِ
+ * اشتباهِ ارزان می‌تواند خودِ مدیر را برایِ یک ساعت بیرون کند (login-DoS).
+ * به‌جای آن attempt_delay() فشارِ سراسری را به تأخیرِ زمانی تبدیل می‌کند.
  */
 function attempt_allowed(): bool
 {
-    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
     $now = time();
+    $k = ip_key(client_ip());
 
     $ipa = jread(attempts_ip_file(), ['k' => []]);
-    $e = $ipa['k'][$ip] ?? ['n' => 0, 'ts' => $now];
-    if ((int)$e['n'] >= 20 && $now - (int)$e['ts'] < 3600) {
-        return false;
-    }
+    $e = is_array($ipa['k'][$k] ?? null) ? $ipa['k'][$k] : ['n' => 0, 'ts' => $now];
+    return !((int)$e['n'] >= 20 && $now - (int)$e['ts'] < 3600);
+}
 
+/**
+ * ثانیه‌های انتظارِ اضافه، بر اساسِ فشارِ سراسریِ یک ساعتِ اخیر. یعنی هجومِ
+ * سراسری هزینه‌اش را می‌پردازد، ولی هیچ‌کس را بیرون نمی‌کند.
+ */
+function attempt_delay(): int
+{
     $a = jread(attempts_file(), ['n' => 0, 'ts' => 0]);
-    if ((int)$a['n'] >= 100 && $now - (int)$a['ts'] < 3600) {
-        return false;
+    if (time() - (int)$a['ts'] >= 3600) {
+        return 0;
     }
-    return true;
+    $n = (int)$a['n'];
+    if ($n >= 400) {
+        return 20;
+    }
+    if ($n >= 200) {
+        return 10;
+    }
+    if ($n >= 100) {
+        return 4;
+    }
+    return 0;
 }
 
 function attempt_fail(): void
 {
     $now = time();
-    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+    $k = ip_key(client_ip());
 
-    $f = attempts_ip_file();
-    $st = jread($f, ['k' => []]);
-    if (!is_array($st['k'] ?? null)) {
-        $st['k'] = [];
-    }
-    $e = $st['k'][$ip] ?? ['n' => 0, 'ts' => $now];
-    if ($now - (int)$e['ts'] >= 3600) {
-        $e = ['n' => 0, 'ts' => $now];
-    }
-    $e['n'] = (int)$e['n'] + 1;
-    $st['k'][$ip] = $e;
-    foreach ($st['k'] as $kk => $vv) {
-        if ($now - (int)($vv['ts'] ?? 0) >= 3600) {
-            unset($st['k'][$kk]);
+    jupdate(attempts_ip_file(), function (array $st) use ($now, $k) {
+        if (!is_array($st['k'] ?? null)) {
+            $st['k'] = [];
         }
-    }
-    jwrite($f, $st);
+        // نگهداریِ کوتاه: فقط پنجرهٔ یک ساعت نگه داشته می‌شود.
+        foreach ($st['k'] as $kk => $vv) {
+            if (!is_array($vv) || $now - (int)($vv['ts'] ?? 0) >= 3600) {
+                unset($st['k'][$kk]);
+            }
+        }
+        $e = $st['k'][$k] ?? ['n' => 0, 'ts' => $now];
+        if ($now - (int)$e['ts'] >= 3600) {
+            $e = ['n' => 0, 'ts' => $now];
+        }
+        $e['n'] = (int)$e['n'] + 1;
+        $st['k'][$k] = $e;
+        return $st;
+    });
 
-    $a = jread(attempts_file(), ['n' => 0, 'ts' => $now]);
-    if ($now - (int)$a['ts'] >= 3600) {
-        $a = ['n' => 0, 'ts' => $now];
-    }
-    $a['n'] = (int)$a['n'] + 1;
-    jwrite(attempts_file(), $a);
+    jupdate(attempts_file(), function (array $a) use ($now) {
+        if ($now - (int)($a['ts'] ?? 0) >= 3600) {
+            $a = ['n' => 0, 'ts' => $now];
+        }
+        $a['n'] = (int)($a['n'] ?? 0) + 1;
+        return $a;
+    });
 }
 
 function attempt_reset(): void
 {
-    jwrite(attempts_file(), ['n' => 0, 'ts' => 0]);
-    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
-    $f = attempts_ip_file();
-    $st = jread($f, ['k' => []]);
-    if (is_array($st['k'] ?? null) && isset($st['k'][$ip])) {
-        unset($st['k'][$ip]);
-        jwrite($f, $st);
-    }
+    $k = ip_key(client_ip());
+    jupdate(attempts_ip_file(), function (array $st) use ($k) {
+        if (is_array($st['k'] ?? null)) {
+            unset($st['k'][$k]);
+        }
+        return $st;
+    });
 }
 
-function api_headers(): void
+/**
+ * هدرهای پاسخ JSON.
+ *
+ * CORS فقط برای نقاطِ خواندنی روشن می‌شود. `report.php` که نوشتنی است هرگز
+ * CORS نمی‌گیرد تا هیچ صفحهٔ وبی از دامنهٔ دیگر نتواند از طریقِ مرورگرِ کاربر
+ * گزارش جعل کند. (کلاینتِ دسکتاپ اصلاً مرورگر نیست و این هدر را نمی‌خواند.)
+ */
+function api_headers(bool $cors = false): void
 {
     header('Content-Type: application/json; charset=utf-8');
     header('Cache-Control: no-store, no-cache, must-revalidate');
-    header('Access-Control-Allow-Origin: *');
+    if ($cors) {
+        header('Access-Control-Allow-Origin: *');
+    }
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: no-referrer');
 }
@@ -278,6 +418,9 @@ function rate_allow(string $ip, int $max, int $windowSec): bool
     if ($ip === '') {
         return true;
     }
+    // IPِ خام ذخیره نمی‌شود: کلید = هشِ نمکی، و فقط تا پایانِ پنجرهٔ
+    // نگهداری می‌شود (هر ردیفِ کهنه بلافاصله پاک می‌شود).
+    $k = ip_key($ip);
     $f = DATA_DIR . '/ratelimit.json';
     $lock = @fopen(DATA_DIR . '/ratelimit.lock', 'c');
     if ($lock) {
@@ -290,21 +433,21 @@ function rate_allow(string $ip, int $max, int $windowSec): bool
             $st['k'] = [];
         }
         foreach ($st['k'] as $kk => $vv) {
-            if ($now - (int)($vv['ts'] ?? 0) >= $windowSec) {
+            if (!is_array($vv) || $now - (int)($vv['ts'] ?? 0) >= $windowSec) {
                 unset($st['k'][$kk]);
             }
         }
-        $e = $st['k'][$ip] ?? ['n' => 0, 'ts' => $now];
+        $e = $st['k'][$k] ?? ['n' => 0, 'ts' => $now];
         if ($now - (int)$e['ts'] >= $windowSec) {
             $e = ['n' => 0, 'ts' => $now];
         }
         if ((int)$e['n'] >= $max) {
-            $st['k'][$ip] = $e;
+            $st['k'][$k] = $e;
             jwrite($f, $st);
             return false;
         }
         $e['n'] = (int)$e['n'] + 1;
-        $st['k'][$ip] = $e;
+        $st['k'][$k] = $e;
         jwrite($f, $st);
         return true;
     } finally {
@@ -615,6 +758,12 @@ function ipinfo_allow(): bool
     return true;
 }
 
+/**
+ * غنی‌سازیِ ISP/ASN برای ردیف‌هایِ تکمیل‌نشده. عمداً با IPِ ذخیره‌شده کار می‌کند،
+ * و چون IPِ خام دیگر ذخیره نمی‌شود، برایِ ردیف‌هایِ جدید این تابع کاری نمی‌کند —
+ * اطلاعاتِ ISP هنگامِ check.php و با IPِ در حافظه ثبت می‌شود. برایِ دادهٔ
+ * قدیمیِ ذخیره‌شده همچنان کار می‌کند.
+ */
 function ip_fill(array &$rows, int $cap = 10, float $budget = 4.0): void
 {
     $deadline = microtime(true) + $budget;
@@ -648,6 +797,35 @@ function ip_fill(array &$rows, int $cap = 10, float $budget = 4.0): void
         $done++;
     }
     unset($c);
+}
+
+/**
+ * فقط https. لینک‌های `javascript:`، `data:`، `vbscript:` و `http:` پذیرفته
+ * نمی‌شوند؛ خروجیِ خالی یعنی «لینکِ خالیِ مجاز»، null یعنی «نامعتبر».
+ */
+function safe_url(string $url): ?string
+{
+    $url = trim($url);
+    if ($url === '') {
+        return '';
+    }
+    if (!preg_match('#^https://[^\s<>"\']+$#i', $url)) {
+        return null;
+    }
+    $p = parse_url($url);
+    if (!is_array($p) || empty($p['host'])) {
+        return null;
+    }
+    return $url;
+}
+
+/**
+ * نمایشِ کوتاهِ «کلیدِ منبع» در پنل. این دیگر IP نیست؛ نمی‌شود آن را به آدرسِ
+ * واقعی برگرداند، ولی همچنان می‌گوید «همان منسابِ قبلی» یا «منبعی دیگر».
+ */
+function src_short(string $src): string
+{
+    return $src === '' ? '' : substr($src, 0, 12);
 }
 
 function str_cut(string $s, int $len): string

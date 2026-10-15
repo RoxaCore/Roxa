@@ -11,49 +11,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = trim((string)($_POST['title'] ?? ''));
         $body = trim((string)($_POST['body'] ?? ''));
         $level = in_array($_POST['level'] ?? '', ['info', 'warn', 'update'], true) ? $_POST['level'] : 'info';
-        $url = trim((string)($_POST['url'] ?? ''));
+        // فقط https پذیرفته می‌شود: `javascript:`، `data:` و `http:` رد می‌شوند.
+        $url = safe_url(trim((string)($_POST['url'] ?? '')));
         $langs = langs_field();
         $countries = country_field();
         $active = isset($_POST['active']) ? true : false;
         if ($title === '' || $body === '') {
             flash('عنوان و متن اعلان اجباری است.', 'err');
+        } elseif ($url === null) {
+            flash('لینک باید با https:// شروع شود؛ لینک پذیرفته نشد.', 'err');
         } else {
-            $store['seq'] = (int)($store['seq'] ?? 0) + 1;
-            $store['items'][] = [
-                'id' => (int)$store['seq'],
-                'title' => str_cut($title, 120),
-                'body' => str_cut($body, 2000),
-                'level' => $level,
-                'url' => str_cut($url, 300),
-                'langs' => $langs,
-                'countries' => $countries,
-                'active' => $active,
-                'created' => date('c'),
-            ];
-            jwrite(DATA_DIR . '/announcements.json', $store);
+            $seq = 0;
+            jupdate(DATA_DIR . '/announcements.json', function (array $store) use ($title, $body, $level, $url, $langs, $countries, $active, &$seq) {
+                $store['seq'] = (int)($store['seq'] ?? 0) + 1;
+                $seq = (int)$store['seq'];
+                if (!is_array($store['items'] ?? null)) {
+                    $store['items'] = [];
+                }
+                $store['items'][] = [
+                    'id' => $seq,
+                    'title' => str_cut($title, 120),
+                    'body' => str_cut($body, 2000),
+                    'level' => $level,
+                    'url' => str_cut($url, 300),
+                    'langs' => $langs,
+                    'countries' => $countries,
+                    'active' => $active,
+                    'created' => date('c'),
+                ];
+                return $store;
+            });
             flash('اعلان ثبت شد.');
         }
     } elseif ($action === 'toggle') {
         $id = (int)($_POST['id'] ?? 0);
-        foreach ($store['items'] as $k => $it) {
-            if ((int)$it['id'] === $id) {
-                $store['items'][$k]['active'] = empty($it['active']);
-                jwrite(DATA_DIR . '/announcements.json', $store);
-                flash('وضعیت اعلان عوض شد.');
-                break;
+        $found = false;
+        jupdate(DATA_DIR . '/announcements.json', function (array $store) use ($id, &$found) {
+            if (!is_array($store['items'] ?? null)) {
+                $store['items'] = [];
+                return $store;
             }
-        }
+            foreach ($store['items'] as $k => $it) {
+                if ((int)($it['id'] ?? 0) === $id) {
+                    $store['items'][$k]['active'] = empty($it['active']);
+                    $found = true;
+                    break;
+                }
+            }
+            return $store;
+        });
+        flash($found ? 'وضعیت اعلان عوض شد.' : 'اعلان پیدا نشد.', $found ? 'ok' : 'err');
     } elseif ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
-        $new = [];
-        foreach ($store['items'] as $it) {
-            if ((int)$it['id'] !== $id) {
-                $new[] = $it;
+        $found = false;
+        jupdate(DATA_DIR . '/announcements.json', function (array $store) use ($id, &$found) {
+            if (!is_array($store['items'] ?? null)) {
+                $store['items'] = [];
+                return $store;
             }
-        }
-        $store['items'] = $new;
-        jwrite(DATA_DIR . '/announcements.json', $store);
-        flash('اعلان حذف شد.');
+            $new = [];
+            foreach ($store['items'] as $it) {
+                if ((int)($it['id'] ?? 0) !== $id) {
+                    $new[] = $it;
+                } elseif (!$found) {
+                    $found = true;
+                }
+            }
+            $store['items'] = $new;
+            return $store;
+        });
+        flash($found ? 'اعلان حذف شد.' : 'اعلان پیدا نشد.', $found ? 'ok' : 'err');
     }
     header('Location: announcements.php');
     exit;
@@ -92,7 +119,7 @@ if (!$items) {
         $ics = (string)($it['countries'] ?? '');
         $il = item_langs($it);
         echo '<tr><td>' . (int)$it['id'] . '</td>';
-        echo '<td>' . h($it['title']) . ($it['url'] !== '' ? ' <a href="' . h($it['url']) . '" target="_blank">🔗</a>' : '') . '</td>';
+        echo '<td>' . h($it['title']) . ((string)($it['url'] ?? '') !== '' && safe_url((string)$it['url']) !== null ? ' <a href="' . h((string)$it['url']) . '" target="_blank" rel="noopener noreferrer">🔗</a>' : '') . '</td>';
         echo '<td style="max-width:280px;color:#9ca3af">' . h(str_cut((string)$it['body'], 90)) . (str_len((string)$it['body']) > 90 ? '…' : '') . '</td>';
         echo '<td><span class="badge ' . $lv[1] . '">' . h($lv[0]) . '</span></td>';
         echo '<td>' . ($il ? h(implode(',', $il)) : '<span style="color:#9ca3af">همه</span>') . '</td>';

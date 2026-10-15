@@ -87,7 +87,9 @@ th{color:var(--mut);font-weight:400;font-size:12px}
         echo '<a href="' . $item[1] . '"' . $on . '>' . h($item[0]) . '</a>';
     }
     echo '</nav>';
-    echo '<a class="out" href="logout.php">خروج از حساب</a></aside>';
+    // خروج باید POST باشد (با توکن CSRF)؛ لینکِ GET قابلِ کلیکِ خودکار است.
+    echo '<form method="post" action="logout.php" style="display:inline">' . csrf_field();
+    echo '<button class="out" type="submit" style="background:none;border:0;cursor:pointer;font:inherit;color:inherit;padding:0">خروج از حساب</button></form></aside>';
     echo '<main class="main">';
     echo '<div class="top"><h1>' . h($title) . '</h1>';
     echo '<div class="u">' . ($user !== '' ? 'کاربر: ' . $user . ' · ' : '') . date('Y-m-d H:i') . '</div></div>';

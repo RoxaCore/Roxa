@@ -1,8 +1,19 @@
-auth.json
-attempts.json
-attempts_ip.json
-reports.json
-stats.lock
-ratelimit.json
-ratelimit.lock
-
+# Only the three empty seed fixtures are tracked. Everything else that lands
+# in this directory at runtime must never enter git:
+#
+#   auth.json          the admin password hash
+#   .salt              the key that makes the stored IP hashes meaningful --
+#                      committing it would let anyone with the repo reverse
+#                      every hashed address back
+#   *.lock, *.tmp      transient
+#   stats/reports/ratelimit/attempts/ipinfo data, once non-empty
+#
+# DATA_DIR now defaults to a directory *outside* the web root (see
+# ../config.php), so this directory is only used if someone deliberately
+# points DATA_DIR back here.
+*
+!.gitignore
+!.htaccess
+!announcements.json
+!stats.json
+!version.json

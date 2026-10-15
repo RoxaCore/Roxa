@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../lib.php';
-api_headers();
+
+// این نقطه نوشتنی است؛ عمداً CORS ندارد تا هیچ صفحهٔ وبِ دامنهٔ دیگری نتواند
+// از طریقِ مرورگرِ کاربر گزارش بفرستد. کلاینت دسکتاپ است و اصلاً به آن نیاز ندارد.
+api_headers(false);
 
 function report_json(array $body, int $code): void
 {
@@ -24,7 +27,8 @@ if (!is_array($data)) {
 
 $ipRemote = (string)($_SERVER['REMOTE_ADDR'] ?? '');
 $ip = filter_var($ipRemote, FILTER_VALIDATE_IP) !== false ? $ipRemote : '';
-// سقف per-IP: ۱۰ گزارش در ساعت — مانع سیل گزارش‌های جعلی.
+// سقف per-IP: ۱۰ گزارش در ساعت — مانع سیل گزارش‌های جعلی. کلید، هشِ نمکیِ
+// IP است نه خودِ IP؛ IPِ خام هیچ‌جا ذخیره نمی‌شود.
 if (!rate_allow('report:' . ($ip !== '' ? $ip : 'unknown'), 10, 3600)) {
     report_json(['ok' => false, 'error' => 'rate'], 429);
 }
@@ -46,30 +50,39 @@ if ($message === '' && $error === '') {
     report_json(['ok' => false, 'error' => 'empty'], 400);
 }
 
+// IPِ خامِ ذخیره‌شده: فقط برایِ اینکه ادمین بتواند گزارش‌هایِ یک منبع را از هم
+// تشخیص دهد. نمی‌توان آن را به IPِ واقعی برگرداند؛ نمکِ سرور جایی ذخیره نمی‌شود.
+$src = $ip !== '' ? ip_key($ip) : '';
+
 try {
-    $file = DATA_DIR . '/reports.json';
-    $store = jread($file, ['seq' => 0, 'items' => []]);
-    $store['seq'] = (int)($store['seq'] ?? 0) + 1;
-    $store['items'][] = [
-        'n' => (int)$store['seq'],
-        'type' => $type,
-        'ver' => $ver,
-        'os' => $os,
-        'id' => $id,
-        'message' => $message,
-        'error' => $error,
-        'log' => $log,
-        'ip' => $ip,
-        'at' => date('c'),
-        'seen' => false,
-    ];
-    // سقف نگهداری: قدیمی‌ترین‌ها حذف شوند تا فایل رشد نکند.
-    if (count($store['items']) > 500) {
-        $store['items'] = array_slice($store['items'], -500);
-    }
-    jwrite($file, $store);
+    $seq = 0;
+    jupdate(DATA_DIR . '/reports.json', function (array $store) use ($type, $ver, $os, $id, $message, $error, $log, $src, &$seq) {
+        if (!is_array($store['items'] ?? null)) {
+            $store['items'] = [];
+        }
+        $store['seq'] = (int)($store['seq'] ?? 0) + 1;
+        $seq = (int)$store['seq'];
+        $store['items'][] = [
+            'n' => $seq,
+            'type' => $type,
+            'ver' => $ver,
+            'os' => $os,
+            'id' => $id,
+            'message' => $message,
+            'error' => $error,
+            'log' => $log,
+            'src' => $src,
+            'at' => date('c'),
+            'seen' => false,
+        ];
+        // سقف نگهداری: قدیمی‌ترین‌ها حذف شوند تا فایل رشد نکند.
+        if (count($store['items']) > 500) {
+            $store['items'] = array_slice($store['items'], -500);
+        }
+        return $store;
+    });
 } catch (Throwable $e) {
     report_json(['ok' => false, 'error' => 'write'], 500);
 }
 
-report_json(['ok' => true, 'n' => (int)$store['seq']], 200);
+report_json(['ok' => true, 'n' => $seq], 200);

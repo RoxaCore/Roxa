@@ -42,7 +42,7 @@ if (!$total) {
     echo '<div class="card"><div class="hint">هنوز کاربری ثبت نشده است. آمار از لحظه‌ای که اپ کاربران این نسخه را اجرا کند ثبت می‌شود.</div></div>';
 } else {
     echo '<div class="card"><h2>لیست کاربران (' . $total . ($total > $limit ? ' — نمایش ' . $limit . ' مورد اخیر' : '') . ')</h2><table>';
-    echo '<tr><th>شناسه</th><th>نام دستگاه</th><th>سیستم‌عامل</th><th>IP</th><th>ISP</th><th>کشور</th><th>نسخه</th><th>اتصال‌ها</th><th>آخرین فعالیت</th></tr>';
+    echo '<tr><th>شناسه</th><th>نام دستگاه</th><th>سیستم‌عامل</th><th>منبع</th><th>ISP</th><th>کشور</th><th>نسخه</th><th>اتصال‌ها</th><th>آخرین فعالیت</th></tr>';
     foreach ($rows as $c) {
         $id = (string)$c['id'];
         $t = strtotime((string)($c['last'] ?? '')) ?: 0;
@@ -59,7 +59,7 @@ if (!$total) {
         echo '<td><a class="mono" style="background:none;padding:0" href="user.php?id=' . h($id) . '">' . h(substr($id, 0, 8)) . '…</a>' . $badge . '</td>';
         echo '<td>' . ($dev !== '' ? h($dev) : '—') . '</td>';
         echo '<td>' . ((string)($c['os'] ?? '') !== '' ? h($c['os']) : '—') . '</td>';
-        echo '<td class="mono" style="background:none;padding:0">' . ((string)($c['ip'] ?? '') !== '' ? h($c['ip']) : ((string)($c['ip_last'] ?? '') !== '' ? h($c['ip_last']) : '—')) . '</td>';
+        echo '<td class="mono" style="background:none;padding:0">' . (src_short((string)($c['ip'] ?? '')) !== '' ? h(src_short((string)$c['ip'])) : (src_short((string)($c['ip_last'] ?? '')) !== '' ? h(src_short((string)$c['ip_last'])) : '—')) . '</td>';
         echo '<td>' . ($isp !== '' ? h($isp) : '—') . '</td>';
         echo '<td>' . ((string)($c['country'] ?? '') !== '' ? h($c['country']) : '—') . '</td>';
         echo '<td>' . ((string)($c['ver'] ?? '') !== '' ? h($c['ver']) : '—') . '</td>';

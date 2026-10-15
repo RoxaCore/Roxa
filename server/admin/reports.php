@@ -9,34 +9,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = (string)($_POST['action'] ?? '');
     if ($action === 'seen') {
         $n = (int)($_POST['n'] ?? 0);
-        foreach ($store['items'] as $k => $it) {
-            if ((int)($it['n'] ?? 0) === $n) {
-                $store['items'][$k]['seen'] = true;
-                break;
+        jupdate(DATA_DIR . '/reports.json', function (array $store) use ($n) {
+            if (!is_array($store['items'] ?? null)) {
+                $store['items'] = [];
+                return $store;
             }
-        }
-        jwrite(DATA_DIR . '/reports.json', $store);
+            foreach ($store['items'] as $k => $it) {
+                if ((int)($it['n'] ?? 0) === $n) {
+                    $store['items'][$k]['seen'] = true;
+                    break;
+                }
+            }
+            return $store;
+        });
         flash('گزارش خوانده شد.');
     } elseif ($action === 'seenall') {
-        foreach ($store['items'] as $k => $it) {
-            $store['items'][$k]['seen'] = true;
-        }
-        jwrite(DATA_DIR . '/reports.json', $store);
+        jupdate(DATA_DIR . '/reports.json', function (array $store) {
+            if (!is_array($store['items'] ?? null)) {
+                $store['items'] = [];
+                return $store;
+            }
+            foreach ($store['items'] as $k => $it) {
+                $store['items'][$k]['seen'] = true;
+            }
+            return $store;
+        });
         flash('همه گزارش‌ها خوانده شد.');
     } elseif ($action === 'delete') {
         $n = (int)($_POST['n'] ?? 0);
-        $new = [];
-        foreach ($store['items'] as $it) {
-            if ((int)($it['n'] ?? 0) !== $n) {
-                $new[] = $it;
+        jupdate(DATA_DIR . '/reports.json', function (array $store) use ($n) {
+            if (!is_array($store['items'] ?? null)) {
+                $store['items'] = [];
+                return $store;
             }
-        }
-        $store['items'] = $new;
-        jwrite(DATA_DIR . '/reports.json', $store);
+            $new = [];
+            foreach ($store['items'] as $it) {
+                if ((int)($it['n'] ?? 0) !== $n) {
+                    $new[] = $it;
+                }
+            }
+            $store['items'] = $new;
+            return $store;
+        });
         flash('گزارش حذف شد.');
     } elseif ($action === 'deleteall') {
-        $store['items'] = [];
-        jwrite(DATA_DIR . '/reports.json', $store);
+        jupdate(DATA_DIR . '/reports.json', function (array $store) {
+            $store['items'] = [];
+            return $store;
+        });
         flash('همه گزارش‌ها حذف شد.');
     }
     header('Location: reports.php');
@@ -91,8 +111,12 @@ if (!$items) {
         if ((string)($it['os'] ?? '') !== '') {
             echo '<br><small style="color:#9ca3af">' . h(str_cut((string)$it['os'], 40)) . '</small>';
         }
-        if ((string)($it['ip'] ?? '') !== '') {
-            echo '<br><small class="mono" style="color:#6b7280">' . h((string)$it['ip']) . '</small>';
+        $src = (string)($it['src'] ?? '');
+        if ($src === '') {
+            $src = (string)($it['ip'] ?? '');  // دادهٔ قدیمی
+        }
+        if ($src !== '') {
+            echo '<br><small class="mono" style="color:#6b7280">منبع ' . h(src_short($src)) . '</small>';
         }
         echo '</td>';
 

@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../lib.php';
-api_headers();
+api_headers(true);
 
 $store = jread(DATA_DIR . '/announcements.json', ['seq' => 0, 'items' => []]);
 $since = isset($_GET['since']) ? (int)$_GET['since'] : 0;
@@ -26,7 +26,7 @@ foreach (($store['items'] ?? []) as $it) {
         'title' => (string)($it['title'] ?? ''),
         'body' => (string)($it['body'] ?? ''),
         'level' => (string)($it['level'] ?? 'info'),
-        'url' => (string)($it['url'] ?? ''),
+        'url' => (string)(safe_url((string)($it['url'] ?? '')) ?? ''),
         'created' => (string)($it['created'] ?? ''),
     ];
 }

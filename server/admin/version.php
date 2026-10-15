@@ -93,9 +93,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sha = hash_file('sha256', $dest) ?: '';
         $size = (int)filesize($dest);
     } else {
-        $url = trim((string)($_POST['url'] ?? ''));
-        if ($url === '' || !preg_match('#^https?://#i', $url)) {
-            $respond(false, 'لینک مستقیم دانلود باید با http یا https شروع شود.');
+        // کلاینت عمداً فقط https را می‌پذیرد؛ لینکِ http در پنل پذیرفته نمی‌شود
+        // تا نسخهٔ منتشرشده از همان اول قابلِ دانلود باشد.
+        $url = safe_url(trim((string)($_POST['url'] ?? '')));
+        if ($url === null || $url === '') {
+            $respond(false, 'لینک مستقیم دانلود باید با https:// شروع شود.');
         }
         $sha = strtolower(preg_replace('/[^0-9a-fA-F]/', '', (string)($_POST['sha'] ?? '')) ?? '');
         $file = null;

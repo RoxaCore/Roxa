@@ -1,33 +1,24 @@
 Options -Indexes
 
-# فایل تنظیمات PHP نباید مستقیم دانلود شود
-<FilesMatch "^\.user\.ini$">
-  <IfModule mod_authz_core.c>
-    Require all denied
-  </IfModule>
-  <IfModule !mod_authz_core.c>
-    Order allow,deny
-    Deny from all
-  </IfModule>
+# فایل‌های دادهٔ JSON باید از سمتِ وب قابلِ دسترسی نباشند — حتی اگر کسی
+# DATA_DIR را دوباره داخلِ webroot برگردانده باشد. `.lock` و `.salt` هم همین‌طور؛
+# `.salt` اگر لو برود، هش‌هایِ IP قابلِ برگشتِ آفلاین می‌شوند.
+<FilesMatch "\.(json|lock|salt|tmp)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
 </FilesMatch>
 
-# جلوگیری از دانلود مستقیم فایل‌های داده (auth.json، stats.json و...)
-<FilesMatch "\.json$">
-  <IfModule mod_authz_core.c>
-    Require all denied
-  </IfModule>
-  <IfModule !mod_authz_core.c>
-    Order allow,deny
-    Deny from all
-  </IfModule>
+<FilesMatch "^\.">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
 </FilesMatch>
-
-# کش بلندمدت برای فونت‌ها (ثابت) و CSS محلی
-<IfModule mod_headers.c>
-  <FilesMatch "\.(woff2|woff|ttf|otf)$">
-    Header set Cache-Control "public, max-age=31536000, immutable"
-  </FilesMatch>
-  <FilesMatch "\.css$">
-    Header set Cache-Control "public, max-age=604800"
-  </FilesMatch>
-</IfModule>

@@ -1,1 +1,16 @@
-Require all denied
+# فایل‌های دادهٔ پنل باید از سمتِ وب قابلِ دسترسی نباشند.
+# <IfModule> دوگانه یعنی روی هر وب‌سروری که این دستور را نمی‌شناسد بی‌صدا رد
+# می‌شود، ولی روی Apache با `Require` (2.4) و `Order/Allow/Deny` (2.2) هر دو کار
+# می‌کند. این تنها لایهٔ حفاظت نیست: DATA_DIR به‌طورِ پیش‌فرض بیرونِ webroot است
+# (config.php) و این فایل فقط برایِ کسانی که آن را دوباره داخل آورده‌اند می‌ماند.
+#
+# اگر Apache هستید، AllowOverride باید «FileInfo» یا «All» باشد وگرنه این فایل
+# اصلاً خوانده نمی‌شود (به server/README.md نگاه کنید).
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>

@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../lib.php';
-api_headers();
+api_headers(true);
 
 $ver = jread(DATA_DIR . '/version.json', [
     'latest' => null,
@@ -38,10 +38,11 @@ if ($id !== '') {
     }
 
     // نوشتن آمار با سقف per-IP؛ پاسخ بهروزرسانی در هر صورت داده می‌شود.
+    // IPِ خام ذخیره نمی‌شود — فقط هشِ نمکی‌اش، برای تشخیص «همان منبع قبلی».
     if (rate_allow($ipOk !== '' ? $ipOk : 'unknown', 60, 60)) {
         stats_touch($id, [
-            'ip_last' => $ipOk,
-            'ip' => $direct ? $ipOk : '',
+            'ip_last' => $ipOk !== '' ? ip_key($ipOk) : '',
+            'ip' => ($direct && $ipOk !== '') ? ip_key($ipOk) : '',
             'os' => $os !== '' ? str_cut($os, 120) : '',
             'country' => $cc,
             'lang' => $lang,

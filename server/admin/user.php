@@ -44,8 +44,8 @@ echo '<div class="grid">';
 echo '<div class="stat"><div class="k">نام دستگاه</div><div class="v"><small>' . ($dev !== '' ? h($dev) : '—') . '</small></div></div>';
 echo '<div class="stat"><div class="k">تعداد اتصال</div><div class="v">' . ($conn > 0 ? (string)$conn : '—') . '</div></div>';
 echo '<div class="stat"><div class="k">سیستم‌عامل</div><div class="v"><small>' . ((string)($c['os'] ?? '') !== '' ? h($c['os']) : '—') . '</small></div></div>';
-echo '<div class="stat"><div class="k">IP (مستقیم)</div><div class="v"><small>' . ((string)($c['ip'] ?? '') !== '' ? h($c['ip']) : '—') . '</small></div></div>';
-echo '<div class="stat"><div class="k">IP آخرین درخواست</div><div class="v"><small>' . ((string)($c['ip_last'] ?? '') !== '' ? h($c['ip_last']) : '—') . '</small></div></div>';
+echo '<div class="stat"><div class="k">منبع (مستقیم)</div><div class="v"><small>' . (src_short((string)($c['ip'] ?? '')) !== '' ? h(src_short((string)$c['ip'])) : '—') . '</small></div></div>';
+echo '<div class="stat"><div class="k">منبع آخرین درخواست</div><div class="v"><small>' . (src_short((string)($c['ip_last'] ?? '')) !== '' ? h(src_short((string)$c['ip_last'])) : '—') . '</small></div></div>';
 echo '<div class="stat"><div class="k">ISP</div><div class="v"><small>' . ($isp !== '' ? h($isp) : '—') . '</small></div></div>';
 echo '<div class="stat"><div class="k">ASN</div><div class="v"><small>' . ($asn > 0 ? 'AS' . $asn : '—') . '</small></div></div>';
 if ($org !== '' && $org !== $isp) {

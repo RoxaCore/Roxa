@@ -248,7 +248,7 @@ function attempts_ip_file(): string
 /**
  * IP فقط از REMOTE_ADDR. هیچ هدرِ قابلِ جعلی (X-Forwarded-For، X-Real-IP،
  * HTTP_CLIENT_IP، Forwarded) خوانده نمی‌شود؛ پشتِ CDN هم همان IPِ لبه ثبت
- * می‌شود که برایِ نرخ‌限额 کافی است.
+ * می‌شود که برایِ نرخ‌محدودیت کافی است.
  */
 function client_ip(): string
 {
@@ -286,7 +286,7 @@ function rate_salt(): string
 
 /**
  * کلیدِ شمارندهها: نمی‌گذاریم IPِ خام در هیچ فایلِ داده ذخیره شود. کلیدِ
- * ۳۲ کاراکتریِ HMAC-SHA256 برای نرخ‌限额 کافی است و قابلِ برگشت نیست.
+ * ۳۲ کاراکتریِ HMAC-SHA256 برای نرخ‌محدودیت کافی است و قابلِ برگشت نیست.
  */
 function ip_key(string $ip): string
 {

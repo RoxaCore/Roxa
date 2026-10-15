@@ -31,7 +31,7 @@ sealed class Program
     // بدونِ `Global\`، هر سشن (Fast User Switching، RDP) نمونهٔ خودش را می‌دید و
     // کاربر با یک نصب، دو برنامهٔ همزمان داشت که هرکدام می‌خواستند TUN و پروکسیِ
     // سیستم را بگیرند.
-    private const string MutexName = @"Global\Roxa唯一的实例";
+    private const string MutexName = @"Global\Roxa.SingleInstance";
     private const string ShowSignalName = @"Global\RoxaShowSignal";
     private const string ExitSignalName = @"Global\RoxaExitSignal";
 

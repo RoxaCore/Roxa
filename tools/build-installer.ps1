@@ -24,6 +24,16 @@ if (Test-Path (Join-Path $pub "engine\geoip.dat")) { throw "geoip.dat must not b
 if (Test-Path (Join-Path $pub "engine\geosite.dat")) { throw "geosite.dat must not be published" }
 if (-not (Test-Path (Join-Path $pub "Roxa.exe"))) { throw "publish output incomplete" }
 
+# The engine now lives in Program Files, which the app cannot write to. Without a
+# bundled sidecar, VerifyEngineIntegrity would have to CREATE xray.exe.sha256, fail
+# on the read-only folder, report a corrupt engine and refuse to connect at all. The
+# digest is produced here so it always matches the exact binary being shipped.
+$engineExe = Join-Path $pub "engine\xray.exe"
+if (-not (Test-Path $engineExe)) { throw "engine\xray.exe missing from publish output" }
+$engineHash = (Get-FileHash -Algorithm SHA256 -Path $engineExe).Hash.ToLowerInvariant()
+Set-Content -Path "$engineExe.sha256" -Value $engineHash -Encoding ascii -NoNewline
+"engine_sha256 = $engineHash"
+
 if (-not (Test-Path $iscc)) { throw "ISCC not found at $iscc" }
 if (Test-Path $out) { Remove-Item $out -Recurse -Force }
 

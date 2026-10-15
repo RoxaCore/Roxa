@@ -410,6 +410,74 @@ function security_headers(): void
 }
 
 /**
+ * آیا مسیری داخلِ ریشهٔ داده‌ست؟ (حروف کوچک/بزرگ بی‌تفاوت است: رویِ ویندوز
+ * مسیر حساسیت ندارد و ممکن است یکی با شکلِ دیگری ثبت شده باشد.)
+ */
+function path_is_within(string $path, string $root): bool
+{
+    $path = rtrim(str_replace('\\', '/', $path), '/');
+    $root = rtrim(str_replace('\\', '/', $root), '/');
+    if ($path === '' || $root === '') {
+        return false;
+    }
+    if (strcasecmp($path, $root) === 0) {
+        return true;
+    }
+    return strncasecmp($path, $root . '/', strlen($root) + 1) === 0;
+}
+
+/**
+ * آیا DATA_DIR داخلِ سند-ریشه است؟
+ *
+ * تنها چیزی که اینجا باید گرفته شود این است که پوشهٔ داده — که auth.json،
+ * stats.json، reports.json و .salt در آن است — جایی باشد که وب‌سرور مستقیماً
+ * سرو می‌کند. در آن حالت `.htaccess` تنها حفاظتِ رو به وب است و رویِ nginx یا
+ * هر میزبانی با `AllowOverride Off` اصلاً اجرا نمی‌شود؛ به‌همین‌دلیل هم پیش‌تر
+ * DATA_DIR بیرونِ سند-ریشه رفته، ولی کسی که مهاجرت نکرده باید آن را ببیند.
+ *
+ * دو ریشه می‌سنجیم:
+ *   1) پوشهٔ خودِ این برنامه (server/). طبق README محتوایِ همین پوشه در webroot
+ *      می‌نشیند، پس هر مسیری زیرِ آن — مثلِ data/ قدیمی — همان داخلِ webroot است.
+ *      این راهِ اصلی است چون به وب‌سرور وابسته نیست.
+ *   2) DOCUMENT_ROOT که دقیق‌تر است، ولی وب‌سرور باید آن را به PHP برساند
+ *      (nginx گاهی نمی‌رساند). راهِ دومِ مکمل است، نه تنها راه.
+ *
+ * در CLI که چیزی سرو نمی‌شود «نه» برمی‌گردد.
+ */
+function data_dir_inside_webroot(): bool
+{
+    static $memo = null;
+    if ($memo !== null) {
+        return $memo;
+    }
+
+    $raw = (string)DATA_DIR;
+    $real = realpath($raw);
+    $target = $real !== false ? $real : $raw;
+    if ($target === '') {
+        return $memo = false;
+    }
+
+    $roots = [];
+    $self = realpath(__DIR__);
+    if ($self !== false) {
+        $roots[] = $self;
+    }
+    $doc = (string)($_SERVER['DOCUMENT_ROOT'] ?? '');
+    if ($doc !== '') {
+        $d = realpath($doc);
+        $roots[] = $d !== false ? $d : $doc;
+    }
+
+    foreach ($roots as $r) {
+        if (path_is_within($target, $r)) {
+            return $memo = true;
+        }
+    }
+    return $memo = false;
+}
+
+/**
  * محدودیت نرخ per-IP برای نوشتن آمار؛ بدون آن هر کسی با GUID تصادفی
  * می‌تواند stats.json را بی‌نهها رشد دهد (هر نوشتن = بازنویسی کل فایل).
  */

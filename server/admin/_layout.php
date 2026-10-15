@@ -72,6 +72,9 @@ th{color:var(--mut);font-weight:400;font-size:12px}
 .msg{padding:11px 15px;border-radius:10px;margin-bottom:16px;font-size:13px}
 .msg.ok{background:#062a1c;color:#34d399;border:1px solid #0d4a33}
 .msg.err{background:#2a0e0e;color:#f87171;border:1px solid #4a0d0d}
+.msg.warn{background:#3a2a0e;color:#fbbf24;border:1px solid #4a3a0d;line-height:1.9}
+.msg.warn code{background:rgba(0,0,0,.3);padding:1px 7px;border-radius:5px;color:#fde68a;direction:ltr;display:inline-block}
+.msg.warn b{color:#fff}
 .hint{color:var(--mut);font-size:12px;margin-top:8px;line-height:1.9}
 .hint code{background:#0d1322;padding:1px 7px;border-radius:5px;color:#c084fc;direction:ltr;display:inline-block}
 .check{display:flex;align-items:center;gap:8px;margin-top:12px;color:var(--tx);font-size:13px}
@@ -96,6 +99,18 @@ th{color:var(--mut);font-weight:400;font-size:12px}
     if ($flash) {
         $cls = $flash['t'] === 'err' ? 'err' : 'ok';
         echo '<div class="msg ' . $cls . '">' . h($flash['m']) . '</div>';
+    }
+    // هشدارِ بیرونی: فقط وقتی که پوشهٔ داده واقعاً زیرِ سند-ریشه باشد. سکوت
+    // در این حالت خطرناک‌ترین حالت است، چون تنها سپرِ رو به وب، .htaccessای
+    // است که رویِ بسیاری از میزبان‌ها اجرا نمی‌شود.
+    if (data_dir_inside_webroot()) {
+        echo '<div class="msg warn"><b>پوشهٔ داده داخلِ سند-ریشه است</b><br>'
+            . '<code>' . h((string)DATA_DIR) . '</code><br>'
+            . '<code>auth.json</code>، <code>stats.json</code>، <code>reports.json</code> و <code>.salt</code> '
+            . 'همه در همین پوشه‌اند. در این حالت تنها حفاظتِ رو به وب، <code>.htaccess</code> است '
+            . '— و رویِ nginx یا هر میزبانی که <code>AllowOverride</code> خاموش دارد، اصلاً اجرا نمی‌شود. '
+            . 'برایِ بیرون بردنِ داده‌ها: <code>php tools/migrate-data.php --apply</code>، '
+            . 'یا متغیرِ <code>ROXA_DATA</code> را به مسیری بیرون از سند-ریشه تنظیم کنید.</div>';
     }
 }
 

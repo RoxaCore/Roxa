@@ -235,5 +235,43 @@ next to Roxa.exe.
   triggered.
 
 
+6. Country flag images
+================================================================
+
+  Files     Assets\Flags\*.png  (90 files: 89 two-letter country
+            codes plus _unknown.png, the fallback used when no
+            code matches)
+  License   Not recorded - see below
+  Source    Not recorded
+  Used for  The country shown next to a server, and the country
+            filter
+
+  These images entered this repository in a single commit with no
+  accompanying note of where they came from. No licence text, no
+  attribution line and no upstream URL travelled with them, and the
+  project cannot reconstruct any of that now. Rather than leave the
+  gap silent, it is recorded here.
+
+  What follows from that:
+
+    - Roxa claims no copyright and no licence over these files.
+      They are NOT covered by the GPL-3.0 that covers Roxa's code,
+      and nothing in this file should be read as relicensing them.
+    - Roxa does not claim that they are in the public domain, nor
+      that they may be freely redistributed. The absence of a
+      recorded licence is not a licence.
+    - They are rendered as they are: no file is edited, recoloured
+      or otherwise modified.
+    - The two-letter codes themselves are ISO 3166-1 alpha-2
+      values, which are not subject to copyright. Only the
+      artwork is in question.
+
+  If you hold rights in any of these images and want them removed
+  or replaced, contact info@roxacore.com and the file will be
+  taken down or swapped for an icon set whose licence is recorded
+  here in full. Until such a set is chosen, treat these files as
+  unlicensed material of unknown provenance.
+
+
 ================================================================
 Questions about licensing: see README.md, section "License".

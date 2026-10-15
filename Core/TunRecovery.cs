@@ -163,9 +163,20 @@ public static class TunRecovery
             try
             {
                 using var p = Process.GetProcessById(state.EnginePid);
-                p.Kill(entireProcessTree: true);
-                TunManager.Log($"Recovery killed orphan engine pid={state.EnginePid}.");
-                killed = true;
+                // آخرین سنگر در برابرِ فایلِ وضعیتِ دستکاری‌شده: همین‌جا نام و
+                // مسیرِ واقعیِ پروسه با مسیرِ خودِ این نمونه مقایسه می‌شود، نه
+                // مقدارِ خوانده‌شده از فایل. بدونِ این، نوشتنِ یک PIDِ دلخواه
+                // در tun-state.json یعنی کشتنِ هر پروسه با دسترسیِ مدیر.
+                if (!IsOurEngineProcess(p))
+                {
+                    TunManager.Log($"Recovery refused to kill pid={state.EnginePid}: not this install's xray.exe.");
+                }
+                else
+                {
+                    p.Kill(entireProcessTree: true);
+                    TunManager.Log($"Recovery killed orphan engine pid={state.EnginePid}.");
+                    killed = true;
+                }
             }
             catch (Exception ex)
             {
@@ -174,7 +185,9 @@ public static class TunRecovery
         }
         try
         {
-            string procName = Path.GetFileNameWithoutExtension(state.EngineExePath);
+            // مسیرِ جست‌وجو هم از خودِ همین نصب می‌آید، نه از درونِ فایل.
+            string enginePath = XrayEngine.EnginePath;
+            string procName = Path.GetFileNameWithoutExtension(enginePath);
             if (!string.IsNullOrEmpty(procName))
             {
                 foreach (var proc in Process.GetProcessesByName(procName))
@@ -184,7 +197,7 @@ public static class TunRecovery
                         if (proc.Id == state.EnginePid) continue;
                         string? exe = null;
                         try { exe = proc.MainModule?.FileName; } catch { }
-                        if (exe == null || !string.Equals(exe, state.EngineExePath, StringComparison.OrdinalIgnoreCase)) continue;
+                        if (exe == null || !string.Equals(exe, enginePath, StringComparison.OrdinalIgnoreCase)) continue;
                         try
                         {
                             proc.Kill(entireProcessTree: true);
@@ -198,6 +211,30 @@ public static class TunRecovery
         }
         catch { }
         if (killed) WaitAdapterGone(state.AdapterName);
+    }
+
+    /// <summary>
+    /// آیا این پروسه واقعاً همان xray.exeِ همین نصب است؟
+    ///
+    /// نام و مسیر هر دو باید بخوانند و تطبیق دهند. مسیرِ خالی یا ناخواندنی
+    /// یعنی نتوانستیم مطمئن شویم، و در آن حالت نباید kill کنیم — رد کردنِ
+    /// اشتباهیِ یک پروسهٔ سالم از کشتنِ اشتباهیِ آن بهتر است.
+    /// </summary>
+    private static bool IsOurEngineProcess(Process p)
+    {
+        try
+        {
+            string enginePath = XrayEngine.EnginePath;
+            if (!string.Equals(
+                    p.ProcessName,
+                    Path.GetFileNameWithoutExtension(XrayEngine.EngineBinary),
+                    StringComparison.OrdinalIgnoreCase))
+                return false;
+            string? exe = p.MainModule?.FileName;
+            return exe != null &&
+                   string.Equals(exe, enginePath, StringComparison.OrdinalIgnoreCase);
+        }
+        catch { return false; }
     }
 
     private static bool IsOurEngineAlive(TunState state)
@@ -226,7 +263,10 @@ public static class TunRecovery
             try
             {
                 string? exe = p.MainModule?.FileName;
-                if (exe != null && !string.Equals(exe, state.EngineExePath, StringComparison.OrdinalIgnoreCase))
+                // خالی بودن هم باید رد شود: خواندنِ همین مسیر است که ثابت می‌کند
+                // پروسه همان xray.exeِ ماست. بدونِ آن، «نه» گفتن از «آری» امن‌تر است
+                // و جست‌وجوی پایینی با تطبیقِ مسیر، موتورِ واقعیِ خودِ ما را پیدا می‌کند.
+                if (exe == null || !string.Equals(exe, state.EngineExePath, StringComparison.OrdinalIgnoreCase))
                     return false;
             }
             catch { return false; }

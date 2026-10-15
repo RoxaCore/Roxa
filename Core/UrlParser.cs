@@ -149,7 +149,12 @@ public static class UrlParser
     {
         try
         {
-            string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+            // همان مسیری را می‌گیریم که لاگِ تونل می‌گیرد. نصب در Program Files یعنی
+            // پوشهٔ برنامه برای کاربرِ عادی فقط-خواندنی است؛ ResolveLogDir اول
+            // <app>\logs را می‌سنجد و اگر قابلِ نوشتن نبود به %LOCALAPPDATA%\Roxa\logs
+            // می‌رود. بدونِ این، خطاِ همین parse هم بی‌صدا گم می‌شد و تنها سندِ
+            // گزارش‌شده از بین می‌رفت.
+            string dir = TunManager.LogDirectory;
             Directory.CreateDirectory(dir);
             string file = Path.Combine(dir, "parser.log");
             if (File.Exists(file) && new FileInfo(file).Length > 4_000_000) File.WriteAllText(file, "");

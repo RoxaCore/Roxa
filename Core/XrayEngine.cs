@@ -305,31 +305,28 @@ public sealed class XrayEngine : IDisposable
         if (string.IsNullOrEmpty(downloadUrl))
             throw new InvalidOperationException(string.Format(TranslationManager.Get("Eng_AssetMissing"), assetName));
 
+        // Fail-closed: this archive is unpacked and executed, so an asset whose digest the
+        // release metadata did not publish cannot be verified at all. Refuse before any
+        // download instead of installing an unverified binary.
+        if (string.IsNullOrEmpty(expectedSha256))
+            throw new InvalidDataException(TranslationManager.Get("Eng_NoDigest"));
+
         byte[] data;
-        bool usedMirror = false;
         try
         {
             data = await http.GetByteArrayAsync(downloadUrl, ct);
         }
         catch (HttpRequestException)
         {
-            if (string.IsNullOrEmpty(expectedSha256))
-                throw;
+            // The mirror is only reached once the digest is known, so whatever it returns
+            // is still verified below.
             Log(TranslationManager.Get("Eng_MirrorTrying"));
             data = await http.GetByteArrayAsync("https://gh-proxy.com/" + downloadUrl, ct);
-            usedMirror = true;
         }
 
-        if (!string.IsNullOrEmpty(expectedSha256))
-        {
-            string actual = HashHex(data);
-            if (!string.Equals(actual, expectedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException(string.Format(TranslationManager.Get("Eng_DigestMismatch"), expectedSha256, actual));
-        }
-        else if (usedMirror)
-        {
-            throw new InvalidDataException(TranslationManager.Get("Eng_NoDigest"));
-        }
+        string actual = HashHex(data);
+        if (!string.Equals(actual, expectedSha256, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException(string.Format(TranslationManager.Get("Eng_DigestMismatch"), expectedSha256, actual));
 
         string zipPath = Path.Combine(Path.GetTempPath(), "roxa-core-download.zip");
         await File.WriteAllBytesAsync(zipPath, data, ct);

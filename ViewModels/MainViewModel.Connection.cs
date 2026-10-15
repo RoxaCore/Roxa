@@ -189,7 +189,7 @@ public partial class MainViewModel : ViewModelBase
                     using var handler = new HttpClientHandler { Proxy = new System.Net.WebProxy($"http://127.0.0.1:{_engine.HttpPort}"), UseProxy = true };
                     using var http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
                     var sw = Stopwatch.StartNew();
-                    using var resp = await http.GetAsync("http://www.gstatic.com/generate_204");
+                    using var resp = await http.GetAsync("https://www.gstatic.com/generate_204");
                     sw.Stop();
                     if (resp.IsSuccessStatusCode)
                     {

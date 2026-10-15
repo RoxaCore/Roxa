@@ -28,7 +28,7 @@ public static class SpeedTester
     private static readonly (string Url, bool Primary)[] TestUrls =
     {
         ("https://speed.cloudflare.com/__down?bytes=250000", true),
-        ("http://cachefly.cachefly.net/1mb.test", false),
+        ("https://cachefly.cachefly.net/1mb.test", false),
     };
 
     private const int EngineStartBudgetMs = 12_000;

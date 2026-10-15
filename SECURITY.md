@@ -10,11 +10,7 @@ Report it privately through one of these channels:
   public, use the *Security* tab and click *Report a vulnerability*. This is
   the preferred channel because it reaches the maintainers directly and keeps
   the report out of public view until it is fixed.
-- **Email** — `<!-- SET THIS: security@your-domain.example -->`
-
-<!-- SET THIS: replace the placeholder above with the real contact address
-     before publishing the repository. -->
-
+- **Email** — `security@roxacore.com`
 ### What to include
 
 - The Roxa version (shown at the bottom of the Settings page).
@@ -46,11 +42,18 @@ These are the areas a security report is most likely to concern:
   engine is running. It is deleted on shutdown, and stale copies from a crash
   are swept on the next start. A report that these files survive, or are
   readable by another user account, is in scope.
-- **Credential storage.** The server list in `%APPDATA%\Roxa\servers.json` is
-  encrypted with Windows DPAPI for the current user. The subscription list in
-  `subscriptions.json` is **not** encrypted and contains subscription URLs,
-  which embed a secret token. Anything that makes either file readable outside
-  the user's own account is in scope.
+- **Credential storage.** The server list in `%APPDATA%\Roxa\servers.json` and
+  the subscription list in `subscriptions.json` are encrypted with Windows DPAPI
+  for the current user; `subscriptions.json` also carries subscription URLs,
+  which embed a secret token, and a file written by an older version is
+  re-encrypted the first time it is read. Anything that makes either file
+  readable outside the user's own account is in scope.
+- **Tunnel state.** `%ProgramData%\Roxa\tun-state.json` records the engine PID,
+  the interface's previous DNS servers and the previous system proxy so that a
+  crash can be undone on the next start. Its directory is writable only by
+  SYSTEM and Administrators, and every value read back is validated before it
+  is acted on. A report that a local, non-elevated account can influence what
+  an elevated Roxa does with it is in scope.
 - **System state.** TUN mode installs routes, a firewall filter set and DNS
   changes, and can modify the system proxy. Reports about state surviving a
   crash, being applied without consent, or being incompletely restored are in

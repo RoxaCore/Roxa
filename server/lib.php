@@ -296,6 +296,59 @@ function ip_key(string $ip): string
 }
 
 /**
+ * سقفِ نگهداریِ هشِ مبدأ — نکتهٔ `src` در reports.json و `ip`/`ip_last` در stats.json.
+ *
+ * این هش‌ها قابلِ برگشت نیستند، ولی همچنان می‌گویند «این درخواست از همان منبعِ
+ * آن یکی بوده» و برایِ مدتِ نامحدود نگه‌داشته‌نشدنی‌اند. ۹۰ روز یعنی یک فصلِ
+ * کاملِ همبستگی برایِ ادمین؛ بعد از آن فقط برچسبِ منبع پاک می‌شود و خودِ رکورد
+ * (گزارش یا کلاینت) سرِ جایش می‌ماند، چون تاریخچهٔ اتصال برایِ عیب‌یابی ارزش
+ * دارد و آدرسِ در آن نیست.
+ */
+const SRC_HASH_TTL_DAYS = 90;
+
+/**
+ * آیا تاریخِ ISO 8601 قدیمی‌تر از سقف است؟
+ *
+ * تاریخِ خالی یا ناخوانا هم «قدیمی» حساب می‌شود: نوشتهٔ کهنه‌ای که تاریخش را
+ * از دست داده، دیگر نمی‌تواند برچسبِ منبع داشته باشد، و ساکت ماندن در این
+ * حالت یعنی داده برایِ همیشه می‌ماند.
+ */
+function src_hash_expired(string $iso): bool
+{
+    if ($iso === '') {
+        return true;
+    }
+    $t = strtotime($iso);
+    if ($t === false) {
+        return true;
+    }
+    return (time() - $t) > (SRC_HASH_TTL_DAYS * 86400);
+}
+
+/**
+ * پاک‌سازیِ برچسبِ منبع در reports.json. فقط `src` می‌رود؛ متنِ گزارش، خطا و لاگ
+ * دست‌نخورده می‌مانند.
+ *
+ * false برمی‌گرداند وقتی چیزی تغییر نکرده تا jupdate بی‌دلیل رویِ دیسک ننویسد.
+ */
+function reports_prune_src(array $store): array
+{
+    if (!is_array($store['items'] ?? null)) {
+        return $store;
+    }
+    foreach ($store['items'] as &$it) {
+        if (!is_array($it)) {
+            continue;
+        }
+        if (($it['src'] ?? '') !== '' && src_hash_expired((string)($it['at'] ?? ''))) {
+            $it['src'] = '';
+        }
+    }
+    unset($it);
+    return $store;
+}
+
+/**
  * قفلِ ورود: فقط per-IP (۲۰ تلاش ناموفق/ساعت از هر آدرس).
  *
  * سقفِ سراسری عمداً قفلِ کامل نمی‌شود: اگر بشود، مهاجم با چند ده تلاشِ
@@ -679,6 +732,20 @@ function stats_touch(string $id, array $meta = []): void
             }
             $st['clients'][$id][$k] = $v;
         }
+        // پاک‌سازیِ برچسبِ منبعِ کلاینت‌هایی که دیگر سر نزده‌اند. خودِ رکورد می‌ماند؛
+        // فقط هشِ منبع می‌رود. ردیفِ همین درخواست‌دهنده تازه‌ترین است (last همین حالا
+        // به now رسید)، پس برچسبِ او هیچ‌وقت در همین عبور پاک نمی‌شود.
+        foreach ($st['clients'] as &$row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $hasSrc = (($row['ip_last'] ?? '') !== '') || (($row['ip'] ?? '') !== '');
+            if ($hasSrc && src_hash_expired((string)($row['last'] ?? ''))) {
+                $row['ip_last'] = '';
+                $row['ip'] = '';
+            }
+        }
+        unset($row);
         jwrite($file, $st);
     } finally {
         if ($lock) {

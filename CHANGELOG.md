@@ -37,6 +37,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Opening an announcement link requires https. The server already refuses to
   store anything else, but the client accepted http as well and handed the
   value straight to the shell, which launches whatever scheme it is given.
+- The source hash the server keeps as a label now has a deadline of its own:
+  90 days. A report loses `src` 90 days after it was filed, and an install
+  identifier's row loses `ip`/`ip_last` 90 days after that install last
+  checked in. The report and the row stay; only the label goes. Previously
+  these hashes were kept as long as the record did, which PRIVACY.md stated
+  plainly but which no passage of time ever shortened.
 
 ## [3.0.8] - 2026-10-15
 

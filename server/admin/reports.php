@@ -4,6 +4,21 @@ require_auth();
 
 $store = jread(DATA_DIR . '/reports.json', ['seq' => 0, 'items' => []]);
 
+// سقفِ نگهداریِ برچسبِ منبع: پنل جایی است که `src` دیده می‌شود، پس همین‌جا هم
+// اعمال می‌شود — وگرنه گزارشِ قدیمی فقط تا وقتی گزارشِ تازه‌ای برسد برچسبِ منبع
+// می‌داشت، که در عمل یعنی ممکن بود برایِ همیشه بماند. زیرِ همان قفلِ jupdate
+// می‌رویم تا با نوشتنِ همزمانِ خودِ report.php گزارشی از دست نرود، و فقط وقتی
+// چیزی واقعاً عوض شده می‌نویسیم تا بازدیدِ پرترافیک اثری رویِ دیسک نگذارد.
+$srcChanged = false;
+jupdate(DATA_DIR . '/reports.json', function (array $s) use (&$srcChanged) {
+    $p = reports_prune_src($s);
+    $srcChanged = ($p != $s);
+    return $srcChanged ? $p : false;
+});
+if ($srcChanged) {
+    $store = jread(DATA_DIR . '/reports.json', ['seq' => 0, 'items' => []]);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
     $action = (string)($_POST['action'] ?? '');

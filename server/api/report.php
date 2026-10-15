@@ -79,7 +79,8 @@ try {
         if (count($store['items']) > 500) {
             $store['items'] = array_slice($store['items'], -500);
         }
-        return $store;
+        // برچسبِ منبعِ گزارشِ قدیمی هم همین‌جا پاک می‌شود؛ خودِ گزارش می‌ماند.
+        return reports_prune_src($store);
     });
 } catch (Throwable $e) {
     report_json(['ok' => false, 'error' => 'write'], 500);

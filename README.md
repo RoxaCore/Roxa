@@ -176,6 +176,29 @@ SIL OFL-1.1, and every managed dependency is MIT. The GPL and these licenses
 coexist because Roxa runs those components as **separate programs**, not by
 linking them into a single work.
 
+### Country flag images
+
+`Assets/Flags/*.png` (90 files) entered this repository in a single commit
+with no note of where they came from: no licence, no attribution, no upstream
+URL. That gap is recorded here rather than glossed over.
+
+- **Roxa does not claim these images.** They are not covered by the GPL-3.0
+  that covers the code, and nothing here should be read as relicensing them.
+- **Roxa does not claim they are free to redistribute.** An unrecorded
+  licence is not a licence; treat them as unlicensed material of unknown
+  provenance.
+- They are rendered unmodified — no file is edited or recoloured.
+
+If you hold rights in any of these images, write to `info@roxacore.com` and
+the file will be removed or replaced. The two-letter codes are ISO 3166-1
+alpha-2 values, which carry no copyright; only the artwork is in question.
+
+> **فارسی:** تصاویرِ پرچم‌ها (`Assets/Flags/*.png`) بدونِ ثبتِ منبع یا مجوز
+> واردِ مخزن شده‌اند. رُخا نه ادعای مالکیت رویِ آن‌ها دارد و نه آن‌ها را
+> بخشی از GPL می‌داند، و نه می‌گوید آزادند. تا انتخابِ مجموعه‌ای با مجوزِ
+> ثبت‌شده، باید مثلِ مادهٔ بدونِ مجوزِ ناشناخته رفتار شود. اگر صاحبِ حقی
+> هستید، به `info@roxacore.com` بنویسید تا فایل حذف یا جایگزین شود.
+
 ---
 
 ## Security and privacy

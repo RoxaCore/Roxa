@@ -29,8 +29,8 @@ writes the sites you visit to disk. Test configurations use `loglevel: none`.
 | `up.roxacore.com/api/announcements.php` | Last-seen announcement id, language, country code | Announcements | On start, then every 60 minutes |
 | `up.roxacore.com/api/report.php` | Crash report: exception, up to 4 000 characters of log tail, install identifier | — | **Only if you turn on "Send crash reports"** |
 | `get.geojs.io`, `ipwho.is` | Your IP address (implicitly — you cannot ask for a country without revealing it) | Country code | On every check **while you are not connected**. The result is cached in `settings.json` and is not requested again while the tunnel is up |
-| `api.github.com/repos/XTLS/Xray-core/releases/latest` | — | Xray-core release metadata | When checking for an engine update |
-| `gh-proxy.com` | — | Xray-core binary | When downloading an engine update |
+| `api.github.com/repos/XTLS/Xray-core/releases/latest` | Your IP address (implicitly — any web request reveals it) | Xray-core release metadata | When checking for an engine update |
+| `gh-proxy.com` | Your IP address (implicitly) | Xray-core binary | When downloading an engine update. **This is a third-party mirror, not operated by Roxa.** It can see that you fetched an Xray-core build and when |
 | `www.wintun.net` | — | Wintun driver archive | First time TUN mode is used |
 | `speed.cloudflare.com`, `cachefly.cachefly.net`, `cp.cloudflare.com`, `www.gstatic.com`, `www.google.com` | — | Fixed-size test payloads | During a delay or speed test, **through your tunnel** |
 | `www.msftconnecttest.com`, `1.1.1.1` | — | Connectivity probes | When checking whether the network changed |
@@ -54,6 +54,33 @@ Roxa is closed; a new one is generated on the next start. Note that the old
 one has already been seen by the server, so this prevents future correlation
 rather than erasing past ones.
 
+## The Roxa server keeps no IP address
+
+Your IP is read from the connection itself (`REMOTE_ADDR`) — never from a
+header, so it cannot be spoofed and cannot be influenced by anyone in between.
+It is then replaced with a keyed one-way hash before anything is written to
+disk, and the address itself is discarded.
+
+The hash uses a random per-server salt that is never published and is not part
+of this repository, so the server cannot turn a stored hash back into your
+address, and neither can anyone who obtains a copy of the server's data
+without also obtaining that salt. What the hash is good for is only the
+question "is this the same source as the previous request?", which is what the
+rate limiter needs.
+
+The salted hashes are kept for at most one hour in the rate-limiter files and
+are overwritten as they age out. Longer-lived records — the install
+identifier's row in the client list, and any crash report — carry the hash of
+the source as a label, which is why the panel says *source* and not *IP*.
+
+**What this does not hide:** sending a request at all reveals your IP to the
+server for the duration of that request, and the third-party services in the
+table above (`get.geojs.io`, `ipwho.is`, `api.github.com`, `gh-proxy.com`)
+receive your IP directly because you asked them for something. Hashing limits
+what is *retained*; it does not limit what is *seen*. If you want neither,
+connect through the tunnel first — the version check then runs from the
+server's address, not yours.
+
 ## Crash reporting is opt-in
 
 *Send crash reports* is **off** in a fresh install. Nothing is uploaded until
@@ -68,6 +95,8 @@ the setting is also visible in Settings at any time.
 - No selling or sharing of data with third parties.
 - No reading of your browsing history, files, or other applications' data.
 - No account, no registration, no email address.
+- No IP address is written to disk by the update server — only a keyed,
+  one-way hash that cannot be reversed without the server's private salt.
 
 ## Third parties
 
@@ -82,5 +111,8 @@ Any change to this list is documented in `CHANGELOG.md` under `Security`.
 > **فارسی:** رُخا هیچ تله‌متری، تحلیل یا گزارشِ خودکارِ خطا ندارد. سرورهای
 > شما با DPAPIِ ویندوز رمزنگاری می‌شوند، ولی **لینکِ اشتراک متنِ ساده** است و
 > چون توکن دارد آن را محافظت کنید. ارسالِ گزارشِ کرش کاملاً اختیاری و
-> پیش‌فرضِ آن خاموش است. فهرستِ کاملِ اتصال‌ها در بالا آمده و در آینده هر
-> تغییری در `CHANGELOG.md` ثبت می‌شود.
+> پیش‌فرضِ آن خاموش است. **آدرسِ IP شما رویِ دیسکِ سرور ذخیره نمی‌شود** — فقط
+> هشِ نمکیِ برگشت‌ناپذیر آن می‌ماند، و آن هم حداکثرِ یک ساعت در
+> شمارندههایِ نرخ‌限额. متنِ کاملِ اتصال‌ها در بالا آمده، از جمله اینکه
+> `gh-proxy.com` (پراکسیِ واسطهٔ ثالث) آدرسِ شما و درخواستِ فایلِ Xray-core
+> را می‌بیند. هر تغییرِ آینده در `CHANGELOG.md` ثبت می‌شود.

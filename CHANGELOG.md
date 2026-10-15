@@ -124,11 +124,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to `%LOCALAPPDATA%\Roxa\logs`.
 - Exclusion routes (`/32`) survived a crash and stayed in the routing table
   forever. They are now persisted and swept on the next start.
+- Setup could hang on "Preparing to Install" forever on a PC that had never
+  had .NET. The runtime download was synchronous with no timeout, no progress
+  and no Cancel, and it ran over WinHTTP, which ignores the per-user proxy a
+  browser uses — so on a slow, filtered or proxied network nothing appeared
+  to happen and there was no way out. The runtime now ships inside setup:
+  the only network traffic at install time is none.
+- The exit code 3010 ("success, reboot required") from the runtime installer
+  was reported as a failure.
 
 ### Security
 
-- The .NET runtime download is verified against a SHA-256 pinned inside the
-  installer; the hash is never fetched over the network.
+- The .NET runtime that ships inside the installer is verified against a
+  SHA-256 pinned in `setup.iss`; the hash is never fetched over the network.
 - The app never downloads or executes an update itself any more. The
   staging and rollback path is still compiled but has no caller:
   `--update-apply` removes whatever was staged and exits non-zero, so the

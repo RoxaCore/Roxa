@@ -1,6 +1,12 @@
 #define MyAppName "Roxa"
 #define MyAppVersion "3.0.8"
 #define MyAppExeName "Roxa.exe"
+; رانتایمِ دات‌نت در خودِ نصب‌کننده می‌آید تا نصب هیچ‌وقت به شبکه وابسته نباشد.
+; فایل در installer\runtime نشسته و در .gitignore است؛ build-installer.ps1 آن را
+; اگر نبود از DotNetUrl دانلود می‌کند و با همان SHA-256ِ زیر می‌سنجد و در صورتِ
+; ناهمخوانی، build را می‌شکند. DotNetUrl و DotNetSha256 فقط منبعِ حقیقتِ اسکریپتِ
+; بیلد و سندِ مجوزند؛ [Code] دیگر هیچ دانلودی نمی‌کند.
+#define DotNetFile "windowsdesktop-runtime-8.0.31-win-x64.exe"
 #define DotNetUrl "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.31/windowsdesktop-runtime-8.0.31-win-x64.exe"
 #define DotNetSha256 "c375dfd80a967405cfeff634912c1fccc56261ce3d9209ea473f60a21184d1cc"
 
@@ -42,6 +48,16 @@ Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription
 
 [Files]
 Source: "publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+; رانتایمِ دات‌نت. dontcopy یعنی به {app} کپی نمی‌شود؛ PrepareToInstall آن را با
+; ExtractTemporaryFile در {tmp} می‌گشاید و بی‌صدا اجرا می‌کند.
+;
+; دانلودِ هنگامِ نصب عمداً حذف شد. DownloadTemporaryFileِ Inno همگام و بدونِ
+; مهلت بود و پشتِ همان صفحهٔ «Preparing to Install» بدونِ پیشرفت و بدونِ Cancel
+; می‌ماند، و از WinHTTP می‌رفت که پروکسیِ کاربر را نمی‌بیند — پس مرورگر وصل
+; می‌شد ولی نصب‌کننده بی‌نهایت منتظر می‌ماند. این فایلِ باندل‌شده یک بار در
+; build تأیید می‌شود و نصب را از شبکه بی‌نیاز می‌کند.
+Source: "runtime\{#DotNetFile}"; DestDir: "{tmp}"; Flags: dontcopy
 
 ; پوشهٔ وضعیتِ تونل باید از همان لحظهٔ نصب بسته باشد.
 ;
@@ -213,12 +229,30 @@ begin
     DirHasVersion8(ExpandConstant('{localappdata}\dotnet\shared\Microsoft.WindowsDesktop.App'));
 end;
 
+// ---------------------------------------------------------------------------
+// راهِ خروجِ دستی وقتی نصبِ رانتایمِ باندل‌شده شکست بخورد.
+//
+// صفحهٔ مایکروسافت در مرورگرِ کاربر باز می‌شود: مرورگر از پروکسیِ کاربر
+// استفاده می‌کند و در همان شبکه‌ای هم که دسترسیِ مستقیم بسته است جواب می‌دهد.
+// ---------------------------------------------------------------------------
+function RuntimeManualFallback(const Why: String): String;
+var
+  OpenCode: Integer;
+begin
+  ShellExec('open', 'https://dotnet.microsoft.com/download/dotnet/8.0', '', '',
+            SW_SHOWNORMAL, ewNoWait, OpenCode);
+  Result := 'The .NET Desktop Runtime 8 could not be installed automatically' +
+            ' (' + Why + ').' + #13#10 + #13#10 +
+            'Microsoft''s download page was opened in your browser. Install the ' +
+            '".NET Desktop Runtime 8.0.x - x64" there, then run this setup again.'
+            + #13#10 + #13#10 + 'Nothing was installed.';
+end;
+
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   ErrorCode: Integer;
   RuntimePath: String;
   Ok: Boolean;
-  Downloaded: Int64;
 begin
   Result := '';
   if IsDotNetDesktopInstalled then
@@ -227,31 +261,52 @@ begin
   // SuppressibleMsgBox تا در حالتِ /SILENT آویزان نماند و خودش IDOK برگرداند.
   SuppressibleMsgBox(
     'The .NET Desktop Runtime 8 is not installed on this PC.' + #13#10 +
-    'Setup will download and install it automatically to continue ' +
-    '(an internet connection is required).',
+    'Setup will install it now. This step does not need an internet connection.',
     mbInformation, MB_OK, IDOK);
 
-  RuntimePath := ExpandConstant('{tmp}\windowsdesktop-runtime.exe');
+  // صفحهٔ «Preparing to Install» تا پایانِ همین تابع باز است؛ بدونِ این متن،
+  // استخراجِ فایلِ ۵۶ مگابایتی و نصبِ بی‌صدای رانتایم دقیقاً همان «هیچ اتفاقی
+  // نمی‌افتد» را نشان می‌داد که گزارش شده بود.
+  WizardForm.PreparingLabel.Caption :=
+    'Installing the bundled .NET Desktop Runtime 8. Please wait...';
+
+  RuntimePath := ExpandConstant('{tmp}\{#DotNetFile}');
   try
-    Downloaded := DownloadTemporaryFile('{#DotNetUrl}', 'windowsdesktop-runtime.exe', '{#DotNetSha256}', nil);
+    ExtractTemporaryFile('{#DotNetFile}');
   except
-    ShellExec('open', 'https://dotnet.microsoft.com/download/dotnet/8.0', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
-    Result := 'The .NET runtime could not be downloaded. Check your internet ' +
-              'connection, or install it manually from the page that just opened ' +
-              'and then run this setup again.';
+    // Pascal Scriptِ Inno ساختارِ «on E: Exception do» را ندارد؛ پیامِ استثنایِ
+    // جاری با GetExceptionMessage خوانده می‌شود (با یک اسکریپتِ کاوش ثابت شد).
+    Result := RuntimeManualFallback('the bundled copy could not be extracted: ' + GetExceptionMessage);
     Exit;
   end;
+
+  if not FileExists(RuntimePath) then
+  begin
+    Result := RuntimeManualFallback('the bundled copy is missing from this setup file.');
+    Exit;
+  end;
+
+  WizardForm.PreparingLabel.Caption :=
+    'Installing the bundled .NET Desktop Runtime 8. This can take a minute...';
 
   Ok := Exec(RuntimePath, '/install /quiet /norestart', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
   if Ok and ((ErrorCode = 0) or (ErrorCode = 3010)) then
   begin
+    // 3010 یعنی «موفق، ری‌استارت لازم است»؛ باید صفحهٔ پایانیِ ری‌استارت را
+    // نشان دهیم نه اینکه آن را به‌عنوانِ شکست گزارش کنیم.
+    if ErrorCode = 3010 then
+      NeedsRestart := True;
     Sleep(1500);
     if IsDotNetDesktopInstalled then
       Exit;
+    Result := RuntimeManualFallback('the installer finished but no runtime appeared.');
+    Exit;
   end;
 
-  Result := 'The .NET runtime was not installed successfully. Try again and ' +
-            'click "Yes" when Windows asks for permission (UAC).';
+  if Ok then
+    Result := RuntimeManualFallback('the installer exited with code ' + IntToStr(ErrorCode) + '.')
+  else
+    Result := RuntimeManualFallback('the installer could not be started.');
 end;
 
 // ---------------------------------------------------------------------------

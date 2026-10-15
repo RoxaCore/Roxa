@@ -11,7 +11,7 @@ Last reviewed: 2026-10-15, against Roxa 3.0.8.
 | File | Contains | Encrypted? |
 |---|---|---|
 | `%APPDATA%\Roxa\servers.json` | Your servers: addresses, ports, UUIDs, passwords, keys | **Yes** — Windows DPAPI, current user |
-| `%APPDATA%\Roxa\subscriptions.json` | Subscription names and URLs | No |
+| `%APPDATA%\Roxa\subscriptions.json` | Subscription names and URLs | **Yes** — Windows DPAPI, current user. A file written by an older version is re-encrypted the first time it is read |
 | `%APPDATA%\Roxa\settings.json` | Preferences, language, and an anonymous install identifier | No |
 | `%APPDATA%\Roxa\*.txt`, `*.flag` | Firewall rules and route pins used for TUN bypass | No |
 | `%LOCALAPPDATA%\Roxa\logs\`, `<app>\logs\` | Operational logs | No |
@@ -124,10 +124,12 @@ third-party components it ships, and their licenses, are listed in
 
 Any change to this list is documented in `CHANGELOG.md` under `Security`.
 
-> **فارسی:** رُخا هیچ تله‌متری، تحلیل یا گزارشِ خودکارِ خطا ندارد. سرورهای
-> شما با DPAPIِ ویندوز رمزنگاری می‌شوند، ولی **لینکِ اشتراک متنِ ساده** است و
-> چون توکن دارد آن را محافظت کنید. ارسالِ گزارشِ کرش کاملاً اختیاری و
-> پیش‌فرضِ آن خاموش است. **آدرسِ IP شما رویِ دیسکِ سرور ذخیره نمی‌شود** — فقط
+> **فارسی:** رُخا هیچ تله‌متری، تحلیل یا گزارشِ خودکارِ خطا ندارد. **سرورها و
+> لینکِ اشتراک هر دو با DPAPIِ ویندوز رمزنگاری می‌شوند** (فایلِ قدیمی در اولین
+> اجرا خودبه‌خود رمزنگاری می‌شود). ولی **کانفیگِ موقتِ موتور متنِ ساده** است و
+> با اینکه دسترسیِ آن فقط به حسابِ خودتان محدود است، تا ۲۴ ساعت رویِ دیسک
+> می‌ماند. ارسالِ گزارشِ کرش کاملاً اختیاری و پیش‌فرضِ آن خاموش است. **آدرسِ IP
+> شما رویِ دیسکِ سرور ذخیره نمی‌شود** — فقط
 > هشِ نمکیِ برگشت‌ناپذیر آن می‌ماند، و آن هم حداکثرِ یک ساعت در
 > شمارندههایِ نرخ‌限额. متنِ کاملِ اتصال‌ها در بالا آمده، از جمله اینکه
 > `gh-proxy.com` (پراکسیِ واسطهٔ ثالث) آدرسِ شما و درخواستِ فایلِ Xray-core

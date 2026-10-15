@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- The engine download is now fail-closed end to end. An Xray-core release
+  asset whose digest GitHub did not publish is refused before any request is
+  made, rather than being installed unverified when the direct download
+  happened to succeed. The digest gate runs first, so the gh-proxy mirror is
+  only reached once the expected hash is known, and its response is checked
+  like any other.
+- The two cleartext test endpoints moved to TLS: the cachefly speed-test
+  fallback and the gstatic `generate_204` probe used for real-delay
+  measurement.
+- `subscriptions.json` is encrypted with Windows DPAPI (current user), like
+  `servers.json`. A file written by an older version is re-encrypted the first
+  time it is read. If DPAPI is unavailable the list is written in plain text
+  rather than being dropped, and is re-encrypted on the next successful save.
+
 ## [3.0.8] - 2026-10-15
 
 ### Added

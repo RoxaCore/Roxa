@@ -295,6 +295,39 @@ public partial class MainWindow : Window
             });
             return files != null && files.Count > 0 ? files[0].TryGetLocalPath() : null;
         };
+        // خروجی/ورودیِ اشتراک‌ها: DPAPI به حسابِ ویندوزِ همین ماشین گره می‌خورد،
+        // پس کاربر برایِ انتقال یا پشتیبان‌گیری به فایلی نیاز دارد که به حسابِ
+        // خاصی وابسته نباشد. فقط مسیر اینجا انتخاب می‌شود؛ کارِ فایل در ViewModel است.
+        vm.ExportSubsHandler = async () =>
+        {
+            var tr = Localization.TranslationManager.Instance;
+            var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = tr["Dlg_ExportSubsTitle"],
+                SuggestedFileName = "roxa-subscriptions",
+                DefaultExtension = "json",
+                FileTypeChoices = new[]
+                {
+                    new FilePickerFileType("JSON") { Patterns = new[] { "*.json" } }
+                }
+            });
+            return file?.TryGetLocalPath();
+        };
+        vm.ImportSubsHandler = async () =>
+        {
+            var tr = Localization.TranslationManager.Instance;
+            var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = tr["Dlg_ImportSubsTitle"],
+                AllowMultiple = false,
+                FileTypeFilter = new[]
+                {
+                    new FilePickerFileType("JSON") { Patterns = new[] { "*.json" } },
+                    FilePickerFileTypes.All
+                }
+            });
+            return files != null && files.Count > 0 ? files[0].TryGetLocalPath() : null;
+        };
         vm.ShowAdminWarningHandler = () =>
         {
             var tr = Localization.TranslationManager.Instance;

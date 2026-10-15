@@ -562,4 +562,21 @@
   <data name="Set_ShowIp" xml:space="preserve"><value>نمایش ستون آدرس (IP)</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>با فعال بودن، ستون آدرس IP در جدول سرورها نمایش داده می‌شود.</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>کپی از کلیپبرد</value></data>
+  <data name="Btn_ExportSubs" xml:space="preserve"><value>خروجی اشتراک‌ها</value></data>
+  <data name="Btn_ImportSubs" xml:space="preserve"><value>ورودی اشتراک‌ها</value></data>
+  <data name="Hint_SubExport" xml:space="preserve"><value>خروجی، لینک‌های اشتراک را به‌صورت متنِ ساده در یک فایل JSON می‌نویسد؛ آن فایل را مثلِ خودِ لینک محافظت کنید. ورودی، اشتراک‌هایی که از قبل دارید دست‌نخورده می‌گذارد و فقط موارد تازه را اضافه می‌کند.</value></data>
+  <data name="Dlg_ExportSubsTitle" xml:space="preserve"><value>خروجی اشتراک‌ها</value></data>
+  <data name="Dlg_ImportSubsTitle" xml:space="preserve"><value>ورودی اشتراک‌ها</value></data>
+  <data name="Toast_SubExported" xml:space="preserve"><value>{0} اشتراک در فایل ذخیره شد</value></data>
+  <data name="Toast_SubExportNone" xml:space="preserve"><value>اشتراکی برای خروجی وجود ندارد</value></data>
+  <data name="Toast_SubExportFailed" xml:space="preserve"><value>خروجی اشتراک‌ها انجام نشد</value></data>
+  <data name="Toast_SubImported" xml:space="preserve"><value>{0} اشتراک وارد شد؛ {1} مورد تکراری رد شد</value></data>
+  <data name="Toast_SubImportEmpty" xml:space="preserve"><value>در این فایل اشتراکی پیدا نشد</value></data>
+  <data name="Toast_SubImportFailed" xml:space="preserve"><value>ورودی اشتراک‌ها انجام نشد</value></data>
+  <data name="Status_SubExported" xml:space="preserve"><value>خروجی {0} اشتراک انجام شد</value></data>
+  <data name="Status_SubImported" xml:space="preserve"><value>{0} اشتراک وارد شد</value></data>
+  <data name="Status_SubFailed" xml:space="preserve"><value>عملیات روی فایل اشتراک‌ها انجام نشد</value></data>
+  <data name="Log_SubExported" xml:space="preserve"><value>اشتراک‌ها در {0} ذخیره شد</value></data>
+  <data name="Status_SubStoredInClear" xml:space="preserve"><value>هشدار: لینک‌های اشتراک به‌صورت متنِ ساده روی دیسک ذخیره شدند</value></data>
+  <data name="Toast_SubStoredInClear" xml:space="preserve"><value>رمزنگاریِ اشتراک‌ها در دسترس نبود؛ فایل متنی نوشته شد و در ذخیرهٔ بعدی دوباره رمزنگاری می‌شود</value></data>
 </root>

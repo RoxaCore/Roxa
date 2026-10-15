@@ -49,6 +49,11 @@ public partial class MainViewModel : ViewModelBase
      public Action? SelectionRefreshHandler { get; set; }
      public Func<Task<string?>>? PickTunExcludedAppHandler { get; set; }
 
+     // مسیرِ فایل برایِ خروجی/ورودیِ اشتراک‌ها. خودِ Storage را رابط نمی‌سازد؛
+     // اینجا فقط مسیرِ انتخابیِ کاربر برمی‌گردد و کارِ فایل در خودِ ViewModel است.
+     public Func<Task<string?>>? ExportSubsHandler { get; set; }
+     public Func<Task<string?>>? ImportSubsHandler { get; set; }
+
     [ObservableProperty] private ObservableCollection<ServerInfo> _servers = new();
     [ObservableProperty] private ObservableCollection<SubscriptionInfo> _subscriptions = new();
     [ObservableProperty] private ObservableCollection<ServerGroup> _groups = new();
@@ -154,6 +159,17 @@ public partial class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
+        // DPAPI از کار افتاده و فایلِ اشتراک‌ها متنی نوشته شده — باید همان لحظه
+        // دیده شود، نه اینکه کاربر بعداً خودش بفهمد. Storage فقط خبر می‌دهد و
+        // رابط نمی‌سازد؛ اینجا به زبانِ رابطِ کاربری ترجمه می‌شود. ToastHandler
+        // هنوز ممکن است تنظیم نشده باشد، پس داخلِ خودِ رویداد خوانده می‌شود، نه
+        // اینجا؛ و Post چون SaveSubscriptions ممکن است از پس‌زمینه صدا شود.
+        Storage.SubscriptionsWrittenInClearText += () => Post(() =>
+        {
+            Status = TranslationManager.Instance["Status_SubStoredInClear"];
+            ToastHandler?.Invoke(TranslationManager.Instance["Toast_SubStoredInClear"]);
+        });
+
         _settings = Storage.LoadSettings();
         SetSystemProxy = _settings.SetSystemProxy;
         AutoConnect = _settings.AutoConnect;

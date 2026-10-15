@@ -288,6 +288,108 @@ public partial class MainViewModel : ViewModelBase
          AppendLog(string.Format(TranslationManager.Instance["Log_SubRemoved"], sub.Name));
      }
 
+    /// <summary>طرحِ فایلِ خروجی/ورودی: فقط نام و لینک. بقیهٔ فیلدها مربوطِ به
+    /// ماشینِ قبلی‌اند (تاریخِ آخرین بروزرسانی، شمارندهٔ سرور، مصرف) و بازیابی
+    /// نمی‌شوند؛ خودِ سرورها با بروزرسانیِ بعدی دوباره ساخته می‌شوند.</summary>
+    private sealed class SubExportEntry
+    {
+        public string Name { get; set; } = "";
+        public string Url { get; set; } = "";
+    }
+
+    private static Task<string?> PickPath(Func<Task<string?>>? handler)
+        => handler == null ? Task.FromResult<string?>(null) : handler();
+
+    /// <summary>
+    /// خروجیِ اشتراک‌ها در یک فایلِ JSON.
+    ///
+    /// عمداً متنِ ساده است نه DPAPI: خودِ مشکل همین است که DPAPI به حسابِ ویندوزِ
+    /// همین ماشین گره می‌خورد، و کاربر برایِ انتقال به ماشینِ دیگر یا نگه‌داشتنِ
+    /// نسخهٔ پشتیبانِ پیش از تعویضِ ویندوز به فایلی نیاز دارد که به حسابِ خاصی
+    /// وابسته نباشد. فایلِ نتیجه لینکِ اشتراک را خوانا دارد و باید مثلِ خودِ
+    /// لینک محافظت شود — Hint در رابطِ کاربری همین را می‌گوید.
+    /// </summary>
+    [RelayCommand]
+    private async Task ExportSubscriptions()
+    {
+        if (Subscriptions.Count == 0)
+        { ToastHandler?.Invoke(TranslationManager.Instance["Toast_SubExportNone"]); return; }
+
+        string? path = await PickPath(ExportSubsHandler);
+        if (string.IsNullOrWhiteSpace(path)) return;   // کاربر انصراف داد
+
+        try
+        {
+            var list = Subscriptions
+                .Select(s => new SubExportEntry { Name = s.Name, Url = s.Url })
+                .ToList();
+            string json = JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(path, json);
+            Status = string.Format(TranslationManager.Instance["Status_SubExported"], list.Count);
+            ToastHandler?.Invoke(string.Format(TranslationManager.Instance["Toast_SubExported"], list.Count));
+            AppendLog(string.Format(TranslationManager.Instance["Log_SubExported"], path));
+        }
+        catch (Exception ex)
+        {
+            Status = TranslationManager.Instance["Status_SubFailed"];
+            ToastHandler?.Invoke(TranslationManager.Instance["Toast_SubExportFailed"]);
+            AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// ورودیِ اشتراک‌ها از فایل.
+    ///
+    /// هیچ‌چیز حذف یا جایگزین نمی‌شود: لینکی که از قبل هست رد می‌شود، و اشتراکِ
+    /// تکراریِ همنام مقدارِ متمایز می‌گیرد تا اسم از دست نرود. سرورهای هر اشتراکِ
+    /// تازه با همان مسیرِ دکمهٔ بروزرسانی واکشی می‌شوند؛ وگرنه بازیابیِ پشتیبان
+    /// فهرستی خالی به کاربر می‌داد.
+    /// </summary>
+    [RelayCommand]
+    private async Task ImportSubscriptions()
+    {
+        string? path = await PickPath(ImportSubsHandler);
+        if (string.IsNullOrWhiteSpace(path)) return;
+
+        var added = new List<SubscriptionInfo>();
+        int skipped = 0;
+        try
+        {
+            string json = await File.ReadAllTextAsync(path);
+            var incoming = JsonSerializer.Deserialize<List<SubExportEntry>>(json);
+            if (incoming == null || incoming.Count == 0)
+            { ToastHandler?.Invoke(TranslationManager.Instance["Toast_SubImportEmpty"]); return; }
+
+            foreach (var e in incoming)
+            {
+                string url = (e.Url ?? "").Trim();
+                if (url.Length == 0) { skipped++; continue; }
+                if (Subscriptions.Any(x => string.Equals(x.Url, url, StringComparison.Ordinal)))
+                { skipped++; continue; }   // همان لینک از قبل هست
+                string name = string.IsNullOrWhiteSpace(e.Name) ? GuessSubName(url) : e.Name.Trim();
+                if (Subscriptions.Any(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase)))
+                    name = name + "-" + DateTime.Now.ToString("MMdd-HHmm");
+                var info = new SubscriptionInfo { Name = name, Url = url };
+                Subscriptions.Add(info);
+                added.Add(info);
+            }
+
+            if (added.Count > 0) SaveSubs();
+            Status = string.Format(TranslationManager.Instance["Status_SubImported"], added.Count);
+            ToastHandler?.Invoke(string.Format(TranslationManager.Instance["Toast_SubImported"], added.Count, skipped));
+        }
+        catch (Exception ex)
+        {
+            Status = TranslationManager.Instance["Status_SubFailed"];
+            ToastHandler?.Invoke(TranslationManager.Instance["Toast_SubImportFailed"]);
+            AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message));
+            return;
+        }
+
+        foreach (var info in added)
+            await UpdateSingleSubscription(info);
+    }
+
     [RelayCommand]
     private async Task CopySubscriptionUrl(SubscriptionInfo? sub)
     {

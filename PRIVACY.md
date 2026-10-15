@@ -93,16 +93,18 @@ server's address, not yours.
 
 *Send crash reports* is **off** in a fresh install. Nothing is uploaded until
 you turn it on. Reports are queued in `%APPDATA%\Roxa\reports-pending` and
-only uploaded while the setting stays enabled. Turning it off stops uploads;
+only uploaded while the setting stays enabled. Turning it off stops uploads and
+empties the queue, so nothing you asked not to send is still waiting on disk;
 the setting is also visible in Settings at any time.
 
 The queue holds at most 30 reports; adding one past that removes the oldest.
 Reports are removed as soon as they are sent, and reports with no content are
-discarded without being sent. A report that could not be sent because you
-never enabled the setting stays on disk until either the setting is turned on
-or a newer crash pushes it out of the queue — there is no age-based expiry,
-so if you want a queued report gone, empty the `reports-pending` folder while
-Roxa is closed.
+discarded without being sent. A report that could not be sent because you never
+enabled the setting is deleted once it is **30 days old** — the sweep runs
+every time Roxa starts, whether or not sending is enabled. Sweeping and
+discarding are local deletions; neither one uploads anything. If you want a
+queued report gone before then, empty the `reports-pending` folder while Roxa
+is closed.
 
 ## What Roxa does not do
 
@@ -128,9 +130,10 @@ Any change to this list is documented in `CHANGELOG.md` under `Security`.
 > لینکِ اشتراک هر دو با DPAPIِ ویندوز رمزنگاری می‌شوند** (فایلِ قدیمی در اولین
 > اجرا خودبه‌خود رمزنگاری می‌شود). ولی **کانفیگِ موقتِ موتور متنِ ساده** است و
 > با اینکه دسترسیِ آن فقط به حسابِ خودتان محدود است، تا ۲۴ ساعت رویِ دیسک
-> می‌ماند. ارسالِ گزارشِ کرش کاملاً اختیاری و پیش‌فرضِ آن خاموش است. **آدرسِ IP
-> شما رویِ دیسکِ سرور ذخیره نمی‌شود** — فقط
+> می‌ماند. ارسالِ گزارشِ کرش کاملاً اختیاری و پیش‌فرضِ آن خاموش است؛ **هر گزارشِ
+> درِ صف حداکثرِ ۳۰ روز می‌ماند** و خاموش کردنِ همان گزینه، صف را هم خالی
+> می‌کند. **آدرسِ IP شما رویِ دیسکِ سرور ذخیره نمی‌شود** — فقط
 > هشِ نمکیِ برگشت‌ناپذیر آن می‌ماند، و آن هم حداکثرِ یک ساعت در
-> شمارندههایِ نرخ‌限额. متنِ کاملِ اتصال‌ها در بالا آمده، از جمله اینکه
+> شمارنده‌هایِ نرخ‌محدودیت. متنِ کاملِ اتصال‌ها در بالا آمده، از جمله اینکه
 > `gh-proxy.com` (پراکسیِ واسطهٔ ثالث) آدرسِ شما و درخواستِ فایلِ Xray-core
 > را می‌بیند. هر تغییرِ آینده در `CHANGELOG.md` ثبت می‌شود.

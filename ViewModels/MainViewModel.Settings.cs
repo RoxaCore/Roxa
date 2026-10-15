@@ -187,6 +187,9 @@ public partial class MainViewModel : ViewModelBase
     {
         _settings.SendUsageStats = value;
         SaveSettings();
+        // خاموش کردنِ صریح یعنی همین الان نمی‌خواهم بیاید؛ پس آنچه از قبل
+        // در صف مانده هم باید برود، نه اینکه منتظرِ رضایتی بماند که داده نشده.
+        if (!value) Core.BugReport.DiscardPending();
     }
 
     public string DeviceId => _settings.ClientId;

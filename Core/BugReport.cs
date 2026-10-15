@@ -38,6 +38,17 @@ public static class BugReport
 
     private const int PendingCap = 30;
 
+    /// <summary>
+    /// گزارشِ درِ صف بیش از این عمر نمی‌کند.
+    ///
+    /// سقفِ تعداد از اول بود، ولی مهلت نه — و کمبودِ مهلت یعنی اگر کاربر هرگز
+    /// رضایت نمی‌داد، همان نخستین گزارشِ کرش برایِ همیشه روی دیسک می‌ماند.
+    /// ۳۰ روز هم‌اندازهٔ سقفِ تعداد است و از ارزشِ یک گزارشِ کرش برایِ
+    /// خطایابی هم بیشتر است: بعد از یک ماه، لاگ و stack آن برایِ نسخهٔ فعلی
+    /// کاربردش را از دست داده.
+    /// </summary>
+    private const int PendingMaxAgeDays = 30;
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -139,6 +150,51 @@ public static class BugReport
         }
     }
 
+    /// <summary>
+    /// صف را از گزارش‌هایِ قدیمی پاک می‌کند.
+    ///
+    /// عمداً پیش از بررسیِ رضایت اجرا می‌شود: این بهداشتِ محلی است، نه ارسال، و
+    /// دقیقاً در همان حالتِ بی‌رضایت است که صف رشد می‌کند و اگر کسی آن را نگاه
+    /// دارد باید کهنه شود.
+    /// </summary>
+    private static void SweepExpired()
+    {
+        try
+        {
+            if (!Directory.Exists(PendingDir)) return;
+            DateTime cutoff = DateTime.Now.AddDays(-PendingMaxAgeDays);
+            foreach (var file in Directory.GetFiles(PendingDir, "*.json"))
+            {
+                try
+                {
+                    if (File.GetLastWriteTime(file) < cutoff) File.Delete(file);
+                }
+                catch { }
+            }
+        }
+        catch { }
+    }
+
+    /// <summary>
+    /// کاربر ارسالِ آمار را خاموش کرد ⇒ آنچه پیش‌تر در صف جمع شده باید برود.
+    ///
+    /// نوشتنِ محلیِ گزارشِ آینده عمداً ادامه می‌یابد (بی‌ضرر است و اگر بعداً
+    /// رضایت داد، ارزشمندترین گزارش همان نخستین اجرای پس از کرش است)؛ ولی
+    /// آنچه بدونِ رضایت مانده، پس از خاموش کردنِ صریحِ همان گزینه بی‌معناست.
+    /// </summary>
+    public static void DiscardPending()
+    {
+        try
+        {
+            if (!Directory.Exists(PendingDir)) return;
+            foreach (var file in Directory.GetFiles(PendingDir, "*.json"))
+            {
+                try { File.Delete(file); } catch { }
+            }
+        }
+        catch { }
+    }
+
     public static async Task<bool> SendAsync(Payload p, int? proxyPort, CancellationToken ct = default)
     {
         try
@@ -174,6 +230,10 @@ public static class BugReport
     /// </summary>
     public static async Task<int> FlushPendingAsync(int? proxyPort)
     {
+        // قبل از گیتِ رضایت: پاک‌سازیِ کهنگی فرستادن نیست، بهداشتِ محلی است و
+        // باید در همان حالتِ بی‌رضایت هم انجام شود که صف رشد می‌کند.
+        SweepExpired();
+
         if (!ConsentAllowsSend()) return 0;
 
         int sent = 0;

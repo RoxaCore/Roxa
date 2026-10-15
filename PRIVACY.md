@@ -15,19 +15,27 @@ Last reviewed: 2026-10-15, against Roxa 3.0.8.
 | `%APPDATA%\Roxa\settings.json` | Preferences, language, and an anonymous install identifier | No |
 | `%APPDATA%\Roxa\*.txt`, `*.flag` | Firewall rules and route pins used for TUN bypass | No |
 | `%LOCALAPPDATA%\Roxa\logs\`, `<app>\logs\` | Operational logs | No |
-| `%TEMP%\roxa-config-*.json` | Full Xray configuration, including your credentials | No — **deleted on shutdown** and swept on the next start |
+| `%ProgramData%\Roxa\tun-state.json` | Engine process id, adapter name, routes, and the proxy/DNS settings to restore after TUN mode. No credentials | No — **inherits the default ProgramData permissions, so other local accounts can read it** |
+| `%TEMP%\roxa-config-*.json` | Full Xray configuration, including your credentials | No — access is restricted to your account, but the file is **kept on disk** for troubleshooting. It is deleted only when Roxa removes configurations older than 24 hours, at the next start |
 
 Roxa does **not** log traffic destinations. The Xray configuration uses
 `loglevel: warning` with no access or error log file, so the engine never
 writes the sites you visit to disk. Test configurations use `loglevel: none`.
 
+The temporary configuration is written to `%TEMP%` with an ACL that grants
+access only to your account, then handed to the engine. It is left in place on
+purpose so a support request can be diagnosed against what was actually run.
+Roxa removes configurations older than 24 hours when it starts, so one
+survives at most until the next time you open the program. If you want it gone
+sooner, deleting `%TEMP%\roxa-config-*.json` while Roxa is closed is safe.
+
 ## Connections Roxa makes
 
 | Destination | Sent | Received | When |
 |---|---|---|---|
-| `up.roxacore.com/api/check.php` | App version, interface language, country code, **install identifier**, and (only if *Send usage statistics* is on) the number of connections you have made | Available update, announcements | On start, then **every 60 minutes** |
+| `up.roxacore.com/api/check.php` | App version, interface language, country code, **install identifier**, a one-way hash of the address you came from, and (only if *Send usage statistics* is on) the number of connections you have made | Available update, announcements | On start, then **every 60 minutes** |
 | `up.roxacore.com/api/announcements.php` | Last-seen announcement id, language, country code | Announcements | On start, then every 60 minutes |
-| `up.roxacore.com/api/report.php` | Crash report: exception, up to 4 000 characters of log tail, install identifier | — | **Only if you turn on "Send crash reports"** |
+| `up.roxacore.com/api/report.php` | Crash report: exception, up to 4 000 characters of log tail, install identifier, and a one-way hash of the address you came from | — | **Only if you turn on "Send crash reports"** |
 | `get.geojs.io`, `ipwho.is` | Your IP address (implicitly — you cannot ask for a country without revealing it) | Country code | On every check **while you are not connected**. The result is cached in `settings.json` and is not requested again while the tunnel is up |
 | `api.github.com/repos/XTLS/Xray-core/releases/latest` | Your IP address (implicitly — any web request reveals it) | Xray-core release metadata | When checking for an engine update |
 | `gh-proxy.com` | Your IP address (implicitly) | Xray-core binary | When downloading an engine update. **This is a third-party mirror, not operated by Roxa.** It can see that you fetched an Xray-core build and when |
@@ -87,6 +95,14 @@ server's address, not yours.
 you turn it on. Reports are queued in `%APPDATA%\Roxa\reports-pending` and
 only uploaded while the setting stays enabled. Turning it off stops uploads;
 the setting is also visible in Settings at any time.
+
+The queue holds at most 30 reports; adding one past that removes the oldest.
+Reports are removed as soon as they are sent, and reports with no content are
+discarded without being sent. A report that could not be sent because you
+never enabled the setting stays on disk until either the setting is turned on
+or a newer crash pushes it out of the queue — there is no age-based expiry,
+so if you want a queued report gone, empty the `reports-pending` folder while
+Roxa is closed.
 
 ## What Roxa does not do
 

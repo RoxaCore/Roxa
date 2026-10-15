@@ -9,17 +9,24 @@ AppId={{8F2C6A19-4B7E-4D0B-9C3A-5E1D2F8B7A64}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppName}
-; همیشه در پوشهٔ کاربر نصب می‌شود، نه Program Files. نصاب با PrivilegesRequired=lowest
-; اجرا می‌شود، پس {autopf} فقط وقتی به Program Files می‌رفت که کاربر عمداً نصاب را
-; «Run as administrator» می‌زد — و آن موقع خودِ برنامه (asInvoker) در پوشهٔ خودش حقِ
-; نوشتن نداشت: لاگ گم می‌شد، دانلودِ موتور و وینتین شکست می‌خورد و آپدیت اعمال
-; می‌شد ولی برنامه دیگر برنمی‌گشت. {localappdata}\Programs همیشه قابلِ نوشتن است.
-DefaultDirName={localappdata}\Programs\{#MyAppName}
+; نصب در Program Files، نه پوشهٔ کاربر. نصاب با PrivilegesRequired=admin اجرا
+; می‌شود تا هم UAC بگیرد و هم بتواند DACLِ %ProgramData%\Roxa را از همان لحظهٔ
+; نصب ببندد (ببین [Dirs] و RestrictProgramDataDir در پایین).
+;
+; خواندنی بودنِ Program Files عمداً مهم نیست چون برنامه دیگر در پوشهٔ خودش
+; نمی‌نویسد: موتور و wintun باندل شده‌اند و فقط خوانده می‌شوند، لاگ‌ها به
+; %LOCALAPPDATA%\Roxa\logs می‌روند، و نوشتنی‌ها در %APPDATA%\Roxa و
+; %ProgramData%\Roxa نشسته‌اند. تنها نوشتنیِ داخلِ برنامه، بازیابیِ موتور هنگامِ
+; خرابی است که فقط با ارتقا مجاز است و در غیرِ این صورت fail-closed می‌شود.
+DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-PrivilegesRequired=lowest
+PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible
-ArchitecturesInstallIn64BitMode=x64compatible
+; Inno 6 املای x64 را منسوخ اعلام می‌کند و آن را با x64os جایگزین می‌کند؛ همان را
+; بدونِ هشدار می‌نویسیم. نتیجه روی ویندوزهای x64 یکی است: {autopf} همان
+; C:\Program Files است.
+ArchitecturesInstallIn64BitMode=x64os
 OutputDir=output
 OutputBaseFilename=Roxa-Setup-{#MyAppVersion}
 Compression=lzma2/max
@@ -35,6 +42,16 @@ Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription
 
 [Files]
 Source: "publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+; پوشهٔ وضعیتِ تونل باید از همان لحظهٔ نصب بسته باشد.
+;
+; Permissions را عمداً خالی گذاشته‌ایم: Inno با Permissions فقط ACE اضافه می‌کند و
+; ارث‌بریِ C:\ProgramData را که به BUILTIN\Users حقِ Write می‌دهد خاموش نمی‌کند.
+; روی همین ماشین آزمایش شد — هم با system-full admins-full و هم با users-readexec،
+; ACEِ ارثیِ Write باقی می‌ماند و چون هر دو Allow رویِ یک SID اتحاد می‌شوند، کاربرِ
+; عادی همچنان می‌نوشت. بستنِ واقعی کارِ RestrictProgramDataDir در [Code] است.
+[Dirs]
+Name: "{commonappdata}\Roxa"
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -235,4 +252,48 @@ begin
 
   Result := 'The .NET runtime was not installed successfully. Try again and ' +
             'click "Yes" when Windows asks for permission (UAC).';
+end;
+
+// ---------------------------------------------------------------------------
+// بستنِ DACLِ %ProgramData%\Roxa در همان لحظهٔ نصب.
+//
+// اینجا باید /inheritance:r بزنیم، نه Permissions در [Dirs]. هر دو مسیر روی همین
+// ماشین آزمایش شدند: پوشهٔ تازه در C:\ProgramData ارث می‌برد از
+//   BUILTIN\Users  ReadAndExecute, Synchronize
+//   BUILTIN\Users  Write                                  <-- اینجا
+// و Inno با Permissions فقط ACEِ صریح اضافه می‌کند. چون Allow برایِ یک SID به هم
+// جوش نمی‌خورد بلکه اتحاد می‌شود، اضافه کردنِ users-readexec هم چیزی را عوض نمی‌کرد.
+//
+// /inheritance:r همهٔ ACEهای ارثی را برمی‌دارد و /grant:r سه ACEِ صریح می‌گذارد:
+// SYSTEM و Administrators کامل، BUILTIN\Users فقط خواندن+اجرا. پس بچه‌ها
+// (tun-state.json) هم همین را ارث می‌برند.
+//
+// SIDs به‌جای نام نوشته می‌شوند چون خروجیِ icacls محلی‌سازی شده است؛
+// *S-1-5-18 و *S-1-5-32-544 و *S-1-5-32-545 روی همهٔ ویندوزها همین‌ها هستند.
+//
+// بهترین تلاش است: اگر icacls در دسترس نباشد نصب متوقف نمی‌شود، چون خودِ برنامه
+// همین ACL را در هر شروع اعمال می‌کند (EnsureProgramDataAcl) و تا آن زمان هم
+// Load() هر ورودیِ tun-state.json را اعتبارسنجی می‌کند.
+// ---------------------------------------------------------------------------
+procedure RestrictProgramDataDir;
+var
+  Params: String;
+  ResultCode: Integer;
+begin
+  Params := '"' + ExpandConstant('{commonappdata}\Roxa') + '" /inheritance:r /grant:r'
+    + ' *S-1-5-18:(OI)(CI)F'
+    + ' *S-1-5-32-544:(OI)(CI)F'
+    + ' *S-1-5-32-545:(OI)(CI)RX';
+  if Exec(ExpandConstant('{sys}\icacls.exe'), Params, '', SW_HIDE,
+          ewWaitUntilTerminated, ResultCode) then
+    Log('[acl] icacls exit=' + IntToStr(ResultCode))
+  else
+    Log('[acl] icacls could not start; Roxa will tighten this ACL on first run');
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  // ssPostInstall یعنی [Dirs] و [Files] همه اجرا شده‌اند.
+  if CurStep = ssPostInstall then
+    RestrictProgramDataDir;
 end;

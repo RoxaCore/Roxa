@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `servers.json`. A file written by an older version is re-encrypted the first
   time it is read. If DPAPI is unavailable the list is written in plain text
   rather than being dropped, and is re-encrypted on the next successful save.
+- A queued crash report is now deleted once it is 30 days old. The cap of 30
+  reports was never matched by a deadline, so a report the user never
+  consented to send stayed on disk indefinitely; the sweep runs at every
+  start, with or without consent, because it deletes rather than uploads.
+  Turning *Send crash reports* off now empties the queue immediately instead
+  of leaving already-collected reports waiting for a consent that was just
+  declined.
 
 ## [3.0.8] - 2026-10-15
 

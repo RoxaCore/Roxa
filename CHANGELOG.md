@@ -98,8 +98,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   English rather than showing a raw key.
 - Layout is script-aware for right-to-left languages, with per-codepoint
   font fallback so Persian and Arabic never render as boxes.
-- A single global mutex is used; a second launch now brings the existing
-  window forward instead of silently exiting.
+- Automatic updating stops at a notification. The banner button opens the
+  release page over https instead of downloading a payload, the
+  *Auto-update app* checkbox is gone from Settings, and `--update-apply`
+  is refused outright.
+- Installation is per-machine in `C:\Program Files\Roxa` and takes one
+  administrator prompt; setup no longer installs per-user.
+- The build script stops only Roxa's own processes. It used to kill every
+  `xray.exe` on the machine, which also took down an unrelated core such
+  as v2rayN's.
 
 ### Fixed
 
@@ -110,6 +117,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The wintun download URL was dead; the correct per-architecture DLL is now
   picked.
 - Manual DNS servers were swept away by the firewall cleanup.
+- Parser diagnostics went to `<app>\logs`, which a normal account cannot
+  create in Program Files, so a failed parse was lost twice over: the
+  exception was already caught and the one file that could explain it was
+  never written. They now use the tunnel log's directory, which falls back
+  to `%LOCALAPPDATA%\Roxa\logs`.
 - Exclusion routes (`/32`) survived a crash and stayed in the routing table
   forever. They are now persisted and swept on the next start.
 
@@ -117,12 +129,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The .NET runtime download is verified against a SHA-256 pinned inside the
   installer; the hash is never fetched over the network.
-- An update is applied with a backup and rolled back if the new build fails
-  to start.
+- The app never downloads or executes an update itself any more. The
+  staging and rollback path is still compiled but has no caller:
+  `--update-apply` removes whatever was staged and exits non-zero, so the
+  running program never executes a payload a remote config pointed at.
 - Settings are written atomically. An unreadable file is quarantined as
   `.bad` instead of being silently discarded.
-- The app installs per-user and runs with `asInvoker`, so no elevation
-  prompt is ever shown and Program Files never becomes unwritable.
+- The installer requires administrator rights and installs per-machine
+  into Program Files, which a normal account cannot write to. The program
+  itself still runs `asInvoker`, so ordinary use never prompts for
+  elevation: everything it writes lives outside the install directory —
+  settings and servers in `%APPDATA%\Roxa`, logs in
+  `%LOCALAPPDATA%\Roxa\logs`, tunnel state in `%ProgramData%\Roxa`.
+- `%ProgramData%\Roxa` is created with inheritance broken and only SYSTEM
+  and Administrators given full control. Another local account can read
+  the tunnel state — engine process id, adapter, routes, the proxy and DNS
+  to restore — but cannot change what Roxa will act on.
+- The engine ships with the digest it must match, so verifying it inside
+  Program Files never writes anything. A binary that fails verification
+  while Roxa is not elevated stops with one clear message asking for
+  administrator rights instead of attempting a re-download into a folder
+  it cannot write to.
 - Host routes are restored and held routes persist across crashes.
 
 ## [3.0.7] - 2026-10-10

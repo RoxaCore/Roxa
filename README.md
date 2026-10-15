@@ -4,12 +4,12 @@
 
 Roxa is a desktop GUI around Xray-core. It supports system-proxy mode and a
 full TUN mode with a kill-switch, per-application bypass, live delay
-measurement, and automatic updates. The interface is available in 14
+measurement, and update notifications. The interface is available in 14
 languages.
 
 > **فارسی:** رُخا یک کلاینت VPN برای ویندوز است که روی Xray-core ساخته شده.
 > هم حالتِ پروکسیِ سیستم و هم حالتِ کاملِ TUN با کیل‌سوییچ، معافیتِ برنامه‌ها،
-> اندازه‌گیریِ زندهٔ تأخیر و به‌روزرسانیِ خودکار دارد. رابط به ۱۴ زبان موجود است.
+> اندازه‌گیریِ زندهٔ تأخیر و اعلانِ به‌روزرسانی دارد. رابط به ۱۴ زبان موجود است.
 
 ---
 
@@ -20,32 +20,36 @@ languages.
 | **Operating system** | Windows 10 version 1607 (build 14393) or newer, including Windows 11 |
 | **Architecture** | x64 |
 | **.NET** | .NET Desktop Runtime 8 — **installed automatically by setup** |
-| **Administrator** | Only needed for TUN mode |
+| **Administrator** | Once for installation, and again for TUN mode |
 
 Windows 7, 8 and 8.1 are not supported: Microsoft no longer ships the .NET 8
 runtime for them, so neither the runtime nor Roxa can run there.
 
 > **فارسی:** ویندوز ۷، ۸ و ۸٫۱ پشتیبانی نمی‌شوند چون مایکروسافت دیگر رانتایمِ
-> دات‌نت ۸ را برای آن‌ها منتشر نمی‌کند. برای حالتِ TUN به دسترسیِ
-> Administrator نیاز است؛ حالتِ پروکسیِ سیستم بدونِ آن کار می‌کند.
+> دات‌نت ۸ را برای آن‌ها منتشر نمی‌کند. نصب به ادمین نیاز دارد؛ بعد از نصب،
+> حالتِ پروکسیِ سیستم بدونِ آن کار می‌کند و برای حالتِ TUN دوباره لازم است.
 
 ---
 
 ## Installation / نحوهٔ نصب
 
 1. Download `Roxa-Setup-<version>.exe`.
-2. Run it. Setup installs **per-user** into
-   `%LOCALAPPDATA%\Programs\Roxa` — no administrator prompt appears.
+2. Run it. Setup asks for administrator rights once and installs
+   **per-machine** into `C:\Program Files\Roxa`, which a normal account
+   cannot write to.
 3. If the .NET Desktop Runtime is missing, setup downloads it from
    Microsoft and verifies its SHA-256 before running it.
 4. Launch Roxa and add a server, or paste a subscription link.
 
 To uninstall, use *Apps & features*. Uninstall runs a cleanup pass first, so
 the TUN adapter, its routes, the firewall rules and the system proxy are all
-restored before the files are removed.
+restored before the files are removed. The install folder and
+`%ProgramData%\Roxa` go with it; your servers and settings in
+`%APPDATA%\Roxa` are left in place.
 
-> **فارسی:** نصب‌کننده برایِ کاربرِ جاری نصب می‌کند و هیچ درخواستِ ادمین نمی‌دهد.
-> اگر رانتایمِ دات‌نت نباشد، خودش ازِ مایکروسافت دانلود و با SHA-256 تأیید
+> **فارسی:** نصب‌کننده یک بار اجازهٔ ادمین می‌گیرد و در `C:\Program Files\Roxa`
+> برایِ همهٔ کاربران نصب می‌کند؛ اجرای برنامه در حالتِ پروکسی به ادمین نیاز
+> ندارد. اگر رانتایمِ دات‌نت نباشد، خودش ازِ مایکروسافت دانلود و با SHA-256 تأیید
 > می‌کند. برای حذف، از «برنامه‌ها و ویژگی‌ها» اقدام کنید؛ حذف اول پاکسازی
 > (آداپتر، مسیرها، فایروال، پروکسیِ سیستم) را اجرا می‌کند.
 

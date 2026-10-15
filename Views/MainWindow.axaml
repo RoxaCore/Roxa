@@ -736,8 +736,11 @@
             <StackPanel Orientation="Horizontal" Spacing="12">
               <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_UpdateAll}" Command="{Binding UpdateSubscriptionsCommand}" Padding="12,8" CornerRadius="6"/>
               <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_Diagnose}" Command="{Binding DiagnoseSubscriptionsCommand}" Padding="12,8" CornerRadius="6"/>
+              <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_ExportSubs}" Command="{Binding ExportSubscriptionsCommand}" Padding="12,8" CornerRadius="6"/>
+              <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_ImportSubs}" Command="{Binding ImportSubscriptionsCommand}" Padding="12,8" CornerRadius="6"/>
               <CheckBox Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Sub_UseProxy}" IsChecked="{Binding UseProxyForSubscriptions}" VerticalAlignment="Center" FontSize="12"/>
             </StackPanel>
+            <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Hint_SubExport}" FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
           </StackPanel>
           
           <ScrollViewer>

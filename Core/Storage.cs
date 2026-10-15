@@ -46,6 +46,19 @@ public static class Storage
 
     public static string DataDir => _dataDir;
 
+    /// <summary>
+    /// وقتی DPAPI از کار افتاد و subscriptions.json به‌جایِ رمزنگاری، متنی نوشته
+    /// شد، یک‌بار اعلام می‌شود.
+    ///
+    /// Storage رابط نمی‌سازد؛ فقط خبر می‌دهد. سکوت بدترین حالتِ ممکن است: کاربر
+    /// باید همان لحظه بفهمد لینک‌های اشتراکش محافظتِ حسابِ ویندوز را از دست
+    /// داده‌اند، نه اینکه بعداً خودش بفهمد. فقط یک‌بار در هر اجرا اعلام می‌شود
+    /// تا هر ذخیرهٔ متوالی toastِ پشتِ سرهم نسازد.
+    /// </summary>
+    public static event Action? SubscriptionsWrittenInClearText;
+
+    private static bool _clearTextAnnounced;
+
     private static string ServersFile => Path.Combine(_dataDir, "servers.json");
     private static string SubscriptionsFile => Path.Combine(_dataDir, "subscriptions.json");
     private static string SettingsFile => Path.Combine(_dataDir, "settings.json");
@@ -180,10 +193,22 @@ public static class Storage
             // می‌کند — مهاجرتِ قدیمی همین مسیر را طی می‌کند.
             TunManager.Log("Storage: DPAPI failed for subscriptions.json; wrote it in plain text. It will be re-encrypted on the next successful save.");
             WriteAtomic(SubscriptionsFile, plain);
+            AnnounceClearText();
             return;
         }
 #pragma warning restore CA1416
         WriteAtomic(SubscriptionsFile, protectedBytes);
+    }
+
+    /// <summary>
+    /// اعلامِ یک‌بارهٔ «فایل متنی نوشته شد». گاردِ تک‌بار اینجاست نه در فراخواننده،
+    /// چون مسیرِ فراخوانی یکی است و هر ذخیرهٔ بعدی هم به همین‌جا می‌رسد.
+    /// </summary>
+    private static void AnnounceClearText()
+    {
+        if (_clearTextAnnounced) return;
+        _clearTextAnnounced = true;
+        SubscriptionsWrittenInClearText?.Invoke();
     }
 
     public static AppSettings LoadSettings()

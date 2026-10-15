@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Export and import of the subscription list, as buttons on the Subscriptions
+  page. This exists because DPAPI binds `subscriptions.json` to one Windows
+  account: moving to another machine, or reinstalling Windows, used to mean
+  re-entering every link by hand. The exported file is plain JSON on purpose —
+  it must not be tied to an account — and the page says so, because it
+  contains the links themselves. Import never removes or replaces anything:
+  an identical URL is skipped and a name collision gets a distinct name.
+
 ### Security
 
 - The engine download is now fail-closed end to end. An Xray-core release
@@ -49,6 +59,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   one holds a PHP worker for that long, so a few hundred parallel guesses could
   have taken the whole panel down — the exact outage a global lockout was
   meant to prevent. The per-IP lockout of 20 failures an hour is unchanged.
+- When DPAPI is unavailable and `subscriptions.json` has to be written as plain
+  text, the user is told on screen instead of only in the log. Losing the
+  encryption silently is the worst outcome here: the fallback already favours
+  keeping the links over keeping them encrypted, and that trade should never
+  be made where nobody can see it.
 
 ## [3.0.8] - 2026-10-15
 

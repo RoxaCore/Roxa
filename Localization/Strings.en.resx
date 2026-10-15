@@ -554,4 +554,21 @@ State: {3}</value>
   <data name="Set_ShowIp" xml:space="preserve"><value>Show IP address column</value></data>
   <data name="Set_ShowIp_Desc" xml:space="preserve"><value>When enabled, the IP address column is shown in the servers table.</value></data>
 <data name="Btn_Paste" xml:space="preserve"><value>Paste from clipboard</value></data>
+  <data name="Btn_ExportSubs" xml:space="preserve"><value>Export subscriptions</value></data>
+  <data name="Btn_ImportSubs" xml:space="preserve"><value>Import subscriptions</value></data>
+  <data name="Hint_SubExport" xml:space="preserve"><value>Export writes your subscription links as plain text into a JSON file; protect that file the way you protect the links themselves. Import leaves the subscriptions you already have untouched and only adds new ones.</value></data>
+  <data name="Dlg_ExportSubsTitle" xml:space="preserve"><value>Export subscriptions</value></data>
+  <data name="Dlg_ImportSubsTitle" xml:space="preserve"><value>Import subscriptions</value></data>
+  <data name="Toast_SubExported" xml:space="preserve"><value>{0} subscription(s) written to the file</value></data>
+  <data name="Toast_SubExportNone" xml:space="preserve"><value>There are no subscriptions to export</value></data>
+  <data name="Toast_SubExportFailed" xml:space="preserve"><value>The export could not be written</value></data>
+  <data name="Toast_SubImported" xml:space="preserve"><value>{0} subscription(s) imported; {1} duplicate(s) skipped</value></data>
+  <data name="Toast_SubImportEmpty" xml:space="preserve"><value>No subscriptions were found in that file</value></data>
+  <data name="Toast_SubImportFailed" xml:space="preserve"><value>The file could not be imported</value></data>
+  <data name="Status_SubExported" xml:space="preserve"><value>{0} subscription(s) exported</value></data>
+  <data name="Status_SubImported" xml:space="preserve"><value>{0} subscription(s) imported</value></data>
+  <data name="Status_SubFailed" xml:space="preserve"><value>That file operation did not complete</value></data>
+  <data name="Log_SubExported" xml:space="preserve"><value>Subscriptions written to {0}</value></data>
+  <data name="Status_SubStoredInClear" xml:space="preserve"><value>Warning: your subscription links were stored on disk as plain text</value></data>
+  <data name="Toast_SubStoredInClear" xml:space="preserve"><value>Encrypting subscriptions was not available, so the file was written as plain text and will be encrypted again on the next save</value></data>
 </root>

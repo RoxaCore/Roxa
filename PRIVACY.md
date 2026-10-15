@@ -15,8 +15,9 @@ Last reviewed: 2026-10-15, against Roxa 3.0.8.
 | `%APPDATA%\Roxa\settings.json` | Preferences, language, and an anonymous install identifier | No |
 | `%APPDATA%\Roxa\*.txt`, `*.flag` | Firewall rules and route pins used for TUN bypass | No |
 | `%LOCALAPPDATA%\Roxa\logs\`, `<app>\logs\` | Operational logs | No |
-| `%ProgramData%\Roxa\tun-state.json` | Engine process id, adapter name, routes, and the proxy/DNS settings to restore after TUN mode. No credentials | No — **inherits the default ProgramData permissions, so other local accounts can read it** |
+| `%ProgramData%\Roxa\tun-state.json` | Engine process id, adapter name, routes, and the proxy/DNS settings to restore after TUN mode. No credentials | No — another local account can still **read** it, but Roxa tightens the folder permissions at every start (SYSTEM and Administrators: full control, everyone else: read only) so that account cannot change what Roxa will act on |
 | `%TEMP%\roxa-config-*.json` | Full Xray configuration, including your credentials | No — access is restricted to your account, but the file is **kept on disk** for troubleshooting. It is deleted only when Roxa removes configurations older than 24 hours, at the next start |
+| A file you pick with *Export subscriptions* | Subscription names and URLs, as plain JSON | **No, and it cannot be** — the point of the export is a file that is not tied to one Windows account, so it can be moved to another machine. Protect it the way you protect the links themselves |
 
 Roxa does **not** log traffic destinations. The Xray configuration uses
 `loglevel: warning` with no access or error log file, so the engine never

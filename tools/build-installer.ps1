@@ -4,7 +4,13 @@ $iscc = Join-Path $env:LOCALAPPDATA "Programs\Inno Setup 6\ISCC.exe"
 $pub = Join-Path $root "installer\publish"
 $out = Join-Path $root "installer\output"
 
-Stop-Process -Name "Roxa","VBCSCompiler","xray" -Force -ErrorAction SilentlyContinue
+# Only our own processes. Killing every process named "xray" on the machine also
+# takes down an unrelated core such as v2rayN's, which must stay untouched, so the
+# engine is identified by its executable path being inside this repository instead.
+Stop-Process -Name "Roxa","VBCSCompiler" -Force -ErrorAction SilentlyContinue
+Get-CimInstance Win32_Process -Filter "Name = 'xray.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.ExecutablePath -and $_.ExecutablePath.StartsWith($root, [StringComparison]::OrdinalIgnoreCase) } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 
 if (Test-Path $pub) { Remove-Item $pub -Recurse -Force }
 

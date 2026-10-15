@@ -1,11 +1,23 @@
 #define MyAppName "Roxa"
 #define MyAppVersion "3.0.8"
 #define MyAppExeName "Roxa.exe"
-; رانتایمِ دات‌نت در خودِ نصب‌کننده می‌آید تا نصب هیچ‌وقت به شبکه وابسته نباشد.
-; فایل در installer\runtime نشسته و در .gitignore است؛ build-installer.ps1 آن را
-; اگر نبود از DotNetUrl دانلود می‌کند و با همان SHA-256ِ زیر می‌سنجد و در صورتِ
-; ناهمخوانی، build را می‌شکند. DotNetUrl و DotNetSha256 فقط منبعِ حقیقتِ اسکریپتِ
-; بیلد و سندِ مجوزند؛ [Code] دیگر هیچ دانلودی نمی‌کند.
+; ---------------------------------------------------------------------------
+; دو بیلد از همین یک فایل ساخته می‌شود:
+;
+;   ISCC setup.iss           -> Roxa-Setup-3.0.8.exe         رانتایم داخلِ خودِ فایل
+;   ISCC /DOnline setup.iss  -> Roxa-Setup-3.0.8-online.exe  رانتایم را هنگامِ نصب
+;                                                         ازِ مایکروسافت می‌گیرد
+;
+; در بیلدِ باندل‌شده، فایلِ رانتایم در installer\runtime نشسته (در .gitignore) و
+; build-installer.ps1 آن را اگر نبود از DotNetUrl دانلود و با همان SHA-256ِ زیر
+; می‌سنجد؛ ناهمخوانی یعنی شکستِ build، نه تحویلِ فایلِ خراب.
+;
+; DotNetUrl و DotNetSha256 در هر دو بیلد معنی دارند: در بیلدِ آنلاین همان هش را
+; خودِ Inno پیش از تحویلِ فایلِ دانلودشده می‌سنجد. اگر مایکروسافت لینک را عوض
+; کند، build با پیامِ صریح می‌شکند و فقط همین سه خط عوض می‌شود؛ و شکستِ نصبِ
+; کاربر به صفحهٔ کانالیِ https://dotnet.microsoft.com/download/dotnet/8.0 می‌رود
+; که فایلی نیست و عوض نمی‌شود.
+; ---------------------------------------------------------------------------
 #define DotNetFile "windowsdesktop-runtime-8.0.31-win-x64.exe"
 #define DotNetUrl "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.31/windowsdesktop-runtime-8.0.31-win-x64.exe"
 #define DotNetSha256 "c375dfd80a967405cfeff634912c1fccc56261ce3d9209ea473f60a21184d1cc"
@@ -34,7 +46,11 @@ ArchitecturesAllowed=x64compatible
 ; C:\Program Files است.
 ArchitecturesInstallIn64BitMode=x64os
 OutputDir=output
+#ifdef Online
+OutputBaseFilename=Roxa-Setup-{#MyAppVersion}-online
+#else
 OutputBaseFilename=Roxa-Setup-{#MyAppVersion}
+#endif
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
@@ -49,15 +65,17 @@ Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription
 [Files]
 Source: "publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-; رانتایمِ دات‌نت. dontcopy یعنی به {app} کپی نمی‌شود؛ PrepareToInstall آن را با
-; ExtractTemporaryFile در {tmp} می‌گشاید و بی‌صدا اجرا می‌کند.
+#ifndef Online
+; رانتایمِ دات‌نت — فقط در بیلدِ باندل‌شده. dontcopy یعنی به {app} کپی نمی‌شود؛
+; PrepareToInstall آن را با ExtractTemporaryFile در {tmp} می‌گشاید و بی‌صدا اجرا
+; می‌کند. نتیجه: نصبِ آفلاین به شبکه وابسته نمی‌شود.
 ;
-; دانلودِ هنگامِ نصب عمداً حذف شد. DownloadTemporaryFileِ Inno همگام و بدونِ
-; مهلت بود و پشتِ همان صفحهٔ «Preparing to Install» بدونِ پیشرفت و بدونِ Cancel
-; می‌ماند، و از WinHTTP می‌رفت که پروکسیِ کاربر را نمی‌بیند — پس مرورگر وصل
-; می‌شد ولی نصب‌کننده بی‌نهایت منتظر می‌ماند. این فایلِ باندل‌شده یک بار در
-; build تأیید می‌شود و نصب را از شبکه بی‌نیاز می‌کند.
+; دانلودِ هنگامِ نصب در این بیلد نیست چون DownloadTemporaryFileِ Inno آن‌موقع
+; پشتِ همان صفحهٔ «Preparing to Install» بدونِ پیشرفت و بدونِ Cancel می‌ماند و
+; از WinHTTP می‌رفت که پروکسیِ کاربر را نمی‌بیند — یعنی دقیقاً همان باگی که
+; گزارش شده بود. بیلدِ آنلاین (/DOnline) همان تابع را با callback و مهلت می‌گیرد.
 Source: "runtime\{#DotNetFile}"; DestDir: "{tmp}"; Flags: dontcopy
+#endif
 
 ; پوشهٔ وضعیتِ تونل باید از همان لحظهٔ نصب بسته باشد.
 ;
@@ -117,6 +135,21 @@ Type: filesandordirs; Name: "{app}\logs"
 const
   MinWindowsMajor = 10;
   MinWindowsBuild = 14393;
+
+#ifdef Online
+// مهلت‌های دانلودِ رانتایم — فقط بیلدِ آنلاین.
+//
+// عمداً در همان بخشِ ابتدایی آمده‌اند: Pascal Script برای هر بلاک فقط یک بخشِ
+// const و یک بخشِ var می‌پذیرد و آنها باید پیش از توابع بیایند.
+const
+  DlTimeoutMs = 600000;   // مهلتِ سختِ کلِ دانلود: ۱۰ دقیقه
+  DlStallMs = 90000;      // ۹۰ ثانیه بدونِ هیچ پیشرفتی
+
+var
+  DlStart: LongWord;      // لحظهٔ شروعِ دانلود
+  DlAdvanced: LongWord;   // لحظهٔ آخرین پیشرفتِ واقعی
+  DlProgress: Int64;      // بایتِ دیده‌شده تا اینجا
+#endif
 
 function IsSupportedWindows: Boolean;
 var
@@ -230,7 +263,34 @@ begin
 end;
 
 // ---------------------------------------------------------------------------
-// راهِ خروجِ دستی وقتی نصبِ رانتایمِ باندل‌شده شکست بخورد.
+// نوشتنِ وضعیتِ پشتِ صفحهٔ «Preparing to Install» — مشترکِ هر دو بیلد.
+//
+// بدونِ این، هر دو کارِ طولانیِ این صفحه (استخراجِ فایلِ ۵۶ مگابایتی، دانلود،
+// نصبِ بی‌صدای رانتایم) دقیقاً همان «هیچ اتفاقی نمی‌افتد» را نشان می‌داد که
+// گزارش شده بود. Update مستقیمِ همان کنترل را رسم می‌کند، پس حتی اگر حلقهٔ
+// پیامِ ویندوز وسطِ کار درگیر باشد هم متن تازه دیده می‌شود.
+//
+// در حالتِ /SILENT ممکن است فرمِ ویزارد در دسترس نباشد؛ چون فقط رابطِ کاربری
+// است، خطا را می‌بلعیم و کارِ اصلی ادامه پیدا می‌کند.
+// ---------------------------------------------------------------------------
+procedure SetPreparingStatus(const S: String; const Percent: Integer);
+begin
+  try
+    WizardForm.PreparingLabel.Caption := S;
+    if (Percent >= 0) and (Percent <= 1000) then
+    begin
+      WizardForm.ProgressGauge.Max := 1000;
+      WizardForm.ProgressGauge.Position := Percent;
+    end;
+    WizardForm.PreparingLabel.Update;
+    WizardForm.ProgressGauge.Update;
+  except
+    Log('[prep] wizard UI not available (silent install?); continuing headless');
+  end;
+end;
+
+// ---------------------------------------------------------------------------
+// راهِ خروجِ دستی وقتی نصبِ رانتایم شکست بخورد — مشترکِ هر دو بیلد.
 //
 // صفحهٔ مایکروسافت در مرورگرِ کاربر باز می‌شود: مرورگر از پروکسیِ کاربر
 // استفاده می‌کند و در همان شبکه‌ای هم که دسترسیِ مستقیم بسته است جواب می‌دهد.
@@ -248,10 +308,80 @@ begin
             + #13#10 + #13#10 + 'Nothing was installed.';
 end;
 
+#ifdef Online
+// ---------------------------------------------------------------------------
+// بیلدِ آنلاین: رانتایم داخلِ فایل نیست و هنگامِ نصب ازِ مایکروسافت دانلود
+// می‌شود.
+//
+// چرا DownloadTemporaryFileِ خودِ Inno، نه یک دانلودگرِ دست‌ساز:
+//  - SHA-256ِ تعبیه‌شده را پیش از تحویلِ فایل می‌سنجد؛ اگر روزی بایتِ دیگری
+//    پشتِ همان لینک بنشیند، هش می‌خورد و اجرا نمی‌شود.
+//  - حینِ کار به OnDownloadProgress پیام می‌دهد؛ یعنی حلقهٔ پیامِ ویندوز
+//    می‌چرخد، هم پیشرفت رسم می‌شود و هم دکمهٔ Cancel زنده می‌ماند.
+//  - بازگرداندنِ False از آن تابع دانلود را متوقف می‌کند؛ همین اهرمِ مهلتِ
+//    سخت و قطعِ اتصالِ بی‌پیشرفت است، پس «آویزان شدنِ تا ابد» ممکن نیست.
+//
+// لایهٔ سوم، مهلتِ دریافتِ خودِ WinHTTP است: اگر اصلاً پیامی نرسد، استثناء
+// می‌دهد و به مسیرِ دستی می‌رویم. سه لایه با هم همان باگِ گزارش‌شده را می‌بندند.
+// ---------------------------------------------------------------------------
+function GetTickCount: LongWord;
+  external 'GetTickCount@kernel32.dll stdcall';
+
+function DlElapsedMs(const Since: LongWord): Int64;
+var
+  NowTick: LongWord;
+begin
+  NowTick := GetTickCount;
+  if NowTick >= Since then
+    Result := NowTick - Since
+  else
+    // GetTickCount حدودِ ۴۹٫۷ روز یک‌بار برمی‌گردد. در آن حالت مبنا را همان
+    // ابتدا می‌گیریم و مهلتِ سخت دوباره شروع می‌شود؛ نه اینکه منفی شود و بی‌مهلت
+    // ادامه دهد.
+    Result := 0;
+end;
+
+function OnDownloadProgress(const Url, FileName: String; const Progress, ProgressMax: Int64): Boolean;
+var
+  Percent: Integer;
+begin
+  Result := True;
+
+  if DlElapsedMs(DlStart) > DlTimeoutMs then
+  begin
+    Log('[dl] aborted: longer than ' + IntToStr(DlTimeoutMs div 1000) + ' seconds');
+    Result := False;
+    Exit;
+  end;
+
+  if Progress > DlProgress then
+  begin
+    DlProgress := Progress;
+    DlAdvanced := GetTickCount;
+  end
+  else if DlElapsedMs(DlAdvanced) > DlStallMs then
+  begin
+    Log('[dl] aborted: no progress for ' + IntToStr(DlStallMs div 1000) + ' seconds');
+    Result := False;
+    Exit;
+  end;
+
+  if ProgressMax > 0 then
+  begin
+    Percent := Integer((Progress * 1000) div ProgressMax);
+    SetPreparingStatus('Downloading the .NET Desktop Runtime 8 from Microsoft: ' +
+      IntToStr(Progress div 1048576) + ' of ' + IntToStr(ProgressMax div 1048576) +
+      ' MB', Percent);
+  end
+  else
+    SetPreparingStatus('Downloading the .NET Desktop Runtime 8 from Microsoft...', -1);
+end;
+
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   ErrorCode: Integer;
   RuntimePath: String;
+  DlBytes: Int64;
   Ok: Boolean;
 begin
   Result := '';
@@ -261,33 +391,33 @@ begin
   // SuppressibleMsgBox تا در حالتِ /SILENT آویزان نماند و خودش IDOK برگرداند.
   SuppressibleMsgBox(
     'The .NET Desktop Runtime 8 is not installed on this PC.' + #13#10 +
-    'Setup will install it now. This step does not need an internet connection.',
+    'Setup will download it from Microsoft now (about 56 MB).',
     mbInformation, MB_OK, IDOK);
 
-  // صفحهٔ «Preparing to Install» تا پایانِ همین تابع باز است؛ بدونِ این متن،
-  // استخراجِ فایلِ ۵۶ مگابایتی و نصبِ بی‌صدای رانتایم دقیقاً همان «هیچ اتفاقی
-  // نمی‌افتد» را نشان می‌داد که گزارش شده بود.
-  WizardForm.PreparingLabel.Caption :=
-    'Installing the bundled .NET Desktop Runtime 8. Please wait...';
-
   RuntimePath := ExpandConstant('{tmp}\{#DotNetFile}');
+
+  DlStart := GetTickCount;
+  DlAdvanced := DlStart;
+  DlProgress := 0;
+  SetPreparingStatus('Downloading the .NET Desktop Runtime 8 from Microsoft...', -1);
+
   try
-    ExtractTemporaryFile('{#DotNetFile}');
+    DlBytes := DownloadTemporaryFile('{#DotNetUrl}', '{#DotNetFile}', '{#DotNetSha256}',
+      @OnDownloadProgress);
+    Log('[dl] downloaded ' + IntToStr(DlBytes) + ' bytes');
   except
-    // Pascal Scriptِ Inno ساختارِ «on E: Exception do» را ندارد؛ پیامِ استثنایِ
-    // جاری با GetExceptionMessage خوانده می‌شود (با یک اسکریپتِ کاوش ثابت شد).
-    Result := RuntimeManualFallback('the bundled copy could not be extracted: ' + GetExceptionMessage);
+    // شاملِ نرسیدن به شبکه، هشِ نامعتبر و لغوِ خودِ کاربر می‌شود.
+    Result := RuntimeManualFallback(GetExceptionMessage);
     Exit;
   end;
 
   if not FileExists(RuntimePath) then
   begin
-    Result := RuntimeManualFallback('the bundled copy is missing from this setup file.');
+    Result := RuntimeManualFallback('the download reported success but no file appeared.');
     Exit;
   end;
 
-  WizardForm.PreparingLabel.Caption :=
-    'Installing the bundled .NET Desktop Runtime 8. This can take a minute...';
+  SetPreparingStatus('Installing the .NET Desktop Runtime 8. This can take a minute...', -1);
 
   Ok := Exec(RuntimePath, '/install /quiet /norestart', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
   if Ok and ((ErrorCode = 0) or (ErrorCode = 3010)) then
@@ -308,6 +438,66 @@ begin
   else
     Result := RuntimeManualFallback('the installer could not be started.');
 end;
+#else
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  ErrorCode: Integer;
+  RuntimePath: String;
+  Ok: Boolean;
+begin
+  Result := '';
+  if IsDotNetDesktopInstalled then
+    Exit;
+
+  // SuppressibleMsgBox تا در حالتِ /SILENT آویزان نماند و خودش IDOK برگرداند.
+  SuppressibleMsgBox(
+    'The .NET Desktop Runtime 8 is not installed on this PC.' + #13#10 +
+    'Setup will install it now. This step does not need an internet connection.',
+    mbInformation, MB_OK, IDOK);
+
+  // صفحهٔ «Preparing to Install» تا پایانِ همین تابع باز است؛ بدونِ این متن،
+  // استخراجِ فایلِ ۵۶ مگابایتی و نصبِ بی‌صدای رانتایم دقیقاً همان «هیچ اتفاقی
+  // نمی‌افتد» را نشان می‌داد که گزارش شده بود.
+  SetPreparingStatus('Installing the bundled .NET Desktop Runtime 8. Please wait...', -1);
+
+  RuntimePath := ExpandConstant('{tmp}\{#DotNetFile}');
+  try
+    ExtractTemporaryFile('{#DotNetFile}');
+  except
+    // Pascal Scriptِ Inno ساختارِ «on E: Exception do» را ندارد؛ پیامِ استثنایِ
+    // جاری با GetExceptionMessage خوانده می‌شود (با یک اسکریپتِ کاوش ثابت شد).
+    Result := RuntimeManualFallback('the bundled copy could not be extracted: ' + GetExceptionMessage);
+    Exit;
+  end;
+
+  if not FileExists(RuntimePath) then
+  begin
+    Result := RuntimeManualFallback('the bundled copy is missing from this setup file.');
+    Exit;
+  end;
+
+  SetPreparingStatus('Installing the bundled .NET Desktop Runtime 8. This can take a minute...', -1);
+
+  Ok := Exec(RuntimePath, '/install /quiet /norestart', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+  if Ok and ((ErrorCode = 0) or (ErrorCode = 3010)) then
+  begin
+    // 3010 یعنی «موفق، ری‌استارت لازم است»؛ باید صفحهٔ پایانیِ ری‌استارت را
+    // نشان دهیم نه اینکه آن را به‌عنوانِ شکست گزارش کنیم.
+    if ErrorCode = 3010 then
+      NeedsRestart := True;
+    Sleep(1500);
+    if IsDotNetDesktopInstalled then
+      Exit;
+    Result := RuntimeManualFallback('the installer finished but no runtime appeared.');
+    Exit;
+  end;
+
+  if Ok then
+    Result := RuntimeManualFallback('the installer exited with code ' + IntToStr(ErrorCode) + '.')
+  else
+    Result := RuntimeManualFallback('the installer could not be started.');
+end;
+#endif
 
 // ---------------------------------------------------------------------------
 // بستنِ DACLِ %ProgramData%\Roxa در همان لحظهٔ نصب.

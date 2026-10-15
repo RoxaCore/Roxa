@@ -33,14 +33,27 @@ runtime for them, so neither the runtime nor Roxa can run there.
 
 ## Installation / نحوهٔ نصب
 
-1. Download `Roxa-Setup-<version>.exe`.
+1. Download one of two installers:
+
+   | File | Size | Needs internet |
+   |---|---|---|
+   | `Roxa-Setup-<version>.exe` | 75 MiB | **No** — the .NET Desktop Runtime is packed inside |
+   | `Roxa-Setup-<version>-online.exe` | 19 MiB | Only if .NET is missing |
+
+   Pick the offline one on a slow, filtered or metered connection. Both
+   install exactly the same program.
+
 2. Run it. Setup asks for administrator rights once and installs
    **per-machine** into `C:\Program Files\Roxa`, which a normal account
    cannot write to.
-3. The .NET Desktop Runtime ships inside setup, so installing needs no
-   internet connection. If it is missing, setup installs it silently and
-   continues; if that ever fails, it opens Microsoft's download page and
-   tells you exactly what to do next.
+
+3. If the .NET Desktop Runtime is missing, the offline installer installs
+   it silently. The online installer downloads it from Microsoft while you
+   watch — live megabyte counter, working **Cancel**, a 10-minute deadline
+   and an abort after 90 seconds without progress — and verifies it against
+   a SHA-256 pinned inside the installer before running it. If anything goes
+   wrong, setup opens Microsoft's download page and tells you the reason.
+
 4. Launch Roxa and add a server, or paste a subscription link.
 
 To uninstall, use *Apps & features*. Uninstall runs a cleanup pass first, so
@@ -49,10 +62,14 @@ restored before the files are removed. The install folder and
 `%ProgramData%\Roxa` go with it; your servers and settings in
 `%APPDATA%\Roxa` are left in place.
 
-> **فارسی:** نصب‌کننده یک بار اجازهٔ ادمین می‌گیرد و در `C:\Program Files\Roxa`
+> **فارسی:** دو نصب‌کننده هست: یکی ۷۵ مگابایتی که رانتایمِ دات‌نت داخلِ خودش
+> است و نصبش به اینترنت وابسته نیست، و یکی ۱۹ مگابایتی (`-online`) که اگر
+> رانتایم نباشد همان موقع ازِ مایکروسافت می‌گیرد — با نمایشِ پیشرفت، دکمهٔ
+> Cancel، مهلتِ ۱۰ دقیقه و تأییدِ SHA-256 پیش از اجرا؛ و اگر چیزی خطا بدهد
+> صفحهٔ دانلودِ مایکروسافت باز می‌شود. نصب‌کننده یک بار اجازهٔ ادمین
+> می‌گیرد و در `C:\Program Files\Roxa`
 > برایِ همهٔ کاربران نصب می‌کند؛ اجرای برنامه در حالتِ پروکسی به ادمین نیاز
-> ندارد. رانتایمِ دات‌نت داخلِ خودِ نصب‌کننده است؛ اگر نباشد بی‌صدا نصبش
-> می‌کند و نصب هیچ‌وقت به اینترنت وابسته نیست. برای حذف، از «برنامه‌ها و
+> ندارد. برای حذف، از «برنامه‌ها و
 > ویژگی‌ها» اقدام کنید؛ حذف اول پاکسازی
 > (آداپتر، مسیرها، فایروال، پروکسیِ سیستم) را اجرا می‌کند.
 
@@ -122,8 +139,12 @@ Connections it makes are listed in full in
 | `cloudflare.com`, `gstatic.com`, `google.com` | Delay and speed measurement, through your tunnel |
 | Your own subscription URL | Fetching the server list you added |
 
-Setup itself contacts no one: the .NET Desktop Runtime is packed inside the
-setup file, so installing works with no network at all.
+Setup contacts exactly one host, and only in one case: if you chose the
+`-online` installer *and* the .NET Desktop Runtime is missing, it fetches it
+from `builds.dotnet.microsoft.com`, which is where Microsoft publishes it.
+The file is checked against a SHA-256 pinned inside the installer before it
+is run, and the fallback on any failure is Microsoft's own download page. The
+offline installer contacts no one.
 
 Your server list is encrypted with Windows DPAPI and never leaves your
 machine except as part of an actual connection.

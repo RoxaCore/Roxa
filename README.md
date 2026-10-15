@@ -37,8 +37,10 @@ runtime for them, so neither the runtime nor Roxa can run there.
 2. Run it. Setup asks for administrator rights once and installs
    **per-machine** into `C:\Program Files\Roxa`, which a normal account
    cannot write to.
-3. If the .NET Desktop Runtime is missing, setup downloads it from
-   Microsoft and verifies its SHA-256 before running it.
+3. The .NET Desktop Runtime ships inside setup, so installing needs no
+   internet connection. If it is missing, setup installs it silently and
+   continues; if that ever fails, it opens Microsoft's download page and
+   tells you exactly what to do next.
 4. Launch Roxa and add a server, or paste a subscription link.
 
 To uninstall, use *Apps & features*. Uninstall runs a cleanup pass first, so
@@ -49,8 +51,9 @@ restored before the files are removed. The install folder and
 
 > **فارسی:** نصب‌کننده یک بار اجازهٔ ادمین می‌گیرد و در `C:\Program Files\Roxa`
 > برایِ همهٔ کاربران نصب می‌کند؛ اجرای برنامه در حالتِ پروکسی به ادمین نیاز
-> ندارد. اگر رانتایمِ دات‌نت نباشد، خودش ازِ مایکروسافت دانلود و با SHA-256 تأیید
-> می‌کند. برای حذف، از «برنامه‌ها و ویژگی‌ها» اقدام کنید؛ حذف اول پاکسازی
+> ندارد. رانتایمِ دات‌نت داخلِ خودِ نصب‌کننده است؛ اگر نباشد بی‌صدا نصبش
+> می‌کند و نصب هیچ‌وقت به اینترنت وابسته نیست. برای حذف، از «برنامه‌ها و
+> ویژگی‌ها» اقدام کنید؛ حذف اول پاکسازی
 > (آداپتر، مسیرها، فایروال، پروکسیِ سیستم) را اجرا می‌کند.
 
 ---
@@ -118,6 +121,9 @@ Connections it makes are listed in full in
 | `wintun.net` | TUN driver download |
 | `cloudflare.com`, `gstatic.com`, `google.com` | Delay and speed measurement, through your tunnel |
 | Your own subscription URL | Fetching the server list you added |
+
+Setup itself contacts no one: the .NET Desktop Runtime is packed inside the
+setup file, so installing works with no network at all.
 
 Your server list is encrypted with Windows DPAPI and never leaves your
 machine except as part of an actual connection.

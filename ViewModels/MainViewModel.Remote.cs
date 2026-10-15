@@ -37,23 +37,7 @@ public partial class MainViewModel : ViewModelBase
     private bool _remoteStarted;
     private bool _remoteChecking;
     private bool _updateNotified;
-    private bool _installRunning;
     private readonly HashSet<int> _toastedAnnouncements = new();
-
-    [ObservableProperty] private bool _isUpdateProgressVisible;
-    [ObservableProperty] private bool _isUpdateProgressIndeterminate;
-    [ObservableProperty] private double _updateProgress;
-    [ObservableProperty] private string _updateProgressText = "";
-
-    partial void OnIsBannerVisibleChanged(bool value)
-    {
-        if (!value && !_installRunning)
-        {
-            IsUpdateProgressVisible = false;
-            UpdateProgress = 0;
-            UpdateProgressText = "";
-        }
-    }
 
     [ObservableProperty] private bool _isBannerVisible;
     [ObservableProperty] private bool _bannerCanDismiss = true;
@@ -72,8 +56,6 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private IBrush _annBannerForeground = new SolidColorBrush(Color.Parse("#1D4ED8"));
     [ObservableProperty] private bool _annBannerHasAction;
     [ObservableProperty] private string _annBannerActionText = "";
-
-    public event Action? UpdateShutdownRequested;
 
     public void StartRemoteChecks()
     {
@@ -147,14 +129,10 @@ public partial class MainViewModel : ViewModelBase
                     TranslationManager.Instance["Upd_Notify"],
                     string.Format(TranslationManager.Instance["Upd_BannerTitle"], _pendingUpdate.Latest));
             }
-            // اپدیت اجباری: نادیده گرفتنِ ردِ قبلی (چون دیگر قابل کنسل نیست) و شروع خودکار نصب.
-            // LastUpdateAttempt برای جلوگیری از حلقهٔ ری‌استارت بی‌نهایت در صورتِ شکستِ apply حفظ می‌شود.
-            if ((AutoUpdate || _pendingUpdate.Force) && !_installRunning && !IsBannerBusy
-                && _settings.LastUpdateAttempt != _pendingUpdate.Latest
-                && (_pendingUpdate.Force || _dismissedUpdateVersion != _pendingUpdate.Latest))
-            {
-                _ = InstallUpdateAsync();
-            }
+            // نصبِ خودکار عمداً حذف شده: برنامه در این نسخه بستهٔ آپدیت را دانلود نمی‌کند
+            // و --update-apply را هم اجرا نمی‌کند. کارِ بررسیِ نسخه همین‌جا به اعلان و
+            // نشان دادنِ بنر ختم می‌شود؛ دکمهٔ بنر خودِ صفحهٔ ریلیز را باز می‌کند.
+            // پس حتی آپدیتِ اجباری هم فقط اصرار می‌کند، خودش دست به کار نمی‌شود.
         }
         if (freshAnnouncement != null)
         {
@@ -187,7 +165,7 @@ public partial class MainViewModel : ViewModelBase
     private void ShowUpdateBanner(UpdateInfo update)
     {
         if (_dismissedUpdateVersion == update.Latest && !update.Force) return;
-        if (!_installRunning) IsBannerBusy = false;
+        IsBannerBusy = false;
         BannerTitle = string.Format(TranslationManager.Instance["Upd_BannerTitle"], update.Latest);
         BannerBody = update.Force
             ? TranslationManager.Instance["Upd_ForceMsg"] +
@@ -195,7 +173,7 @@ public partial class MainViewModel : ViewModelBase
             : update.Notes;
         BannerBackground = new SolidColorBrush(Color.Parse("#F5F3FF"));
         BannerForeground = new SolidColorBrush(Color.Parse("#6D28D9"));
-        BannerActionText = TranslationManager.Instance["Upd_Btn_Install"];
+        BannerActionText = TranslationManager.Instance["Upd_Btn_OpenPage"];
         BannerHasAction = !string.IsNullOrWhiteSpace(update.Url);
         BannerCanDismiss = !update.Force;
         IsBannerVisible = true;
@@ -267,74 +245,25 @@ public partial class MainViewModel : ViewModelBase
         AnnDismiss();
     }
 
+    /// <summary>
+    /// دکمهٔ بنرِ آپدیت. در این نسخه چیزی دانلود نمی‌شود و آپدیتی اعمال نمی‌شود، پس فقط
+    /// صفحهٔ ریلیز را باز می‌کند. همان قاعدهٔ AnnBannerAction: UseShellExecute یک URI را
+    /// به هر دست‌کارِ آن می‌سپارد، و آنچه از شبکه آمده باید پیش از باز شدن همین‌جا رد شود؛
+    /// فقط https پذیرفته می‌شود.
+    /// </summary>
     [RelayCommand]
-    private async Task BannerAction()
+    private void BannerAction()
     {
-        await InstallUpdateAsync();
-    }
-
-    [RelayCommand]
-    private async Task InstallUpdateAsync()
-    {
-        if (_pendingUpdate is not { UpdateAvailable: true } || IsBannerBusy || _installRunning) return;
-        IsBannerBusy = true;
-        _installRunning = true;
-        // وضعیت اتصال در لحظهٔ شروع آپدیت ثبت می‌شود؛ اگر کاربر هنگام دانلود قطع کند،
-        // پس از ری‌استارت همچنان به همان سرور قبلی وصل شود.
-        bool wasConnected = IsConnected;
-        BannerBody = TranslationManager.Instance["Upd_Downloading"];
+        if (_pendingUpdate is not { UpdateAvailable: true } || string.IsNullOrWhiteSpace(_pendingUpdate.Url))
+            return;
+        if (!Uri.TryCreate(_pendingUpdate.Url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
+            return;
         try
         {
-            BeginUpdateProgress();
-            var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
-            var info = _pendingUpdate;
-            var progress = new Progress<double>(SetUpdateDownloadPercent);
-            await Task.Run(() => UpdateInstaller.StageAsync(info, proxyPort, progress));
-            _settings.LastUpdateAttempt = info.Latest;
-            SaveSettings();
-            if (wasConnected)
-                UpdateInstaller.MarkReconnectAfterUpdate();
-            // دانلود کامل شد → نوار وارد مرحلهٔ نصب می‌شود (نامعین، تا پایان نصب توسط آپدیت‌گذار)
-            SetUpdateDownloadPercent(100);
-            IsUpdateProgressIndeterminate = true;
-            UpdateProgressText = TranslationManager.Instance["Upd_Installing"];
-            BannerBody = TranslationManager.Instance["Upd_Done"];
-            UpdateInstaller.LaunchUpdater();
-            UpdateShutdownRequested?.Invoke();
+            Process.Start(new ProcessStartInfo(_pendingUpdate.Url) { UseShellExecute = true });
         }
-        catch (Exception ex)
+        catch
         {
-            AppendLog($"Update failed: {ex.Message}");
-            BannerBody = TranslationManager.Instance["Upd_Failed"];
-            EndUpdateProgress();
-            IsBannerBusy = false;
-            _installRunning = false;
         }
-    }
-
-    /// <summary>آغاز نوار پیشرفت آپدیت؛ مرحلهٔ دانلود با درصد معین نمایش داده می‌شود.</summary>
-    private void BeginUpdateProgress()
-    {
-        UpdateProgress = 0;
-        IsUpdateProgressIndeterminate = false;
-        IsUpdateProgressVisible = true;
-        SetUpdateDownloadPercent(0);
-    }
-
-    /// <summary>به‌روزرسانی درصد دانلود و متن کنار نوار پیشرفت.</summary>
-    private void SetUpdateDownloadPercent(double percent)
-    {
-        double p = Math.Clamp(percent, 0, 100);
-        UpdateProgress = p;
-        UpdateProgressText = string.Format(TranslationManager.Instance["Upd_Percent"], (int)Math.Round(p));
-    }
-
-    /// <summary>پایان نوار پیشرفت و مخفی‌سازی آن.</summary>
-    private void EndUpdateProgress()
-    {
-        IsUpdateProgressVisible = false;
-        IsUpdateProgressIndeterminate = false;
-        UpdateProgress = 0;
-        UpdateProgressText = "";
     }
 }

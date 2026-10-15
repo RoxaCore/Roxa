@@ -52,11 +52,14 @@ sealed class Program
             return;
         }
 
-        if (args.Length == 5 && args[0] == "--update-apply")
+        // آپدیتِ خودکار در این نسخه غیرفعال است: برنامه دیگر بستهٔ به‌روزرسانی را دانلود
+        // نمی‌کند و این مسیر را هم اجرا نمی‌کند. به‌جایِ ردِ بی‌صدا — که اعمال نشدنِ یک
+        // به‌روزرسانی را پنهان می‌کرد — باقی‌مانده را پاک می‌کنیم و با کدِ غیرصفر
+        // برمی‌گردیم تا زنجیرهٔ فراخواننده بداند هیچ چیزی اعمال نشد.
+        if (args.Length > 0 && args[0] == "--update-apply")
         {
-            int appPid = int.TryParse(args[2], out var p) ? p : 0;
-            int code = Core.UpdateApplier.Run(args[1], appPid, args[3], args[4]);
-            Environment.Exit(code);
+            try { Core.UpdateApplier.CleanupStaging(); } catch { }
+            Environment.Exit(2);
             return;
         }
 

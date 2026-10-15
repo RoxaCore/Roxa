@@ -315,6 +315,7 @@ State: {3}</value>
   <data name="Upd_Notify" xml:space="preserve"><value>New update</value></data>
   <data name="Upd_BannerTitle" xml:space="preserve"><value>New version {0} is ready to download</value></data>
   <data name="Upd_Btn_Install" xml:space="preserve"><value>Install</value></data>
+  <data name="Upd_Btn_OpenPage" xml:space="preserve"><value>Open download page</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>Downloading update…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>Download complete; the app will close to install</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>Installing update…</value></data>

@@ -13,6 +13,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Additional terms under section 7 of that license: the "Roxa" name and
+// visual identity are not licensed. See "The name and logo are not
+// covered" in README.md.
 
 using System.ComponentModel;
 using System.Diagnostics;

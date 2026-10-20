@@ -267,10 +267,10 @@ next to Roxa.exe.
       artwork is in question.
 
   If you hold rights in any of these images and want them removed
-  or replaced, contact info@roxacore.com and the file will be
-  taken down or swapped for an icon set whose licence is recorded
-  here in full. Until such a set is chosen, treat these files as
-  unlicensed material of unknown provenance.
+  or replaced, contact roxacore.admin@gmail.com and the file will
+  be taken down or swapped for an icon set whose licence is
+  recorded here in full. Until such a set is chosen, treat these
+  files as unlicensed material of unknown provenance.
 
 
 ================================================================

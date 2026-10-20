@@ -220,15 +220,15 @@ URL. That gap is recorded here rather than glossed over.
   provenance.
 - They are rendered unmodified — no file is edited or recoloured.
 
-If you hold rights in any of these images, write to `info@roxacore.com` and
-the file will be removed or replaced. The two-letter codes are ISO 3166-1
+If you hold rights in any of these images, write to `roxacore.admin@gmail.com`
+and the file will be removed or replaced. The two-letter codes are ISO 3166-1
 alpha-2 values, which carry no copyright; only the artwork is in question.
 
 > The flag images (`Assets/Flags/*.png`) entered the repository without a
 > recorded source or license. Roxa neither claims ownership of them nor
 > counts them as part of the GPL, nor says they are free. Until a licensed
 > set is chosen, treat them as unlicensed material of unknown provenance.
-> If you hold rights to any, write to `info@roxacore.com` to have it removed or replaced.
+> If you hold rights to any, write to `roxacore.admin@gmail.com` to have it removed or replaced.
 
 ---
 

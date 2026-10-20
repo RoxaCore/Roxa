@@ -28,7 +28,7 @@ using Roxa.Models;
 
 namespace Roxa.Core;
 
-/// <summary>نتیجه‌ی بررسی سبکِ دریافت اشتراک (دکمه‌ی عیب‌یابی): بدون پرتاب کردن خطا.</summary>
+/// <summary>Result of a lightweight subscription fetch probe (diagnostics button): no exception is thrown.</summary>
 public sealed class FetchProbe
 {
     public int StatusCode { get; set; }
@@ -40,12 +40,12 @@ public sealed class FetchProbe
     public bool Success => Error == null && StatusCode >= 200 && StatusCode < 300 && ServerCount > 0;
 }
 
-/// <summary>دریافت و پارس سابسکریپشن: plain-links / base64 / JSON.</summary>
+/// <summary>Fetching and parsing a subscription: plain-links / base64 / JSON.</summary>
 public static class SubscriptionManager
 {
     public static string UserAgent { get; set; } = "v2rayNG/1.8.33";
 
-    /// <summary>تعداد تلاش برای خطاهای گذرای شبکه (قطع DNS موقت، ۵xx و …).</summary>
+    /// <summary>Number of attempts for transient network failures (temporary DNS outage, 5xx and …).</summary>
     private const int FetchAttempts = 3;
 
     private static SocketsHttpHandler CreateHandler(string? proxyAddress = null, bool forceDirect = false)
@@ -73,8 +73,8 @@ public static class SubscriptionManager
         };
         if (forceDirect)
         {
-            // حالت «بدون پروکسی» باید واقعاً مستقیم باشد؛
-            // بدون این خط، UseProxy پیش‌فرض true است و از پراکسی سیستم استفاده می‌شود.
+            // The "no proxy" mode must really go direct;
+            // without this line, UseProxy defaults to true and the system proxy is used.
             handler.UseProxy = false;
         }
         else if (!string.IsNullOrEmpty(proxyAddress))
@@ -87,23 +87,23 @@ public static class SubscriptionManager
     public static Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoAsync(string url, CancellationToken ct = default)
         => FetchWithRetryAsync(url, forceDirect: false, null, ct);
 
-    /// <summary>دریافت مستقیم: حتی پراکسی تنظیم‌شده‌ی سیستم هم استفاده نمی‌شود.</summary>
+    /// <summary>Direct fetch: even the configured system proxy is not used.</summary>
     public static Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoDirectAsync(string url, CancellationToken ct = default)
         => FetchWithRetryAsync(url, forceDirect: true, null, ct);
 
     public static Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchWithInfoAndProxyAsync(string url, string proxyAddress, CancellationToken ct = default)
         => FetchWithRetryAsync(url, forceDirect: false, proxyAddress, ct);
 
-    /// <summary>هر تلاشِ هوشمند حداکثر اینقدر طول می‌کشد؛ کوتاه‌تر از مسیر قدیمی (۳۰s×۳)
-    /// تا زنجیرهٔ چندمسیره بیش از حد معطل نکند.</summary>
+    /// <summary>Each smart attempt takes at most this long; shorter than the old path (30s×3)
+    /// so the multi-route chain is not stalled for too long.</summary>
     private const int SmartFetchTimeoutSeconds = 20;
 
     /// <summary>
-    /// دریافت با زنجیرهٔ خودکار چندمسیره (مثل v2rayN): اول مسیرِ ترجیحی، بعد بقیهٔ
-    /// مسیرها بدون دخالت کاربر — «اگر بدون پروکسی نیاورد با پروکسی، و برعکس».
-    /// ترتیب: preferDirect یا پروکسیِ موتور (هرکدام اول) ← پروکسیِ سیستم‌پیش‌فرض.
-    /// اگر شکست ناشی از DNSِ جاماندهٔ TUN قبلی باشد، یک‌بار خودکار ترمیم می‌شود؛
-    /// قبلاً چنین حالتی فقط با ری‌استارت کامل برنامه درست می‌شد.
+    /// Fetch with an automatic multi-route chain (like v2rayN): preferred route first, then the rest of the
+    /// routes without user intervention — "if it did not work without the proxy, try with the proxy, and vice versa".
+    /// Order: preferDirect or the engine proxy (whichever is first) ← the default system proxy.
+    /// If the failure is caused by DNS left over from the previous TUN, it is repaired automatically once;
+    /// previously such a case was only fixed by a full application restart.
     /// </summary>
     public static async Task<(List<ServerInfo> servers, SubscriptionInfo? info)> FetchSmartAsync(
         string url, string? engineProxyAddress, bool preferDirect, Action<string>? progress = null, CancellationToken ct = default)
@@ -111,12 +111,12 @@ public static class SubscriptionManager
         url = StripFragment(url);
         EnsureHttpUrl(url);
 
-        // اگر DNSِ جاماندهٔ TUNِ قبلی جلوی resolve را بگیرد، همین اول ترمیم شود.
+        // If DNS left over from the previous TUN blocks resolution, heal it right at the start.
         await TryHealDeadDnsAsync(progress);
 
-        // دور زدن TUN — خودمان یا بیگانه مثل v2rayN/sing-tun: مسیرِ میزبانِ اشتراک را
-        // مستقیم به گیت‌ویِ فیزیکی وصل می‌کنیم تا «دریافت مستقیم» واقعاً از زیرِ هر TUN
-        // بیرون برود؛ وگرنه پنل‌های ایرانی با خروجِ خارجی جواب نمی‌دهند.
+        // Bypassing TUN — ours or a third party like v2rayN/sing-tun: the subscription
+        // host's route is pinned straight to the physical gateway so the "direct fetch"
+        // really escapes under any TUN; otherwise Iranian panels give no answer via a foreign exit.
         string fetchHost = new Uri(url).Host;
         using var bypass = await TestRouteBypass.BeginAsync(new[] { fetchHost });
         if (bypass.HasRoutes) progress?.Invoke(TranslationManager.Get("Log_SubBypass"));
@@ -152,23 +152,23 @@ public static class SubscriptionManager
                 last = ex;
                 string path = mode.Proxy != null ? "engine-proxy" : mode.ForceDirect ? "direct" : "system-proxy";
                 TunManager.Log($"subscription fetch via {path} failed: {ex.Message}");
-                // شکستِ همه‌جانبه معمولاً تقصیر DNSِ 127.0.0.1 جامانده از نشست TUN قبلی است؛
-                // قبلاً فقط ری‌استارت (با TunRecovery) آن را درست می‌کرد.
+                // Total failure is usually the fault of a leftover 127.0.0.1 DNS from a
+                // previous TUN session; previously only a restart (via TunRecovery) fixed it.
                 await TryHealDeadDnsAsync(progress);
             }
         }
         throw last ?? new InvalidOperationException("subscription fetch failed");
     }
 
-    /// <summary>اگر DNS آداپترها به stub مردهٔ 127.0.0.1 اشاره می‌کند یک‌بار ترمیم می‌کند.</summary>
+    /// <summary>One-time repair when the adapter DNS points at the dead 127.0.0.1 stub.</summary>
     private static async Task TryHealDeadDnsAsync(Action<string>? progress)
     {
         string? msg = null;
         try
         {
-            // SweepDeadAdapters پروسهٔ PowerShell را اجرا می‌کند؛ روی رشتهٔ UI یخ چندثانیه‌ای می‌زد.
+            // SweepDeadAdapters spawns a PowerShell process; it froze the UI thread for seconds.
             bool needsSweep = await Task.Run(() => !TunDns.IsStubListening());
-            if (!needsSweep) return;  // stub بالاست؛ تقصیر DNS نیست
+            if (!needsSweep) return;  // the stub is up; DNS is not to blame
             int healed = await Task.Run(() => TunDns.SweepDeadAdapters(out _));
             if (healed > 0)
                 msg = string.Format(TranslationManager.Get("Log_SubHealDns"), healed);
@@ -207,7 +207,7 @@ public static class SubscriptionManager
         using var response = await http.GetAsync(url, ct);
         if (!response.IsSuccessStatusCode)
         {
-            // قبلاً بدنه‌ی خطا (مثلا صفحه‌ی HTML پشت CDN) بی‌صدا «۰ سرور» تلقی می‌شد.
+            // Previously an error body (e.g. an HTML page behind a CDN) was silently taken as "0 servers".
             throw new HttpRequestException(
                 string.Format(TranslationManager.Get("Sub_HttpStatus"), (int)response.StatusCode, response.ReasonPhrase ?? ""),
                 null, response.StatusCode);
@@ -225,7 +225,7 @@ public static class SubscriptionManager
         return (servers, info);
     }
 
-    /// <summary>دریافت سبک برای عیب‌یابی: خطا را گزارش می‌کند، پرتاب نمی‌کند.</summary>
+    /// <summary>Light fetch for diagnostics: it reports the error instead of throwing.</summary>
     public static async Task<FetchProbe> ProbeAsync(string url, string? proxyAddress = null, bool forceDirect = false, CancellationToken ct = default)
     {
         var result = new FetchProbe();
@@ -256,7 +256,7 @@ public static class SubscriptionManager
         return result;
     }
 
-    /// <summary>فقط خطای گذرای شبکه دوباره تلاش می‌شود؛ خطای محتوا/پاسخ قطعی تکرار نمی‌شود.</summary>
+    /// <summary>Only transient network errors are retried; content/response errors are final.</summary>
     private static bool IsTransient(Exception ex)
     {
         if (ex is HttpRequestException hre)
@@ -355,7 +355,7 @@ public static class SubscriptionManager
         return info;
     }
 
-    /// <summary>لینک اشتراک باید مطلق و http/https باشد؛ بقیه‌ی پروتکل‌ها رد می‌شوند.</summary>
+    /// <summary>The subscription link must be absolute and http/https; all other schemes are rejected.</summary>
     private static void EnsureHttpUrl(string url)
     {
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)
@@ -417,7 +417,7 @@ public static class SubscriptionManager
         return list;
     }
 
-    /// <summary>کلید واحد تکراری: ServerInfo.GetDupeKey؛ نام داخل کلید نیست.</summary>
+    /// <summary>The single duplicate key: ServerInfo.GetDupeKey; the name is not part of it.</summary>
     private static string DupeKey(ServerInfo s) => s.GetDupeKey();
 
     private static ServerInfo? FromConfigObject(JsonElement item)

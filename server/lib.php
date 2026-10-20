@@ -30,11 +30,11 @@ function post_size_exceeded(): bool
     return $len > $max;
 }
 
-// چک زودهنگام: اگر POST بزرگ‌تر از post_max_size باشد، PHP $_POST را خالی می‌کند و
-// csrf_check به‌جای خطای درست، 419/CSRF یا زنجیرهٔ warning می‌دهد. زودتر از session خارج می‌شویم.
+// Early check: if POST is larger than post_max_size, PHP empties $_POST and
+// csrf_check returns 419/CSRF or a chain of warnings instead of the proper error. We bail out before the session starts.
 if (post_size_exceeded()) {
-    // اگر PHP قبلاً Warning چاپ کرده باشد، headers_sent() درست است و دیگر نباید
-    // http_response_code/header صدا زده شود (وگرنه دو Warning اضافه تولید می‌شود).
+    // If PHP has already printed a Warning, headers_sent() is true and we must no longer call
+    // http_response_code/header (otherwise two extra Warnings are produced).
     if (!headers_sent()) {
         http_response_code(413);
         header('Content-Type: text/plain; charset=utf-8');
@@ -73,8 +73,8 @@ function sess_start(): void
 }
 
 /**
- * خواندنِ زیرِ قفلِ اشتراکی. بدونِ این، خوانندهٔ همزمان می‌تواند بینِ truncate
- * و write فایلِ ناقص ببیند.
+ * Reading under a shared lock. Without this, a concurrent reader can see a partial
+ * file between truncate and write.
  */
 function jread(string $file, array $default): array
 {
@@ -100,8 +100,8 @@ function jread(string $file, array $default): array
 }
 
 /**
- * نوشتنِ اتمیک: فایلِ موقتِ همنام + rename. خوانندهٔ همزمان یا نسخهٔ قبلی را
- * می‌بیند یا بعدی را — هیچ‌وقت ناقص را.
+ * Atomic write: same-name temp file + rename. A concurrent reader sees either the previous
+ * version or the next one — never a partial one.
  */
 function jwrite(string $file, array $data): void
 {
@@ -125,19 +125,19 @@ function jwrite(string $file, array $data): void
 }
 
 /**
- * خواندن، تغییر و نوشتنِ زیرِ یک قفلِ واحد.
+ * Read, modify and write under a single lock.
  *
- * کالبک آرایه را می‌گیرد و **باید** صریح یکی از این‌ها را برگرداند:
- *   - آرایهٔ تغییریافته: نوشته می‌شود
- *   - false: هیچ‌چیز نوشته نشود (مثلاً سقف پر است یا شرطی برقرار نیست)
+ * The callback receives the array and **must** explicitly return one of the following:
+ *   - the modified array: it is written
+ *   - false: write nothing (e.g. the cap is full or a condition does not hold)
  *
- * چون آرایه در PHP مقداری است، تغییرِ محلیِ پارامتر به بیرون منتقل نمی‌شود.
- * برگرداندنِ null (یعنی کالبکِ بدونِ return) خطا می‌دهد، چون رایج‌ترین راهِ
- * خراب‌کردنِ ساکتِ این تابع همین است: فراموش کردنِ return و نوشته‌شدنِ همان
- * ورودیِ بی‌تغییر.
+ * Because arrays are value types in PHP, a local change to the parameter does not propagate outward.
+ * Returning null (i.e. a callback without a return) is an error, because the most common way to
+ * silently break this function is exactly that: forgetting the return and writing back the same
+ * unchanged input.
  *
- * قفل رویِ فایلِ جداگانهٔ `.lock` گرفته می‌شود تا read-modify-writeِ چند
- * درخواستِ همزمان از دست نرود و آیتم گم یا تکراری نشود.
+ * The lock is taken on a separate `.lock` file so that the read-modify-write of several
+ * concurrent requests is not lost and no item is lost or duplicated.
  */
 function jupdate(string $file, callable $mutator)
 {
@@ -246,9 +246,9 @@ function attempts_ip_file(): string
 }
 
 /**
- * IP فقط از REMOTE_ADDR. هیچ هدرِ قابلِ جعلی (X-Forwarded-For، X-Real-IP،
- * HTTP_CLIENT_IP، Forwarded) خوانده نمی‌شود؛ پشتِ CDN هم همان IPِ لبه ثبت
- * می‌شود که برایِ نرخ‌محدودیت کافی است.
+ * IP comes only from REMOTE_ADDR. No spoofable header (X-Forwarded-For, X-Real-IP,
+ * HTTP_CLIENT_IP, Forwarded) is read; behind a CDN the same edge IP is recorded,
+ * which is enough for rate limiting.
  */
 function client_ip(): string
 {
@@ -257,9 +257,9 @@ function client_ip(): string
 }
 
 /**
- * نمکِ ثابت برای هش کردن IP. در فایلِ خارج از git (DATA_DIR/.salt) نگه
- * داشته می‌شود؛ بدونِ آن هشِ IP قابلِ برگشتِ آفلاین است و حفاظتِ حریم
- * خصوصی وجود ندارد.
+ * Fixed salt for hashing the IP. Kept in a file outside git (DATA_DIR/.salt);
+ * without it the IP hash is reversible offline and there is no privacy
+ * protection.
  */
 function rate_salt(): string
 {
@@ -285,33 +285,33 @@ function rate_salt(): string
 }
 
 /**
- * کلیدِ شمارندهها: نمی‌گذاریم IPِ خام در هیچ فایلِ داده ذخیره شود. کلیدِ
- * ۳۲ کاراکتریِ HMAC-SHA256 برای نرخ‌محدودیت کافی است و قابلِ برگشت نیست.
+ * Counter key: we never let a raw IP be stored in any data file. The 32-character
+ * HMAC-SHA256 key is enough for rate limiting and is not reversible.
  */
 function ip_key(string $ip): string
 {
-    // حتی IPِ خالی هم هش می‌شود تا همهٔ درخواست‌هایِ بدونِ آدرس در یک سطلِ واحد
-    // جمع نشوند و بی‌دلیل همدیگر را از سقفِ نرخ خارج نکنند.
+    // Even an empty IP is hashed, so that all requests without an address do not pile
+    // into a single bucket and needlessly rate-limit each other.
     return substr(hash_hmac('sha256', $ip, rate_salt()), 0, 32);
 }
 
 /**
- * سقفِ نگهداریِ هشِ مبدأ — نکتهٔ `src` در reports.json و `ip`/`ip_last` در stats.json.
+ * Retention limit for the origin hash — the `src` entry in reports.json and `ip`/`ip_last` in stats.json.
  *
- * این هش‌ها قابلِ برگشت نیستند، ولی همچنان می‌گویند «این درخواست از همان منبعِ
- * آن یکی بوده» و برایِ مدتِ نامحدود نگه‌داشته‌نشدنی‌اند. ۹۰ روز یعنی یک فصلِ
- * کاملِ همبستگی برایِ ادمین؛ بعد از آن فقط برچسبِ منبع پاک می‌شود و خودِ رکورد
- * (گزارش یا کلاینت) سرِ جایش می‌ماند، چون تاریخچهٔ اتصال برایِ عیب‌یابی ارزش
- * دارد و آدرسِ در آن نیست.
+ * These hashes are not reversible, but they still say "this request came from the same
+ * origin as that one" and must not be kept for an unlimited time. 90 days is a full quarter
+ * of correlation for the admin; after that only the origin label is cleared and the record
+ * itself (report or client) stays in place, because the connection history is valuable
+ * for troubleshooting and contains no address.
  */
 const SRC_HASH_TTL_DAYS = 90;
 
 /**
- * آیا تاریخِ ISO 8601 قدیمی‌تر از سقف است؟
+ * Is the ISO 8601 date older than the limit?
  *
- * تاریخِ خالی یا ناخوانا هم «قدیمی» حساب می‌شود: نوشتهٔ کهنه‌ای که تاریخش را
- * از دست داده، دیگر نمی‌تواند برچسبِ منبع داشته باشد، و ساکت ماندن در این
- * حالت یعنی داده برایِ همیشه می‌ماند.
+ * An empty or unreadable date also counts as "old": an old entry that has lost
+ * its date can no longer carry an origin label, and staying silent in this
+ * case means the data stays forever.
  */
 function src_hash_expired(string $iso): bool
 {
@@ -326,10 +326,10 @@ function src_hash_expired(string $iso): bool
 }
 
 /**
- * پاک‌سازیِ برچسبِ منبع در reports.json. فقط `src` می‌رود؛ متنِ گزارش، خطا و لاگ
- * دست‌نخورده می‌مانند.
+ * Clearing the origin label in reports.json. Only `src` is removed; report text, errors and logs
+ * remain untouched.
  *
- * false برمی‌گرداند وقتی چیزی تغییر نکرده تا jupdate بی‌دلیل رویِ دیسک ننویسد.
+ * Returns false when nothing has changed, so jupdate does not write to disk needlessly.
  */
 function reports_prune_src(array $store): array
 {
@@ -349,12 +349,12 @@ function reports_prune_src(array $store): array
 }
 
 /**
- * قفلِ ورود: فقط per-IP (۲۰ تلاش ناموفق/ساعت از هر آدرس).
+ * Login lock: per-IP only (20 failed attempts/hour from each address).
  *
- * سقفِ سراسری عمداً قفلِ کامل نمی‌شود: اگر بشود، مهاجم با چند ده تلاشِ
- * اشتباهِ ارزان می‌تواند خودِ مدیر را برایِ یک ساعت بیرون کند (login-DoS).
- * به‌جای آن attempt_pressure() فشارِ سراسری را به تأخیرِ کوتاه یا پاسخِ ۴۲۹
- * تبدیل می‌کند.
+ * The global cap deliberately does not lock out completely: if it did, an attacker
+ * with a few dozen cheap wrong attempts could lock the admin himself out for an hour (login-DoS).
+ * Instead attempt_pressure() turns the global pressure into a short delay or a 429
+ * response.
  */
 function attempt_allowed(): bool
 {
@@ -367,31 +367,31 @@ function attempt_allowed(): bool
 }
 
 /**
- * سقفِ تأخیرِ مصنوعیِ ورود، بر حسبِ ثانیه.
+ * Cap on the artificial login delay, in seconds.
  *
- * چرا این‌قدر کوتاه: `sleep` در PHP یک درخواست را برایِ همان مدت به یک worker
- * گره می‌زند. اگر فشارِ سراسری بیست ثانیه خواب بدهد، مهاجم با چند صد درخواستِ
- * موازی می‌تواند کلِ pool را اشغال کند و خودِ پنل را از کار بیندازد — دقیقاً
- * همان چیزی که قفلِ سراسری می‌خواست از آن جلوگیری کند. تأخیر باید حدسِ آنلاین
- * را کُند کند، نه اینکه خودش سلاحِ حمله شود. بالایِ سقف، به‌جایِ انتظار،
- * پاسخِ ۴۲۹ِ فوری داده می‌شود.
+ * Why so short: `sleep` in PHP pins a request to a worker for that duration.
+ * If the global pressure slept for twenty seconds, an attacker with a few hundred
+ * parallel requests could occupy the whole pool and take the panel down — exactly
+ * what the global lock wanted to prevent. The delay must slow online guessing,
+ * not become the attack weapon itself. Above the cap, instead of waiting,
+ * an immediate 429 response is returned.
  */
 const LOGIN_DELAY_MAX = 2;
 
 /**
- * تعدادِ تلاشِ ناموفقِ سراسری که از آن به بعد دیگر انتظار نمی‌کشیم و ۴۲۹
- * می‌دهیم. پایین‌تر از این، فقط تأخیرِ کوتاه.
+ * Number of global failed attempts from which on we no longer wait and return
+ * 429. Below that, only a short delay.
  */
 const LOGIN_GLOBAL_REJECT = 400;
 
 /**
- * فشارِ سراسریِ یک ساعتِ اخیر را برمی‌گرداند:
- *   [0] تأخیرِ اضافهٔ ثانیه (۰ یا LOGIN_DELAY_MAX - ۱؛ همراهِ ثانیهٔ پایه یعنی
- *       مجموعاً ۱ تا LOGIN_DELAY_MAX ثانیه)
- *   [1] آیا اصلاً رد شود (۴۲۹) به‌جایِ انتظار
+ * Returns the global pressure of the last hour:
+ *   [0] extra delay in seconds (0 or LOGIN_DELAY_MAX - 1; with the base second that is
+ *       1 to LOGIN_DELAY_MAX seconds in total)
+ *   [1] whether to reject outright (429) instead of waiting
  *
- * سقفِ سراسری عمداً قفلِ کامل نمی‌شود: اگر بشود، مهاجم با چند ده تلاشِ
- * اشتباهِ ارزان می‌تواند خودِ مدیر را برایِ یک ساعت بیرون کند (login-DoS).
+ * The global cap deliberately does not lock out completely: if it did, an attacker
+ * with a few dozen cheap wrong attempts could lock the admin himself out for an hour (login-DoS).
  */
 function attempt_pressure(): array
 {
@@ -418,7 +418,7 @@ function attempt_fail(): void
         if (!is_array($st['k'] ?? null)) {
             $st['k'] = [];
         }
-        // نگهداریِ کوتاه: فقط پنجرهٔ یک ساعت نگه داشته می‌شود.
+        // Short retention: only the one-hour window is kept.
         foreach ($st['k'] as $kk => $vv) {
             if (!is_array($vv) || $now - (int)($vv['ts'] ?? 0) >= 3600) {
                 unset($st['k'][$kk]);
@@ -454,11 +454,11 @@ function attempt_reset(): void
 }
 
 /**
- * هدرهای پاسخ JSON.
+ * JSON response headers.
  *
- * CORS فقط برای نقاطِ خواندنی روشن می‌شود. `report.php` که نوشتنی است هرگز
- * CORS نمی‌گیرد تا هیچ صفحهٔ وبی از دامنهٔ دیگر نتواند از طریقِ مرورگرِ کاربر
- * گزارش جعل کند. (کلاینتِ دسکتاپ اصلاً مرورگر نیست و این هدر را نمی‌خواند.)
+ * CORS is enabled only for read endpoints. `report.php`, which writes, never
+ * gets CORS, so no web page from another domain can forge a report
+ * through the user's browser. (The desktop client is not a browser at all and does not read this header.)
  */
 function api_headers(bool $cors = false): void
 {
@@ -471,7 +471,7 @@ function api_headers(bool $cors = false): void
     header('Referrer-Policy: no-referrer');
 }
 
-/** هدرهای امنیتی صفحات HTML — قبل از هر خروجی فراخوانی شود. */
+/** HTML page security headers — call before any output. */
 function security_headers(): void
 {
     if (headers_sent()) {
@@ -484,8 +484,8 @@ function security_headers(): void
 }
 
 /**
- * آیا مسیری داخلِ ریشهٔ داده‌ست؟ (حروف کوچک/بزرگ بی‌تفاوت است: رویِ ویندوز
- * مسیر حساسیت ندارد و ممکن است یکی با شکلِ دیگری ثبت شده باشد.)
+ * Is a path inside the data root? (Case does not matter: on Windows
+ * paths are case-insensitive and one may be recorded in a different form.)
  */
 function path_is_within(string $path, string $root): bool
 {
@@ -501,22 +501,22 @@ function path_is_within(string $path, string $root): bool
 }
 
 /**
- * آیا DATA_DIR داخلِ سند-ریشه است؟
+ * Is DATA_DIR inside the document root?
  *
- * تنها چیزی که اینجا باید گرفته شود این است که پوشهٔ داده — که auth.json،
- * stats.json، reports.json و .salt در آن است — جایی باشد که وب‌سرور مستقیماً
- * سرو می‌کند. در آن حالت `.htaccess` تنها حفاظتِ رو به وب است و رویِ nginx یا
- * هر میزبانی با `AllowOverride Off` اصلاً اجرا نمی‌شود؛ به‌همین‌دلیل هم پیش‌تر
- * DATA_DIR بیرونِ سند-ریشه رفته، ولی کسی که مهاجرت نکرده باید آن را ببیند.
+ * The only thing to catch here is that the data folder — holding auth.json,
+ * stats.json, reports.json and .salt — must be somewhere the web server serves
+ * directly. In that case `.htaccess` is the only web-facing protection and on nginx or
+ * any host with `AllowOverride Off` it is not executed at all; for that same reason DATA_DIR
+ * was previously moved outside the document root, but whoever has not migrated must see it.
  *
- * دو ریشه می‌سنجیم:
- *   1) پوشهٔ خودِ این برنامه (server/). طبق README محتوایِ همین پوشه در webroot
- *      می‌نشیند، پس هر مسیری زیرِ آن — مثلِ data/ قدیمی — همان داخلِ webroot است.
- *      این راهِ اصلی است چون به وب‌سرور وابسته نیست.
- *   2) DOCUMENT_ROOT که دقیق‌تر است، ولی وب‌سرور باید آن را به PHP برساند
- *      (nginx گاهی نمی‌رساند). راهِ دومِ مکمل است، نه تنها راه.
+ * We measure two roots:
+ *   1) This program's own folder (server/). Per the README the contents of this folder land in webroot,
+ *      so any path under it — like the old data/ — is inside webroot.
+ *      This is the primary path because it does not depend on the web server.
+ *   2) DOCUMENT_ROOT, which is more precise, but the web server must pass it to PHP
+ *      (nginx sometimes does not). The second path is complementary, not the only one.
  *
- * در CLI که چیزی سرو نمی‌شود «نه» برمی‌گردد.
+ * In CLI, where nothing is served, "no" is returned.
  */
 function data_dir_inside_webroot(): bool
 {
@@ -552,16 +552,16 @@ function data_dir_inside_webroot(): bool
 }
 
 /**
- * محدودیت نرخ per-IP برای نوشتن آمار؛ بدون آن هر کسی با GUID تصادفی
- * می‌تواند stats.json را بی‌نهها رشد دهد (هر نوشتن = بازنویسی کل فایل).
+ * Per-IP rate limit for writing stats; without it anyone with a random GUID can
+ * grow stats.json forever (each write = rewriting the whole file).
  */
 function rate_allow(string $ip, int $max, int $windowSec): bool
 {
     if ($ip === '') {
         return true;
     }
-    // IPِ خام ذخیره نمی‌شود: کلید = هشِ نمکی، و فقط تا پایانِ پنجرهٔ
-    // نگهداری می‌شود (هر ردیفِ کهنه بلافاصله پاک می‌شود).
+    // The raw IP is not stored: key = salted hash, kept only until the end of the
+    // retention window (each stale row is cleared immediately).
     $k = ip_key($ip);
     $f = DATA_DIR . '/ratelimit.json';
     $lock = @fopen(DATA_DIR . '/ratelimit.lock', 'c');
@@ -741,7 +741,7 @@ function stats_touch(string $id, array $meta = []): void
         if (isset($st['clients'][$id]) && is_array($st['clients'][$id])) {
             $st['clients'][$id]['last'] = $now;
         } else {
-            // سقف ورودی‌ها: GUIDهای جعلی نمی‌توانند فایل را بی‌نهها رشد دهند.
+            // Input cap: forged GUIDs cannot grow the file forever.
             if (count($st['clients']) >= 5000) {
                 return;
             }
@@ -753,9 +753,9 @@ function stats_touch(string $id, array $meta = []): void
             }
             $st['clients'][$id][$k] = $v;
         }
-        // پاک‌سازیِ برچسبِ منبعِ کلاینت‌هایی که دیگر سر نزده‌اند. خودِ رکورد می‌ماند؛
-        // فقط هشِ منبع می‌رود. ردیفِ همین درخواست‌دهنده تازه‌ترین است (last همین حالا
-        // به now رسید)، پس برچسبِ او هیچ‌وقت در همین عبور پاک نمی‌شود.
+        // Clearing the origin label of clients that no longer check in. The record itself stays;
+        // only the origin hash is removed. The row of this very requester is the freshest (last was just
+        // set to now), so its label is never cleared in this pass.
         foreach ($st['clients'] as &$row) {
             if (!is_array($row)) {
                 continue;
@@ -897,7 +897,7 @@ function ip_info_save(string $id, array $info): void
     ]);
 }
 
-/** سقف ساعتی فراخوانی ipwho.is؛ بدون آن هر شناسهٔ جعلیِ `id` یک درخواست سمت‌سرور می‌سازد. */
+/** Hourly cap on ipwho.is calls; without it every forged `id` makes a server-side request. */
 function ipinfo_allow(): bool
 {
     $f = DATA_DIR . '/ipinfo_quota.json';
@@ -915,10 +915,10 @@ function ipinfo_allow(): bool
 }
 
 /**
- * غنی‌سازیِ ISP/ASN برای ردیف‌هایِ تکمیل‌نشده. عمداً با IPِ ذخیره‌شده کار می‌کند،
- * و چون IPِ خام دیگر ذخیره نمی‌شود، برایِ ردیف‌هایِ جدید این تابع کاری نمی‌کند —
- * اطلاعاتِ ISP هنگامِ check.php و با IPِ در حافظه ثبت می‌شود. برایِ دادهٔ
- * قدیمیِ ذخیره‌شده همچنان کار می‌کند.
+ * ISP/ASN enrichment for unfinished rows. It deliberately works with the stored IP,
+ * and since the raw IP is no longer stored, this function does nothing for new rows —
+ * ISP info is recorded at check.php time with the in-memory IP. It still works
+ * for old stored data.
  */
 function ip_fill(array &$rows, int $cap = 10, float $budget = 4.0): void
 {
@@ -956,8 +956,8 @@ function ip_fill(array &$rows, int $cap = 10, float $budget = 4.0): void
 }
 
 /**
- * فقط https. لینک‌های `javascript:`، `data:`، `vbscript:` و `http:` پذیرفته
- * نمی‌شوند؛ خروجیِ خالی یعنی «لینکِ خالیِ مجاز»، null یعنی «نامعتبر».
+ * https only. Links `javascript:`, `data:`, `vbscript:` and `http:` are not
+ * accepted; empty output means "empty link allowed", null means "invalid".
  */
 function safe_url(string $url): ?string
 {
@@ -976,8 +976,8 @@ function safe_url(string $url): ?string
 }
 
 /**
- * نمایشِ کوتاهِ «کلیدِ منبع» در پنل. این دیگر IP نیست؛ نمی‌شود آن را به آدرسِ
- * واقعی برگرداند، ولی همچنان می‌گوید «همان منسابِ قبلی» یا «منبعی دیگر».
+ * Short display of the "origin key" in the panel. This is no longer an IP; it cannot be
+ * reversed to a real address, but it still says "the same previous origin" or "another source".
  */
 function src_short(string $src): string
 {

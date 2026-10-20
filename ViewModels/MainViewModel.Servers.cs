@@ -135,8 +135,8 @@ public partial class MainViewModel : ViewModelBase
         var dupes = new List<ServerInfo>();
         foreach (var s in Servers)
         {
-            // همان کلید واحد شمارش (DupeKey = ServerInfo.GetDupeKey): همهٔ فیلدهای
-            // مؤثر بر اتصال، بدون نام و لینک؛ شمارش و حذف از یک تعریف واحد می‌آیند.
+            // The same single counting key (DupeKey = ServerInfo.GetDupeKey): all
+            // fields that affect the connection, minus name and link.
             if (!seen.Add(DupeKey(s))) dupes.Add(s);
         }
         foreach (var d in dupes)
@@ -225,7 +225,7 @@ public partial class MainViewModel : ViewModelBase
         AppendLog(string.Format(TranslationManager.Instance["Log_Sorted"], SortField));
     }
 
-    // ---------- اتصال ----------
+    // ---------- connection ----------
 
 
     [RelayCommand]

@@ -49,9 +49,9 @@ public static class RemoteConfig
     public const string DefaultBaseUrl = "https://up.roxacore.com";
 
     /// <summary>
-    /// آدرس فید اپدیت/اعلان‌ها. فقط برای تست محلی می‌توان آن را با متغیر محیطی
-    /// ROXA_TEST_FEED به یک سرور لوکال (loopback) اشاره داد؛ هر مقدار غیر-lopback
-    /// نادیده گرفته می‌شود تا مسیر اصلیِ انتشارِ امن حفظ شود.
+    /// The update/announcement feed URL. Only for local testing may it be pointed
+    /// at a local (loopback) server through the ROXA_TEST_FEED environment
+    /// variable; any non-loopback value is ignored so the secure release path holds.
     /// </summary>
     public static string BaseUrl { get; } = ResolveBaseUrl();
 
@@ -156,7 +156,7 @@ public static class RemoteConfig
             var url = $"{BaseUrl}/api/check.php?v={Uri.EscapeDataString(AppVersion)}&lang={Uri.EscapeDataString(lang)}";
             if (!string.IsNullOrWhiteSpace(country))
                 url += $"&country={Uri.EscapeDataString(country)}";
-            // آمار/شناسه فقط با اجازهٔ کاربر (بخش حریم خصوصی) ارسال می‌شود؛ نام رایانه اصلاً فرستاده نمی‌شود.
+            // Stats/IDs are sent only with the user's consent (Privacy section); the machine name is never sent.
             if (includeStats)
             {
                 if (!string.IsNullOrWhiteSpace(clientId))

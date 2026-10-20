@@ -5,10 +5,10 @@
        For more details visit https://learn.microsoft.com/en-us/windows/win32/sbscs/application-manifests -->
   <assemblyIdentity version="1.0.0.0" name="Roxa.Desktop"/>
 
-  <!-- نصب در {localappdata} انجام می‌شود و TUN/مسیریابی از همان‌جا با privilege
-       اجرایِ همین کاربر کار می‌کند؛ پس هیچ دلیلی برای درخواستِ UAC نیست.
-       این را صریح می‌نویسیم تا تحلیلِ امنیتیِ نصب‌کننده آن را «بدونِ
-       requestedExecutionLevel» نبیند و تفسیر به حدسِ ابزار نماند. -->
+  <!-- Installation goes to {localappdata}, and TUN/routing works from there with
+       the privilege of this same user's process, so there is no reason to request
+       UAC. We state this explicitly so a security analysis of the installer does
+       not call it "without a requestedExecutionLevel" and leave it to guesswork. -->
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
     <security>
       <requestedPrivileges>
@@ -25,7 +25,7 @@
 
       <!-- Windows 10 -->
       <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" />
-      <!-- Windows 11 / Windows Server 2022 (و بالاتر) -->
+      <!-- Windows 11 / Windows Server 2022 (and above) -->
       <supportedOS Id="{1f676c76-80e1-4239-95bb-83d0f6d0da78}" />
     </application>
   </compatibility>

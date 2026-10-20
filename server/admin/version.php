@@ -18,12 +18,12 @@ $ver = jread($storeFile, [
 ]);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // درخواست‌های AJAX (با نوار پیشرفت) به‌جای ریدایرکت، پاسخ JSON می‌گیرند.
+    // AJAX requests (with progress bar) receive a JSON response instead of a redirect.
     $isAjax = strtolower((string)($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '')) === 'xmlhttprequest';
 
     /**
-     * پاسخ پایانی: JSON برای نوار پیشرفت، وگرنه رفتار قبلی (flash + ریدایرکت).
-     * در حالت موفقیتِ AJAX هم flash می‌نویسیم تا بعد از تازه‌سازی صفحه پیام بماند.
+     * Final response: JSON for the progress bar, otherwise the old behavior
+     * (flash + redirect). On AJAX success we also flash so the message survives a refresh.
      */
     $respond = static function (bool $ok, string $msg) use ($isAjax): void {
         if ($isAjax) {
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     };
 
     if ($isAjax) {
-        // csrf_check در حالت AJAX با خروجی متنی 419 تمام می‌شود؛ همین‌جا با پیام فارسی پاسخ می‌دهیم.
+        // csrf_check in AJAX mode ends with a plain 419 output; here we reply with a Persian message instead.
         sess_start();
         $token = (string)($_POST['csrf'] ?? '');
         if ($token === '' || empty($_SESSION['csrf']) || !hash_equals((string)$_SESSION['csrf'], $token)) {
@@ -93,8 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sha = hash_file('sha256', $dest) ?: '';
         $size = (int)filesize($dest);
     } else {
-        // کلاینت عمداً فقط https را می‌پذیرد؛ لینکِ http در پنل پذیرفته نمی‌شود
-        // تا نسخهٔ منتشرشده از همان اول قابلِ دانلود باشد.
+        // The client deliberately accepts only https; an http link is not accepted
+        // in the panel so the published version is downloadable from the start.
         $url = safe_url(trim((string)($_POST['url'] ?? '')));
         if ($url === null || $url === '') {
             $respond(false, 'لینک مستقیم دانلود باید با https:// شروع شود.');
@@ -126,9 +126,9 @@ $activeBadge = !empty($ver['active'])
     ? '<span class="badge b-on">در حال انتشار</span>'
     : '<span class="badge b-off">انتشار نشده</span>';
 
-// سقف واقعی آپلود = کوچک‌ترین مقدار مثبتِ upload_max_filesize و post_max_size.
-// هم در راهنما نمایش داده می‌شود و هم پیش از ارسال فرم در مرورگر چک می‌شود تا
-// به‌جای صفحهٔ خطای 413، یک پیام فارسی واضح ببینید و فایل بالاتر از سقف انتخاب نشود.
+// The real upload cap = the smaller positive of upload_max_filesize and
+// post_max_size. It is shown in the help and checked in the browser before the
+// form is sent, so instead of a 413 page you get a clear Persian message and no oversized file is chosen.
 $capUp = ini_bytes((string)ini_get('upload_max_filesize'));
 $capPost = ini_bytes((string)ini_get('post_max_size'));
 $caps = [];
@@ -197,7 +197,7 @@ echo '۲. شمارهٔ نسخه را وارد کنید (مثلاً <code>1.1.0</
 echo '۳. اپ کاربران با باز شدن برنامه این نسخه را چک می‌کند؛ اگر جدیدتر باشد بنر نمایش می‌دهد و با کلیک روی «نصب» خودکار دانلود و جایگزین می‌شود.';
 echo '</div></div>';
 
-// نوار پیشرفت بارگذاری + چک سقف + ارسال AJAX تا پاسخ سرور (JSON) همان‌جا نمایش داده شود.
+// Upload progress bar + cap check + AJAX submit so the server's (JSON) response is shown right there.
 echo '<style>
 .up-progress{display:none;margin-top:16px}
 .up-track{height:10px;background:#0d1322;border:1px solid #1f2937;border-radius:999px;overflow:hidden}
@@ -257,7 +257,7 @@ echo '<script>
     if (busy) return;
     msg.style.display = "none";
 
-    // حالت «لینک مستقیم»: ارسال معمولی فرم، چون فایلی آپلود نمی‌شود.
+    // «لینک مستقیم» mode: normal form submission, since no file is uploaded.
     if (mode && mode.value !== "upload") {
       form.submit();
       return;

@@ -90,7 +90,7 @@ th{color:var(--mut);font-weight:400;font-size:12px}
         echo '<a href="' . $item[1] . '"' . $on . '>' . h($item[0]) . '</a>';
     }
     echo '</nav>';
-    // خروج باید POST باشد (با توکن CSRF)؛ لینکِ GET قابلِ کلیکِ خودکار است.
+    // Logout must be POST (with a CSRF token); a GET link is auto-clickable.
     echo '<form method="post" action="logout.php" style="display:inline">' . csrf_field();
     echo '<button class="out" type="submit" style="background:none;border:0;cursor:pointer;font:inherit;color:inherit;padding:0">خروج از حساب</button></form></aside>';
     echo '<main class="main">';
@@ -100,9 +100,9 @@ th{color:var(--mut);font-weight:400;font-size:12px}
         $cls = $flash['t'] === 'err' ? 'err' : 'ok';
         echo '<div class="msg ' . $cls . '">' . h($flash['m']) . '</div>';
     }
-    // هشدارِ بیرونی: فقط وقتی که پوشهٔ داده واقعاً زیرِ سند-ریشه باشد. سکوت
-    // در این حالت خطرناک‌ترین حالت است، چون تنها سپرِ رو به وب، .htaccessای
-    // است که رویِ بسیاری از میزبان‌ها اجرا نمی‌شود.
+    // External warning: only when the data folder really sits under the
+    // document root. Silence is most dangerous here, because the only
+    // web-facing shield is an .htaccess that many hosts never apply.
     if (data_dir_inside_webroot()) {
         echo '<div class="msg warn"><b>پوشهٔ داده داخلِ سند-ریشه است</b><br>'
             . '<code>' . h((string)DATA_DIR) . '</code><br>'

@@ -37,8 +37,8 @@ if ($id !== '') {
         }
     }
 
-    // نوشتن آمار با سقف per-IP؛ پاسخ بهروزرسانی در هر صورت داده می‌شود.
-    // IPِ خام ذخیره نمی‌شود — فقط هشِ نمکی‌اش، برای تشخیص «همان منبع قبلی».
+    // Writing stats is per-IP capped; the update response is returned either way.
+    // The raw IP is not stored — only its salted hash, to tell "the same earlier source".
     if (rate_allow($ipOk !== '' ? $ipOk : 'unknown', 60, 60)) {
         stats_touch($id, [
             'ip_last' => $ipOk !== '' ? ip_key($ipOk) : '',

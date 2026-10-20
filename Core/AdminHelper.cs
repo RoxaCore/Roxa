@@ -43,8 +43,8 @@ public static class AdminHelper
         try
         {
             System.Diagnostics.Process.Start(psi);
-            // بعد از موفقیت Process.Start (اگر UAC رد شده باشد اینجا نمی‌آییم)؛
-            // آیکون سینی باید قبل از Environment.Exit روی رشتهٔ UI پاک شود.
+            // After Process.Start succeeds (a declined UAC prompt never gets
+            // here); the tray icon must go before Environment.Exit on the UI thread.
             try
             {
                 if (Avalonia.Application.Current is Roxa.App app)

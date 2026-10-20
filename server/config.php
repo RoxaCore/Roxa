@@ -11,15 +11,15 @@ define('SESSION_LIFETIME', 28800);
 define('APP_NAME', 'Roxa');
 
 /**
- * B1 — داده‌ها (auth.json، stats.json، reports.json و...) باید بیرونِ webroot
- * باشند. تا وقتی داخلِ سند-ریشه بود، حفاظت فقط `.htaccess` بود که روی nginx و
- * هر وب‌سرورِ بدونِ AllowOverride بی‌اثر است.
+ * B1 — data (auth.json, stats.json, reports.json, etc.) must live outside the
+ * webroot. While inside the document root, the only protection was `.htaccess`,
+ * which is ineffective on nginx and any web server without AllowOverride.
  *
- * ترتیبِ انتخاب:
- *   1) متغیرِ محیطی ROXA_DATA — صریح‌ترین و توصیه‌شده.
- *   2) roxa-data، هم‌سطحِ پوشهٔ وب (بیرون از server/).
- *   3) اگر roxa-data هنوز ساخته نشده ولی data/ قدیمی پُر است، همان قدیمی تا
- *      زمانِ مهاجرت (tools/migrate-data.php) با هشدار ادامه می‌دهد.
+ * Selection order:
+ *   1) ROXA_DATA environment variable — most explicit and recommended.
+ *   2) roxa-data, sibling of the web folder (outside server/).
+ *   3) If roxa-data is not yet created but the old data/ is populated, the old
+ *      one is used until migration (tools/migrate-data.php), with a warning.
  */
 function roxa_data_dir(): string
 {
@@ -31,8 +31,8 @@ function roxa_data_dir(): string
     $new = dirname(__DIR__) . '/roxa-data';
     $old = __DIR__ . '/data';
 
-    // اگر قدیمی داده دارد و جدید هنوز خالی است، مهاجرت نکرده‌ایم: قدیمی را با
-    // هشدار ادامه بده تا پنل از کار نیفتد.
+    // If the old one has data and the new one is still empty, we have not
+    // migrated: keep using the old one with a warning so the panel stays up.
     if (is_dir($old) && !is_dir($new)) {
         return $old;
     }

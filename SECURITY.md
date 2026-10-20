@@ -98,7 +98,7 @@ These are targets, not guarantees.
 If a report is accepted, the fix is released in the next version and credited
 in `CHANGELOG.md` under `Security`, unless the reporter prefers otherwise.
 
-> **فارسی:** آسیب‌پذیری را در معرضِ عموم گزارش نکنید. از تبِ *Security* و
-> گزینهٔ *Report a vulnerability* استفاده کنید. نسخهٔ رُخا، نسخهٔ ویندوز و
-> حالتِ اتصال (TUN یا پروکسی) را حتماً ذکر کنید، ولی **آدرسِ سرور، لینکِ
-> اشتراک و کلیدها را نفرستید.** فقط آخرین نسخهٔ منتشرشده پشتیبانی می‌شود.
+> Do not report a vulnerability publicly. Use the *Security* tab and
+> *Report a vulnerability*. Always mention the Roxa version, the Windows
+> version and the connection mode (TUN or proxy), but **do not send server
+> addresses, subscription links or keys.** Only the latest released version is supported.

@@ -26,11 +26,11 @@ using System.Text.RegularExpressions;
 namespace Roxa.Core;
 
 /// <summary>
-/// گزارش باگ/کرش به پنل (api/report.php).
-/// کرش در لحظه در پوشهٔ صف نوشته می‌شود و ارسال فوری بهترین-تلاش است؛ وگرنه
-/// در اجرای بعدی (یا بعد از اتصال) FlushPending آن را می‌فرستد.
-/// هر گزارش دو بخش دارد: بخش خودکار برنامه (نسخه، سیستم‌عامل، شناسه، خطا/لاگ)
-/// و متن اختیاری کاربر.
+/// Reports bugs/crashes to the panel (api/report.php).
+/// A crash is written to the queue folder the moment it happens, and an immediate send is
+/// best-effort; otherwise FlushPending sends it on the next run (or after connecting).
+/// Every report has two parts: the app's automatic part (version, OS, id, error/log)
+/// and the user's optional text.
 /// </summary>
 public static class BugReport
 {
@@ -40,13 +40,13 @@ public static class BugReport
     private const int PendingCap = 30;
 
     /// <summary>
-    /// گزارشِ درِ صف بیش از این عمر نمی‌کند.
+    /// A queued report does not live longer than this.
     ///
-    /// سقفِ تعداد از اول بود، ولی مهلت نه — و کمبودِ مهلت یعنی اگر کاربر هرگز
-    /// رضایت نمی‌داد، همان نخستین گزارشِ کرش برایِ همیشه روی دیسک می‌ماند.
-    /// ۳۰ روز هم‌اندازهٔ سقفِ تعداد است و از ارزشِ یک گزارشِ کرش برایِ
-    /// خطایابی هم بیشتر است: بعد از یک ماه، لاگ و stack آن برایِ نسخهٔ فعلی
-    /// کاربردش را از دست داده.
+    /// The count cap existed from the start, but the deadline did not — and the missing deadline
+    /// meant that if the user never gave consent, that very first crash report would stay on
+    /// disk forever. 30 days matches the count cap and is also worth more than a crash report
+    /// for debugging: after a month, its log and stack have lost their usefulness for the
+    /// current version.
     /// </summary>
     private const int PendingMaxAgeDays = 30;
 
@@ -94,23 +94,23 @@ public static class BugReport
     public static Payload Create(string type) => new() { Type = type, Os = OsInfo(), Id = DeviceId() };
 
     /// <summary>
-    /// آیا فرستادنِ گزارش مجاز است؟
+    /// Is sending a report allowed?
     ///
-    /// نوشتنِ محلی در صف همیشه انجام می‌شود — بی‌ضرر است و اگر کاربر بعداً رضایت
-    /// داد، گزارشِ کرشِ همان نخستین اجرا (که ارزشمندترینشان است) گم نمی‌شود.
-    /// این کلید فقط «رفتن به سرور» را کنترل می‌کند.
+    /// Local writing to the queue always happens — it is harmless, and if the user gives consent
+    /// later, the crash report of that very first run (the most valuable one) is not lost.
+    /// This key only controls "going to the server".
     ///
-    /// بدونِ این گیت، خطا و stack و ۴۰ خطِ آخرِ لاگ و ClientId برخلافِ آنچه در
-    /// تنظیمات به کاربر گفته بودیم، بی‌صدا ارسال می‌شد — گزارشِ کرش از مسیرِ
-    /// FlushPendingAsync هم می‌گذشت و اصلاً به تنظیمات نگاه نمی‌کرد.
+    /// Without this gate, the error and stack and the last 40 log lines and ClientId would be sent
+    /// silently, contrary to what we told the user in settings — the crash report also passed through
+    /// the FlushPendingAsync path and never looked at settings at all.
     /// </summary>
     private static bool ConsentAllowsSend()
     {
         try { return Storage.LoadSettings().SendUsageStats; }
-        catch { return false; } // نتوانستیم رضایت را بخوانیم ⇒ رضایت نداریم ⇒ نمی‌فرستیم
+        catch { return false; } // couldn't read consent ⇒ no consent ⇒ don't send
     }
 
-    /// <summary>کرش: فایل در صف نوشته می‌شود و ارسال فوری بهترین-تلاش انجام می‌گیرد.</summary>
+    /// <summary>Crash: the file is written to the queue and an immediate send is best-effort.</summary>
     public static void ReportCrash(Exception? ex, string logTail = "")
     {
         if (ex == null) return;
@@ -119,7 +119,7 @@ public static class BugReport
         p.Log = Cut(logTail, 4000);
         string? file = Enqueue(p);
         if (file == null) return;
-        if (!ConsentAllowsSend()) return; // در صف می‌ماند؛ فقط اگر کاربر رضایت بدهد می‌رود
+        if (!ConsentAllowsSend()) return; // stays in the queue; only goes if the user consents
         _ = Task.Run(async () =>
         {
             try
@@ -142,8 +142,8 @@ public static class BugReport
                 files.RemoveAt(0);
             }
             string file = Path.Combine(PendingDir, $"{DateTime.Now:yyyyMMddHHmmssfff}-{p.Type}.json");
-            // رویِ دیسک هم نسخهٔ پاک‌شده می‌ماند؛ مبادا خودِ فایلِ صف بعداً
-            // کسی را لو بدهد، بی‌آنکه کسی آن را فرستاده باشد.
+            // The sanitized version is what stays on disk too, lest the queue file itself
+            // later expose someone without anyone having sent it.
             File.WriteAllText(file, JsonSerializer.Serialize(Sanitized(p), JsonOptions), Encoding.UTF8);
             return file;
         }
@@ -154,11 +154,11 @@ public static class BugReport
     }
 
     /// <summary>
-    /// صف را از گزارش‌هایِ قدیمی پاک می‌کند.
+    /// Clears the queue of old reports.
     ///
-    /// عمداً پیش از بررسیِ رضایت اجرا می‌شود: این بهداشتِ محلی است، نه ارسال، و
-    /// دقیقاً در همان حالتِ بی‌رضایت است که صف رشد می‌کند و اگر کسی آن را نگاه
-    /// دارد باید کهنه شود.
+    /// Deliberately runs before the consent check: this is local hygiene, not sending, and
+    /// precisely in the no-consent state the queue grows and, if anyone is keeping an
+    /// eye on it, it must go stale.
     /// </summary>
     private static void SweepExpired()
     {
@@ -179,11 +179,11 @@ public static class BugReport
     }
 
     /// <summary>
-    /// کاربر ارسالِ آمار را خاموش کرد ⇒ آنچه پیش‌تر در صف جمع شده باید برود.
+    /// The user turned off usage statistics sending ⇒ whatever was previously collected in the queue must go.
     ///
-    /// نوشتنِ محلیِ گزارشِ آینده عمداً ادامه می‌یابد (بی‌ضرر است و اگر بعداً
-    /// رضایت داد، ارزشمندترین گزارش همان نخستین اجرای پس از کرش است)؛ ولی
-    /// آنچه بدونِ رضایت مانده، پس از خاموش کردنِ صریحِ همان گزینه بی‌معناست.
+    /// Local writing of future reports deliberately continues (it is harmless, and if the user
+    /// gives consent later, the most valuable report is that very first run after the crash); but
+    /// what remained without consent is pointless after explicitly turning that same option off.
     /// </summary>
     public static void DiscardPending()
     {
@@ -224,17 +224,17 @@ public static class BugReport
     }
 
     /// <summary>
-    /// ارسال همهٔ گزارش‌های در صف؛ با اولین شکست (قطعی شبکه) متوقف می‌شود.
+    /// Sends all queued reports; stops at the first failure (network outage).
     ///
-    /// این مهم‌ترین نقطهٔ کنترلِ رضایت است: هم در شروعِ برنامه و هم بعد از هر
-    /// اتصال صدا زده می‌شود، پس اگر اینجا گیت نداشته باشد، کلِ گزارشِ کرش بدونِ
-    /// توجه به چک‌باکسِ تنظیمات بیرون می‌رود — دقیقاً همان چیزی که به کاربر
-    /// گفته بودیم جزوِ آمار و اطلاعات است. بدونِ رضایت، فقط صف را می‌شماریم.
+    /// This is the most important consent control point: it is called both at app startup and after
+    /// every connection, so if it had no gate here, the entire crash report would go out
+    /// regardless of the settings checkbox — exactly the thing we told the user
+    /// counts as usage statistics. Without consent, we only count the queue.
     /// </summary>
     public static async Task<int> FlushPendingAsync(int? proxyPort)
     {
-        // قبل از گیتِ رضایت: پاک‌سازیِ کهنگی فرستادن نیست، بهداشتِ محلی است و
-        // باید در همان حالتِ بی‌رضایت هم انجام شود که صف رشد می‌کند.
+        // Before the consent gate: the expiry sweep is not sending, it is local hygiene and
+        // must run even in the no-consent state where the queue grows.
         SweepExpired();
 
         if (!ConsentAllowsSend()) return 0;
@@ -280,25 +280,25 @@ public static class BugReport
         @"\b\d{1,3}(?:\.\d{1,3}){3}\b", RegexOptions.Compiled);
 
     /// <summary>
-    /// حذفِ چیزهایی که گزارشِ کرش نباید ببرد: لینکِ اشتراک (که توکن در مسیرش است)،
-    /// UUID (شناسهٔ سرور) و آدرسِ IP.
+    /// Removes the things a crash report must not carry: the subscription link (whose path holds a token),
+    /// the UUID (server id) and IP addresses.
     ///
-    /// رویِ Log و Error اعمال می‌شود، نه رویِ Message: متنِ دستیِ کارب را تغییر
-    /// نمی‌دهیم، چون کسی که خودش چیزی نوشته ممکن است برایِ خطایابی دقیقاً همان
-    /// را بخواهد بفرستد — و SECURITY.md هم صریحاً از او خواسته چنین چیزی ننویسد.
-    /// برایِ گزارشِ کرش هم Message خالی است، پس این دو بخش همان کلِ گزارش‌اند.
+    /// Applied to Log and Error, not Message: we do not alter the user's manual text,
+    /// because someone who wrote something themselves may want exactly that
+    /// sent for debugging — and SECURITY.md explicitly asks them not to write such things.
+    /// For a crash report Message is also empty, so these two parts are the whole report.
     ///
-    /// نکته‌ها:
-    ///  - لینک فقط وقتی پاک می‌شود که مسیرِ غیرِ خالی یا query داشته باشد؛
-    ///    یک لینکِ خانگی مثلِ https://example.com که در لاگ برایِ خطایابیِ
-    ///    آپدیت ارزشمند است می‌ماند، ولی هر مسیری که بتواند توکنِ اشتراک
-    ///    باشد می‌رود.
-    ///  - 127.x.x.x و 0.0.0.0 حذف نمی‌شوند: لوپ‌بک آدرسِ کسی نیست و بدونِ آن
-    ///    خطای پروکسیِ محلیِ رایج‌ترین چیزی است که در گزارش می‌آید.
-    ///  - IPv6 عمداً حذف نمی‌شود. یک الگویِ قابلِ اعتماد برایِ آن نمی‌شود
-    ///    نوشت که متنِ کوتاهِ سه‌بخشیِ زمان (07:11:53) را هم نگیرد، و حذفِ
-    ///    اشتباهیِ زمان‌ها از یک گزارشِ خطایابی هزینه‌ای واقعی است. اگر راهی
-    ///    قطعی پیدا شد باید اضافه شود.
+    /// Notes:
+    ///  - A link is only scrubbed when it has a non-empty path or query;
+    ///    a home-page link like https://example.com, valuable in a log for debugging
+    ///    updates, stays, but any path that could be a subscription
+    ///    token goes.
+    ///  - 127.x.x.x and 0.0.0.0 are not removed: loopback is nobody's address and without it
+    ///    the local proxy error is the most common thing a report contains.
+    ///  - IPv6 is deliberately not removed. No trustworthy pattern can be
+    ///    written for it that also doesn't match the short three-part time text (07:11:53), and wrongly
+    ///    removing times from a debugging report is a real cost. If a reliable way
+    ///    is found it must be added.
     /// </summary>
     public static string Scrub(string s)
     {
@@ -309,7 +309,7 @@ public static class BugReport
         return s;
     }
 
-    /// <summary>لینکِ دارایِ مسیر یا query ⇒ می‌تواند توکنِ اشتراک باشد.</summary>
+    /// <summary>A link with a path or query ⇒ it can be a subscription token.</summary>
     private static bool IsSecretUrl(string raw)
     {
         string t = raw.TrimEnd('.', ',', ')', ']', ';', '>', '"');
@@ -318,7 +318,7 @@ public static class BugReport
         return !string.IsNullOrEmpty(u.Query) || (path.Length > 1 && path != "/");
     }
 
-    /// <summary>IPv4ِ معنادار و غیرِ لوپ‌بک ⇒ آدرسی است که باید برود.</summary>
+    /// <summary>A meaningful, non-loopback IPv4 ⇒ an address that must go.</summary>
     private static bool IsPublicIpv4(string s)
     {
         var parts = s.Split('.');
@@ -333,9 +333,9 @@ public static class BugReport
     }
 
     /// <summary>
-    /// نسخهٔ پاک‌شدهٔ گزارش پیش از سریال‌سازی. خودِ Payload را تغییر نمی‌دهیم
-    /// تا فراخواننده همان چیزی را ببیند که داده بود؛ فقط آنچه رویِ دیسک یا
-    /// شبکه می‌رود پاک می‌شود.
+    /// The scrubbed version of the report, before serialization. We do not modify the Payload itself
+    /// so the caller sees exactly what they gave; only what goes to disk or
+    /// the network is scrubbed.
     /// </summary>
     private static Payload Sanitized(Payload p)
     {

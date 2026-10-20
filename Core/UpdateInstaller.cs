@@ -43,7 +43,7 @@ public static class UpdateInstaller
 
         // The downloaded zip is extracted and executed, so it must arrive over TLS
         // and be pinned to the hash the update feed published.
-        // فقط استثنای تست محلی: سرور تست روی loopback بدون TLS (ROXA_TEST_FEED).
+        // The only local-test exception: a test server on loopback without TLS (ROXA_TEST_FEED).
         if (!Uri.TryCreate(info.Url, UriKind.Absolute, out var uri))
             throw new InvalidOperationException(TranslationManager.Get("Upd_RequireHttps"));
         bool loopbackHost = uri.Host is "127.0.0.1" or "localhost" or "::1" or "[::1]";
@@ -154,13 +154,13 @@ public static class UpdateInstaller
 
     private static string ReconnectMarkerPath => Path.Combine(Path.GetTempPath(), "roxa-update-reconnect");
 
-    /// <summary>قبل از ری‌استارت آپدیت: اگر وصل بودیم، پس از اعمال آپدیت دوباره به همان سرور وصل شو.</summary>
+    /// <summary>Before the update restart: if we were connected, reconnect to the same server once the update is applied.</summary>
     public static void MarkReconnectAfterUpdate()
     {
         try { File.WriteAllText(ReconnectMarkerPath, "1"); } catch { }
     }
 
-    /// <summary>وجود مارکر را برمی‌گرداند و آن را پاک می‌کند (فقط یک‌بار مصرف می‌شود).</summary>
+    /// <summary>Returns whether the marker exists and clears it (it is single-use).</summary>
     public static bool ConsumeReconnectMarker()
     {
         try

@@ -96,13 +96,13 @@ public static class TunDns
     }
 
     /// <summary>
-    /// شرایطِ اعمال را می‌سنجد و اگر ممکن بود، عکسِ فوریِ DNS فعلی را برمی‌گرداند،
-    /// بی‌آنکه چیزی را عوض کرده باشد.
+    /// Checks whether applying is possible and, if so, returns an immediate snapshot
+    /// of the current DNS without having changed anything.
     ///
-    /// این جداسازی عمداً است. کدِ قبلی اول سیستم را عوض می‌کرد و بعد مقدارِ قبلی را
-    /// می‌خواند و در TunState ثبت می‌کرد؛ اگر برنامه در همین بازه می‌مرد (کرش، یا kill
-    /// از Task Manager) هیچ‌کس نمی‌ماند بداند DNS کاربر قبلاً چه بوده، و جاروبِ بعدی
-    /// تنظیمِ استاتیکِ دستیِ او را بی‌صدا به DHCP تبدیل می‌کرد.
+    /// This separation is deliberate. The old code changed the system first and then
+    /// read the previous values into TunState; if the program died in that window
+    /// (crash, or kill from Task Manager) nobody would be left to know what the user's
+    /// DNS used to be, and the next sweep would silently make their manual static setting DHCP.
     /// </summary>
     public static List<TunDnsRecord>? PrepareApply()
     {
@@ -122,22 +122,22 @@ public static class TunDns
     }
 
     /// <summary>
-    /// عکسِ از پیش گرفته‌شده را رویِ سیستم اعمال می‌کند. فراخواننده باید خودش
-    /// عکس را قبل از این فراخوانی ذخیره کرده باشد.
+    /// Applies a previously taken snapshot to the system. The caller must have
+    /// saved that snapshot themselves before this call.
     /// </summary>
     public static bool TryApply(List<TunDnsRecord> prev)
     {
         if (!OperatingSystem.IsWindows() || prev == null || prev.Count == 0) return false;
 
-        // netsh بدون لودِ ماژول PowerShell: اجرای powershell برای Set-DnsClientServerAddress
-        // حدود ۸ ثانیه (استارت سرد + لود NetTCPIP) طول می‌کشید و بزرگ‌ترین گلوگاه اتصال TUN بود.
+        // netsh without loading the PowerShell module: running powershell for Set-DnsClientServerAddress
+        // took about 8 seconds (cold start + loading NetTCPIP) and was the biggest bottleneck of the TUN connection.
         if (TryApplyNetsh(prev))
         {
             TunManager.Log($"DNS switched to {StubIp} on {prev.Count} adapter(s).");
             return true;
         }
 
-        // پشتیبان: همان powershell قدیمی اگر netsh به هر دلیلی شکست بخورد.
+        // Fallback: the old powershell path if netsh fails for any reason.
         if (RunPowerShell(BuildApplyScript(prev)))
         {
             TunManager.Log($"DNS switched (powershell fallback) to {StubIp} on {prev.Count} adapter(s).");
@@ -161,7 +161,7 @@ public static class TunDns
                     return false;
                 }
             }
-            // معادل ipconfig /flushdns بدون پروسهٔ اضافه
+            // Equivalent of ipconfig /flushdns without an extra process
             try { DnsFlushResolverCache(); } catch { }
             return true;
         }
@@ -259,16 +259,16 @@ public static class TunDns
     }
 
     /// <summary>
-    /// آداپترهایی که DNS دستی‌شان 127.0.0.1 است در حالی که سرویس DNS محلی اصلا در دسترس نیست.
-    /// نشانه‌ی باقی‌ماندنِ DNSِ نشستِ TUN بعد از خروج ناگهانی (مثلا کشته شدن برنامه) است؛
-    /// فایل TunState هم که پاک شده، پس بازیابی عادی هیچ‌وقت چیزی برنمی‌گرداند.
-    /// فقط می‌خواند و گزارش می‌دهد؛ تغییری نمی‌دهد.
+    /// Adapters whose manual DNS is 127.0.0.1 while the local DNS service is not
+    /// reachable at all. A sign the TUN session's DNS stayed behind after a sudden
+    /// exit (e.g. the app was killed); the TunState file is gone too, so a normal
+    /// restore would never bring anything back. Reads and reports only; changes nothing.
     /// </summary>
     public static List<TunDnsRecord> FindDeadStubAdapters()
     {
         var list = new List<TunDnsRecord>();
         if (!OperatingSystem.IsWindows()) return list;
-        if (IsStubListening()) return list;   // سرویس DNS محلی زنده است؛ پس 127.0.0.1 عمدی است.
+        if (IsStubListening()) return list;   // local DNS service is alive; so 127.0.0.1 is intentional.
         foreach (var nic in NicCandidates())
         {
             try
@@ -285,9 +285,9 @@ public static class TunDns
     }
 
     /// <summary>
-    /// DNS جامانده‌ی 127.0.0.1 را به حالت خودکار برمی‌گرداند (یا 127.0.0.1 را از لیست حذف می‌کند
-    /// تا DNS دستی دیگرِ کاربر حفظ شود). بدون دسترسی مدیر هیچ کاری نمی‌کند.
-    /// خروجی: تعداد آداپترهای ترمیم‌شده؛ needsAdmin یعنی ترمیم لازم بود ولی دسترسی نبود.
+    /// Returns leftover 127.0.0.1 DNS to automatic (or removes 127.0.0.1 from the list
+    /// to preserve the user's other manual DNS). Does nothing without admin rights.
+    /// Returns the number of repaired adapters; needsAdmin means repair was needed but rights were missing.
     /// </summary>
     public static int SweepDeadAdapters(out bool needsAdmin)
     {
@@ -300,11 +300,11 @@ public static class TunDns
             needsAdmin = true;
             return 0;
         }
-        // مقدارِ واقعیِ قبلی را از TunState بخوان، نه از رویِ لیستِ فعلی حدس بزن.
-        // حدسِ قبلی این بود که «هر سرورِ به‌جز 127.0.0.1 را نگه دار؛ اگر چیزی
-        // نماند DHCP». ولی ما کلِ لیست را جایگزین می‌کنیم، پس وقتی تنظیمِ استاتیکِ
-        // کاربر دقیقاً 127.0.0.1 بوده یا در لیستِ فعلی چیزی جز آن نمانده، keep خالی
-        // می‌شد و تنظیمِ دستیِ او بی‌صدا به DHCP تبدیل می‌شد.
+        // Read the real previous value from TunState instead of guessing from the
+        // current list. The old guess was «keep every server except 127.0.0.1; if
+        // nothing is left, DHCP». But we replace the whole list, so when the user's
+        // static setting was exactly 127.0.0.1 or nothing but it remained in the
+        // current list, keep came out empty and their manual setting silently became DHCP.
         var prevByIfIndex = new Dictionary<int, TunDnsRecord>();
         try
         {
@@ -321,7 +321,7 @@ public static class TunDns
             {
                 if (!known.WasStatic)
                 {
-                    // قبلاً هم خودکار (DHCP) بوده؛ همان را برگردان.
+                    // It was automatic (DHCP) before too; restore that.
                     sb.Append($"Set-DnsClientServerAddress -InterfaceIndex {r.IfIndex} -ResetServerAddresses; ");
                     continue;
                 }
@@ -334,7 +334,7 @@ public static class TunDns
                 }
             }
 
-            // فایلِ وضعیت در دست نیست (مثلاً بعد از حذفِ برنامه)؛ بهترین حدسِ ممکن.
+            // The state file is unavailable (e.g. after uninstalling); best guess possible.
             var keep = r.Servers.Where(s => !string.Equals(s, StubIp, StringComparison.OrdinalIgnoreCase)).ToList();
             if (keep.Count > 0)
                 sb.Append($"Set-DnsClientServerAddress -InterfaceIndex {r.IfIndex} -ServerAddresses @({string.Join(",", keep.Select(Quote))}); ");
@@ -464,8 +464,8 @@ public static class TunDns
             using var p = Process.Start(psi);
             if (p == null) return false;
 
-            // استریم‌ها را قبل از WaitForExit تخلیه می‌کنیم؛ وگرنه پر شدن بافرِ stdout
-            // پروسه را متوقف می‌کند و اسکریپت با timeout بی‌جهت شکست می‌خورد.
+            // We drain the streams before WaitForExit; otherwise a full stdout buffer
+            // stalls the process and the script fails with a pointless timeout.
             var outTask = p.StandardOutput.ReadToEndAsync();
             var errTask = p.StandardError.ReadToEndAsync();
 

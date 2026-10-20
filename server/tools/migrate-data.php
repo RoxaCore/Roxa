@@ -1,19 +1,19 @@
 <?php
 /**
- * مهاجرتِ داده‌ها: بیرون‌بردنِ داده‌ها از webroot + پاک‌سازیِ IPهایِ خام.
+ * Data migration: move data out of the webroot + scrub raw IPs.
  *
- *   php tools/migrate-data.php           فقط گزارش می‌دهد (dry-run)
- *   php tools/migrate-data.php --apply   واقعاً اجرا می‌کند
+ *   php tools/migrate-data.php           report only (dry-run)
+ *   php tools/migrate-data.php --apply   actually perform it
  *
- * دو کار انجام می‌شود:
- *   ۱) اگر داده‌ها هنوز در server/data/ باشند، به DATA_DIRِ بیرونِ وب‌ریشه
- *      منتقل می‌شوند (config.php پیش‌فرض را خارج گذاشته، ولی اگر قبلاً داخلِ
- *      webroot مستقر شده باشید این اسکریپت آن‌ها را جابه‌جا می‌کند).
- *   ۲) هر IPِ خامی که در stats.json یا reports.json مانده باشد، به هشِ نمکیِ
- *      همین سرور تبدیل می‌شود. نمک ساخته می‌شود اگر نباشد.
+ * Two things are done:
+ *   1) If the data still sits in server/data/, it is moved to DATA_DIR outside
+ *      the webroot (config.php defaults outside, but if you had already
+ *      settled inside webroot this script relocates them).
+ *   2) Any raw IP left in stats.json or reports.json is turned into a salted
+ *      hash of this server. The salt is created if missing.
  *
- * نکته: بعد از پاک‌سازی، ISP/ASNِ ثبت‌شده پابرجاست ولی دیگر نمی‌شود IP را
- * برگرداند؛ همین هدف است.
+ * Note: after scrubbing, the recorded ISP/ASN remains but the IP can no longer
+ * be reversed; that is exactly the goal.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -45,7 +45,7 @@ if (is_dir($oldDir)) {
     }
 }
 
-// ۱) جابه‌جایی
+// 1) Relocation
 if ($newDir === $oldDir) {
     echo "skip: DATA_DIR is still the old in-webroot directory (check config.php / ROXA_DATA).\n";
 } elseif ($srcFiles) {
@@ -58,7 +58,7 @@ if ($newDir === $oldDir) {
         echo ($apply ? 'move ' : 'would move ') . $p . ' -> ' . $dst . "\n";
         if ($apply) {
             if (!@rename($p, $dst)) {
-                // rename ممکن است بین دو پارتیشن شکست بخورد؛ کپی+حذف.
+                // rename may fail across two partitions; copy+delete.
                 if (@copy($p, $dst)) {
                     @unlink($p);
                 } else {
@@ -75,7 +75,7 @@ if ($newDir === $oldDir) {
 
 echo "\n";
 
-// ۲) پاک‌سازیِ IPِ خام
+// 2) Scrub raw IPs
 $scrub = static function (string $label, string $file, callable $fix) use ($apply): void {
     if (!is_file($file)) {
         echo "skip: $label (not present)\n";

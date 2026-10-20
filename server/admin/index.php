@@ -3,9 +3,9 @@ require_once __DIR__ . '/_layout.php';
 
 sess_start();
 
-// راه‌اندازیِ پنل از اینجا حذف شده است. ساختِ رمزِ مدیر فقط از راهِ خطِ فرمان
-// (tools/create-admin.php) روی خودِ سرور انجام می‌شود؛ بنابراین هیچ درخواستِ
-// HTTP‌ای — از جمله اسکنرهایی که اول /admin/ را می‌بینند — نمی‌تواند رمز بسازد.
+// Panel bootstrap has been removed from here. Creating the admin password is
+// done only via the command line (tools/create-admin.php) on the server itself;
+// so no HTTP request — including scanners that probe /admin/ first — can set a password.
 if (!is_file(auth_file())) {
     http_response_code(503);
     echo '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">';

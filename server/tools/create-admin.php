@@ -1,16 +1,16 @@
 <?php
 /**
- * ساختِ یا تغییرِ رمزِ مدیر — فقط از راهِ خطِ فرمان روی خودِ سرور.
+ * Create or change the admin password — CLI only, on the server itself.
  *
- *   php tools/create-admin.php            رمز را می‌پرسد
- *   php tools/create-admin.php 'pass…'    رمز را از آرگومان می‌گیرد
+ *   php tools/create-admin.php            prompts for the password
+ *   php tools/create-admin.php 'pass…'    takes the password from the argument
  *
- * چرا CLI و نه صفحهٔ وب؟ ساختِ حساب از راهِ HTTP یعنی هر درخواستِ ناخواسته
- * می‌تواند رمز بسازد، و کلیدِ راه‌اندازیِ وب مجبور بود در access-log هم بماند.
- * اینجا نه توکنی هست نه لاگی.
+ * Why CLI and not a web page? Creating the account over HTTP means any
+ * unwanted request could set a password, and the web bootstrap key would also
+ * remain in the access log. Here there is neither token nor log.
  */
 
-// زیرِ وب‌سرور اجرا نشود — نه فایل‌ها را بخواند نه رمز بنویسد.
+// Do not run under a web server — it must neither read files nor write a password.
 if (PHP_SAPI !== 'cli') {
     fwrite(STDERR, "This script must be run from the command line.\n");
     exit(1);
@@ -26,7 +26,7 @@ if (!is_dir(DATA_DIR) && !@mkdir(DATA_DIR, 0700, true)) {
 $pw = isset($argv[1]) ? (string)$argv[1] : '';
 if ($pw === '') {
     echo 'New admin password (min 8 characters): ';
-    // stty -echo تا رمز روی صفحه تایپ‌شده تکرار نشود (در صورتِ در دسترس بودن stty).
+    // stty -echo so the typed password is not echoed back (when stty is available).
     if (DIRECTORY_SEPARATOR === '/') {
         @shell_exec('stty -echo 2>/dev/null');
     }
@@ -49,8 +49,8 @@ if ($hash === false) {
 }
 
 $existed = is_file(auth_file());
-// کنارِ هم می‌نویسیم و rename می‌کنیم تا در صورتِ قطعِ برقِ همزمان، رمزِ قبلی
-// از بین نرود و رمزِ جدید هم ناقص نوشته نشود.
+// We write beside it and rename so that in case of a simultaneous power loss,
+// the previous password is not lost and the new one is not written partially.
 $tmp = DATA_DIR . '/.auth.' . bin2hex(random_bytes(6)) . '.tmp';
 if (file_put_contents($tmp, json_encode(['hash' => $hash, 'created' => date('c')], JSON_UNESCAPED_SLASHES), LOCK_EX) === false) {
     fwrite(STDERR, 'Cannot write ' . $tmp . "\n");

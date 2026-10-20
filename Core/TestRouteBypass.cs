@@ -29,7 +29,7 @@ public sealed class TestRouteScope : IDisposable
 
     internal void Track(string ip) { lock (_ips) _ips.Add(ip); }
 
-    /// <summary>آیا واقعاً مسیری برای دور زدن اضافه شده است؟ (برای نمایش پیام در لاگ/وضعیت)</summary>
+    /// <summary>Has a bypass route actually been added? (for showing a message in the log/status)</summary>
     public bool HasRoutes { get { lock (_ips) return _ips.Count > 0; } }
 
     public void Dispose()
@@ -38,8 +38,8 @@ public sealed class TestRouteScope : IDisposable
         _disposed = true;
         string[] ips;
         lock (_ips) { ips = _ips.ToArray(); _ips.Clear(); }
-        // route delete پروسه‌محور است و Dispose روی رشتهٔ UI صدا زده می‌شود؛
-        // آزادسازی مسیرها در پس‌زمینه انجام می‌شود تا UI ثانیه‌ای قفل نشود.
+        // route delete is per-process, and Dispose is called on the UI thread;
+        // routes are released in the background so the UI doesn't freeze for seconds.
         if (ips.Length > 0)
             Task.Factory.StartNew(() =>
             {
@@ -55,12 +55,12 @@ public static class TestRouteBypass
         public string Via = "";
         public int Refs;
 
-        // مسیرِ ازپیش‌موجودِ خودِ کاربر برایِ همین IP، اگر قبل از ما آنجا بوده.
+        // The user's own pre-existing route for this IP, if one was there before us.
         //
-        // بدونِ این، delete در خطِ افزودن و باز هم delete در Release یعنی نابودیِ
-        // دائمیِ مسیری که هیچ‌کس نمی‌دانسته وجود داشته — کاربر ممکن است برایِ یک
-        // میزبانِ خاص مسیرِ ثابتِ دستی گذاشته باشد و ما بی‌خبر آن را پاک می‌کنیم.
-        // null یعنی چیزی نبوده، یا چیزی بوده که قابلِ بازسازی نیست (مثلاً On-link).
+        // Without this, delete at add time and delete again in Release means the
+        // permanent destruction of a route nobody knew existed — the user may have
+        // set a fixed manual route for a specific host, and we wipe it unknowingly.
+        // null means there was nothing, or something not reconstructable (e.g. On-link).
         public string? OriginalVia;
     }
 
@@ -78,8 +78,8 @@ public static class TestRouteBypass
     public static bool IsBypassing => !TestsViaTun && AdminHelper.IsRunningAsAdmin() && TunManager.IsCaptureActive;
 
     /// <param name="forceDirect">
-    /// برای تشخیص سلامت مسیر مستقیم (چک اینترنت): حتی وقتی «تست از مسیر تونل»
-    /// تنظیم شده هم بایپس ساخته شود، چون تونلِ بعد از تعویض شبکه ممکن است مرده باشد.
+    /// For probing the health of the direct route (internet check): build the bypass
+    /// even when «تست از مسیر تونل» is set, because the tunnel may be dead after a network change.
     /// </param>
     public static async Task<TestRouteScope> BeginAsync(IEnumerable<string?>? hosts, bool forceDirect = false)
     {
@@ -88,9 +88,9 @@ public static class TestRouteBypass
         {
             if ((!forceDirect && TestsViaTun) || hosts == null) return scope;
             if (!AdminHelper.IsRunningAsAdmin()) return scope;
-            // دور زدن لازم است وقتی TUN خودمان فعال باشد یا TUNِ بیگانه‌ای (مثل v2rayN)
-            // مسیر پیش‌فرض را بگیرد؛ در حالت عادی (بدون TUN) مسیرِ عادی همان مستقیم است
-            // و نیازی به اضافه‌کردن مسیر نیست.
+            // Bypassing is needed when our own TUN is active or a foreign TUN (like v2rayN)
+            // takes the default route; in the normal case (no TUN) the normal route is the
+            // direct one and there is no need to add a route.
             if (!TunManager.IsCaptureActive && !TunManager.AnyTunDefaultRoute()) return scope;
 
             var wanted = new List<string>();
@@ -102,9 +102,9 @@ public static class TestRouteBypass
             }
             if (wanted.Count == 0) return scope;
 
-            // route print (Gateway) و حلقهٔ route delete/add پروسه‌محورند. اینها قبلاً
-            // روی رشتهٔ UI اجرا می‌شدند و هر TCP ping در اتصال هوشمند/تست‌ها UI را
-            // چند صد میلی‌ثانیه می‌گرفت؛ اکنون در پس‌زمینهٔ LongRunning اجرا می‌شوند.
+            // route print (Gateway) and the route delete/add loop are process-based. These
+            // used to run on the UI thread, and every TCP ping in smart-connect/tests held
+            // the UI for hundreds of milliseconds; now they run in a LongRunning background.
             string? via = await Task.Run(Gateway);
             if (via == null) return scope;
 
@@ -126,8 +126,8 @@ public static class TestRouteBypass
                         }
                         else
                         {
-                            // قبل از دست‌زدن ببین خودِ کاربر مسیری برایِ این IP
-                            // دارد یا نه؛ اگر داشته باشد باید بعداً برگردانده شود.
+                            // Before touching anything, check whether the user has a
+                            // route for this IP; if so, it must be restored later.
                             string? original = TunManager.GetHostRouteVia(ip);
 
                             TunManager.RunRoute($"delete {ip} mask 255.255.255.255");
@@ -139,8 +139,8 @@ public static class TestRouteBypass
                             }
                             else if (original != null)
                             {
-                                // مسیرِ کاربر را پاک کردیم ولی مسیرِ خودمان ساخته
-                                // نشد؛ بی‌صدا رهایش نکن.
+                                // We deleted the user's route but ours failed to
+                                // be created; don't silently leave it.
                                 try { TunManager.RunRoute($"add {ip} mask 255.255.255.255 {original}"); } catch { }
                                 TunManager.Log($"host route restore failed for {ip} -> {original}");
                             }
@@ -171,9 +171,9 @@ public static class TestRouteBypass
     }
 
     /// <summary>
-    /// مسیرِ خودِ کاربر را برمی‌گرداند. فقط وقتی یک گیت‌ویِ واقعی داشته؛ On-link و
-    /// هر چیزِ دیگر قابلِ بازسازی با route.exe نیست و لاگ می‌شود تا حداقل معلوم باشد
-    /// چه چیزی از دست رفته.
+    /// Restores the user's own route. Only when it had a real gateway; On-link and
+    /// anything else cannot be rebuilt with route.exe, and it gets logged so at
+    /// least it's known what was lost.
     /// </summary>
     private static void RestoreOriginal(string ip, string? original)
     {
@@ -192,7 +192,7 @@ public static class TestRouteBypass
     }
 
     /// <summary>
-    /// بازنویسیِ فایلِ پشتیبان از رویِ وضعیتِ فعلی. باید داخلِ _lock صدا زده شود.
+    /// Rewrites the backup file from the current state. Must be called inside _lock.
     /// </summary>
     private static void SaveHeld()
     {
@@ -205,19 +205,19 @@ public static class TestRouteBypass
                 lines.Add($"{kv.Key}\t{kv.Value.Via}\t{kv.Value.OriginalVia ?? ""}");
             File.WriteAllLines(HeldFile, lines);
         }
-        catch { /* اگر نوشتِ نشد، فقط شبکهٔ امنِ بعد از کرش را از دست می‌دهیم */ }
+        catch { /* if it didn't write, we only lose the safe network after a crash */ }
     }
 
     /// <summary>
-    /// مسیرهایِ /32 که از اجرایِ قبلی جا مانده‌اند را پاک می‌کند و مسیرِ خودِ کاربر
-    /// را برمی‌گرداند. هم در شروعِ برنامه و هم در <c>--cleanup</c> (هنگامِ حذف) صدا
-    /// زده می‌شود.
+    /// Clears the /32 routes left behind by a previous run and restores the
+    /// user's own route. Called both at program startup and in <c>--cleanup</c>
+    /// (during uninstall).
     ///
-    /// دلیلش فقط کرش نیست: <see cref="TestRouteScope.Dispose"/> آزادسازی را در
-    /// پس‌زمینه می‌گذارد، پس اگر برنامه بلافاصله بعد از تست بسته شود، آن تَک هرگز
-    /// تمام نمی‌شود و مسیرها می‌مانند. اگر بعداً شبکه عوض شود، گیت‌ویِ مرده سرِ جایش
-    /// می‌ماند و IPِ سرور — دقیقاً چیزی که برایِ اتصالِ بعدی لازم است — غیرقابلِ
-    /// دسترس می‌شود.
+    /// The reason is not only crashes: <see cref="TestRouteScope.Dispose"/> defers
+    /// the release into the background, so if the program closes right after a test,
+    /// that task never finishes and the routes stay. If the network later changes,
+    /// the dead gateway remains in place and the server IP — exactly what the next
+    /// connection needs — becomes unreachable.
     /// </summary>
     public static void ReleaseOrphanedHostRoutes()
     {
@@ -240,7 +240,7 @@ public static class TestRouteBypass
 
                 lock (_lock)
                 {
-                    if (_held.ContainsKey(ip)) continue;   // همین حالا زنده و نگه‌داشته شده
+                    if (_held.ContainsKey(ip)) continue;   // alive and held right now
                 }
 
                 try { TunManager.RunRoute($"delete {ip} mask 255.255.255.255"); } catch { }
@@ -249,9 +249,9 @@ public static class TestRouteBypass
             catch { }
         }
 
-        // فقط وقتی فایل را پاک کن که چیزِ زنده‌ای نمانده. وگرنه رکوردِ مسیرهایِ
-        // همین حالا نگه‌داشته‌شده را هم می‌سوزانیم و اگر همان لحظه کرش کنیم، همان
-        // مسیرها بی‌صاحب می‌شوند.
+        // Only delete the file when nothing alive remains. Otherwise we also burn
+        // the records of routes currently being held, and if we crash at that very
+        // moment those routes become ownerless.
         lock (_lock)
         {
             if (_held.Count > 0)

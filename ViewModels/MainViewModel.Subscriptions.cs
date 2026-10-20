@@ -34,8 +34,8 @@ namespace Roxa.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
 
-    /// <summary>آدرس پروکسیِ موتور برای دریافت اشتراک (فقط وقتی وصل باشد)؛
-    /// فقط تعیین‌کنندهٔ ترتیبِ زنجیرهٔ خودکار است، نه محدودیت.</summary>
+    /// <summary>The engine's proxy address for fetching subscriptions (only while connected);
+    /// it only sets the order of the automatic chain, it is not a limit.</summary>
     private string? EngineSubProxy => IsConnected && _engine.HttpPort > 0 ? $"127.0.0.1:{_engine.HttpPort}" : null;
 
     private static string GuessSubName(string url)
@@ -64,8 +64,8 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             Status = string.Format(TranslationManager.Instance["Status_Fetching"], name);
-            // زنجیرهٔ خودکار: پروکسی/مستقیم/پروکسی سیستم — قبلاً فقط یک مسیر زده می‌شد
-            // و شکستِ آن (مثلاً به‌خاطر DNS جاماندهٔ TUN) کل افزودن را خراب می‌کرد.
+            // Automatic chain: proxy/direct/system proxy — previously only one path was
+            // tried and its failure (e.g. because of a leftover TUN DNS) broke the whole add.
             var (servers, subInfo) = await SubscriptionManager.FetchSmartAsync(
                 url, EngineSubProxy, preferDirect: !UseProxyForSubscriptions,
                 progress: s => { Status = s; AppendLog(s); });
@@ -106,8 +106,8 @@ public partial class MainViewModel : ViewModelBase
         {
             Enrich(server);
             server.SubscriptionName = subName;
-            // تشخیص تکراری با کلید واحد (آدرس+پورت+پروتکل+ترنسپورت)، نه با لینک کامل؛
-            // قبلاً نام داخل لینک بود و همان گره با نام متفاوت دوباره اضافه می‌شد.
+            // Duplicate detection with the single key (address+port+protocol+transport), not
+            // the full link; previously the name was in the link, so one node could return twice.
             string fdk = DupeKey(server);
             if (Servers.Any(s => string.Equals(DupeKey(s), fdk, StringComparison.Ordinal))) continue;
                 Servers.Insert(0, server);
@@ -288,9 +288,9 @@ public partial class MainViewModel : ViewModelBase
          AppendLog(string.Format(TranslationManager.Instance["Log_SubRemoved"], sub.Name));
      }
 
-    /// <summary>طرحِ فایلِ خروجی/ورودی: فقط نام و لینک. بقیهٔ فیلدها مربوطِ به
-    /// ماشینِ قبلی‌اند (تاریخِ آخرین بروزرسانی، شمارندهٔ سرور، مصرف) و بازیابی
-    /// نمی‌شوند؛ خودِ سرورها با بروزرسانیِ بعدی دوباره ساخته می‌شوند.</summary>
+    /// <summary>Export/import file schema: name and link only. The other fields belong to
+    /// the previous machine (last-update date, server counters, usage) and are not
+    /// restored; the servers themselves are rebuilt on the next refresh.</summary>
     private sealed class SubExportEntry
     {
         public string Name { get; set; } = "";
@@ -301,13 +301,13 @@ public partial class MainViewModel : ViewModelBase
         => handler == null ? Task.FromResult<string?>(null) : handler();
 
     /// <summary>
-    /// خروجیِ اشتراک‌ها در یک فایلِ JSON.
+    /// Exports the subscriptions to a JSON file.
     ///
-    /// عمداً متنِ ساده است نه DPAPI: خودِ مشکل همین است که DPAPI به حسابِ ویندوزِ
-    /// همین ماشین گره می‌خورد، و کاربر برایِ انتقال به ماشینِ دیگر یا نگه‌داشتنِ
-    /// نسخهٔ پشتیبانِ پیش از تعویضِ ویندوز به فایلی نیاز دارد که به حسابِ خاصی
-    /// وابسته نباشد. فایلِ نتیجه لینکِ اشتراک را خوانا دارد و باید مثلِ خودِ
-    /// لینک محافظت شود — Hint در رابطِ کاربری همین را می‌گوید.
+    /// Deliberately plain text, not DPAPI: the very problem is that DPAPI is tied to
+    /// this machine's Windows account, and the user needs a file for moving to another
+    /// machine or keeping a backup before reinstalling Windows that does not depend on
+    /// any one account. The resulting file holds the subscription link in readable form
+    /// and must be protected like the link itself — the UI Hint says exactly that.
     /// </summary>
     [RelayCommand]
     private async Task ExportSubscriptions()
@@ -316,7 +316,7 @@ public partial class MainViewModel : ViewModelBase
         { ToastHandler?.Invoke(TranslationManager.Instance["Toast_SubExportNone"]); return; }
 
         string? path = await PickPath(ExportSubsHandler);
-        if (string.IsNullOrWhiteSpace(path)) return;   // کاربر انصراف داد
+        if (string.IsNullOrWhiteSpace(path)) return;   // the user cancelled
 
         try
         {
@@ -338,12 +338,12 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// ورودیِ اشتراک‌ها از فایل.
+    /// Imports subscriptions from a file.
     ///
-    /// هیچ‌چیز حذف یا جایگزین نمی‌شود: لینکی که از قبل هست رد می‌شود، و اشتراکِ
-    /// تکراریِ همنام مقدارِ متمایز می‌گیرد تا اسم از دست نرود. سرورهای هر اشتراکِ
-    /// تازه با همان مسیرِ دکمهٔ بروزرسانی واکشی می‌شوند؛ وگرنه بازیابیِ پشتیبان
-    /// فهرستی خالی به کاربر می‌داد.
+    /// Nothing is deleted or replaced: an existing link is skipped, and a duplicate
+    /// subscription with the same name gets a distinct value so no name is lost. The
+    /// servers of each new subscription are fetched along the same path as the refresh
+    /// button; otherwise a restored backup would hand the user an empty list.
     /// </summary>
     [RelayCommand]
     private async Task ImportSubscriptions()
@@ -365,7 +365,7 @@ public partial class MainViewModel : ViewModelBase
                 string url = (e.Url ?? "").Trim();
                 if (url.Length == 0) { skipped++; continue; }
                 if (Subscriptions.Any(x => string.Equals(x.Url, url, StringComparison.Ordinal)))
-                { skipped++; continue; }   // همان لینک از قبل هست
+                { skipped++; continue; }   // that link already exists
                 string name = string.IsNullOrWhiteSpace(e.Name) ? GuessSubName(url) : e.Name.Trim();
                 if (Subscriptions.Any(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase)))
                     name = name + "-" + DateTime.Now.ToString("MMdd-HHmm");
@@ -450,8 +450,8 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// عیب‌یابی زنجیره‌ی دریافت اشتراک: DNS سیستم (و ترمیم DNS جامانده) ← پروکسی ← دریافت HTTP ← نسخه‌ی موتور.
-    /// جزئیات در سربرگ «لاگ» نمایش داده می‌شود.
+    /// Diagnosing the subscription fetch chain: system DNS (and repairing a leftover DNS)
+    /// ← proxy ← HTTP fetch ← engine version. Details are shown in the "log" tab.
     /// </summary>
     [RelayCommand]
     private async Task DiagnoseSubscriptions()
@@ -476,9 +476,9 @@ public partial class MainViewModel : ViewModelBase
             Status = summary;
             AppendLog(summary);
             ToastHandler?.Invoke(summary);
-            // طبق درخواست: بعد از پایان عیب‌یابی، برنامه یک‌بار کامل بسته شود و در
-            // تب «اشتراکات» باز شود؛ تأخیر کوتاه تا خلاصه دیده شود و اتصال با
-            // --reconnect (توسط handler ری‌استارت) حفظ شود.
+            // Per request: after diagnostics finish, the app fully closes once and reopens on
+            // the "subscriptions" tab; a short delay so the summary is seen, and the
+            // connection is kept with --reconnect (handled by the restart handler).
             await Task.Delay(1800);
             RestartRequested?.Invoke("--tab subscriptions");
         }

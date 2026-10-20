@@ -42,16 +42,16 @@ public partial class QrShareWindow : Window
         this.FindControl<TextBox>("LinkBox")!.Text = link;
         this.FindControl<Button>("CopyBtn")!.Content = tr["Dlg_CopyLink"];
         this.FindControl<Button>("CloseBtn")!.Content = tr["Dlg_Close"];
-        // XAML این پنجره را ثابت RightToLeft کرده بود؛ باید از زبانِ فعال بیاید.
-        // enum را واجد می‌نویسیم چون FlowDirection رویِ خودِ Window هم پراپرتی است
-        // و در Avalonia.Media تعریف شده (نه Avalonia.Layout).
+        // XAML had this window hard-coded to RightToLeft; it must follow the active language.
+        // The enum is written fully qualified because FlowDirection is also a property
+        // on Window itself and lives in Avalonia.Media (not Avalonia.Layout).
         FlowDirection = tr.IsRightToLeft
             ? Avalonia.Media.FlowDirection.RightToLeft
             : Avalonia.Media.FlowDirection.LeftToRight;
         RenderQr(link);
     }
 
-    // برای دیزاینر
+    // For the designer
     public QrShareWindow()
     {
         InitializeComponent();
@@ -77,7 +77,7 @@ public partial class QrShareWindow : Window
         }
         catch
         {
-            // async void؛ استثنا نباید از اینجا رد شود و برنامه را بیندازد.
+            // async void; an exception must not slip through here and take the app down.
         }
         Close();
     }

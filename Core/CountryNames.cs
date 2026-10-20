@@ -20,10 +20,10 @@
 
 namespace Roxa.Core;
 
-/// <summary>نام کشورها به زبان‌های مختلف رابط — برای نمایش به‌جای کد دوحرفی.</summary>
+/// <summary>Country names in the various UI languages — shown instead of the two-letter code.</summary>
 internal static class CountryNames
 {
-    // ترتیب زبان‌ها در هر ردیف: fa en ar zh ru tr ur es fr ko de ja pt hi
+    // Language order in each row: fa en ar zh ru tr ur es fr ko de ja pt hi
     private static readonly string[] Langs = ["fa", "en", "ar", "zh", "ru", "tr", "ur", "es", "fr", "ko", "de", "ja", "pt", "hi"];
 
     public static string? Get(string code, string lang)
@@ -115,6 +115,6 @@ internal static class CountryNames
         "SI|اسلوونی|Slovenia|سلوفينيا|斯洛文尼亚|Словения|Slovenya|سلووینیا|Eslovenia|Slovénie|슬로베니아|Slowenien|スロベニア|Eslovênia|स्लोवेनिया",
     ];
 
-    // باید بعد از Rows تعریف شود؛ وگرنه Build() موقع مقداردهی Rows را null می‌بیند.
+    // Must be declared after Rows, otherwise Build() sees Rows as null while assigning it.
     private static readonly Dictionary<string, string[]> Map = Build();
 }

@@ -25,7 +25,7 @@ using Roxa.Models;
 
 namespace Roxa.Core;
 
-/// <summary>ساخت کانفیگ JSON موتور xray از روی یک سرور.</summary>
+/// <summary>Builds the xray engine JSON config from a server.</summary>
 public static class XrayConfigBuilder
 {
     public static bool LastDnsStub { get; private set; }
@@ -44,15 +44,15 @@ public static class XrayConfigBuilder
         new(PrivateIpCidrs.Select(c => (JsonNode)c).ToArray());
 
     /// <summary>
-    /// ثانیه‌های بی‌حرکتی پیش از بسته‌شدن یک اتصال/نشست در موتور.
-    /// پیش‌فرضِ xray سیصد ثانیه است؛ در حالت TUN نشست‌های UDP کشفِ شبکه
-    /// تا آن موقع باز می‌مانند و هندل/حافظه انباشته می‌کنند.
-    /// مقدار عمداً شصت ثانیه گذاشته شده تا QUIC/HTTP3 (که فاصله‌های
-    /// بی‌حرکتِ طبیعی دارد) آسیب نبیند.
+    /// Idle seconds before the engine closes a connection/session.
+    /// xray's default is three hundred seconds; in TUN mode network-discovery UDP sessions
+    /// stay open until then and pile up handles/memory.
+    /// The value is deliberately set to sixty seconds so QUIC/HTTP3 (which has
+    /// natural idle gaps) is not hurt.
     /// </summary>
     private const int ConnIdleSeconds = 60;
 
-    /// <summary>فقط <c>connIdle</c> تنظیم می‌شود؛ بقیهٔ فیلدها پیش‌فرض خودِ موتور می‌مانند.</summary>
+    /// <summary>Only <c>connIdle</c> is set; the remaining fields keep the engine's own defaults.</summary>
     private static JsonObject BuildPolicy() =>
         new()
         {
@@ -83,17 +83,17 @@ public static class XrayConfigBuilder
                 ["domainStrategy"] = "AsIs",
                 ["rules"] = new JsonArray
                 {
-                    // پورت‌های کشفِ شبکه را از همان اول می‌بندیم. این‌ها بِرودکستِ
-                    // لوکال‌اند و نباید هرگز واردِ تونل شوند: 137/138 (NBNS)،
-                    // 1900 (SSDP)، 5353 (mDNS)، 5355 (LLMNR) و 1947 (بِرودکستِ
-                    // دانگِلِ HASP). مسیریابیِ ویندوز را نمی‌شد به‌طورِ قطعی
-                    // درستش کرد — subnet-broadcast از رویِ آدرسِ آداپتور محاسبه
-                    // می‌شود، نه از رویِ جدولِ مسیر — و هر بار که آن بسته‌ها
-                    // وارد می‌شدند xray به‌ازایِ هر کدام یک نشستِ UDP باز می‌کرد:
-                    // در یک نوبت ۱۶٬۳۰۹ بسته در یک دقیقه ثبت شد و حافظه‌اش تا
-                    // ۹۴۱ مگابایت با ۱۶٬۷۰۰ هندل بالا رفت. اینجا قبل از هر قانونِ
-                    // دیگری می‌آیند تا blackhole آن‌ها را بی‌آنکه socketی باز کند
-                    // دور بریزد.
+                    // We block the network-discovery ports right from the start. These are local
+                    // broadcasts and must never enter the tunnel: 137/138 (NBNS),
+                    // 1900 (SSDP), 5353 (mDNS), 5355 (LLMNR) and 1947 (broadcast of the
+                    // HASP dongle). Windows routing could not be fixed for certain —
+                    // subnet-broadcast is computed from the adapter address, not from
+                    // the routing table — and every time those packets came in, xray
+                    // opened one UDP session per packet: in one run 16,309 packets
+                    // were logged in a single minute and its memory climbed to 941 MB
+                    // with 16,700 handles. They come before every other rule so that
+                    // blackhole discards them without opening
+                    // a socket.
                     new JsonObject
                     {
                         ["type"] = "field",
@@ -467,9 +467,9 @@ public static class XrayConfigBuilder
             "dns" => "header-dns",
             "wechat" or "wechat-video" => "header-wechat",
             "wireguard" => "header-wireguard",
-            // مقادیر خام finalmask که خودِ لینک صریحا با پیشوند header- نوشته
-            // (مثلا از سمت سرور با نسخه‌ی جدیدتر موتور) همان‌طور عبور داده می‌شوند
-            // تا بی‌صدا حذف نشوند و اتصال به خاطر ناهماهنگیِ obfuscation نشکند.
+            // Raw finalmask values that the link itself explicitly writes with the header- prefix
+            // (e.g. from the server side running a newer engine version) are passed through as-is
+            // so they are not silently dropped and the connection does not break over obfuscation mismatch.
             _ => IsRawFinalmaskId(t) ? t : null
         };
     }
@@ -523,8 +523,8 @@ public static class XrayConfigBuilder
 
         var routingRules = new JsonArray
         {
-            // همان قانونِ بستنِ بِرودکست‌های کشفِ شبکه (NBNS/SSDP/mDNS/LLMNR/HASP)
-            // که در سازندهٔ تک‌سرور هم هست؛ اینجا هم لازم است.
+            // The same rule that blocks the network-discovery broadcasts (NBNS/SSDP/mDNS/LLMNR/HASP)
+            // as in the single-server builder; it is needed here too.
             new JsonObject
             {
                 ["type"] = "field",

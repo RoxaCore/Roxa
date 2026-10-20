@@ -4,11 +4,11 @@ require_auth();
 
 $store = jread(DATA_DIR . '/reports.json', ['seq' => 0, 'items' => []]);
 
-// سقفِ نگهداریِ برچسبِ منبع: پنل جایی است که `src` دیده می‌شود، پس همین‌جا هم
-// اعمال می‌شود — وگرنه گزارشِ قدیمی فقط تا وقتی گزارشِ تازه‌ای برسد برچسبِ منبع
-// می‌داشت، که در عمل یعنی ممکن بود برایِ همیشه بماند. زیرِ همان قفلِ jupdate
-// می‌رویم تا با نوشتنِ همزمانِ خودِ report.php گزارشی از دست نرود، و فقط وقتی
-// چیزی واقعاً عوض شده می‌نویسیم تا بازدیدِ پرترافیک اثری رویِ دیسک نگذارد.
+// Retention of the source label: the panel is where `src` is seen, so it is
+// enforced here too — otherwise an old report kept its source label only until
+// a fresh one arrived, which in practice could mean it stayed forever. We enter
+// the same jupdate lock so no report is lost to report.php writing at the same
+// time, and write only when something really changed so a busy visit leaves no disk trace.
 $srcChanged = false;
 jupdate(DATA_DIR . '/reports.json', function (array $s) use (&$srcChanged) {
     $p = reports_prune_src($s);
@@ -128,7 +128,7 @@ if (!$items) {
         }
         $src = (string)($it['src'] ?? '');
         if ($src === '') {
-            $src = (string)($it['ip'] ?? '');  // دادهٔ قدیمی
+            $src = (string)($it['ip'] ?? '');  // legacy data
         }
         if ($src !== '') {
             echo '<br><small class="mono" style="color:#6b7280">منبع ' . h(src_short($src)) . '</small>';

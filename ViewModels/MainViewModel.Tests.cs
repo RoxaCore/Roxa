@@ -65,24 +65,24 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// سقف همزمانی «تست کامل» — عمدتاً کمتر از تست تک‌مرحله‌ای.
-    /// مرحلهٔ سرعت برای هر سرور یک پروسهٔ xray تازه می‌سازد؛ بالابردنش باعث
-    /// پرش ناگهانی CPU/رم و کندی کل سیستم می‌شود.
+    /// Concurrency cap for the "full test" — deliberately lower than the single-stage test.
+    /// The speed stage builds a fresh xray process per server; raising it causes a
+    /// sudden CPU/RAM spike and slows the whole system down.
     /// </summary>
     private const int FullTestPingConcurrency = 4;
     private const int FullTestSpeedConcurrency = 2;
 
-    /// <summary>مکث بین شروع سرورهای پشت‌سرهم (میلی‌ثانیه) تا اتصال‌ها/پروسه‌ها پلکانی بالا بیایند.</summary>
+    /// <summary>Delay between starting back-to-back servers (milliseconds) so connections/processes come up staggered.</summary>
     private const int FullTestStaggerMs = 75;
 
-    /// <summary>مکث بین مراحل سه‌گانه تا رشتهٔ UI نفس بکشد و پروسه‌های مرحلهٔ قبل بسته شوند.</summary>
+    /// <summary>Pause between the three stages so the UI thread can breathe and the previous stage's processes close.</summary>
     private const int FullTestSettleMs = 300;
 
     /// <summary>
-    /// اجرای پلکانی آیتم‌ها با سقف همزمانی و مکث کوتاه بین شروع‌ها.
-    /// برخلاف <c>Task.WhenAll</c> روی کل لیست، اینجا همهٔ تسک‌ها یک‌جا ساخته نمی‌شوند؛
-    /// هر آیتم پس از آزادشدن جای خالی و گذشت مکث، تازه شروع می‌شود.
-    /// به این ترتیب هم UI قفل نمی‌شود و هم منابع به‌یک‌باره اشباع نمی‌شوند.
+    /// Runs the items staggered, with a concurrency cap and a short delay between starts.
+    /// Unlike <c>Task.WhenAll</c> over the whole list, the tasks are not all built at
+    /// once here; each item starts only after a slot frees up and the delay has passed.
+    /// That way the UI does not lock and resources are not saturated in one go.
     /// </summary>
     private static async Task RunThrottledAsync(
         IReadOnlyList<ServerInfo> targets,
@@ -120,8 +120,8 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// توقف کوتاه برای دادن فرصت به رشتهٔ UI: رویدادهای عقب‌ماندهٔ CollectionChanged و
-    /// به‌روزرسانی Status تخلیه می‌شوند و پروسه‌های xray مرحلهٔ قبل فرصت بسته‌شدن پیدا می‌کنند.
+    /// A short stop to give the UI thread a chance: queued CollectionChanged events and
+    /// Status updates are flushed and the previous stage's xray processes get to close.
     /// </summary>
     private static async Task SettleBeforeUiAsync(CancellationToken ct)
     {
@@ -147,7 +147,7 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (OperationCanceledException)
         {
-            // لغو؛ سرورهای بی‌نتیجه در پایین علامت‌گذاری می‌شوند.
+            // Cancelled; servers with no result are marked at the bottom.
         }
         catch (Exception ex)
         {
@@ -313,7 +313,7 @@ public partial class MainViewModel : ViewModelBase
         finally { IsTesting = false; }
     }
 
-    // ---------- انتخاب چندتایی ----------
+    // ---------- multi-select ----------
     public string SelectedCountText => SelectedCount > 0 ? string.Format(TranslationManager.Instance["SelectedCount"], SelectedCount) : "";
     private bool HasSelection() => SelectedCount > 0;
 
@@ -544,9 +544,9 @@ public partial class MainViewModel : ViewModelBase
      }
 
      /// <summary>
-     /// تست کامل گروه: ابتدا پینگ (سریع‌ترین تست)، سپس تأخیر واقعی و در پایان تست سرعت.
-     /// هر سه مرحله با یک توکن لغو مشترک اجرا می‌شوند تا دکمهٔ «توقف» کل زنجیره را متوقف کند؛
-     /// پس از هر مرحله، اگر لغو شده باشد مرحلهٔ بعد اجرا نمی‌شود.
+     /// Full group test: first ping (the fastest test), then real delay, then the speed test.
+     /// All three stages share one cancellation token so the "stop" button halts the whole chain;
+     /// after each stage, when cancelled, the next stage does not run.
      /// </summary>
      [RelayCommand]
      private async Task TestGroupFull(ServerGroup? group)
@@ -557,7 +557,7 @@ public partial class MainViewModel : ViewModelBase
          IsTesting = true;
          try
          {
-             // ---- مرحله ۱: پینگ TCP (سریع‌ترین) ----
+             // ---- stage 1: TCP ping (the fastest) ----
              BeginTestProgress(targets.Count);
              Status = string.Format(TranslationManager.Instance["Status_GroupPing"], group!.Title, targets.Count);
              foreach (var s in targets) { s.LatencyMs = -1; s.PingMs = -1; }
@@ -577,7 +577,7 @@ public partial class MainViewModel : ViewModelBase
              EndTestProgress();
              if (ct.IsCancellationRequested) return;
 
-             // ---- مرحله ۲: تأخیر واقعی ----
+             // ---- stage 2: real delay ----
              await SettleBeforeUiAsync(ct);
              BeginTestProgress(targets.Count);
              Status = string.Format(TranslationManager.Instance["Status_GroupReal"], group.Title, targets.Count);
@@ -588,7 +588,7 @@ public partial class MainViewModel : ViewModelBase
              EndTestProgress();
              if (ct.IsCancellationRequested) return;
 
-             // ---- مرحله ۳: تست سرعت ----
+             // ---- stage 3: speed test ----
              BeginTestProgress(targets.Count);
              Status = string.Format(TranslationManager.Instance["Status_GroupSpeed"], group.Title, targets.Count);
              foreach (var s in targets) s.RecordSpeed(-1);
@@ -638,7 +638,7 @@ public partial class MainViewModel : ViewModelBase
          finally { IsTesting = false; }
      }
 
-     // ---------- تب تأخیر واقعی ----------
+     // ---------- real delay tab ----------
      [RelayCommand]
      private async Task TestRealDelayAll()
      {
@@ -707,14 +707,14 @@ public partial class MainViewModel : ViewModelBase
         finally { IsTesting = false; }
     }
 
-    // ---------- اشتراک ----------
+    // ---------- subscription ----------
 
 
      [RelayCommand]
      private void StopTest()
      {
-         // CTS را عوض نمی‌کنیم تا تسک‌های در حال اجرا همان توکن لغوشده را ببینند؛
-         // فقط cancel می‌کنیم و dispose را به تأخیر می‌اندازیم (توکن هنوز در دسترس است).
+         // We do not swap the CTS so running tasks keep seeing their cancelled token;
+         // we only cancel and defer dispose (the token is still reachable).
          var cts = _testCts;
          try { cts?.Cancel(); } catch { }
          IsTesting = false;
@@ -724,8 +724,8 @@ public partial class MainViewModel : ViewModelBase
       }
 
     /// <summary>
-    /// برای هر تست یک CTS تازه می‌سازد و CTS قبلی را لغو می‌کند.
-    /// dispose آن را به تعویق می‌اندازیم چون ممکن است هنوز توکنش در دست تسک‌های قبلی باشد.
+    /// Builds a fresh CTS per test and cancels the previous one.
+    /// Its dispose is deferred because its token may still be held by earlier tasks.
     /// </summary>
     private CancellationToken NewTestToken()
     {

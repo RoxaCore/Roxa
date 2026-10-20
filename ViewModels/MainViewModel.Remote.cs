@@ -74,9 +74,9 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             var lang = string.IsNullOrWhiteSpace(_settings.Language) ? "fa" : _settings.Language;
-            // شناسه همین‌جا ساخته نمی‌شود: سازندهٔ اصلی در MainViewModel هنگام
-            // ساخته شدنِ ViewModel کار می‌کند و DeviceId را هم اطلاع می‌دهد؛
-            // تکرارش اینجا فقط نسخهٔ ناقص‌تری بود که OnPropertyChanged را صدا نمی‌زد.
+            // The id is not built here: the main constructor in MainViewModel runs
+            // when the ViewModel is created and also notifies DeviceId; repeating it
+            // here only produced a less complete version that never raised OnPropertyChanged.
             if (!IsConnected)
             {
                 var cc = await Task.Run(() => RemoteConfig.DetectCountryAsync());
@@ -129,10 +129,10 @@ public partial class MainViewModel : ViewModelBase
                     TranslationManager.Instance["Upd_Notify"],
                     string.Format(TranslationManager.Instance["Upd_BannerTitle"], _pendingUpdate.Latest));
             }
-            // نصبِ خودکار عمداً حذف شده: برنامه در این نسخه بستهٔ آپدیت را دانلود نمی‌کند
-            // و --update-apply را هم اجرا نمی‌کند. کارِ بررسیِ نسخه همین‌جا به اعلان و
-            // نشان دادنِ بنر ختم می‌شود؛ دکمهٔ بنر خودِ صفحهٔ ریلیز را باز می‌کند.
-            // پس حتی آپدیتِ اجباری هم فقط اصرار می‌کند، خودش دست به کار نمی‌شود.
+            // Silent install was deliberately removed: this version neither downloads the
+            // update package nor runs --update-apply. Version checking ends here with a
+            // notification and the banner; the banner button simply opens the release page.
+            // So even a forced update only insists — it never acts on its own.
         }
         if (freshAnnouncement != null)
         {
@@ -227,9 +227,9 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void AnnBannerAction()
     {
-        // فقط https. سرور لینکِ اعلان را با همین قاعده می‌نویسد، ولی سمتِ کلاینت
-        // هم باید همین را بخواهد: UseShellExecute یک URI را به هر دست‌کارِ آن
-        // می‌سپارد، و چیزی که از شبکه آمده باید پیش از باز شدن همین‌جا رد شود.
+        // https only. The server writes the announcement link by the same rule, but the
+        // client must demand it too: UseShellExecute hands a URI to whatever handles it,
+        // and anything that came from the network must be filtered here before opening.
         if (_currentAnnouncement is { } ann && !string.IsNullOrWhiteSpace(ann.Url)
             && Uri.TryCreate(ann.Url, UriKind.Absolute, out var uri)
             && uri.Scheme == Uri.UriSchemeHttps)
@@ -246,10 +246,10 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// دکمهٔ بنرِ آپدیت. در این نسخه چیزی دانلود نمی‌شود و آپدیتی اعمال نمی‌شود، پس فقط
-    /// صفحهٔ ریلیز را باز می‌کند. همان قاعدهٔ AnnBannerAction: UseShellExecute یک URI را
-    /// به هر دست‌کارِ آن می‌سپارد، و آنچه از شبکه آمده باید پیش از باز شدن همین‌جا رد شود؛
-    /// فقط https پذیرفته می‌شود.
+    /// The update banner button. This version downloads nothing and applies no update,
+    /// so it only opens the release page. Same rule as AnnBannerAction: UseShellExecute
+    /// hands a URI to whatever handles it, so anything from the network must be filtered
+    /// here before opening; only https is accepted.
     /// </summary>
     [RelayCommand]
     private void BannerAction()

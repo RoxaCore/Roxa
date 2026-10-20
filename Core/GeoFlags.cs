@@ -24,7 +24,7 @@ using System.Text.RegularExpressions;
 
 namespace Roxa.Core;
 
-/// <summary>تشخیص کشور از روی اسم/آدرس + ایموجی پرچم.</summary>
+/// <summary>Country detection from name/address plus the flag emoji.</summary>
 public static class GeoFlags
 {
     internal static readonly HashSet<string> IsoCodes = new(StringComparer.OrdinalIgnoreCase)
@@ -69,7 +69,7 @@ public static class GeoFlags
         return new string(new[] { c1, c2 });
     }
 
-    /// <summary>نام کامل کشور به زبان فعلی رابط؛ اگر ترجمه نبود نام بومی، وگرنه کد.</summary>
+    /// <summary>Full country name in the current UI language; native name when untranslated, else the code.</summary>
     public static string CountryName(string code)
     {
         if (string.IsNullOrEmpty(code) || code.Length != 2 || !IsoCodes.Contains(code)) return "";

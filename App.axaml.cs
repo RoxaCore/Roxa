@@ -53,20 +53,20 @@ public partial class App : Application
         TranslationManager.Instance.SetCulture(lang);
         TunRecovery.RecoverOnStartup();
         TunKillSwitch.CleanupLeftovers();
-        // قانون‌های RoxaTunExcl_ هم باید جاروب شوند؛ SyncRules فقط هنگامِ
-        // اتصالِ TUN اجرا می‌شود و اگر برنامه هنگامِ وصل کرش کرده باشد، این
-        // قانون‌ها برنامهٔ کاربر را تا اتصالِ بعدی بدونِ هیچ توضیحی کند می‌کنند.
+        // The RoxaTunExcl_ rules must be swept too; SyncRules only runs while
+        // TUN is connecting, and if the app crashed mid-connect these rules
+        // silently slow the user's apps down until the next connection.
         try { TunExclusion.CleanupLeftovers(); } catch { }
-        // مسیرهایِ /32 که از اجرایِ قبلی جا مانده‌اند (کرش یا خروجِ وسطِ تست). بدونِ
-        // این، اگر شبکه عوض شود گیت‌ویِ مرده سرِ جایش می‌ماند و IPِ سرور غیرقابلِ
-        // دسترس می‌شود.
+        // /32 routes left by a previous run (crash or exit mid-test). Without
+        // this, after a network change the dead gateway stays put and the
+        // server IP becomes unreachable.
         try { TestRouteBypass.ReleaseOrphanedHostRoutes(); } catch { }
-        // فایل‌های کانفیگِ موقتِ نشست‌های قبلی (که شناسهٔ سرور در نامشان هست و
-        // با هر بار به‌روزرسانیِ اشتراک تازه‌ای می‌ماند) باید از اینجا جمع شوند.
+        // Temp config files from previous sessions (server id in the name, a
+        // new one left on every subscription refresh) must be swept from here.
         try { XrayEngine.SweepTempConfigs(); } catch { }
         AppDomain.CurrentDomain.ProcessExit += (_, _) =>
         {
-            // آیکون سینی اول پاک شود؛ اگر کار دیگری کند/خطا بدهد نباید شبح بماند.
+            // Dispose the tray icon first so it cannot linger as a ghost if anything else fails.
             try { DisposeTray(); } catch { }
             try { NotificationHelper.Cleanup(); } catch { }
             try { TunKillSwitch.Shutdown(); } catch { }
@@ -74,9 +74,9 @@ public partial class App : Application
         };
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
         {
-            // گزارش کرش: بخش خودکار (exception + stack + لاگ اخیر) در صف نوشته می‌شود
-            // و یا همین‌جا ارسال می‌شود یا در اجرای بعدی برنامه. ارسالش به رضایتِ
-            // کاربر (SendUsageStats) وابسته است؛ نوشتنِ محلی همیشه انجام می‌شود.
+            // Crash report: the automatic part (exception + stack + recent log)
+            // is queued and either sent here or on the next run. Sending depends
+            // on user consent (SendUsageStats); the local write always happens.
             try { BugReport.ReportCrash(e.ExceptionObject as Exception, SafeLogTail()); }
             catch { }
             try { DisposeTray(); } catch { }
@@ -85,11 +85,11 @@ public partial class App : Application
             TunRecovery.EmergencyCleanup();
         };
 
-        // خطاهایِ رابطِ کاربری از همین‌جا می‌گذرند، نه از AppDomain. بدونِ این هندلر،
-        // یک استثنایِ عادی در UI کلِ برنامه را می‌کُشت — و چون خروجِ براثرِ استثنایِ
-        // مهارنشده تضمینی برایِ اجرای ProcessExit ندارد، DNS و پروکسی و TUN را همان
-        // وسطِ حالِ سیستم کاربر رها می‌کرد. اینجا ثبت می‌شود و اجازهٔ ادامه می‌دهیم
-        // تا کاربر بتواند تمیز قطع کند یا حداقل سینیِ سیستم سرِ جایش باشد.
+        // UI errors go through here, not AppDomain. Without this handler an
+        // ordinary UI exception killed the whole app — and because exiting on
+        // an unhandled exception does not guarantee ProcessExit runs, it left
+        // DNS, the proxy and TUN behind in the user's system. Here it is
+        // logged and execution continues, so the user can disconnect cleanly.
         Dispatcher.UIThread.UnhandledException += (_, e) =>
         {
             try { TunManager.Log($"UI exception: {e.Exception}"); }
@@ -99,9 +99,9 @@ public partial class App : Application
             e.Handled = true;
         };
 
-        // استثنایِ یک Task که هیچ‌کس منتظرش نبود فقط موقعِ جمع‌آوریِ زباله منفجر می‌شود
-        // و طبقِ رفتارِ .NET کلِ پروسه را می‌کُشد — ساعت‌ها بعد، بی‌آنکه سرِ کاری
-        // باشد که کاربر می‌فهمد. باید ثبت و خنثی شود.
+        // An exception in a task nobody awaited only explodes during garbage
+        // collection and, per .NET behavior, kills the whole process — hours
+        // later, over work the user cannot connect to. Log and neutralize it.
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
             var agg = e.Exception;
@@ -117,8 +117,8 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// ۴۰ خطِ آخرِ لاگ برایِ ضمیمه به گزارش. جدا شد چون هر سه هندلرِ بالا به همان
-    /// نیاز داشتند و تکرارش سه‌بار یعنی سه‌جا برایِ از‌دست‌رفتنِ سکوت.
+    /// The last 40 log lines to attach to a report. Split out because all three
+    /// handlers above needed it; repeating it was three places to lose silence.
     /// </summary>
     private string SafeLogTail()
     {
@@ -135,8 +135,8 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // از دانشنامهٔ زبان می‌پرسیم، نه از فهرستِ دستی؛ وگرنه زبانی مثلِ اردو
-            // که راست‌به‌چپ است جا می‌ماند و با چیدمانِ چپ‌به‌راست نشان داده می‌شد.
+            // We ask the culture info, not a manual list; otherwise an RTL
+            // language like Urdu was missed and shown with an LTR layout.
             bool isRtl = TranslationManager.Instance.IsRightToLeft;
 
             MainWindow = new MainWindow
@@ -278,12 +278,12 @@ public partial class App : Application
         _traySyncTimer.Tick += (_, _) =>
         {
             if (MainWindow?.DataContext is not MainViewModel vm) return;
-            // اگر ساخت آیکون تری شکست خورده باشد (مثلاً فایل ico موجود نیست) همهٔ
-            // آیتم‌ها null می‌مانند و این تایمر هر ۲ ثانیه برنامه را crash می‌کرد.
+            // If building the tray icon failed (e.g. the ico file is missing),
+            // every item stays null and this timer crashed the app every 2s.
             if (_trayIcon == null || _smartItem == null || _proxyItem == null || _notifItem == null) return;
 
-            // فقط وقتی مقدار واقعاً عوض شده می‌نویسیم؛ نوشتنِ بی‌قید و شرط هر ۲ ثانیه
-            // پنجرهٔ سینیِ ویندوز را هربار به‌روزرسانی می‌کرد و رویدادِ پیامِ سینی می‌ساخت.
+            // Write only when the value really changed; writing every 2s
+            // refreshed the tray window and raised tray messages each time.
             if (vm.IsSmartConnecting)
             {
                 SetIfChanged(ref _smartHeader, TranslationManager.Get("Tray_Stop"), v => _smartItem.Header = v);
@@ -347,7 +347,7 @@ public partial class App : Application
             catch { }
             finally
             {
-                // حتی اگر توقف موتور خطا بدهد، پروسه نباید زامبی بماند.
+                // Even if stopping the engine errors, the process must not stay a zombie.
                 try { MainWindow?.ForceClose(); } catch { }
             }
         });

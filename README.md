@@ -7,13 +7,13 @@ full TUN mode with a kill-switch, per-application bypass, live delay
 measurement, and update notifications. The interface is available in 14
 languages.
 
-> **فارسی:** رُخا یک کلاینت VPN برای ویندوز است که روی Xray-core ساخته شده.
-> هم حالتِ پروکسیِ سیستم و هم حالتِ کاملِ TUN با کیل‌سوییچ، معافیتِ برنامه‌ها،
-> اندازه‌گیریِ زندهٔ تأخیر و اعلانِ به‌روزرسانی دارد. رابط به ۱۴ زبان موجود است.
+> Roxa is a VPN client for Windows, built on Xray-core. It offers both
+> system-proxy mode and full TUN mode, with a kill-switch, per-application
+> bypass, live delay measurement, and update notifications, in 14 languages.
 
 ---
 
-## Requirements / نیازمندی‌ها
+## Requirements
 
 | | |
 |---|---|
@@ -25,13 +25,13 @@ languages.
 Windows 7, 8 and 8.1 are not supported: Microsoft no longer ships the .NET 8
 runtime for them, so neither the runtime nor Roxa can run there.
 
-> **فارسی:** ویندوز ۷، ۸ و ۸٫۱ پشتیبانی نمی‌شوند چون مایکروسافت دیگر رانتایمِ
-> دات‌نت ۸ را برای آن‌ها منتشر نمی‌کند. نصب به ادمین نیاز دارد؛ بعد از نصب،
-> حالتِ پروکسیِ سیستم بدونِ آن کار می‌کند و برای حالتِ TUN دوباره لازم است.
+> Windows 7, 8 and 8.1 are not supported because Microsoft no longer ships
+> the .NET 8 runtime for them. Setup needs administrator rights once; after
+> that system-proxy mode works without them, and TUN mode needs them again.
 
 ---
 
-## Installation / نحوهٔ نصب
+## Installation
 
 1. Download one of two installers:
 
@@ -62,16 +62,16 @@ restored before the files are removed. The install folder and
 `%ProgramData%\Roxa` go with it; your servers and settings in
 `%APPDATA%\Roxa` are left in place.
 
-> **فارسی:** دو نصب‌کننده هست: یکی ۷۵ مگابایتی که رانتایمِ دات‌نت داخلِ خودش
-> است و نصبش به اینترنت وابسته نیست، و یکی ۱۹ مگابایتی (`-online`) که اگر
-> رانتایم نباشد همان موقع ازِ مایکروسافت می‌گیرد — با نمایشِ پیشرفت، دکمهٔ
-> Cancel، مهلتِ ۱۰ دقیقه و تأییدِ SHA-256 پیش از اجرا؛ و اگر چیزی خطا بدهد
-> صفحهٔ دانلودِ مایکروسافت باز می‌شود. نصب‌کننده یک بار اجازهٔ ادمین
-> می‌گیرد و در `C:\Program Files\Roxa`
-> برایِ همهٔ کاربران نصب می‌کند؛ اجرای برنامه در حالتِ پروکسی به ادمین نیاز
-> ندارد. برای حذف، از «برنامه‌ها و
-> ویژگی‌ها» اقدام کنید؛ حذف اول پاکسازی
-> (آداپتر، مسیرها، فایروال، پروکسیِ سیستم) را اجرا می‌کند.
+> There are two installers: a 75 MB one with the .NET runtime packed
+> inside, whose setup does not depend on the internet, and a 19 MB one
+> (`-online`) that fetches the runtime from Microsoft on the spot —
+> with a progress display, a Cancel button, a 10-minute deadline and
+> a SHA-256 check before running. If anything fails, Microsoft's
+> download page opens. Setup asks for administrator rights once and
+> installs for all users under `C:\Program Files\Roxa`; running the
+> app in proxy mode needs no admin. To uninstall, use *Apps & features*;
+> uninstall first runs a cleanup pass (adapter, routes, firewall,
+> system proxy).
 
 ---
 
@@ -96,14 +96,14 @@ is posted alongside the download so you can verify the file yourself:
 Get-FileHash .\Roxa-Setup-3.0.8.exe -Algorithm SHA256
 ```
 
-> **فارسی:** چون نصب‌کننده امضایِ دیجیتال ندارد، ویندوز پیامِ
-> «Windows protected your PC» را نشان می‌دهد. رویِ **More info** و بعد
-> **Run anyway** بزنید. این پیام به‌خاطرِ نبودِ گواهی است، نه مشکلِ امنیتی.
-> هشدارِ SHA-256 هر نسخه کنارِ لینکِ دانلود منتشر می‌شود.
+> Because the installer has no digital signature, Windows shows the
+> "Windows protected your PC" message. Click **More info**, then
+> **Run anyway**. The message means there is no certificate, not that
+> there is a security problem. The SHA-256 of each release is posted next to the download link.
 
 ---
 
-## Reporting a problem / گزارشِ مشکل
+## Reporting a problem
 
 - **In-app:** use the bug report entry in Settings. If you have enabled
   *Send crash reports*, a report containing the exception and the tail of the
@@ -116,11 +116,11 @@ Get-FileHash .\Roxa-Setup-3.0.8.exe -Algorithm SHA256
 When reporting a connection problem, include the operating system version and
 whether you were in TUN mode or system-proxy mode.
 
-> **فارسی:** از داخلِ برنامه، گزینهٔ گزارشِ باگ در تنظیمات را بزنید. اگر
-> «ارسالِ گزارشِ کرش» را روشن کرده باشید (که پیش‌فرض خاموش است)، گزارشِ خطا
-> همراهِ ۴۰۰۰ کاراکترِ آخرِ لاگ ارسال می‌شود. لاگ‌ها در پوشهٔ `logs` کنارِ
-> `Roxa.exe` هستند. هنگامِ گزارشِ مشکلِ اتصال، نسخهٔ ویندوز و اینکه در حالتِ
-> TUN بودید یا پروکسی را ذکر کنید.
+> From inside the app, use the bug report entry in Settings. If you have
+> enabled *Send crash reports* (off by default), the report is sent together
+> with the last 4000 characters of the log. The logs live in the `logs` folder
+> next to `Roxa.exe`. When reporting a connection problem, mention your
+> Windows version and whether you were in TUN mode or proxy mode.
 
 ---
 
@@ -149,9 +149,9 @@ offline installer contacts no one.
 Your server list is encrypted with Windows DPAPI and never leaves your
 machine except as part of an actual connection.
 
-> **فارسی:** رُخا هیچ تله‌متری یا گزارشِ خودکارِ خطا ندارد. فهرستِ کاملِ
-> اتصال‌ها در `THIRD-PARTY-NOTICES.txt` آمده. لیستِ سرورهای شما با DPAPIِ
-> ویندوز رمزنگاری می‌شود و جز در هنگامِ اتصالِ واقعی، جایی نمی‌رود.
+> Roxa has no telemetry and no automatic crash reporting. The full list of
+> connections is in `THIRD-PARTY-NOTICES.txt`. Your server list is encrypted
+> with Windows DPAPI and goes nowhere except during an actual connection.
 
 ---
 
@@ -193,10 +193,10 @@ This is the trademark reservation permitted by section 7(e) of the GPL. It
 protects users from mistaking an unofficial build for the real one; it does
 not restrict what you do with the code.
 
-> **فارسی:** کدِ رُخا آزاد است و تحتِ GPL-3.0. ولی **نامِ «رُخا»، لوگو و
-> هویتِ بصریِ آن مالِ پروژه است و با GPL منتقل نمی‌شود.** می‌توانید سورس را
-> تغییر دهید و توزیع کنید، ولی نام و لوگو را نباید بدونِ اجازهٔ کتبی استفاده
-> کنید. این بندِ ۷(e) قراردادِ GPL است.
+> Roxa's code is free software under GPL-3.0. But **the name "Roxa", the
+> logo and the project's visual identity belong to the project and are not
+> transferred with the GPL.** You may modify and distribute the source, but
+> may not use the name or logo without written permission. This is section 7(e) of the GPL.
 
 ### Third-party components
 
@@ -224,11 +224,11 @@ If you hold rights in any of these images, write to `info@roxacore.com` and
 the file will be removed or replaced. The two-letter codes are ISO 3166-1
 alpha-2 values, which carry no copyright; only the artwork is in question.
 
-> **فارسی:** تصاویرِ پرچم‌ها (`Assets/Flags/*.png`) بدونِ ثبتِ منبع یا مجوز
-> واردِ مخزن شده‌اند. رُخا نه ادعای مالکیت رویِ آن‌ها دارد و نه آن‌ها را
-> بخشی از GPL می‌داند، و نه می‌گوید آزادند. تا انتخابِ مجموعه‌ای با مجوزِ
-> ثبت‌شده، باید مثلِ مادهٔ بدونِ مجوزِ ناشناخته رفتار شود. اگر صاحبِ حقی
-> هستید، به `info@roxacore.com` بنویسید تا فایل حذف یا جایگزین شود.
+> The flag images (`Assets/Flags/*.png`) entered the repository without a
+> recorded source or license. Roxa neither claims ownership of them nor
+> counts them as part of the GPL, nor says they are free. Until a licensed
+> set is chosen, treat them as unlicensed material of unknown provenance.
+> If you hold rights to any, write to `info@roxacore.com` to have it removed or replaced.
 
 ---
 

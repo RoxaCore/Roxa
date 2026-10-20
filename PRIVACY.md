@@ -139,14 +139,14 @@ third-party components it ships, and their licenses, are listed in
 
 Any change to this list is documented in `CHANGELOG.md` under `Security`.
 
-> **فارسی:** رُخا هیچ تله‌متری، تحلیل یا گزارشِ خودکارِ خطا ندارد. **سرورها و
-> لینکِ اشتراک هر دو با DPAPIِ ویندوز رمزنگاری می‌شوند** (فایلِ قدیمی در اولین
-> اجرا خودبه‌خود رمزنگاری می‌شود). ولی **کانفیگِ موقتِ موتور متنِ ساده** است و
-> با اینکه دسترسیِ آن فقط به حسابِ خودتان محدود است، تا ۲۴ ساعت رویِ دیسک
-> می‌ماند. ارسالِ گزارشِ کرش کاملاً اختیاری و پیش‌فرضِ آن خاموش است؛ **هر گزارشِ
-> درِ صف حداکثرِ ۳۰ روز می‌ماند** و خاموش کردنِ همان گزینه، صف را هم خالی
-> می‌کند. **آدرسِ IP شما رویِ دیسکِ سرور ذخیره نمی‌شود** — فقط
-> هشِ نمکیِ برگشت‌ناپذیر آن می‌ماند، و آن هم حداکثرِ یک ساعت در
-> شمارنده‌هایِ نرخ‌محدودیت. متنِ کاملِ اتصال‌ها در بالا آمده، از جمله اینکه
-> `gh-proxy.com` (پراکسیِ واسطهٔ ثالث) آدرسِ شما و درخواستِ فایلِ Xray-core
-> را می‌بیند. هر تغییرِ آینده در `CHANGELOG.md` ثبت می‌شود.
+> Roxa has no telemetry, analytics or automatic crash reporting.
+> **Servers and subscription links are both encrypted with Windows DPAPI**
+> (an older file is re-encrypted automatically on first run). But **the
+> engine's temporary config is plain text**, and although access to it is
+> restricted to your own account, it stays on disk for 24 hours. Sending
+> crash reports is entirely optional and off by default; **each report in the
+> queue stays at most 30 days**, and turning the option off empties the queue.
+> **Your IP address is not stored on the server's disk** — only an
+> irreversible salted hash remains, and that for at most one hour in the
+> rate-limiter counters. The full list of connections is above, including
+> that `gh-proxy.com` (a third-party proxy) sees your address and the Xray-core file request. Any future change is recorded in `CHANGELOG.md`.

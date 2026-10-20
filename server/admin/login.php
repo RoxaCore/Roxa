@@ -30,15 +30,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         attempt_fail();
-        // سقفِ سراسری هرگز قفلِ کامل نمی‌کند تا مهاجم نتواند با هجومِ موازیِ
-        // ارزان خودِ مدیر را بیرون کند. فقط تأخیرِ کوتاه، و بالایِ سقفِ حمله
-        // پاسخِ ۴۲۹ِ فوری — نه انتظارِ طولانی که worker را می‌گیرد.
+        // The global cap never fully locks so an attacker cannot lock the admin
+        // out with a cheap parallel flood. Only a short delay, and above the
+        // attack cap an immediate 429 — not a long wait that occupies a worker.
         [$extra, $reject] = attempt_pressure();
         if ($reject) {
             http_response_code(429);
             $err = 'تلاش‌های ناموفق زیاد بود. کمی بعد دوباره تلاش کنید.';
         } else {
-            // ثانیهٔ پایه + تأخیرِ فشارِ سراسری؛ همیشه در بازهٔ ۱ تا LOGIN_DELAY_MAX.
+            // Base second + global pressure delay; always within the 1 to LOGIN_DELAY_MAX range.
             sleep(1 + $extra);
             $err = 'رمز عبور اشتباه است.';
         }

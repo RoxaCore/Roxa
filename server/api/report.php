@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/../lib.php';
 
-// این نقطه نوشتنی است؛ عمداً CORS ندارد تا هیچ صفحهٔ وبِ دامنهٔ دیگری نتواند
-// از طریقِ مرورگرِ کاربر گزارش بفرستد. کلاینت دسکتاپ است و اصلاً به آن نیاز ندارد.
+// This endpoint is write-only; CORS is deliberately omitted so no other
+// domain's page can report via the user's browser; the desktop client needs none.
 api_headers(false);
 
 function report_json(array $body, int $code): void
@@ -27,8 +27,8 @@ if (!is_array($data)) {
 
 $ipRemote = (string)($_SERVER['REMOTE_ADDR'] ?? '');
 $ip = filter_var($ipRemote, FILTER_VALIDATE_IP) !== false ? $ipRemote : '';
-// سقف per-IP: ۱۰ گزارش در ساعت — مانع سیل گزارش‌های جعلی. کلید، هشِ نمکیِ
-// IP است نه خودِ IP؛ IPِ خام هیچ‌جا ذخیره نمی‌شود.
+// Per-IP cap: 10 reports per hour — blocks a flood of forged reports. The key
+// is a salted hash of the IP, not the IP itself; the raw IP is never stored.
 if (!rate_allow('report:' . ($ip !== '' ? $ip : 'unknown'), 10, 3600)) {
     report_json(['ok' => false, 'error' => 'rate'], 429);
 }
@@ -50,8 +50,8 @@ if ($message === '' && $error === '') {
     report_json(['ok' => false, 'error' => 'empty'], 400);
 }
 
-// IPِ خامِ ذخیره‌شده: فقط برایِ اینکه ادمین بتواند گزارش‌هایِ یک منبع را از هم
-// تشخیص دهد. نمی‌توان آن را به IPِ واقعی برگرداند؛ نمکِ سرور جایی ذخیره نمی‌شود.
+// Stored raw IP: only so the admin can tell reports of one source apart.
+// It cannot be reversed to the real IP; the server salt is never stored anywhere.
 $src = $ip !== '' ? ip_key($ip) : '';
 
 try {
@@ -75,11 +75,11 @@ try {
             'at' => date('c'),
             'seen' => false,
         ];
-        // سقف نگهداری: قدیمی‌ترین‌ها حذف شوند تا فایل رشد نکند.
+        // Retention cap: drop the oldest so the file does not grow.
         if (count($store['items']) > 500) {
             $store['items'] = array_slice($store['items'], -500);
         }
-        // برچسبِ منبعِ گزارشِ قدیمی هم همین‌جا پاک می‌شود؛ خودِ گزارش می‌ماند.
+        // The source label of old reports is pruned here too; the reports themselves stay.
         return reports_prune_src($store);
     });
 } catch (Throwable $e) {

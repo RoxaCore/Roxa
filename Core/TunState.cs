@@ -112,26 +112,26 @@ public sealed class TunState
     }
 
     /// <summary>
-    /// مقدارهای خوانده‌شده از دیسک را پیش از هر استفاده‌ای قابلِ اعتماد می‌کند.
+    /// Makes values read from disk trustworthy before any use.
     ///
-    /// این فایل در %ProgramData% (مشترک میان همهٔ کاربرانِ ماشین) و %LocalAppData%
-    /// (مالکش خودِ کاربر است) نوشته می‌شود، و بخشِ بزرگی از بازیابیِ آن با
-    /// دسترسیِ مدیر اجرا می‌شود. بدونِ این، هر کاربرِ غیر-مدیر می‌توانست PIDِ
-    /// دلخواه بگذارد و پروسهٔ دلخواه را با دسترسیِ مدیر بکشد، یا DNS و
-    /// پروکسیِ سیستم را عوض کند — یعنی ارتقایِ سطحِ دسترسیِ محلی، نه صرفاً
-    /// «درستیِ داده».
+    /// This file is written to %ProgramData% (shared among all users of the
+    /// machine) and %LocalAppData% (owned by the user themselves), and a large
+    /// part of its recovery runs with administrative privileges. Without this,
+    /// any non-admin user could set an arbitrary PID and kill an arbitrary
+    /// process with admin rights, or change the system DNS and proxy — that is,
+    /// local privilege escalation, not merely "data integrity".
     ///
-    /// قاعدهٔ کلی: هیچ فیلدی از خودِ فایل برایِ تصمیمِ اعتماد خوانده نمی‌شود.
-    /// مسیر و نامِ موتور همیشه با مسیرِ خودِ همین نمونه مقایسه می‌شود، و
-    /// هر مقداری که به فرمان یا رجیستری می‌رود باید شکلِ معتبرِ خودش را داشته باشد.
+    /// General rule: no field from the file itself is used for a trust decision.
+    /// The engine path and name are always compared against this very instance's
+    /// own path, and any value going into a command or the registry must have its valid form.
     /// </summary>
     private static void Sanitize(TunState st)
     {
-        // JSON می‌پذیرد که فیلدی را صریحاً null کند؛ باید قبل از هر Count/RemoveAll درست شود.
+        // JSON allows a field to be explicitly null; fix it before any Count/RemoveAll.
         st.Routes ??= new();
         st.AdapterName ??= "";
 
-        // --- موتور: باید همان xray.exeِ همین نصب باشد ---
+        // --- engine: it must be this install's own xray.exe ---
         string own;
         try { own = XrayEngine.EnginePath; } catch { own = ""; }
         if (own.Length == 0 ||
@@ -147,12 +147,12 @@ public sealed class TunState
             st.EngineExePath = "";
         }
 
-        // --- رابط ---
+        // --- adapter ---
         if (string.IsNullOrWhiteSpace(st.AdapterName) || st.AdapterName.Length > 256 ||
             st.AdapterName.IndexOf('"') >= 0)
             st.AdapterName = TunManager.AdapterName;
 
-        // --- پروکسیِ قبلی: به رجیستری نوشته می‌شود، پس فقط شکلِ معتبر می‌پذیریم ---
+        // --- previous proxy: written to the registry, so only a valid form is accepted ---
         if (st.ProxySet != null && !IsUsableProxyServer(st.ProxySet))
         {
             TunManager.Log("tun-state: ProxySet rejected (not a valid proxy address); dropping the proxy record.");
@@ -170,7 +170,7 @@ public sealed class TunState
             st.ProxyPrevOverride = null;
         }
 
-        // --- DNS: هر رکورد باید شاخصِ رابطِ واقعی و آدرسِ IPِ معتبر داشته باشد ---
+        // --- DNS: each record must carry a real adapter index and a valid IP address ---
         if (st.DnsPrev is { Count: > 0 })
         {
             int before = st.DnsPrev.Count;
@@ -181,7 +181,7 @@ public sealed class TunState
         }
         else st.DnsPrev = null;
 
-        // --- مسیرها: مقصد، ماسک و دروازه همگی باید IP باشند ---
+        // --- routes: destination, mask and gateway must all be IPs ---
         if (st.Routes.Count > 0)
         {
             int before = st.Routes.Count;
@@ -194,9 +194,9 @@ public sealed class TunState
     }
 
     /// <summary>
-    /// IP هست؟ یک عددِ خام مثل «۱» هم IPAddress.TryParse را رد می‌کند و
-    /// 0.0.0.1 می‌سازد، پس باید همان رشتهٔ ورودی برگردد تا نوشتنِ آن در
-    /// netsh / route / رجیستری معنای تعیین‌شده را داشته باشد.
+    /// Is it an IP? A raw number like "1" also passes IPAddress.TryParse and
+    /// yields 0.0.0.1, so the input string itself must be returned so that writing it to
+    /// netsh / route / the registry keeps its intended meaning.
     /// </summary>
     private static bool IsUsableIp(string? s)
     {
@@ -210,9 +210,9 @@ public sealed class TunState
     {
         if (r == null) return false;
         if (r.IfIndex <= 0) return false;
-        // نامِ رابط فقط در فرمانِ netsh می‌رود؛ گیومه مرزِ آرگومان را می‌شکند.
+        // The adapter name only goes into the netsh command; a quote breaks the argument boundary.
         if (string.IsNullOrWhiteSpace(r.Alias) || r.Alias.Length > 256 || r.Alias.IndexOf('"') >= 0) return false;
-        if (!r.WasStatic) return true;              // DHCP: چیزی برایِ بازگردانی ندارد
+        if (!r.WasStatic) return true;              // DHCP: nothing to restore
         if (r.Servers.Count == 0 || r.Servers.Count > 8) return false;
         foreach (var s in r.Servers)
             if (!IsUsableIp(s)) return false;
@@ -229,8 +229,8 @@ public sealed class TunState
     }
 
     /// <summary>
-    /// شکلِ ProxyServer: [scheme=]host[:port] و ممکن است با گیومه مانند
-    /// [::1]:8080 باشد. میزبان یا IP است یا نامِ میزبانی از حروف، عدد، نقطه و خط تیره.
+    /// ProxyServer form: [scheme=]host[:port], and it may be bracketed like
+    /// [::1]:8080. The host is either an IP or a hostname of letters, digits, dots and hyphens.
     /// </summary>
     private static bool IsUsableHostPort(string v)
     {
@@ -268,8 +268,8 @@ public sealed class TunState
     }
 
     /// <summary>
-    /// شکلِ ProxyOverride: لیستِ جداشده با «;» از نام‌های دامنه، الگوهای ستاره‌دار،
-    /// <local> و شبکه‌های CIDR/wildcard. هیچ کاراکترِ شکننده‌ای نباید داشته باشد.
+    /// ProxyOverride form: a ";"-separated list of domain names, star patterns,
+    /// <local> and CIDR/wildcard networks. It must contain no fragile characters.
     /// </summary>
     private static bool IsUsableProxyOverride(string? s)
     {
@@ -303,18 +303,18 @@ public sealed class TunState
     }
 
     /// <summary>
-    /// %ProgramData%\Roxa را با دسترسیِ بسته می‌سازد: نوشتن فقط برای SYSTEM و
-    /// Administrators، و خواندن برای گروه Users.
+    /// Creates %ProgramData%\Roxa with tight permissions: write only for SYSTEM and
+    /// Administrators, and read for the Users group.
     ///
-    /// چرا اینجا و نه در نصاب: نصاب با PrivilegesRequired=lowest اجرا می‌شود (تا
-    /// خودِ برنامه در {localappdata}\Programs قابلِ نوشتن بماند) و چنین نصابی
-    /// نمی‌تواند DACLِ پوشه‌ای در ProgramData را عوض کند مگر مالکش باشد. ولی
-    /// خودِ برنامه در هر دو حالت می‌تواند: پوشهٔ ساختهٔ نصابِ قدیمی را همان
-    /// کاربری مالک است که نصبش کرده، و مالک همیشه DACLِ خودش را عوض می‌کند؛
-    /// و نمونهٔ ارتقاداشته هم اصلاً دسترسیِ لازم را دارد.
+    /// Why here and not in the installer: the installer runs with PrivilegesRequired=lowest (so
+    /// the program itself stays writable in {localappdata}\Programs), and such an installer
+    /// cannot change the DACL of a ProgramData folder unless it owns it. But the
+    /// program itself can in both cases: the folder created by the old installer is owned by
+    /// the user who installed it, and an owner always changes their own DACL; and the
+    /// elevated instance simply has the required access.
     ///
-    /// فقط یک بار در هر اجرا انجام می‌شود، و اگر از قبل بسته باشد هیچ کاری
-    /// نمی‌کند تا هزینهٔ خواندنِ DACL در هر ذخیره پرداخت نشود.
+    /// It runs only once per run, and if it is already tight it does nothing,
+    /// so the cost of reading the DACL is not paid on every save.
     /// </summary>
     private static void EnsureProgramDataAcl()
     {
@@ -357,31 +357,31 @@ public sealed class TunState
         }
         catch (Exception ex)
         {
-            // مالک نیستیم و ارتقاع هم نیستیم — دفعهٔ بعد یک اجرای ارتقاداشته همین کار را می‌کند.
+            // Not the owner and not elevated either — the next elevated run will do it.
             TunManager.Log($"ProgramData ACL not applied ({ex.GetType().Name}); an elevated run will tighten it.");
         }
     }
 
     /// <summary>
-    /// آیا DACL از قبل به شکلِ مطلوب است؟
+    /// Is the DACL already in the desired shape?
     ///
-    /// چیزی که دنبالش می‌گردیم دقیقاً همان وضعیتِ واقعیِ این ماشین پیش از اصلاح
-    /// بود: ارث‌بریِ روشن، یک قانونِ GenericAll برای CREATOR OWNER، و Write برای
-    /// گروه Users.
+    /// What we are looking for is exactly this machine's actual pre-fix state:
+    /// inheritance on, one GenericAll rule for CREATOR OWNER, and Write for the
+    /// Users group.
     ///
-    /// نکتهٔ ظریف اینجا این است که نباید دنبال «آیا این قانونِ نوشتن است؟» گشت:
-    /// Modify و FullControl هر دو بیت‌هایِ ReadAndExecute را هم دارند، پس یک قانونِ
-    /// کاملاً فاقدِ نوشتن هم با آن ماسک تطبیق می‌کند و قضاوت برعکس می‌شود.
-    /// راهِ درست این است که بپرسیم «آیا این قانون چیزی جز خواندن و اجرا می‌دهد؟»
-    /// — یعنی آیا بیتِ خارج از مجموعهٔ مجاز دارد.
+    /// The subtlety here is that we must not ask "is this rule a write rule?":
+    /// Modify and FullControl both carry the ReadAndExecute bits too, so a rule with
+    /// no write at all would still match that mask and the verdict would be reversed.
+    /// The right approach is to ask "does this rule grant anything beyond reading and executing?"
+    /// — i.e. does it have any bit outside the allowed set.
     /// </summary>
     private static bool TightEnough(System.Security.AccessControl.DirectorySecurity security)
     {
-        // AreAccessRulesProtected == true یعنی ارث‌بری قطع شده و وضعیتِ مطلوبِ ماست؛
-        // false یعنی هنوز از ProgramData ارث می‌برد و باید بسته شود.
+        // AreAccessRulesProtected == true means inheritance is blocked, which is our desired state;
+        // false means it still inherits from ProgramData and must be blocked.
         if (!security.AreAccessRulesProtected) return false;
 
-        // هرچه یک کاربرِ عادی می‌تواند بکند: بخواند، اجرا کند، همگام شود.
+        // Everything an ordinary user can do: read, execute, synchronize.
         const System.Security.AccessControl.FileSystemRights reader =
             System.Security.AccessControl.FileSystemRights.ReadAndExecute |
             System.Security.AccessControl.FileSystemRights.Synchronize;

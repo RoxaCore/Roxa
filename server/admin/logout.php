@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/../lib.php';
 
-// خروج باید POST باشد: خروجِ GET از طریقِ یک تصویر یا لینک در هر صفحه‌ای
-// قابلِ کلیک‌شدن است و session را می‌شکند (logout CSRF).
+// Logout must be POST: a GET logout can be triggered via an image or link on
+// any page and breaks the session (logout CSRF).
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     http_response_code(405);
     header('Allow: POST');

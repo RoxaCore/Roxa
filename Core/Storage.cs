@@ -26,10 +26,10 @@ using Roxa.Models;
 namespace Roxa.Core;
 
 /// <summary>
-/// ذخیره‌سازی JSON در پوشه AppData/Roxa.
-/// servers.json و subscriptions.json با DPAPI (CurrentUser) رمزنگاری می‌شوند؛
-/// settings.json متنِ ساده است (پرتنظیمات، و شناسهٔ نصب باید پیش از بارگذاریِ
-/// موتور قابلِ خواندن باشد).
+/// JSON storage in the AppData/Roxa folder.
+/// servers.json and subscriptions.json are encrypted with DPAPI (CurrentUser);
+/// settings.json is plain text (settings-heavy, and the install ID must be readable
+/// before the engine loads).
 /// </summary>
 public static class Storage
 {
@@ -47,13 +47,13 @@ public static class Storage
     public static string DataDir => _dataDir;
 
     /// <summary>
-    /// وقتی DPAPI از کار افتاد و subscriptions.json به‌جایِ رمزنگاری، متنی نوشته
-    /// شد، یک‌بار اعلام می‌شود.
+    /// Announced once when DPAPI fails and subscriptions.json gets written as
+    /// plain text instead of being encrypted.
     ///
-    /// Storage رابط نمی‌سازد؛ فقط خبر می‌دهد. سکوت بدترین حالتِ ممکن است: کاربر
-    /// باید همان لحظه بفهمد لینک‌های اشتراکش محافظتِ حسابِ ویندوز را از دست
-    /// داده‌اند، نه اینکه بعداً خودش بفهمد. فقط یک‌بار در هر اجرا اعلام می‌شود
-    /// تا هر ذخیرهٔ متوالی toastِ پشتِ سرهم نسازد.
+    /// Storage builds no UI; it only reports. Silence is the worst case: the user
+    /// must learn right away that their subscription links lost Windows account
+    /// protection, not find out later themselves. Announced once per run so that
+    /// consecutive saves don't create back-to-back toasts.
     /// </summary>
     public static event Action? SubscriptionsWrittenInClearText;
 
@@ -112,11 +112,11 @@ public static class Storage
     }
 
     /// <summary>
-    /// تشخیصِ اینکه آیا بایت‌ها از رویِ عادتِ JSON شروع می‌شوند.
+    /// Detects whether the bytes start out looking like JSON.
     ///
-    /// این تشخیص‌دهندهٔ ما بینِ «نسخهٔ قدیمیِ متنی» و «متنِ رمزنگاری‌شده» است، و
-    /// برایِ همین باید قطعی باشد: یک blobِ DPAPI هیچ‌وقت با `[` یا `{` شروع
-    /// نمی‌شود، پس اگر اینطور بود، فایل متنی است و باید مهاجرت کند.
+    /// This is our discriminator between «old plain-text version» and «encrypted
+    /// text», so it must be definitive: a DPAPI blob never starts with `[` or `{`,
+    /// so if it does, the file is plain text and must migrate.
     /// </summary>
     private static bool LooksLikeJson(byte[] raw)
     {
@@ -137,8 +137,8 @@ public static class Storage
             if (raw.Length == 0) return new List<SubscriptionInfo>();
 
             string json;
-            // فایلِ قدیمی متنی است؛ بارگذاریِ موفق یعنی باید همین الان رمزنگاری شود،
-            // وگرنه لینکِ اشتراک (که توکن دارد) به شکلِ متنِ ساده روی دیسک می‌ماند.
+            // The old file is plain text; a successful load means it must be encrypted
+            // right now, else the subscription link (holding a token) stays plain on disk.
             bool migrate = false;
 
             if (OperatingSystem.IsWindows() && !LooksLikeJson(raw))
@@ -151,9 +151,9 @@ public static class Storage
                 }
                 catch (CryptographicException)
                 {
-                    // نه متنِ ماست نه رمزِ ما — مثلاً کپیِ پروفایل از کاربر یا
-                    // ماشینِ دیگر. آن را همچنان متن می‌خوانیم؛ اگر JSON نبود
-                    // catchِ بیرونی قرنطینه می‌کند و کپی را نگه می‌دارد.
+                    // Neither our plain text nor our cipher — e.g. a profile copied
+                    // from another user or machine. We still read it as text; if it
+                    // isn't JSON, the outer catch quarantines it and keeps the copy.
                     json = Encoding.UTF8.GetString(raw);
                 }
 #pragma warning restore CA1416
@@ -188,9 +188,9 @@ public static class Storage
         }
         catch (CryptographicException)
         {
-            // از دست‌دادنِ لینکِ اشتراکِ کاربر بدتر از نوشتنِ متنی است. متنی
-            // می‌نویسیم، هشدار می‌گذاریم، و ذخیرهٔ موفقِ بعدی دوباره رمزنگاری
-            // می‌کند — مهاجرتِ قدیمی همین مسیر را طی می‌کند.
+            // Losing the user's subscription link is worse than writing plain text.
+            // We write it plainly, raise a warning, and the next successful save
+            // re-encrypts it — the old-data migration follows the same path.
             TunManager.Log("Storage: DPAPI failed for subscriptions.json; wrote it in plain text. It will be re-encrypted on the next successful save.");
             WriteAtomic(SubscriptionsFile, plain);
             AnnounceClearText();
@@ -201,8 +201,8 @@ public static class Storage
     }
 
     /// <summary>
-    /// اعلامِ یک‌بارهٔ «فایل متنی نوشته شد». گاردِ تک‌بار اینجاست نه در فراخواننده،
-    /// چون مسیرِ فراخوانی یکی است و هر ذخیرهٔ بعدی هم به همین‌جا می‌رسد.
+    /// One-time announcement of «فایل متنی نوشته شد». The one-shot guard is here, not in the caller,
+    /// because the call path is single and every later save lands here too.
     /// </summary>
     private static void AnnounceClearText()
     {
@@ -225,12 +225,12 @@ public static class Storage
         => WriteAtomic(SettingsFile, JsonSerializer.Serialize(settings, Options));
 
     /// <summary>
-    /// نوشتنِ اتمیک: اول در فایلِ موقت، بعد جایگزینیِ اتمیک.
+    /// Atomic write: first into a temp file, then an atomic replace.
     ///
-    /// File.WriteAllText معمولی اول طولِ فایلِ مقصد را صفر می‌کند و بعد می‌نویسد؛
-    /// پس یک کرش یا kill در همان لحظه یک فایلِ ناقص می‌گذارد و Load در سکوت
-    /// همه‌چیز را به پیش‌فرض برمی‌گرداند — یعنی زبان، کلیدها، سرورها، اشتراک‌ها و
-    /// تنظیماتِ کیل‌سوییچِ کاربر بی‌صدا گم می‌شد و کسی هم خبر نمی‌شد.
+    /// Ordinary File.WriteAllText first truncates the destination file to zero and
+    /// then writes; so a crash or kill at that instant leaves a partial file and Load
+    /// silently restores every default — the user's language, keys, servers,
+    /// subscriptions and kill-switch settings silently vanished and nobody noticed.
     /// </summary>
     private static void WriteAtomic(string path, byte[] content)
     {
@@ -243,8 +243,8 @@ public static class Storage
         => WriteAtomic(path, Encoding.UTF8.GetBytes(content));
 
     /// <summary>
-    /// فایلِ خراب را دور نمی‌ریزیم؛ کنارِ خودش نگه می‌داریم تا قابلِ بررسی و
-    /// بازیابی باشد. بی‌صدا حذف‌کردنِ دادهٔ کاربر قابلِ قبول نیست.
+    /// We don't throw a corrupt file away; we keep it next to its place so it can be
+    /// inspected and recovered. Silently deleting user data is not acceptable.
     /// </summary>
     private static void Quarantine(string path)
     {

@@ -1,39 +1,39 @@
 # Roxa update server
 
-نسخه‌خوان، اعلان‌ها و پنلِ مدیریت. فقط به PHP 8.1+ و یک وب‌سرور نیاز دارد؛
-هیچ دیتابیسی در کار نیست و همهٔ داده‌ها JSON هستند.
+Version checker, announcements, and the management panel. Needs only PHP 8.1+ and a
+web server; no database involved, all data is JSON.
 
-## نصب
+## Installation
 
-1. محتوای همین پوشه را در webroot بگذارید (مثلاً `~/public_html/up.roxacore.com`).
-2. **پوشهٔ داده را از وب‌ریشه بیرون ببرید** — این مهم‌ترین قدم است:
+1. Put the contents of this folder in the web root (e.g. `~/public_html/up.roxacore.com`).
+2. **Move the data folder out of the web root** — this is the most important step:
 
    ```bash
    ROXA_DATA=/var/lib/roxa php tools/migrate-data.php --apply
    ```
 
-   `config.php` بدونِ `ROXA_DATA` هم پیش‌فرضاً `roxa-data/` را **هم‌سطحِ وب‌ریشه**
-   می‌سازد (یعنی بیرون از `server/`). اگر وب‌ریشه‌تان همان `server/` است، پس
-   `roxa-data/` بیرون است. اگر وب‌ریشه ریشهٔ مخزن است، حتماً `ROXA_DATA` را
-   روی مسیری خارج از آن تنظیم کنید.
+   Without `ROXA_DATA`, `config.php` still creates `roxa-data/` **next to the web
+   root** by default (i.e. outside `server/`). If your web root *is* `server/`, then
+   `roxa-data/` is already outside. If the web root is the repository root, be sure
+   to point `ROXA_DATA` at a path outside it.
 
-   دلیل: تا وقتی داده‌ها داخلِ سند-ریشه بودند، تنها حفاظتشان `.htaccess` بود —
-   که روی nginx و هر وب‌سرورِ بدونِ `AllowOverride` بی‌اثر است و `auth.json`
-   (رمزِ مدیر) را قابلِ دانلود می‌کند.
+   Why: as long as the data lived inside the document root, its only protection was
+   `.htaccess` — which is ineffective on nginx and any web server without
+   `AllowOverride`, leaving `auth.json` (the admin password) downloadable.
 
-3. رمزِ مدیر را بسازید (فقط از راهِ خطِ فرمان):
+3. Create the admin password (command line only):
 
    ```bash
    php tools/create-admin.php
    ```
 
-   **ساختِ حساب از راهِ وب حذف شده است.** اگر `auth.json` نباشد، `/admin/`
-   کد ۵۰۳ می‌دهد و راهی برایِ ساختِ رمز از بیرون نیست.
+   **Web-based account creation has been removed.** Without `auth.json`, `/admin/`
+   returns 503, and there is no way to create the password from outside.
 
-## الزاماتِ وب‌سرور
+## Web server requirements
 
-`.htaccess`ها فقط روی Apache با `AllowOverride` خوانده می‌شوند. اگر این را
-نداشته باشید، محافظتِ `.htaccess` از بین می‌رود (بخشِ بعدی را ببینید).
+`.htaccess` files are only honored on Apache with `AllowOverride`. Without it,
+the `.htaccess` protection is void (see the next section).
 
 ```apache
 <Directory "/var/www/up.roxacore.com">
@@ -42,39 +42,39 @@
 </Directory>
 ```
 
-اگر **nginx** دارید، `AllowOverride` معنایی ندارد؛ باید خودتان بنویسید:
+If you are on **nginx**, `AllowOverride` means nothing; you must write it yourself:
 
 ```nginx
 location ~* \.(json|lock|salt|tmp)$ { deny all; }
 location ~ /\. { deny all; }
 ```
 
-و پوشهٔ `data/` را هم deny کنید. (با این حال، اگر `ROXA_DATA` را درست
-گذاشته باشید، داده‌ها اصلاً زیرِ سند-ریشه نیستند و این صرفاً لایهٔ دوم است.)
+Also deny the `data/` folder. (However, if you have set `ROXA_DATA` properly,
+the data is not under the document root at all and this is merely a second layer.)
 
-## چه چیزهایی محافظت می‌شوند
+## What is protected
 
-| لایه | چه می‌کند |
+| Layer | What it does |
 |---|---|
-| `DATA_DIR` بیرونِ وب‌ریشه | `auth.json`، `stats.json`، `reports.json` و `.salt` اصلاً قابلِ درخواستِ HTTP نیستند. |
-| `server/.htaccess` | روی Apache، `.json`/`.lock`/`.salt`/`.tmp` و فایل‌های نقطه‌ای را deny می‌کند. |
-| `server/data/.htaccess` | لایهٔ سوم برایِ کسی که `DATA_DIR` را دوباره داخل آورده باشد. |
-| بنرِ زردِ پنل | اگر `DATA_DIR` زیرِ سند-ریشه باشد، پنل رویِ **همهٔ** صفحه‌ها هشدار می‌دهد و مسیر را نشان می‌دهد. سکوت در این حالت خطرناک‌ترین حالت است. تشخیص از رویِ مسیرِ خودِ برنامه می‌رود و به وب‌سرور وابسته نیست؛ `DOCUMENT_ROOT` فقط راهِ دوم است. |
+| `DATA_DIR` outside the web root | `auth.json`, `stats.json`, `reports.json` and `.salt` cannot be requested over HTTP at all. |
+| `server/.htaccess` | On Apache, denies `.json`/`.lock`/`.salt`/`.tmp` and dotfiles. |
+| `server/data/.htaccess` | A third layer for anyone who moved `DATA_DIR` back inside. |
+| Yellow banner in the panel | If `DATA_DIR` is under the document root, the panel warns on **every** page and shows the path. Silence in this state would be the most dangerous option. Detection reads the program's own path and does not depend on the web server; `DOCUMENT_ROOT` is only a fallback. |
 
-`.salt` اگر لو برود، هشِ IP قابلِ برگشتِ آفلاین می‌شود؛ به‌همین‌دلیل هم در
-`.htaccess` پوشیده شده هم با `chmod 600` نوشته می‌شود.
+If `.salt` leaks, the IP hashes become brute-forceable offline; that is why it is
+both covered by `.htaccess` and written with `chmod 600`.
 
-## حریمِ خصوصی
+## Privacy
 
-- IPِ خام هیچ‌جا ذخیره نمی‌شود؛ فقط هشِ نمکیِ HMAC-SHA256 (نکتهٔ `src` در پنل).
-- نمک در `DATA_DIR/.salt` است و **نباید** کپیِ آن را به جایی دیگر ببرید، چون
-  این کار هش‌هایِ قدیمی را هم قابلِ برگشت می‌کند.
-- نرخ‌محدودیت و شمارنده‌هایِ ورود هم با همان هش کار می‌کنند و بعد از پنجرهٔ
-  یک‌ساعته پاک می‌شوند.
-- برچسبِ منبع (`src` در `reports.json` و `ip`/`ip_last` در `stats.json`) حداکثر
-  **۹۰ روز** نگه داشته می‌شود و بعد پاک می‌شود؛ خودِ گزارش و ردیفِ کلاینت
-  می‌مانند. سقف در `SRC_HASH_TTL_DAYS` در `lib.php` است و رویِ هر گزارشِ تازه
-  و هر چک‌اینِ تازه اعمال می‌شود.
-- `.salt` را در backup نگیرید مگر اینکه بخواهید هشها را نگه دارید.
+- Raw IPs are never stored anywhere; only salted HMAC-SHA256 hashes (the `src` label in the panel).
+- The salt lives in `DATA_DIR/.salt` and you **must not** copy it elsewhere, because
+  doing so makes old hashes brute-forceable too.
+- The rate limiter and the login counters work off the same hash and are cleared
+  after a one-hour window.
+- The source label (`src` in `reports.json` and `ip`/`ip_last` in `stats.json`) is kept
+  for at most **90 days**, then dropped; the report itself and the client row stay.
+  The cap lives in `SRC_HASH_TTL_DAYS` in `lib.php` and is applied to every
+  fresh report and every fresh check-in.
+- Do not back up `.salt` unless you want to keep the hashes usable.
 
-جزئیاتِ کاملِ رفتار در [`../PRIVACY.md`](../PRIVACY.md) است.
+Full details of the behavior are in [`../PRIVACY.md`](../PRIVACY.md).

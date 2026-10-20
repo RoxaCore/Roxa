@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = trim((string)($_POST['title'] ?? ''));
         $body = trim((string)($_POST['body'] ?? ''));
         $level = in_array($_POST['level'] ?? '', ['info', 'warn', 'update'], true) ? $_POST['level'] : 'info';
-        // فقط https پذیرفته می‌شود: `javascript:`، `data:` و `http:` رد می‌شوند.
+        // Only https is accepted: `javascript:`, `data:` and `http:` are rejected.
         $url = safe_url(trim((string)($_POST['url'] ?? '')));
         $langs = langs_field();
         $countries = country_field();

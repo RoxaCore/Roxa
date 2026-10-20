@@ -33,8 +33,8 @@ public static class TunExclusion
     private const uint PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
     private const int ScanIntervalMs = 1000;
     private const int GatewayCheckEvery = 10;
-    // گیت‌ویِ پیشنهادی باید این‌قدر نوبت پشت‌سرهم پایدار باشد تا بپذیریمش؛ در لحظهٔ
-    // تعویض آداپتر، کارتِ در حال قطع‌شدن چند ثانیه مسیرِ پیش‌فرضِ کم‌metric دارد.
+    // The candidate gateway must stay stable for this many consecutive ticks before we accept it; at the
+    // moment of an adapter switch, the disconnecting card still holds the default low-metric route for seconds.
     private const int GatewayStableTicks = 2;
     private const int MaxNewPinsPerScan = 10;
     private const long PidCacheTtlMs = 15000;
@@ -70,9 +70,9 @@ public static class TunExclusion
     }
 
     /// <summary>
-    /// جدول TCP به‌همراه PIDِ مالک، مستقیم از iphlpapi. جایگزینِ netstat.exe شد چون
-    /// فراخوانیِ هر ثانیه‌ایِ آن ۶۰ پروسه در دقیقه می‌ساخت و سیستم را کند می‌کرد.
-    /// آدرس‌ها و پورت‌ها در همان ترتیبِ بایتِ شبکه‌اند که SetTcpEntry انتظار دارد.
+    /// The TCP table along with the owning PID, straight from iphlpapi. Replaced netstat.exe because
+    /// calling it once per second spawned 60 processes a minute and slowed the system down.
+    /// Addresses and ports are in the same network byte order that SetTcpEntry expects.
     /// </summary>
     [DllImport("iphlpapi.dll", SetLastError = true)]
     private static extern uint GetExtendedTcpTable(
@@ -179,17 +179,17 @@ public static class TunExclusion
     }
 
     /// <summary>
-    /// قانون‌هایی را که از نشستِ قبلی مانده‌اند پاک می‌کند.
-    /// SyncRules فقط هنگامِ اتصالِ TUN اجرا می‌شود و Stop هم در مسیرِ عادیِ
-    /// قطع اتصال صدا می‌خورد؛ اما اگر برنامه هنگامِ وصل کرش کند یا از مسیرِ
-    /// ProcessExit/UnhandledException بیرون برود (که TunExclusion.Stop را صدا
-    /// نمی‌زند)، این قانون‌ها می‌مانند. هر کدام «dir=out action=block UDP 443»
-    /// رویِ یک برنامهٔ مشخص است، یعنی از دیدِ کاربر همان «این برنامه
-    /// اینترنتش کنده» — بی‌آنکه چیزی به Roxa اشاره کند و تا اتصالِ بعدیِ TUN
-    /// هم باقی می‌ماند. در شروعِ برنامه نشستِ فعالی وجود ندارد (تک‌نمونه‌ای
-    /// بودنِ برنامه با mutex در Program.cs تضمین شده)، پس هرچه در RulesFile
-    /// ثبت است باقی‌مانده است. الگو دقیقاً همانِ TunKillSwitch.CleanupLeftovers
-    /// است که کنارش صدا زده می‌شود.
+    /// Removes the rules left over from the previous session.
+    /// SyncRules only runs while the TUN is connected, and Stop is also called on the normal
+    /// disconnect path; but if the app crashes while connected or exits through the
+    /// ProcessExit/UnhandledException path (which does not call TunExclusion.Stop),
+    /// these rules remain. Each one is "dir=out action=block UDP 443"
+    /// on a specific program — in the user's eyes that is exactly "this app's
+    /// internet is dead" — without pointing at Roxa in any way, and it persists until the next TUN
+    /// connection. At program startup there is no active session (single-instance
+    /// behavior is guaranteed by a mutex in Program.cs), so whatever is recorded in RulesFile
+    /// is a leftover. The pattern is exactly the same as TunKillSwitch.CleanupLeftovers
+    /// which is called alongside it.
     /// </summary>
     public static void CleanupLeftovers()
     {
@@ -263,20 +263,20 @@ public static class TunExclusion
     }
 
     /// <summary>
-    /// به‌روزرسانیِ گیت‌ویِ معتبر برای سنجاق کردن مسیرها.
-    /// ۱) اگر گیت‌ویِ فعلی دیگر روی هیچ کارتِ غیر-TUN نیست (آداپتر عوض شده)، مسیرهای
-    ///    سنجاق‌شده به سیاه‌چاله تبدیل شده‌اند و باید همین حالا حذف شوند، نه اینکه
-    ///    تا یافتنِ جایگزین منتظر بمانند.
-    /// ۲) گیت‌ویِ جدید فقط بعد از پایداری چند نوبتِ پیاپی پذیرفته می‌شود، چون کارتِ
-    ///    در حال قطع‌شدن چند ثانیه هنوز مسیرِ پیش‌فرضِ کم‌metric دارد.
-    /// ۳) اگر تشخیص خالی برگشت، گیت‌ویِ قبلی حفظ می‌شود تا اسکن از کار نیفتد.
+    /// Refreshes the valid gateway for pinning routes.
+    /// 1) If the current gateway is no longer on any non-TUN card (the adapter was swapped), the pinned
+    ///    routes have become black holes and must be dropped right now, not
+    ///    wait until a replacement is found.
+    /// 2) A new gateway is only accepted after staying stable for a few consecutive ticks, because the
+    ///    disconnecting card still holds the default low-metric route for a few seconds.
+    /// 3) If detection returns empty, the previous gateway is kept so the scan does not stall.
     /// </summary>
     private static void RefreshGatewayLocked()
     {
-        // اول گیت‌ویِ سالم را پیدا می‌کنیم؛ بررسیِ «آیا گیت‌ویِ قدیمی هنوز هست» فقط
-        // وقتی لازم است که گیت‌ویِ فعلی فرق کرده باشد. اگر GetDefaultGatewayVia همان
-        // قبلی را برگرداند، خودِ آن ثابت کرده روی کارتِ فیزیکی هست و فراخوانیِ دوم
-        // صرفاً یک پیمایشِ تکراریِ کارت‌های شبکه است.
+        // First we find the healthy gateway; checking "is the old gateway still there" is only
+        // needed when the current gateway has changed. If GetDefaultGatewayVia returns the
+        // same one as before, that by itself proves it sits on the physical card, and the second call
+        // is merely a redundant sweep of the network cards.
         string? gw = TunManager.GetDefaultGatewayVia();
 
         if (_gateway != null && !string.Equals(gw, _gateway, StringComparison.Ordinal)
@@ -291,8 +291,8 @@ public static class TunExclusion
 
         if (gw == null)
         {
-            // تشخیص گیت‌وی هنگام تعویض آداپتر گاهی چند نوبت خالی برمی‌گردد؛ تا گیت‌ویِ
-            // معتبر نداریم چیزی سنجاق نمی‌کنیم، ولی اسکن نباید متوقف شود.
+            // Gateway detection sometimes returns empty for a few ticks during an adapter switch; until we
+            // have a valid gateway we pin nothing, but the scan must not stop.
             if (_gateway == null)
                 TunManager.Log("exclusion gateway detection empty; pinning deferred");
             return;
@@ -329,16 +329,16 @@ public static class TunExclusion
     }
 
     /// <summary>
-    /// تطبیقِ مسیرهای سنجاق‌شده با جدول مسیر واقعی. ویندوز هنگام تعویض آداپتر یا تجدید
-    /// DHCP مسیرهای /32 را حذف می‌کند، ولی <c>_pinned</c> هنوز فکر می‌کند سرِ جایشان
-    /// هستند و دیگر هرگز دوباره ساخته نمی‌شوند → ترافیکِ برنامهٔ معاف به TUN می‌رود
-    /// یا پشتِ گیت‌ویِ مرده گیر می‌کند.
+    /// Reconciles the pinned routes against the real routing table. Windows drops the /32 routes when
+    /// the adapter is swapped or DHCP renews, but <c>_pinned</c> still thinks they are
+    /// still in place and they are never recreated → the exempted app's traffic flows into the TUN
+    /// or gets stuck behind the dead gateway.
     /// </summary>
     private static void ReconcilePinsLocked()
     {
         if (_pinned.Count == 0) return;
-        // FilterPresent در شکِ route print همه را «حاضر» برمی‌گرداند؛ یعنی فقط وقتی
-        // مطمئنیم مسیر رفته، آن را حذف می‌کنیم.
+        // FilterPresent returns everything as "present" when the route parse fails; so we only
+        // remove a route once we are sure it is gone.
         var present = FilterPresent(_pinned.Select(IpText).ToList());
         var missing = _pinned.Where(v => !present.Contains(IpText(v))).ToList();
         if (missing.Count == 0) return;
@@ -352,8 +352,8 @@ public static class TunExclusion
     }
 
     /// <summary>
-    /// فراموش‌کردنِ resetهای انجام‌شده برای یک مقصد، تا بعد از ساختنِ مسیرِ تازه همان
-    /// اتصال دوباره reset شود و برنامه واقعاً از مسیرِ سالم استفاده کند.
+    /// Forgets the resets already done for a destination, so that after the fresh route is built
+    /// that same connection gets reset again and the app really uses the healthy route.
     /// </summary>
     private static void DropRstForDestLocked(uint dst)
     {
@@ -374,7 +374,7 @@ public static class TunExclusion
             rc = GetExtendedTcpTable(buf, ref size, false, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
             if (rc != NoError) return rows;
 
-            // ستون اول تعداد ردیف است، بعد از آن آرایهٔ ردیفها با اندازهٔ ثابت.
+            // The first column is the row count, then the fixed-size array of rows.
             int count = Marshal.ReadInt32(buf);
             IntPtr ptr = IntPtr.Add(buf, sizeof(int));
             int stride = Marshal.SizeOf<MibTcpRowOwnerPid>();
@@ -415,8 +415,8 @@ public static class TunExclusion
                 _pinned.Add(row.RemoteIp);
                 newPins++;
                 PersistPinsLocked();
-                // مسیرِ تازه فقط با resetِ دوبارهٔ همان اتصال به برنامه می‌رسد؛ وگرنه
-                // سوکتِ کهنه روی گیت‌ویِ مرده می‌ماند و برنامه «قطع» دیده می‌شود.
+                // A fresh route only reaches the app after the same connection is
+                // reset again; else the stale socket stays on the dead gateway.
                 DropRstForDestLocked(row.RemoteIp);
                 TunManager.Log($"exclusion pin {IpText(row.RemoteIp)} via {_gateway}");
             }
@@ -472,15 +472,15 @@ public static class TunExclusion
         var present = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         try
         {
-            // از جدولِ بومی می‌خوانیم نه از خروجیِ route print؛ اجرایِ پروسه در هر نوبت
-            // یعنی ساختِ پروسه + اسکنِ آنتی‌ویروس، و این چک هر چند ثانیه تکرار می‌شود.
-            // اگر خواندن شکست خورد نباید نتیجه بگیریم که هیچ پینی باقی نمانده؛
-            // وگرنه فایل پین‌ها به‌اشتباه حذف می‌شود.
+            // Read from the native table rather than `route print` output; spawning
+            // a process every round means process creation plus antivirus scanning,
+            // and this check repeats every few seconds. If the read fails we must
+            // not conclude that no pins remain, or the pin file gets deleted wrongly.
             var table = IpRoute.GetTable();
             if (table == null) return want;
             foreach (var row in table)
             {
-                if (row.Mask != uint.MaxValue) continue;   // فقط مسیرهای /32
+                if (row.Mask != uint.MaxValue) continue;   // /32 host routes only
                 string dst = IpRoute.IpToString(row.Dest);
                 if (want.Contains(dst)) present.Add(dst);
             }

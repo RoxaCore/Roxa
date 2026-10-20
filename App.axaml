@@ -9,13 +9,13 @@
         <local:ViewLocator />
     </Application.DataTemplates>
 
-    <!-- Resources باید پیش از Styles بیاید تا StaticResource در همان زمانِ بارگذاری پیدا شود. -->
+    <!-- Resources must come before Styles so that StaticResource is resolved at load time. -->
     <Application.Resources>
-        <!-- فونتِ اصلی. فقط لاتین و عربی/فارسی دارد؛ برایِ چینی، ژاپنی، کره‌ای، روسی و
-             هندی گلیف ندارد. پُرشدنِ آن گلیف‌ها اینجا انجام نمی‌شود: لیستِ کام‌گذاری‌شده
-             داخلِ خودِ FontFamily در Avalonia بی‌صدا نادیده گرفته می‌شود
-             (AvaloniaUI/Avalonia#19362). جایگزینِ واقعی،
-             FontManagerOptions.FontFallbacks در Program.BuildAvaloniaApp است. -->
+        <!-- Primary font. It only covers Latin and Arabic/Persian; it has no glyphs
+             for Chinese, Japanese, Korean, Russian or Indic. Those glyphs are NOT
+             filled in here: a comma-separated list inside FontFamily itself is
+             silently ignored by Avalonia (AvaloniaUI/Avalonia#19362). The real
+             substitute is FontManagerOptions.FontFallbacks in Program.BuildAvaloniaApp. -->
         <FontFamily x:Key="Vazirmatn">avares://Roxa/Assets/Fonts/Vazirmatn-Regular.ttf#Vazirmatn</FontFamily>
         <conv:BoolToOpacityConverter x:Key="BoolToOpacity"/>
     </Application.Resources>
@@ -24,9 +24,9 @@
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
 
-        <!-- پیشفرضِ فونت برایِ همهٔ پنجره‌ها.
-             قبلاً فقط MainWindow این FontFamily را داشت؛ پنجره‌هایِ ویرایشگرِ سرور و QR
-             بدونِ آن می‌ماندند و به Inter می‌افتادند — یعنی همان مربع‌هایِ خالی. -->
+        <!-- Default font for every window.
+             Previously only MainWindow had this FontFamily; the server-editor and
+             QR windows were left without it and fell back to Inter — the very same empty boxes. -->
         <Style Selector="Window">
             <Setter Property="FontFamily" Value="{StaticResource Vazirmatn}" />
         </Style>

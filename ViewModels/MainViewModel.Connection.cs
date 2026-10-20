@@ -34,12 +34,12 @@ namespace Roxa.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
 
-    // با تغییر مقدار، رویداد PropertyChanged می‌نشیند تا سربرگ «در حال اتصال…»
-    // هنگام اتصال TUN ناپدید نشود و UI از عملیات عقب نماند.
+    // When the value changes, the PropertyChanged event fires so the «در حال اتصال…» header
+    // does not disappear while TUN connects and the UI does not fall behind the operation.
     [ObservableProperty] private bool _isConnecting;
 
-    // وقتی تعویض TUN هنگام اتصال باعث قطع+وصل مجدد می‌شود، به‌جای دو نوتیفیشن
-    // «ROXA قطع/وصل شد» و «متصل شد به …»، فقط یک نوتیفیشن ادغام‌شده نشان داده می‌شود.
+    // When toggling TUN while connected causes a disconnect+reconnect, instead of two
+    // notifications («ROXA قطع/وصل شد» and «متصل شد به …») a single merged notification is shown.
     private bool? _tunToggleReconnect;
 
     [ObservableProperty] private bool _isSwitchingServer;
@@ -61,24 +61,24 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// اگر اینترنت قطع باشد پیام «اینترنت قطع است» نشان می‌دهد و true برمی‌گرداند تا
-    /// به‌جای پیام گمراه‌کنندهٔ «هیچ سروری پاسخ نداد»، دلیل واقعی دیده شود.
+    /// If the internet is down it shows the «اینترنت قطع است» message and returns true so
+    /// that the real reason is visible instead of the misleading «هیچ سروری پاسخ نداد» message.
     /// </summary>
     private async Task<bool> NoInternetAsync()
     {
-        // در حالت اتصال، پروب‌ها از مسیر پروکسی داخلی موتور هم می‌روند؛
-        // وگرنه در TUN پروب‌های خامِ پورت ۸۰ وارد تونل می‌شوند و «اینترنت قطع» غلط دیده می‌شود.
+        // While connected, the probes also go through the engine's internal proxy path;
+        // otherwise in TUN mode the raw port-80 probes enter the tunnel and «اینترنت قطع» is wrongly reported.
         int? proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
         if (await NetHealth.IsInternetAvailableAsync(proxyPort: proxyPort)) return false;
 
-        // بعد از عوض‌شدن شبکه (قطعی WiFi و وصل‌شدن دوباره) اولین پروب اغلب به‌خاطر
-        // بالا آمدن DHCP/DNS شکست می‌خورد؛ یک بار دیگر با فاصلهٔ کوتاه.
+        // After a network change (WiFi dropping and reconnecting) the first probe often fails because
+        // DHCP/DNS is still coming up; try once more after a short delay.
         await Task.Delay(700);
         if (await NetHealth.IsInternetAvailableAsync(proxyPort: proxyPort, timeoutMs: 2000)) return false;
 
-        // تونلِ بعد از تعویض شبکه مرده ولی مسیر مستقیم سالم است: پروب مستقیم با
-        // بایپس (همان مکانیزم مرحلهٔ ۱ «یافتن سرور بهتر»). اگر جواب داد یعنی
-        // اینترنت قطع نیست و نباید جلوی کار (مثل جستجو که تونل را تازه می‌کند) گرفته شود.
+        // The tunnel is dead after a network switch but the direct route is healthy: a direct probe with
+        // bypass (the same mechanism as stage 1 «یافتن سرور بهتر»). If it answers, the
+        // internet is not down and work (such as a search that refreshes the tunnel) must not be blocked.
         if (IsConnected)
         {
             try
@@ -122,26 +122,26 @@ public partial class MainViewModel : ViewModelBase
                 if (tunReconnect != null) NotificationHelper.ShowError(issue);
                 return;
             }
-            // قطع‌بودن اینترنت را قبل از شروع اتصال (و اتصال‌مجددِ تعویض TUN) بگوی؛
-            // وگرنه موتور بالا می‌آید و کاربر فکر می‌کند وصل است.
+            // Report the dead internet before starting the connection (and the TUN-toggle reconnect);
+            // otherwise the engine comes up and the user thinks it is connected.
             if (await NoInternetAsync()) return;
             Status = TranslationManager.Instance["Status_Connecting"];
             await _engine.StartAsync(server, SetSystemProxy, _settings, tunExclusionHosts: Servers.Select(s => s.Address),
                 progress: s => Post(() => Status = s));
             IsConnected = true;
-            // خودِ اتصال رویدادِ شبکه شلیک می‌کند (ساختِ TUN، عوض‌شدنِ مسیرها، سوییچِ DNS).
-            // ویندوز آن را با تأخیرِ کم اعلام می‌کند — یعنی وقتی IsConnected تازه true شده
-            // هنوز در صفِ تحویل است. اگر پنجرهٔ محافظ همین‌جا شروع نشود، گوشِ شبکه همان
-            // رویداد را «شبکه عوض شد» می‌فهمد و چند ثانیه بعد وصلِ مجددِ خودکار راه
-            // می‌انداخت: هم در اتصالِ اولِ هر اجرای برنامه، هم بعد از تعویضِ سرور.
+            // The connection itself fires a network event (TUN creation, route changes, DNS switch).
+            // Windows reports it with a short delay — meaning when IsConnected has just become true it is
+            // still in the delivery queue. If the guard window is not started right here, the network listener reads that
+            // event as «شبکه عوض شد» and seconds later kicks off an automatic reconnect: both on the
+            // first connection of every program run, and after switching servers.
             SuppressNetworkWatcher(NetSelfChangeSuppressMs);
             TunKillSwitch.SetTunnelUp(true, _engine.HttpPort);
             if (!IsTesting && SetSystemProxy && !LeaveSystemProxyAsIs && !_engine.IsTunActive)
                 ApplySystemProxyEndpoint();
             if (_engine.IsTunActive)
             {
-                // SweepPersistedPins داخل Start روی رشتهٔ UI و در قفل اجرا می‌شد و
-                // می‌توانست با route.exe چند ثانیه سربرگ را نگه دارد؛ به پس‌زمینه رفت.
+                // SweepPersistedPins ran inside Start on the UI thread and under a lock and
+                // could hold the header for several seconds with route.exe; it moved to the background.
                 var tunExcluded = _settings.TunExcludedApps?.ToList();
                 _ = Task.Run(() => TunExclusion.Start(tunExcluded));
             }
@@ -150,7 +150,7 @@ public partial class MainViewModel : ViewModelBase
             SpeedBlinkOpacity = 1.0;
             RefreshConnectionFlags();
             Status = string.Format(TranslationManager.Instance["Status_ConnectedTo"], server.Name);
-            // اگر گزارشی در صف مانده (مثلاً کرشِ هنگام قطع شبکه)، حالا از مسیر تونل ارسال شود.
+            // If a report is still pending (e.g. a crash during a network drop), send it now through the tunnel.
             _ = Task.Run(async () =>
             {
                 try { await Core.BugReport.FlushPendingAsync(_engine.HttpPort); } catch { }
@@ -185,7 +185,7 @@ public partial class MainViewModel : ViewModelBase
                 catch { }
             });
 
-            // آپدیت تأخیر واقعی بعد از اتصال
+            // Update the real delay after connecting
             _ = Task.Run(async () =>
             {
                 try
@@ -223,13 +223,13 @@ public partial class MainViewModel : ViewModelBase
 
     private void DisconnectCore(bool notify)
     {
-        // kill پروسه، حذف مسیرها و بازگردانی DNS با powershell چند ثانیه طول می‌کشد؛
-        // اجرای همزمان آن روی رشتهٔ UI، قطع اتصال دستی/تعویض سرور/اتصال هوشمند را
-        // می‌گرفت. اکنون در پس‌زمینهٔ LongRunning اجرا می‌شود و گیت داخلی Stop()
-        // هم‌زمانی آن با پاکسازی StartAsync را سریالایز می‌کند.
+        // Killing the process, removing routes and restoring DNS via powershell takes several
+        // seconds; running it synchronously on the UI thread used to stall manual disconnect,
+        // server switching and smart connect. It now runs on a LongRunning background thread and
+        // the internal Stop() gate serializes it with StartAsync's cleanup.
         _cleanupTask = Task.Factory.StartNew(() => { try { _engine.StopAndCleanupTun(); } catch { } }, TaskCreationOptions.LongRunning);
-        // حذفِ مسیرها و بازگردانیِ DNS رویدادِ شبکه شلیک می‌کند؛ بدونِ این پنجره،
-        // گوشِ شبکه همان «شبکه عوض شد» تفسیرش می‌کرد و وصلِ مجددِ خودکار راه می‌افتاد.
+        // Removing routes and restoring DNS fires a network event; without this window,
+        // the network listener would interpret it as «شبکه عوض شد» and start an automatic reconnect.
         SuppressNetworkWatcher(NetSelfChangeSuppressMs);
         TunKillSwitch.SetTunnelUp(false, 0);
         IsConnected = false;
@@ -242,8 +242,8 @@ public partial class MainViewModel : ViewModelBase
     private Task? _cleanupTask;
 
     /// <summary>
-    /// تا پاکسازیِ پس‌زمینهٔ اتصال قبلی تمام شود صبر می‌کند؛ بدون آن، پینگ/تست مرحلهٔ ۱
-    /// اتصال هوشمند با DNSِ مردهٔ تونل و مسیرهای در حال حذف هم‌زمان می‌شود و ثانیه‌ها می‌ایستد.
+    /// Waits for the previous connection's background cleanup to finish; without it, the
+    /// stage-1 ping/test of smart connect overlaps the tunnel's dead DNS and the routes being removed and stalls for seconds.
     /// </summary>
     private async Task AwaitCleanupAsync()
     {
@@ -256,10 +256,10 @@ public partial class MainViewModel : ViewModelBase
     private static readonly TimeSpan RestartCleanupTimeout = TimeSpan.FromSeconds(15);
 
     /// <summary>
-    /// قطعِ کاملِ اتصال پیش از ری‌استارت. DisconnectCore پاکسازی را در پس‌زمینه رها
-    /// می‌کند و بلافاصله برمی‌گردد؛ اینجا تا پایانِ حذفِ مسیرها، بازگردانیِ DNS و
-    /// بستنِ موتور صبر می‌کنیم تا نمونهٔ بعدی روی TUN و WFPِ نیمه‌کاره بالا نیاید.
-    /// سقفِ زمانی دارد تا ری‌استارت هرگز به خاطرِ گیر کردنِ پاکسازی متوقف نشود.
+    /// Fully disconnects before the restart. DisconnectCore leaves the cleanup running in the
+    /// background and returns immediately; here we wait until route removal, DNS restore and
+    /// engine shutdown finish so the next instance does not start on a half-torn-down TUN and WFP.
+    /// It has a timeout so the restart never hangs on a stuck cleanup.
     /// </summary>
     public async Task PrepareRestartAsync()
     {
@@ -302,7 +302,7 @@ public partial class MainViewModel : ViewModelBase
         finally { if (switching) IsSwitchingServer = false; }
     }
 
-    // ---------- تست ----------
+    // ---------- Test ----------
 
     [RelayCommand]
     private void ToggleTun() => UseTunMode = !UseTunMode;
@@ -324,8 +324,8 @@ public partial class MainViewModel : ViewModelBase
 
         try
         {
-            // پاکسازی اتصال قبلی (kill + حذف مسیرها + بازگردانی DNS) باید تمام شود؛
-            // وگرنه پینگ‌های مرحلهٔ ۱ با DNSِ مردهٔ تونل هم‌زمان می‌شوند و ثانیه‌ها می‌ایستند.
+            // Cleanup of the previous connection (kill + route removal + DNS restore) must finish;
+            // otherwise stage 1 pings race the tunnel's dead DNS and stall for seconds.
             await AwaitCleanupAsync();
 
             int totalServers = Servers.Count;
@@ -334,13 +334,13 @@ public partial class MainViewModel : ViewModelBase
             SearchTotalCount = totalServers;
             OnPropertyChanged(nameof(SearchProgressText));
 
-            // --- مرحله ۱: پینگ سریع TCP روی همه سرورها ---
+            // --- Stage 1: fast TCP ping on all servers ---
             Status = TranslationManager.Instance["Status_SmartStage1"];
             ToastHandler?.Invoke(TranslationManager.Instance["Toast_FindingBest"]);
             AppendLog(TranslationManager.Instance["Log_SmartStage1"]);
 
-            // یک scope مشترک برای همهٔ پینگ‌ها: قبلاً هر پینگ جداگانه route print +
-            // resolve + افزودن/حذف مسیر اجرا می‌کرد و شروع اتصال هوشمند می‌خوابید.
+            // One shared scope for all the pings: previously each ping ran route print +
+            // resolve + add/remove route on its own, and smart connect startup would stall.
             using var bypassScope = await TestRouteBypass.BeginAsync(Servers.Select(s => (string?)s.Address));
 
             foreach (var s in Servers) { s.LatencyMs = -1; s.PingMs = -1; }
@@ -367,20 +367,20 @@ public partial class MainViewModel : ViewModelBase
             catch (OperationCanceledException) { }
             if (ct.IsCancellationRequested) throw new OperationCanceledException(ct);
 
-            // صبر تا همه Post() ها اجرا بشن
+            // Wait until all Post() calls have run
             await Dispatcher.UIThread.InvokeAsync(() => { });
             AutoSortAfterTest("latency");
 
-            // --- انتخاب ۱۲ کاندید برتر ---
+            // --- Pick the top 12 candidates ---
             var candidates = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).Take(12).ToList();
 
-            // ذخیره مابقی سرورها برای جستجوی تدریجی
+            // Save the remaining servers for the gradual search
             var candidateIds = new HashSet<string>(candidates.Select(c => c.Id));
             _searchPool = Servers.Where(s => !candidateIds.Contains(s.Id)).ToList();
             _lastSearchTime = DateTime.Now;
             AppendLog(string.Format(TranslationManager.Instance["Log_SearchPool"], _searchPool.Count));
 
-            // آپدیت تعداد کل برای فاز تأخیر واقعی
+            // Update the total count for the real-delay phase
             tested = 0;
             SearchTestedCount = 0;
             SearchTotalCount = candidates.Count;
@@ -399,7 +399,7 @@ public partial class MainViewModel : ViewModelBase
 
             AppendLog(string.Format(TranslationManager.Instance["Log_SmartCandidates"], candidates.Count));
 
-            // --- مرحله ۲: تأخیر واقعی batch (multi-outbound) ---
+            // --- Stage 2: batch real delay (multi-outbound) ---
             Status = string.Format(TranslationManager.Instance["Status_SmartRealDelay"], candidates.Count);
             AppendLog(string.Format(TranslationManager.Instance["Log_SmartTesting"], candidates.Count));
 
@@ -419,7 +419,7 @@ public partial class MainViewModel : ViewModelBase
 
             await Dispatcher.UIThread.InvokeAsync(() => { });
 
-            // --- انتخاب نهایی: کمترین تأخیر واقعی ---
+            // --- Final selection: lowest real delay ---
             var finalBest = candidates
                 .Where(s => s.RealDelayMs > 0 && s.LatencyMs > 0)
                 .OrderBy(s => s.RealDelayMs)
@@ -464,7 +464,7 @@ public partial class MainViewModel : ViewModelBase
         finally { FlushLog(); }
     }
 
-    // ---------- یافتن سرور بهتر ----------
+    // ---------- Finding a better server ----------
     [RelayCommand]
     private async Task FindBetterServer()
     {
@@ -489,10 +489,10 @@ public partial class MainViewModel : ViewModelBase
             AppendLog(TranslationManager.Instance["Log_FindNoSelection"]);
             return;
         }
-        // اینترنت قطع است؟ قبل از اتلافِ وقتِ تست بگو تا «هیچ سروری پاسخ نداد» دیده نشود.
+        // Internet down? Say so before wasting time on the test, so «no server responded» never shows.
         if (await NoInternetAsync()) return;
 
-        // بررسی انقضا: اگه ۱۵ دقیقه گذشته، از اول شروع کن
+        // Expiry check: if 15 minutes have passed, start over
         if (_searchPool.Count == 0 || (DateTime.Now - _lastSearchTime) > SearchExpiry)
         {
             AppendLog(TranslationManager.Instance["Log_PoolExpired"]);
@@ -502,7 +502,7 @@ public partial class MainViewModel : ViewModelBase
             _searchPool = _searchPool.OrderBy(_ => rng.Next()).ToList();
         }
 
-        // برداشتن batch بعدی
+        // Take the next batch
         var batch = _searchPool.Take(SearchBatchSize).ToList();
         _searchPool.RemoveRange(0, Math.Min(SearchBatchSize, _searchPool.Count));
         _lastSearchTime = DateTime.Now;
@@ -530,8 +530,8 @@ public partial class MainViewModel : ViewModelBase
             AppendLog(string.Format(TranslationManager.Instance["Log_FindBetter"], batch.Count, _searchPool.Count));
             ToastHandler?.Invoke(string.Format(TranslationManager.Instance["Toast_CheckingNew"], batch.Count));
 
-            // --- مرحله ۱: TCP ping سریع روی batch ---
-            // scope مشترک برای کل batch؛ قبلاً هر پینگ جداگانه route/resolve اجرا می‌کرد.
+            // --- Stage 1: fast TCP ping on the batch ---
+            // One shared scope for the whole batch; previously each ping ran route/resolve on its own.
             int invalidDomains = 0;
 
             static async Task<bool> IsHostUnresolvableAsync(string? address)
@@ -580,7 +580,7 @@ public partial class MainViewModel : ViewModelBase
             await Dispatcher.UIThread.InvokeAsync(() => { });
             AutoSortAfterTest("latency");
 
-            // فیلتر: فقط سرورهایی که TCP موفق داشتن
+            // Filter: only the servers that had a successful TCP ping
             var survivors = batch.Where(s => s.LatencyMs > 0).ToList();
             if (survivors.Count == 0)
             {
@@ -596,7 +596,7 @@ public partial class MainViewModel : ViewModelBase
 
             AppendLog(string.Format(TranslationManager.Instance["Log_FindSurvivors"], survivors.Count));
 
-            // --- مرحله ۲: تأخیر واقعی batch (multi-outbound) ---
+            // --- Stage 2: batch real delay (multi-outbound) ---
             AppendLog(string.Format(TranslationManager.Instance["Log_FindRealBatch"], survivors.Count));
 
             foreach (var c in survivors) { c.RealDelayMs = -1; c.RealDelaySuccessRate = -1; c.RealDelayJitter = 0; }
@@ -612,7 +612,7 @@ public partial class MainViewModel : ViewModelBase
             }
             catch (OperationCanceledException) { }
 
-            // اجرای Post های باقی‌مانده UI قبل از مقایسه
+            // Run the remaining UI Post() calls before comparing
             await Dispatcher.UIThread.InvokeAsync(() => { });
 
             var bestCandidate = survivors
@@ -622,7 +622,7 @@ public partial class MainViewModel : ViewModelBase
                 .FirstOrDefault();
             int bestMs = bestCandidate?.RealDelayMs ?? int.MaxValue;
 
-            // --- مقایسه با سرور فعلی ---
+            // --- Compare against the current server ---
             if (bestCandidate != null && bestMs < int.MaxValue)
             {
                 int currentMs = SelectedServer.RealDelayMs > 0 ? SelectedServer.RealDelayMs
@@ -630,7 +630,7 @@ public partial class MainViewModel : ViewModelBase
 
                 if (bestMs < currentMs)
                 {
-                    // سرور بهتر پیدا شد → سوییچ
+                    // Better server found → switch
                     AppendLog(string.Format(TranslationManager.Instance["Log_FindSwitch"], SelectedServer.Name, currentMs, bestCandidate.Name, bestMs));
                     ToastHandler?.Invoke(string.Format(TranslationManager.Instance["Toast_SwitchTo"], bestCandidate.Name, bestMs));
 

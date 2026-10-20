@@ -9,18 +9,18 @@ installer/publish/
 installer/output/
 installer/runtime/
 
-# ابزارهای توسعه (کش و حاشیه‌نویسی پروژه)
+# Development tools (cache and project annotations)
 .opencode/
 
-# بسته‌های انتشار: در پنل آپلود می‌شوند، جایی در تاریخچهٔ گیت ندارند
+# Release packages: uploaded via the panel, they have no place in git history
 upload-*.zip
 server/dl/*.zip
-# اسکرین‌شات‌ها و تصاویرِ کنارِ پنل: هرگز نباید واردِ مخزن شوند.
-# index.html این پوشه عمداً مستثنی است چون commit شده.
+# Screenshots and panel images: they must never enter the repository.
+# index.html of this folder is deliberately excepted because it is committed.
 server/dl/*.png
 server/dl/*.jpg
 
-# موتورهای بزرگ که در بستهٔ آپدیت نیستند و کد هم به آن‌ها ارجاع نمی‌دهد
+# Large engines that are not in the update package and not referenced by the code
 engine/sing-box.exe
 engine/libcronet.dll
 engine/LICENSE-sing-box.txt

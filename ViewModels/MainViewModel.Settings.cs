@@ -49,13 +49,13 @@ public partial class MainViewModel : ViewModelBase
         {
             Localization.TranslationManager.Instance.SetCulture(match.code);
             _settings.Language = match.code;
-            // ذخیرهٔ فوری، نه debounce: ری‌استارتِ زبان همین حالا شروع می‌شود و اگر
-            // برنامه وصل نباشد کلِ خروج کمتر از ۵۰۰ میلی‌ثانیه طول می‌کشد؛ تایمرِ
-            // debounce فرصتِ نوشتن پیدا نمی‌کرد و نمونهٔ بعدی همان زبانِ قبلی را
-            // می‌خواند («فارسی زدم، عربی بالا آمد»).
+            // Save immediately, not debounced: the language restart begins right now and,
+            // when the app is not connected, the whole exit takes under 500 ms; the debounce
+            // timer never got a chance to write and the next instance read the previous
+            // language ("I picked Persian and Arabic came up").
             SaveSettingsNow();
-            // --disconnect: ری‌استارتِ بعد از تغییر زبان باید اول اتصال را کامل قطع
-            // کند و بعد از بالا آمدن، دوباره وصل نشود.
+            // --disconnect: a restart after a language change must first disconnect fully
+            // and must not connect again once it comes back up.
             RestartRequested?.Invoke("--disconnect");
         }
     }
@@ -145,8 +145,8 @@ public partial class MainViewModel : ViewModelBase
 
         if (ok)
         {
-            // کاربر ممکن است در حین دیالوگ تیک را خاموش کرده باشد؛ در آن صورت
-            // اعمالِ دوبارهٔ TUN با UI ناهمخوان می‌شود و اتصال غیرمنتظره وصل/قطع می‌شود.
+            // The user may have unticked the box while the dialog was open; in that case
+            // re-applying TUN would drift from the UI and the connection would flip on and off.
             if (!UseTunMode) return;
             _settings.TunConfirmed = true;
             SaveSettings();
@@ -187,8 +187,8 @@ public partial class MainViewModel : ViewModelBase
     {
         _settings.SendUsageStats = value;
         SaveSettings();
-        // خاموش کردنِ صریح یعنی همین الان نمی‌خواهم بیاید؛ پس آنچه از قبل
-        // در صف مانده هم باید برود، نه اینکه منتظرِ رضایتی بماند که داده نشده.
+        // Explicitly turning it off means "not right now", so whatever was already
+        // queued must go too, rather than waiting for a consent that was never given.
         if (!value) Core.BugReport.DiscardPending();
     }
 
@@ -328,9 +328,9 @@ public partial class MainViewModel : ViewModelBase
             KillSwitchStatus = engaged
                 ? string.Format(TranslationManager.Instance["Set_KillSwitch_Waiting"], count)
                 : "";
-            // قطعِ عمدیِ خودِ برنامه (تعویضِ سرور، قطعِ دستی، وصلِ مجددِ خودکارِ
-            // بعد از تغییرِ شبکه) بلاکِ WFP درست راه می‌اندازد، ولی اعلانش فقط اضطراب است؛
-            // فقط از دستِ رفتنِ واقعیِ تونل باید خبر بدهیم.
+            // A deliberate disconnect by the app itself (server switch, manual disconnect,
+            // automatic reconnect after a network change) arms the right WFP block, but
+            // announcing it is just noise; only a real tunnel loss should be reported.
             if (TunKillSwitch.LastTransitionExpected) return;
             if (engaged)
                 NotificationHelper.Show(
@@ -344,13 +344,13 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// نسخهٔ برنامه برای نمایش در انتهای صفحهٔ تنظیمات.
+    /// The app version shown at the end of the settings page.
     ///
-    /// از <see cref="RemoteConfig.AppVersion"/> می‌آید که خودش attributeِ
-    /// <c>AssemblyInformationalVersion</c> روی مونتاژ را می‌خواند؛ یعنی همان
-    /// مقدارِ <c>&lt;Version&gt;</c> در Roxa.csproj. عدد در یک جا عوض می‌شود
-    /// و هم در UI و هم در درخواستِ آپدیت اعمال می‌گردد — عمداً ثابتِ متنی
-    /// نوشته نشده تا با نصب‌کننده از دست نرود.
+    /// It comes from <see cref="RemoteConfig.AppVersion"/>, which itself reads the
+    /// <c>AssemblyInformationalVersion</c> attribute on the assembly — i.e. the same
+    /// value as <c>&lt;Version&gt;</c> in Roxa.csproj. The number changes in one place
+    /// and applies to both the UI and the update request — deliberately not a text
+    /// constant, so it cannot be lost by the installer.
     /// </summary>
     public string AppVersionDisplay => RemoteConfig.AppVersion;
 

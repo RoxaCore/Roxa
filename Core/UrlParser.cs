@@ -26,7 +26,7 @@ using Roxa.Models;
 
 namespace Roxa.Core;
 
-/// <summary>پارس لینک‌های اشتراک‌گذاری به ServerInfo. پشتیبانی: vmess/vless/ss/trojan.</summary>
+/// <summary>Parses share links into ServerInfo. Supported: vmess/vless/ss/trojan.</summary>
 public static class UrlParser
 {
     public static bool IsProtocolLink(string text)
@@ -149,11 +149,11 @@ public static class UrlParser
     {
         try
         {
-            // همان مسیری را می‌گیریم که لاگِ تونل می‌گیرد. نصب در Program Files یعنی
-            // پوشهٔ برنامه برای کاربرِ عادی فقط-خواندنی است؛ ResolveLogDir اول
-            // <app>\logs را می‌سنجد و اگر قابلِ نوشتن نبود به %LOCALAPPDATA%\Roxa\logs
-            // می‌رود. بدونِ این، خطاِ همین parse هم بی‌صدا گم می‌شد و تنها سندِ
-            // گزارش‌شده از بین می‌رفت.
+            // It takes the same path the tunnel log takes. Installing under Program Files
+            // leaves the app folder read-only for a normal user; ResolveLogDir first checks
+            // <app>\logs and, when that is not writable, falls back to
+            // %LOCALAPPDATA%\Roxa\logs. Without this, an error from this very parse was
+            // silently lost and the only reported symptom disappeared.
             string dir = TunManager.LogDirectory;
             Directory.CreateDirectory(dir);
             string file = Path.Combine(dir, "parser.log");
@@ -340,7 +340,7 @@ public static class UrlParser
         "auto", "packet-up", "stream-up", "stream-one"
     ];
 
-    /// <summary>مقدار mode را بررسی می‌کند؛ خالی "" برمی‌گرداند و مقدار نامعتبر خطا می‌دهد.</summary>
+    /// <summary>Validates the mode value; returns "" when empty and errors on an invalid value.</summary>
     public static string ValidateXhttpMode(string mode)
     {
         string m = (mode ?? "").Trim();
@@ -349,7 +349,7 @@ public static class UrlParser
         throw new FormatException(string.Format(TranslationManager.Get("Url_InvalidParam"), "mode", m));
     }
 
-    /// <summary>فقط JSON معتبرِ object پذیرفته می‌شود؛ در غیر این صورت نادیده گرفته می‌شود.</summary>
+    /// <summary>Only a valid JSON object is accepted; anything else is ignored.</summary>
     public static string NormalizeXhttpExtra(string extra)
     {
         string e = (extra ?? "").Trim();

@@ -39,8 +39,8 @@ public static class TunRecovery
             KillOrphanEngine(state);
             if (state != null) RestoreProxyIfOurs(state);
             TunDns.RestoreFromState(state);
-            // اگر فایل وضعیت گم شده باشد RestoreFromState هیچ کاری نمی‌کند؛
-            // این خط مستقیم دنبال DNSِ جامانده‌ی 127.0.0.1 (بدون سرویسِ روی :53) می‌گردد.
+            // If the state file is missing, RestoreFromState does nothing;
+            // this line searches directly for a leftover 127.0.0.1 DNS (with no service on :53).
             TunDns.SweepDeadAdapters(out bool dnsStaleNeedsAdmin);
             CleanupStaleProxy();
 
@@ -111,10 +111,10 @@ public static class TunRecovery
 
     public static void EmergencyCleanup()
     {
-        // هم روی ProcessExit و هم روی ShutdownRequested ثبت شده است؛ بدون این سد، کلِ
-        // پاکسازی (کشتنِ موتور، حذفِ مسیرها، بازگردانیِ DNS) دو بار اجرا می‌شد و
-        // زمانِ خروج — یعنی همان پنجره‌ای که نمونهٔ بعدی منتظرش می‌ماند — دو برابر
-        // می‌شد. UnhandledException هم همین متد را صدا می‌زند.
+        // It is registered on both ProcessExit and ShutdownRequested; without this guard the whole
+        // cleanup (killing the engine, removing routes, restoring DNS) ran twice, doubling the
+        // exit time — the very window the next instance waits for.
+        // UnhandledException calls this same method too.
         if (Interlocked.Exchange(ref _cleanupDone, 1) == 1) return;
         if (!OperatingSystem.IsWindows()) return;
         try
@@ -138,8 +138,8 @@ public static class TunRecovery
             TunState.Delete();
         }
         catch { }
-        // آخرین خطوطِ لاگ را پیش از پایانِ پروسه روی دیسک می‌ریزیم؛ هر دو بافر
-        // حداکثر یک ثانیه عقب‌اند و نباید موقعِ کرش/خروج گم شوند.
+        // We flush the last log lines to disk before the process ends; both buffers
+        // lag by at most one second and must not be lost on crash/exit.
         try { TunManager.FlushLog(); } catch { }
         try { XrayEngine.FlushEngineLog(); } catch { }
     }
@@ -163,10 +163,10 @@ public static class TunRecovery
             try
             {
                 using var p = Process.GetProcessById(state.EnginePid);
-                // آخرین سنگر در برابرِ فایلِ وضعیتِ دستکاری‌شده: همین‌جا نام و
-                // مسیرِ واقعیِ پروسه با مسیرِ خودِ این نمونه مقایسه می‌شود، نه
-                // مقدارِ خوانده‌شده از فایل. بدونِ این، نوشتنِ یک PIDِ دلخواه
-                // در tun-state.json یعنی کشتنِ هر پروسه با دسترسیِ مدیر.
+                // The last defense against a tampered state file: here the real name and
+                // path of the process are compared against this instance's own path, not
+                // the value read from the file. Without it, writing an arbitrary PID
+                // into tun-state.json would mean killing any process with admin rights.
                 if (!IsOurEngineProcess(p))
                 {
                     TunManager.Log($"Recovery refused to kill pid={state.EnginePid}: not this install's xray.exe.");
@@ -185,7 +185,7 @@ public static class TunRecovery
         }
         try
         {
-            // مسیرِ جست‌وجو هم از خودِ همین نصب می‌آید، نه از درونِ فایل.
+            // The search path also comes from this very install, not from inside the file.
             string enginePath = XrayEngine.EnginePath;
             string procName = Path.GetFileNameWithoutExtension(enginePath);
             if (!string.IsNullOrEmpty(procName))
@@ -214,11 +214,11 @@ public static class TunRecovery
     }
 
     /// <summary>
-    /// آیا این پروسه واقعاً همان xray.exeِ همین نصب است؟
+    /// Is this process really the xray.exe of this very install?
     ///
-    /// نام و مسیر هر دو باید بخوانند و تطبیق دهند. مسیرِ خالی یا ناخواندنی
-    /// یعنی نتوانستیم مطمئن شویم، و در آن حالت نباید kill کنیم — رد کردنِ
-    /// اشتباهیِ یک پروسهٔ سالم از کشتنِ اشتباهیِ آن بهتر است.
+    /// Both name and path must be readable and match. An empty or unreadable path
+    /// means we could not verify, and in that case we must not kill — wrongly rejecting
+    /// a healthy process is better than wrongly killing it.
     /// </summary>
     private static bool IsOurEngineProcess(Process p)
     {
@@ -251,21 +251,21 @@ public static class TunRecovery
                     if (Math.Abs(p.StartTime.ToFileTimeUtc() - state.EngineStartTicks) > TimeSpan.TicksPerSecond * 10)
                         return false;
                 }
-                // نادیده‌گرفتنِ خطای خواندنِ StartTime دقیقاً همان نقطه‌ای است که
-                // محافظتِ تکرارِ PID را بی‌اثر می‌کند: اگر پروسهٔ ثبت‌شده مرده باشد
-                // و ویندوز همان شماره را به یک برنامهٔ دیگر داده باشد، در اینجا
-                // باید «نه» بگوییم تا پروسهٔ بی‌گناه کشته نشود. موتورِ خودِ ما
-                // همیشه از همین کاربرِ برخوردار است و خواندنش خطا نمی‌دهد؛ و اگر
-                // باز هم این‌جا رد شویم، جست‌وجوی پایینی با تطبیقِ مسیرِ کامل
-                // همان موتور را پیدا و پاک می‌کند، پس چیزی از دست نمی‌رود.
+                // Ignoring the StartTime read error is exactly the point where the
+                // PID-reuse protection becomes ineffective: if the recorded process is dead
+                // and Windows handed that same number to another program, here we must
+                // say "no" so the innocent process is not killed. Our own engine
+                // always runs as this same user and reading it never fails; and if we
+                // still get rejected here, the scan below matches the full path,
+                // finds and removes the real engine, so nothing is lost.
                 catch { return false; }
             }
             try
             {
                 string? exe = p.MainModule?.FileName;
-                // خالی بودن هم باید رد شود: خواندنِ همین مسیر است که ثابت می‌کند
-                // پروسه همان xray.exeِ ماست. بدونِ آن، «نه» گفتن از «آری» امن‌تر است
-                // و جست‌وجوی پایینی با تطبیقِ مسیر، موتورِ واقعیِ خودِ ما را پیدا می‌کند.
+                // Null must be rejected too: reading this very path is what proves
+                // the process is our xray.exe. Without it, saying "no" is safer than "yes",
+                // and the path-matching scan below will find our real engine.
                 if (exe == null || !string.Equals(exe, state.EngineExePath, StringComparison.OrdinalIgnoreCase))
                     return false;
             }

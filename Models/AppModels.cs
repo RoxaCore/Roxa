@@ -147,9 +147,9 @@ public class AppSettings
     public int ShownAnnouncementCount { get; set; }
     public string Country { get; set; } = "";
     public string ClientId { get; set; } = "";
-    // پیش‌فرضِ off: یک نصبِ تازه بدونِ هیچ رضایتی نباید چیزی بفرستد. گیتِ ارسالِ
-    // گزارشِ کرش (BugReport.ConsentAllowsSend) به همین بستگی دارد؛ روشن‌شدنش
-    // باید انتخابِ خودِ کاربر باشد.
+    // Off by default: a fresh install must not send anything without consent.
+    // The crash-report send gate (BugReport.ConsentAllowsSend) rests on this;
+    // turning it on must be the user's own choice.
     public bool SendUsageStats { get; set; }
     public int ConnectCount { get; set; }
     public List<string> TunExcludedApps { get; set; } = new();

@@ -237,8 +237,8 @@ public partial class ServerInfo : ObservableObject
 
                 if (shortName.StartsWith(CountryCode, StringComparison.OrdinalIgnoreCase))
                 {
-                    // کد به اسم چسبیده («DE-01») → «آلمان 01»؛ ولی اگر حرف بعدی بخشی از کلمه باشد
-                    // (مثل «India» با کد IN) دست نمی‌زنیم تا اسم خراب نشود.
+                    // Code glued to the name ("DE-01") → "Germany 01"; but if the next letter
+                    // is part of a word (e.g. "India" with code IN) we leave it alone.
                     if (shortName.Length == CountryCode.Length)
                         return cn.Length > 0 ? cn : shortName;
                     if (!char.IsLetter(shortName[CountryCode.Length]) && cn.Length > 0)
@@ -260,10 +260,10 @@ public partial class ServerInfo : ObservableObject
     private string? _nameTokensFor;
 
     /// <summary>
-    /// توکن‌های اسمِ همین سرور، فقط وقتی Name عوض شود دوباره ساخته می‌شود. قبلاً
-    /// برای هر بارِ خواندنِ ShortName، اسمِ همهٔ سرورهای هم‌اشتراک از نو Split
-    /// می‌شد؛ با لیستِ چندصدتایی یعنی صدها آرایهٔ جدید به‌ازای هر سلولی که رندر
-    /// می‌شود، روی همان رشته‌ای که رابط را می‌کِشد.
+    /// Tokens of this server's name, rebuilt only when Name changes. Previously
+    /// every read of ShortName re-split the names of all servers in the same
+    /// subscription — with lists of several hundred that means hundreds of new
+    /// arrays per rendered cell, on the very string that drives the UI.
     /// </summary>
     private string[] NameTokens
     {
@@ -342,7 +342,7 @@ public partial class ServerInfo : ObservableObject
         }
     }
 
-    /// <summary>اگر transport این سرور پشتیبانی نشود، پیام خطا؛ وگرنه رشتهٔ خالی.</summary>
+    /// <summary>An error message when this server's transport is unsupported; otherwise an empty string.</summary>
     [JsonIgnore]
     public string TransportIssue
     {
@@ -559,10 +559,10 @@ public partial class ServerInfo : ObservableObject
     };
 
     /// <summary>
-    /// کلید واحد تشخیص تکراری: همهٔ فیلدهای مؤثر بر پیکربندی اتصال — آدرس، پورت،
-    /// پروتکل، ترنسپورت، مسیر، حالت، امنیت، رمزنگاری، احراز هویت و پارامترهای لایهٔ
-    /// پروکسی. نام و لینک داخل کلید نیستند (دو لینک متفاوتِیک پیکربندی تکراری‌اند)؛
-    /// دو سرور با آدرس/پورت یکسان ولی هر فیلدمؤثر دیگر متفاوت، تکراری نیستند.
+    /// The single key identifying duplicates: all fields affecting the connection
+    /// config - address, port, protocol, transport, path, mode, security, encryption,
+    /// auth and proxy-layer parameters. Name and link are not in it (two links to one
+    /// config are duplicates); same address/port with a differing effective field is not.
     /// </summary>
     public string GetDupeKey() => string.Join('|',
         Protocol,

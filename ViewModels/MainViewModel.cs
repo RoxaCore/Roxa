@@ -49,8 +49,8 @@ public partial class MainViewModel : ViewModelBase
      public Action? SelectionRefreshHandler { get; set; }
      public Func<Task<string?>>? PickTunExcludedAppHandler { get; set; }
 
-     // مسیرِ فایل برایِ خروجی/ورودیِ اشتراک‌ها. خودِ Storage را رابط نمی‌سازد؛
-     // اینجا فقط مسیرِ انتخابیِ کاربر برمی‌گردد و کارِ فایل در خودِ ViewModel است.
+     // File path for subscription export/import. Storage itself does not build the dialog;
+     // here only the user-chosen path is returned and the file work lives in the ViewModel.
      public Func<Task<string?>>? ExportSubsHandler { get; set; }
      public Func<Task<string?>>? ImportSubsHandler { get; set; }
 
@@ -97,7 +97,7 @@ public partial class MainViewModel : ViewModelBase
           }
       }
 
-      // --- وضعیت جستجوی تدریجی ---
+      // --- Incremental search state ---
       private List<ServerInfo> _searchPool = new();
       private DateTime _lastSearchTime = DateTime.MinValue;
       private const int SearchBatchSize = 5;
@@ -112,9 +112,9 @@ public partial class MainViewModel : ViewModelBase
      public bool HasDuplicates => DuplicateCount > 0;
 
      /// <summary>
-     /// مبنای واحد تشخیص تکراری برای شمارش، حذف و افزودن: ServerInfo.GetDupeKey —
-     /// آدرس + پورت + پروتکل + ترنسپورت + مسیر + حالت + امنیت + رمزنگاری +
-     /// احراز هویت و بقیهٔ فیلدهای مؤثر بر اتصال؛ نام و لینک در کلید نیستند.
+     /// Single basis for duplicate detection when counting, deleting and adding: ServerInfo.GetDupeKey —
+     /// address + port + protocol + transport + path + mode + security + encryption +
+     /// authentication and the remaining fields that affect the connection; name and link are not in the key.
      /// </summary>
      public static string DupeKey(ServerInfo s) => s.GetDupeKey();
 
@@ -130,7 +130,7 @@ public partial class MainViewModel : ViewModelBase
       public string[] SortOptions => [TranslationManager.Instance["Sort_None"], TranslationManager.Instance["Sort_Latency"], TranslationManager.Instance["Sort_Speed"], TranslationManager.Instance["Sort_Name"]];
 
 
-    // آرگومان اضافه (مثل --tab subscriptions) به فرمان relaunch پیوست می‌شود.
+    // Extra arguments (like --tab subscriptions) are appended to the relaunch command.
     public event Action<string>? RestartRequested;
 
     private ServerInfo? DisplayServer => IsConnected ? _engine.CurrentServer ?? SelectedServer : SelectedServer;
@@ -159,11 +159,11 @@ public partial class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        // DPAPI از کار افتاده و فایلِ اشتراک‌ها متنی نوشته شده — باید همان لحظه
-        // دیده شود، نه اینکه کاربر بعداً خودش بفهمد. Storage فقط خبر می‌دهد و
-        // رابط نمی‌سازد؛ اینجا به زبانِ رابطِ کاربری ترجمه می‌شود. ToastHandler
-        // هنوز ممکن است تنظیم نشده باشد، پس داخلِ خودِ رویداد خوانده می‌شود، نه
-        // اینجا؛ و Post چون SaveSubscriptions ممکن است از پس‌زمینه صدا شود.
+        // DPAPI has failed and the subscription file is written in clear text — it must be seen
+        // right away, not discovered by the user later. Storage only raises a notice and does
+        // not build a dialog; here it is translated into UI language. ToastHandler
+        // may still be unset, so it is read inside the event itself rather than
+        // here; and Post because SaveSubscriptions may be called from a background thread.
         Storage.SubscriptionsWrittenInClearText += () => Post(() =>
         {
             Status = TranslationManager.Instance["Status_SubStoredInClear"];
@@ -262,7 +262,7 @@ public partial class MainViewModel : ViewModelBase
         };
         AppendLog(string.Format(TranslationManager.Instance["Log_ServersLoaded"], Servers.Count, Subscriptions.Count));
 
-        // ارسال گزارش‌های در صف (کرشِ اجرای قبلی یا گزارشی که هنگام قطع شبکه ماند).
+        // Send queued reports (a crash from a previous run, or a report stuck during a network outage).
         _ = Task.Run(async () =>
         {
             try
@@ -278,14 +278,14 @@ public partial class MainViewModel : ViewModelBase
         _speedTimer.Tick += (_, _) => UpdateLiveSpeed();
         _speedTimer.Start();
 
-        // گوش‌دادن به تغییرِ شبکه (خاموش/روشن‌کردنِ وای‌فای، عوض‌شدنِ مودم) تا بعد از
-        // برگشتنِ اینترنت، وصلِ مجددِ خودکار به همان سرورِ قبلی انجام شود.
+        // Listen for network changes (Wi-Fi on/off, modem swap) so that once the
+        // internet is back, automatic reconnection to the same previous server happens.
         StartNetworkWatcher();
 
         _blinkTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
         _blinkTimer.Tick += (_, _) => BlinkTick();
-        // آغاز/توقف در OnIsConnectedChanged؛ در حالتِ قطع بودن، این تایمر فقط
-        // رشتهٔ UI را ۱۰ بار در ثانیه بیدار می‌کرد تا opacity را ۱ بگذارد.
+        // Start/stop in OnIsConnectedChanged; while disconnected, this timer merely
+        // woke the UI string 10 times a second just to set opacity to 1.
         if (IsConnected) _blinkTimer.Start();
     }
 
@@ -338,9 +338,9 @@ public partial class MainViewModel : ViewModelBase
     private static readonly object _nicGate = new();
 
     /// <summary>
-    /// پیمایشِ کاملِ کارت‌های شبکه (به‌همراهِ دو بار GetIPStatistics برای هر کارت) هر ۳
-    /// ثانیه و روی رشتهٔ UI گران تمام می‌شد؛ نتیجه را ۵ ثانیه نگه می‌داریم و فقط وقتی
-    /// کارتِ ذخیره‌شده از کار افتاده باشد دوباره می‌گردیم.
+    /// Full enumeration of all network cards (plus two GetIPStatistics calls per card) every 3
+    /// seconds on the UI thread was expensive; we hold the result for 5 seconds and only rescan
+    /// when the cached card has gone down.
     /// </summary>
     private static System.Net.NetworkInformation.NetworkInterface? FindActiveNetworkInterface()
     {
@@ -469,7 +469,7 @@ public partial class MainViewModel : ViewModelBase
 
     public async Task OnStartedAsync()
     {
-        // صدازننده async void است؛ هر استثنایی اینجا باعث crash کل برنامه می‌شود.
+        // The invoker is async void; any exception here crashes the whole application.
         try
         {
             StartRemoteChecks();
@@ -480,8 +480,8 @@ public partial class MainViewModel : ViewModelBase
                     await UpdateSubscriptions();
             }
             bool restartReconnect = Program.StartupArgs.Length > 0 && Array.Exists(Program.StartupArgs, a => a == "--reconnect");
-            // ری‌استارتِ بعد از قطعِ عمدی (مثلاً عوض کردن زبان) نباید دوباره وصل شود؛
-            // AutoConnect فقط برای اجرای عادیِ برنامه است، نه برای این اجرا.
+            // A restart after an intentional disconnect (e.g. changing the language) must not reconnect;
+            // AutoConnect is only for a normal run of the app, not for this launch.
             bool noAutoConnect = Program.StartupArgs.Length > 0 && Array.Exists(Program.StartupArgs, a => a == "--no-autoconnect");
             if ((restartReconnect || (AutoConnect && !noAutoConnect)) && !IsConnected)
             {
@@ -558,8 +558,8 @@ public partial class MainViewModel : ViewModelBase
         _visibleLines.Clear();
         int start = Math.Max(0, _allLogLines.Count - 100);
 
-        // فیلتر را یک‌بار در هر بازسازی حل می‌کنیم، نه به‌ازای هر خط؛ قبلاً هر
-        // نوبت چند صد جست‌وجوی ResourceManager روی رشتهٔ UI انجام می‌شد.
+        // We resolve the filter once per rebuild instead of per line; previously every
+        // pass ran several hundred ResourceManager lookups over the UI string.
         string filter = LogFilter;
         bool showAll = true, errorsOnly = false, connectionOnly = false;
         if (string.Equals(filter, TranslationManager.Instance["Filter_Errors"], StringComparison.Ordinal))
@@ -600,9 +600,9 @@ public partial class MainViewModel : ViewModelBase
 
     private void SaveSettings()
     {
-        // ذخیره را ۵۰۰ میلی‌ثانیه عقب می‌اندازیم؛ قبلاً هر یک از حدود ۲۵ setter
-        // (حتی انتخابِ هر سرور) بلافاصله سریالایز و روی دیسک نوشته می‌شد و با
-        // حرکتِ سریع در رابط ده‌ها نوشتنِ پشت‌سرهم داشتیم.
+        // Defer saving by 500 ms; previously each of the ~25 setters
+        // (even picking a server) was serialized to disk at once, and
+        // quick UI movement produced dozens of back-to-back writes.
         lock (_settingsSaveGate)
         {
             _settingsSaveTimer ??= new System.Threading.Timer(
@@ -612,12 +612,12 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// فوری‌کردنِ ذخیرهٔ به‌تعویق‌افتاده. خروجِ برنامه این را صدا می‌زند تا آخرین
-    /// تغییرِ تنظیمات در ۵۰۰ میلی‌ثانیهٔ آخر گم نشود.
+    /// Flush the pending save. The app calls this on exit so the last
+    /// settings change in the final 500 ms is not lost.
     /// </summary>
     /// <summary>
-    /// برای مسیرهایی که بلافاصله ری‌استارت یا خروج دارند. نباید منتظرِ ذخیرهٔ
-    /// debounce شده بمانند، چون نمونهٔ بعدی همین فایل را می‌خواند.
+    /// For paths that restart or exit immediately. They must not wait for the
+    /// debounced save, because the next instance reads the same file.
     /// </summary>
     public void FlushPendingSettings() => SaveSettingsNow();
 
@@ -647,15 +647,15 @@ public partial class MainViewModel : ViewModelBase
             await Clipboard.SetTextAsync(text);
     }
 
-    // ---------- سرور ----------
+    // ---------- server ----------
 
 
       public void Shutdown()
       {
-          // رویدادِ static را رها می‌کنیم؛ وگرنه نمونهٔ قبلیِ ViewModel با کلِ
-          // نمودارِ اشیایش برای همیشه نگه داشته می‌شود.
+          // Release the static event; otherwise the previous ViewModel
+          // instance stays alive forever with its whole object graph.
           try { TunKillSwitch.StateChanged -= OnKillSwitchStateChanged; } catch { }
-          // ذخیرهٔ به‌تعویق‌افتادهٔ تنظیمات را همین‌جا می‌ریزیم تا گم نشود.
+          // Drop the pending settings save here too, so it is not lost.
           SaveSettingsNow();
           try { SaveServers(); } catch { }
           _engine.Dispose();

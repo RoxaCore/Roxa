@@ -25,7 +25,7 @@ using Roxa.Models;
 
 namespace Roxa.Core;
 
-/// <summary>تست Real Delay: انجین (تکی یا multi-outbound) + warmup موازی + ۳ نمونه median روی پروکسی محلی.</summary>
+/// <summary>Real delay test: the engine (single or multi-outbound) + parallel warmup + 3 median samples over a local proxy.</summary>
 public static class RealDelayTester
 {
     private static readonly string[] WarmupUrls =
@@ -45,12 +45,12 @@ public static class RealDelayTester
     private const int BatchHttpConcurrency = 8;
 
     /// <summary>
-    /// همزمانیِ مسیر جایگزین (تک‌تک). این مسیر برای هر سرور یک پروسهٔ xray جداگانه بالا می‌آورد،
-    /// پس باید خیلی کمتر از BatchHttpConcurrency باشد تا CPU/رم یک‌باره اشباع نشود.
+    /// Concurrency of the fallback path (one by one). That path brings up a separate
+    /// xray process per server, so it must sit far below BatchHttpConcurrency.
     /// </summary>
     private const int FallbackProcessConcurrency = 2;
 
-    /// <summary>مکث بین شروع سرورها در مسیر جایگزین (پلکانی‌شدن اتصال‌ها).</summary>
+    /// <summary>Delay between server starts on the fallback path (connections are staggered).</summary>
     private const int FallbackStaggerMs = 75;
 
     private static readonly TimeSpan SessionUrlTtl = TimeSpan.FromSeconds(90);
@@ -296,8 +296,8 @@ public static class RealDelayTester
         Action<ServerInfo, TestResult>? onResult,
         CancellationToken ct)
     {
-        // برخلاف Task.WhenAll روی کل لیست، اینجا هر سرور پس از آزادشدن جای خالی
-        // و گذشت مکث کوتاه شروع می‌شود؛ چون هر کدام یک پروسهٔ xray بالا می‌آورد.
+        // Unlike Task.WhenAll over the whole list, here each server starts once a
+        // slot frees up and a short pause has passed (each one spawns an xray process).
         using var sem = new SemaphoreSlim(FallbackProcessConcurrency);
         var tasks = new List<Task>(servers.Count);
         foreach (var s in servers)

@@ -256,8 +256,8 @@
     <!-- Tabs -->
     <TabControl x:Name="MainTabControl" Grid.Row="2" Margin="24,0,24,0" Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
       <TabControl.Resources>
-        <!-- سایهٔ نرمِ قرصِ انتخاب‌شده. فقط یک بار تعریف می‌شود و در استایلِ
-             TabItem:selected از آن استفاده می‌شود تا از تعریفِ چندباره پرهیز شود. -->
+        <!-- Soft shadow of the selected pill. Defined once and reused by the
+             TabItem:selected style so it is not defined twice. -->
         <DropShadowEffect x:Key="TabPillShadow" Color="#000000" BlurRadius="8" Opacity="0.12" OffsetX="0" OffsetY="1"/>
       </TabControl.Resources>
       <TabControl.Styles>
@@ -266,16 +266,16 @@
           <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
-        <!-- «قرص»: هر تب یک آیتمِ مستقل و گوشه‌گرد، به‌جایِ خطِ زیرِ جدا.
-             توجه: هیچ‌کدام از این مقادیر hardcode نیست؛ رنگ‌ها از palette
-             خودِ پنجره گرفته شده‌اند. -->
+        <!-- The "pill": each tab is its own rounded item instead of a separate underline.
+             Note: none of these values are hardcoded; the colours are taken from the
+             window's own palette. -->
         <Style Selector="TabItem">
           <Setter Property="FontSize" Value="13"/>
           <Setter Property="FontWeight" Value="Medium"/>
           <Setter Property="Padding" Value="14,7"/>
           <Setter Property="Margin" Value="2,4"/>
-          <!-- #999999 روی #F7F8FA فقط 2.75:1 می‌داد و از حدِ WCAG (4.5:1)
-               رد بود. #6B7280 حدود 4.66:1 می‌شود. -->
+          <!-- #999999 on #F7F8FA gave only 2.75:1 and failed the WCAG bar (4.5:1).
+               #6B7280 gives about 4.66:1. -->
           <Setter Property="Foreground" Value="#6B7280"/>
           <Setter Property="Background" Value="Transparent"/>
           <Setter Property="CornerRadius" Value="8"/>
@@ -283,15 +283,15 @@
           <Setter Property="BorderBrush" Value="Transparent"/>
         </Style>
 
-        <!-- هاور: بازخوردِ لمسی روی خودِ قرص، نه فقط تغییرِ رنگِ متن. -->
+        <!-- Hover: tactile feedback on the pill itself, not just a change in text colour. -->
         <Style Selector="TabItem:pointerover">
           <Setter Property="Background" Value="#EEF1F0"/>
           <Setter Property="Foreground" Value="#4B5B57"/>
         </Style>
 
-        <!-- قرصِ انتخاب‌شده: سفید + حاشیهٔ ملایم + سایه، روی زمینهٔ #F7F8FA.
-             عمداً از سبزِ برند برایِ تبِ فعال استفاده نمی‌کنیم تا آن رنگ برایِ
-             وضعیتِ «متصل» آزاد بماند و کاربر اشتباه نگیرد. -->
+        <!-- Selected pill: white + soft border + shadow, over the #F7F8FA background.
+             We deliberately avoid the brand green for the active tab so that colour
+             stays free for the "connected" state and the user is not misled. -->
         <Style Selector="TabItem:selected">
           <Setter Property="Background" Value="#FFFFFF"/>
           <Setter Property="BorderBrush" Value="#D5DEDB"/>
@@ -300,10 +300,10 @@
           <Setter Property="Effect" Value="{StaticResource TabPillShadow}"/>
         </Style>
 
-        <!-- فوکوسِ صفحه‌کلید: بدونِ این، کاربرِ فقط-کیبورد نمی‌فهمد روی کدام
-             تب است. :focus-visible یعنی با کلیکِ ماوس نمایش داده نمی‌شود و
-             فقط با Tab خودش را نشان می‌دهد. بعد از :selected آمده تا در
-             برخوردِ هر دو، حالتِ فوکوس برنده باشد. -->
+        <!-- Keyboard focus: without it a keyboard-only user cannot tell which tab is
+             focused. :focus-visible means a mouse click does not show it and it only
+             appears via Tab. It comes after :selected so that when both collide the
+             focused state wins. -->
         <Style Selector="TabItem:focus-visible">
           <Setter Property="BorderBrush" Value="#0E7C6B"/>
           <Setter Property="Background" Value="#E9EFEE"/>
@@ -362,7 +362,7 @@
                     <TextBlock Text="{Binding DuplicateCount}" FontWeight="Bold"/>
                   </StackPanel>
                 </Button>
-                <!-- نکتهٔ گوشه‌ای به‌جای بجِ شبیه دکمه: بدون پس‌زمینه و بدون حسِ دکمه -->
+                <!-- A corner hint instead of a badge that looks like a button: no background, no button feel -->
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Hint_BypassTun}"
                            IsVisible="{Binding TestsBypassingTun}" FontSize="11" FontStyle="Italic"
                            Foreground="#6B7280" VerticalAlignment="Center" Margin="6,0,0,0"/>
@@ -974,7 +974,7 @@
               </StackPanel>
             </Border>
 
-            <!-- پایانِ صفحهٔ تنظیمات: نسخهٔ برنامه. عدد از csproj می‌آید، نه ثابت. -->
+            <!-- End of the settings page: the app version. The number comes from the csproj, not a constant. -->
             <Border Height="1" Background="{StaticResource BorderLight}" Margin="0,16,0,0"/>
             <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" Margin="0,12,0,8">
               <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Version}"

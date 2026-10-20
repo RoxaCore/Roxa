@@ -27,24 +27,24 @@ using System.Text;
 namespace Roxa.Core;
 
 /// <summary>
-/// تشخیص «قطع بودن اینترنت» مستقیم و بدون DNSِ سیستم و بدون پروکسی.
-/// فقط دست‌دادنِ TCP کافی نیست (پورت‌های hijack/captive هم SYN-ACK می‌فرستند)؛
-/// باید یک مبادلهٔ HTTP واقعی با پاسخِ موردِ انتظار دیده شود:
-/// gstatic → 204 ، msftconnecttest → بدنهٔ Microsoft Connect Test ،
-/// و 1.1.1.1 → پاسخِ HTTP که خودِ 1.1.1.1 را معرفی کند (بدون نیاز به DNS).
-/// برای اینکه هنگام قطع‌بودن، پیام‌های «هیچ سروری پاسخ نداد»
-/// با «اینترنت قطع است» عوض شوند و کاربر گمراه نشود.
+/// Detects "internet is down" directly, without system DNS and without a proxy.
+/// A bare TCP handshake is not enough (hijack/captive ports also send SYN-ACK);
+/// a real HTTP exchange with the expected answer must be seen:
+/// gstatic → 204, msftconnecttest → the Microsoft Connect Test body, and
+/// 1.1.1.1 → an HTTP response identifying itself as 1.1.1.1 (no DNS needed).
+/// This is what swaps the "no server responded" messages for "the internet is
+/// down" while offline, so the user is not misled.
 /// </summary>
 public static class NetHealth
 {
-    /// <summary>میزبان‌های پروب — برای ساختِ بایپسِ مستقیم (TestRouteBypass) هم استفاده می‌شوند.</summary>
+    /// <summary>Probe hosts — also used to build the direct bypass (TestRouteBypass).</summary>
     public static readonly string[] ProbeHosts = { "www.gstatic.com", "www.msftconnecttest.com", "1.1.1.1" };
 
     /// <summary>
-    /// اگر هرکدام از پروب‌ها پاسخ درست بگیرند آنلاین است؛ موازی و با یک بودجهٔ زمانی مشترک.
-    /// وقتی پروکسی داخلی موتور سالم است (proxyPort) پروب‌های HTTPS از همان مسیر هم
-    /// می‌روند: در حالت TUN پروب‌های خامِ پورت ۸۰ وارد تونل می‌شوند و خروجی ۸۰ِ
-    /// سرورهای VPN اغلب بسته است، در حالی که ۴۴۳ کاملاً سالم است.
+    /// Online if any probe gets the right answer; run in parallel on a shared budget.
+    /// When the engine's internal proxy is healthy (proxyPort) the HTTPS probes
+    /// also go through it: in TUN mode raw port-80 probes enter the tunnel and the
+    /// port-80 exit of VPN servers is often blocked, while 443 is perfectly healthy.
     /// </summary>
     public static async Task<bool> IsInternetAvailableAsync(int timeoutMs = 2500, int? proxyPort = null)
     {
@@ -57,11 +57,11 @@ public static class NetHealth
                 firstLine => firstLine.Contains(" 200 ", StringComparison.Ordinal), "Microsoft Connect Test", cts.Token),
             ProbeHttpAsync("1.1.1.1", "/cdn-cgi/trace",
                 firstLine => firstLine.StartsWith("HTTP/", StringComparison.Ordinal), "1.1.1.1", cts.Token),
-            // پوشش پورت 443: شبکه‌ای که فقط 80 را hijack/blocks کند نباید «اینترنت قطع» گزارش شود.
+            // Port-443 coverage: a network that only hijacks/blocks 80 must not be reported as "the internet is down".
             ProbeTlsAsync("www.gstatic.com", "/generate_204",
                 firstLine => firstLine.Contains(" 204 ", StringComparison.Ordinal), null, cts.Token),
-            // پوشش بدون DNS: با IP خام (گواهی 1.1.1.1 شامل IP-SAN است) تا اگر
-            // resolve سیستم/تونل مرده باشد باز هم بتوان سلامت مسیر مستقیم را فهمید.
+            // DNS-free coverage: with a raw IP (the 1.1.1.1 certificate carries an IP-SAN),
+            // so a dead system/tunnel resolve still reveals whether the direct path is healthy.
             ProbeTlsAsync("1.1.1.1", "/cdn-cgi/trace",
                 firstLine => firstLine.StartsWith("HTTP/", StringComparison.Ordinal), "1.1.1.1", cts.Token),
         };
@@ -137,8 +137,8 @@ public static class NetHealth
 
             var buffer = new byte[700];
             var ms = new MemoryStream();
-            // HTTP/1.0 + Connection: close → سرور بعد از پاسخ می‌بندد؛ تا انتها می‌خوانیم
-            // تا بدنه (مثل Microsoft Connect Test) هم به دست آید.
+            // HTTP/1.0 + Connection: close → the server closes after answering; we read to
+            // the end so the body (e.g. Microsoft Connect Test) is obtained too.
             while (ms.Length < buffer.Length)
             {
                 int n = await stream.ReadAsync(buffer, ct);
@@ -174,7 +174,7 @@ public static class NetHealth
             using var client = new TcpClient();
             await client.ConnectAsync(target, 443, ct);
             using var ssl = new SslStream(client.GetStream(), leaveInnerStreamOpen: false);
-            // اعتبارسنجی گواهی پیش‌فرض: هجوم/hijack روی 443 بدون گواهی معتبر رد می‌شود.
+            // Default certificate validation: a hijack on 443 without a valid certificate is rejected.
             await ssl.AuthenticateAsClientAsync(new SslClientAuthenticationOptions { TargetHost = host }, ct);
 
             string request =

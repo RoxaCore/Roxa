@@ -23,7 +23,7 @@ using Microsoft.Win32;
 
 namespace Roxa.Core;
 
-/// <summary>تنظیم پروکسی سیستم. فقط ویندوز؛ بقیه پلتفرم‌ها no-op.</summary>
+/// <summary>Sets the system proxy. Windows only; a no-op on other platforms.</summary>
 public static class SystemProxy
 {
     public static void Set(string proxy)
@@ -91,13 +91,13 @@ public static class SystemProxy
             int c = v.LastIndexOf(':');
             if (c <= 0) continue;
             string host = v[..c].Trim();
-            // آدرس‌های IPv6 داخل براکت می‌آیند: [::1]:8080
+            // IPv6 addresses come wrapped in brackets: [::1]:8080
             if (host.Length > 1 && host[0] == '[' && host[^1] == ']') host = host[1..^1];
             if (!int.TryParse(v[(c + 1)..].Trim(), out int port) || port <= 0 || port > 65535) continue;
             if (!IsLoopbackHost(host))
             {
-                // پراکسی غیر-loopback مال ما نیست (پراکسی ما همیشه 127.0.0.1 است)؛
-                // پاک کردنش تنظیمات کاربر را خراب می‌کند.
+                // A non-loopback proxy is not ours (ours is always 127.0.0.1);
+                // clearing it would break the user's own settings.
                 return false;
             }
             sawLoopback = true;

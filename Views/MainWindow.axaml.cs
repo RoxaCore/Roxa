@@ -41,8 +41,8 @@ public partial class MainWindow : Window
         var iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "roxa-icon.ico");
         if (System.IO.File.Exists(iconPath))
             Icon = new WindowIcon(iconPath);
-        // فشار روی هدر گروه اغلب توسط کنترل‌های داخلی (مثلاً دکمهٔ Expander) handle می‌شود؛
-        // باید با handledEventsToo ثبت شود تا درگ سربرگ‌ها کار کند.
+        // Pressing a group header is often handled by an inner control (e.g. the Expander
+        // button), so it must be registered with handledEventsToo for tab dragging to work.
         AddHandler(InputElement.PointerPressedEvent, OnAnyPointerPressed, handledEventsToo: true);
         Opened += OnOpened;
         Activated += OnActivated;
@@ -236,9 +236,9 @@ public partial class MainWindow : Window
                 bool disconnected = false;
                 if (disconnectFirst && wasConnected)
                 {
-                    // ری‌استارت وسطِ اتصال ممنوع: اول تا آخر قطع می‌کنیم تا نمونهٔ
-                    // بعدی روی آداپتور/مسیر/WFPِ نیمه‌کاره بالا نیاید، و بعد هم
-                    // با --no-autoconnect جلوی وصل شدنِ خودکار گرفته می‌شود.
+                    // A restart mid-connection is forbidden: we fully disconnect first so
+                    // the next instance does not come up on a half-finished adapter/routes/WFP,
+                    // and then --no-autoconnect stops it from connecting by itself.
                     await vm.PrepareRestartAsync();
                     disconnected = true;
                     wasConnected = false;
@@ -249,8 +249,8 @@ public partial class MainWindow : Window
                 var psi = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = exe,
-                    // --wait-pid: نمونهٔ جدید منتظر می‌ماند تا این نمونه واقعاً از
-                    // بین برود، به‌جای حدس زدن با یک حلقهٔ ثابتِ mutex.
+                    // --wait-pid: the new instance waits until this one is really gone,
+                    // instead of guessing with a fixed mutex loop.
                     Arguments = "--wait-exit --wait-pid " + Environment.ProcessId
                         + (wasConnected && !noReconnect ? " --reconnect" : "")
                         + (disconnected ? " --no-autoconnect" : "")
@@ -259,8 +259,8 @@ public partial class MainWindow : Window
                 };
                 if (Core.AdminHelper.IsRunningAsAdmin())
                     psi.Verb = "runas";
-                // ذخیرهٔ تنظیماتِ معلّق (مثلاً زبانِ تازه) پیش از ری‌استارت؛ نمونهٔ
-                // بعدی همین فایل را می‌خواند و نباید نسخهٔ کهنه را ببیند.
+                // Flush pending settings (e.g. a new language) before restarting; the
+                // next instance reads this same file and must not see the stale version.
                 try { vm.FlushPendingSettings(); } catch { }
                 System.Diagnostics.Process.Start(psi);
             }
@@ -268,7 +268,7 @@ public partial class MainWindow : Window
             Environment.Exit(0);
         };
         vm.OpenDnsSettingsHandler = () => OpenDnsDialog();
-        // ری‌استارت با ‎--tab subscriptions‎ (عیب‌یابی اشتراکات): بازشدن در تب اشتراکات؛ فقط یک‌بار.
+        // Restart with ‎--tab subscriptions‎ (subscription diagnostics): opens on the subscriptions tab; once only.
         if (!_startupTabApplied)
         {
             var sargs = Program.StartupArgs;
@@ -295,9 +295,9 @@ public partial class MainWindow : Window
             });
             return files != null && files.Count > 0 ? files[0].TryGetLocalPath() : null;
         };
-        // خروجی/ورودیِ اشتراک‌ها: DPAPI به حسابِ ویندوزِ همین ماشین گره می‌خورد،
-        // پس کاربر برایِ انتقال یا پشتیبان‌گیری به فایلی نیاز دارد که به حسابِ
-        // خاصی وابسته نباشد. فقط مسیر اینجا انتخاب می‌شود؛ کارِ فایل در ViewModel است.
+        // Subscription import/export: DPAPI is tied to this machine's Windows account,
+        // so the user needs a file that does not depend on any one account to transfer
+        // or back up. Only the path is picked here; the file work lives in the ViewModel.
         vm.ExportSubsHandler = async () =>
         {
             var tr = Localization.TranslationManager.Instance;
@@ -515,7 +515,7 @@ public partial class MainWindow : Window
         }
     }
 
-    // --- درگ سربرگ گروه‌ها برای تغییر ترتیب تب‌ها ---
+    // --- dragging the group tabs to reorder them ---
     private ServerGroup? _dragGroup;
     private bool _dragActive;
     private Point _pressPoint;
@@ -523,13 +523,13 @@ public partial class MainWindow : Window
 
     private void OnAnyPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        // هر فشاری (حتی handleشده توسط کنترل‌های داخلی) ابتدا وضعیت درگ قبلی را بازنشانی می‌کند
+        // Any press (even one handled by an inner control) first resets the previous drag state
         _dragGroup = null;
         _dragActive = false;
         if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed) return;
         if (e.Source is not Visual src) return;
 
-        // پیمایش تا Expander؛ فشار داخل محتوا (جدول سرورها) یا روی کنترل‌های تعاملی رد می‌شود
+        // Climb up to the Expander; a press inside the content (the server table) or on interactive controls is skipped
         Expander? expander = null;
         bool skip = false;
         for (var cur = src; cur != null; cur = cur.GetVisualParent())
@@ -552,7 +552,7 @@ public partial class MainWindow : Window
         if (_dragGroup == null) return;
         if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
         {
-            // دکمه بدون رویداد Released رها شد (رویداد توسط کنترل دیگری مصرف شده)
+            // The button was released without a Released event (the event was consumed by another control)
             EndGroupDrag();
             return;
         }

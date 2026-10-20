@@ -24,21 +24,21 @@ namespace Roxa.Core;
 
 public static class UpdateApplier
 {
-    // بکاپِ نسخهٔ فعلی کنارِ تنظیماتِ برنامه نگه داشته می‌شود، نه در %TEMP%:
-    // هم دوامش بیشتر است و هم معمولاً همان درایوِ نصب است، پس کپی کوتاه می‌ماند.
-    // فقط یک بکاپ نگه می‌داریم و آپدیتِ بعدی همان را جایگزین می‌کند؛ حذفِ خودکارِ
-    // آن در شروعِ برنامه خطرناک بود، چون «برنامه بالا آمد» هنوز دلیلِ سالم‌بودن
-    // نیست — ممکن است ثانیه‌ها بعد کرش کند.
+    // The backup of the current version is kept next to the app's settings, not in
+    // %TEMP%: it lasts longer and is usually on the same install drive, so the copy
+    // stays short. We keep a single backup and the next update replaces it; deleting
+    // it automatically at startup was dangerous, because "the app came up" is not
+    // yet proof it is healthy — it may crash seconds later.
     private static string BackupDir =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Roxa", "update-backup");
 
     public static int Run(string payload, int appPid, string targetDir, string exeName)
     {
         string exePath = Path.Combine(targetDir, exeName);
-        // هر دو نسخه (تازه و برگشت‌خورده) باید همان «بعد از اتصال» را داشته باشند.
+        // Both versions (fresh and rolled back) must carry the same "after connect".
         bool reconnect = false;
         try { reconnect = UpdateInstaller.ConsumeReconnectMarker(); } catch { }
-        // در catch هم لازم است، پس بیرون از try تعریف می‌شود.
+        // Also needed inside catch, so it is declared outside try.
         bool backedUp = false;
 
         try
@@ -48,9 +48,9 @@ public static class UpdateApplier
                 Thread.Sleep(800);
             Thread.Sleep(1000);
 
-            // ۱) بستهٔ تازه باید واقعاً یک نسخهٔ قابلِ اجرا باشد. کپیکردنِ پوشهٔ
-            // خالی یا ناقص رویِ نصبِ زنده، نسخهٔ کارکردِ قبلی را هم می‌کشت و کاربر
-            // می‌ماند با نصبِ ترکیبیِ فایل‌های قدیمی/جدید.
+            // 1) The fresh package must really be a runnable build. Copying an empty
+            // or partial folder over the live install also kills the previously
+            // working version, leaving a mixed install of old and new files.
             if (!LooksLikePe(Path.Combine(payload, exeName)))
             {
                 Log("payload is not a valid build; keeping the current install.");
@@ -58,13 +58,13 @@ public static class UpdateApplier
                 return 0;
             }
 
-            // ۲) از نسخهٔ فعلی بکاپ بگیر؛ این تنها چیزی است که بینِ یک آپدیتِ ناقص و
-            // یک برنامهٔ گم‌شده فرق می‌اندازد. کپی عمدی است نه Move: اگر Move کنیم
-            // و در همان گذار بمیریم، پوشهٔ نصب خالی می‌ماند.
+            // 2) Back up the current version; this is the only thing separating a
+            // failed update from a missing app. The copy is deliberate, not a Move:
+            // a Move that dies mid-transition leaves the install folder empty.
             backedUp = TryBackup(targetDir);
 
-            // ۳) کپی با تلاشِ چندباره؛ قفل‌بودنِ فایل (آنتی‌ویروس، موتورِ جامانده)
-            // شایع‌ترین دلیلِ شکست است.
+            // 3) Copy with retries; a locked file (antivirus, a leftover engine)
+            // is the most common cause of failure.
             if (!TryCopyTree(payload, targetDir))
             {
                 Log("copy failed; restoring the previous build.");
@@ -73,7 +73,7 @@ public static class UpdateApplier
                 return 0;
             }
 
-            // ۴) اجرا، و بعد بررسیِ اینکه واقعاً ماندگار شد.
+            // 4) Run it, then verify that it actually stayed.
             bool started = Launch(exePath, targetDir, reconnect, out Process? proc);
             if (!started || proc == null)
             {
@@ -82,9 +82,9 @@ public static class UpdateApplier
                 return 0;
             }
 
-            // ۲۰ ثانیه صبر می‌کنیم. اگر هنوز زنده بود، یا با کدِ صفر خارج شد، آپدیت
-            // را موفق فرض می‌کنیم. خروجِ صفر می‌تواند «نمونهٔ دیگری در حالِ اجراست»
-            // باشد که کاملاً عادی است — پس فقط کدِ غیرصفر یعنی نسخهٔ تازه خراب است.
+            // Wait 20 seconds. If it is still alive, or exited with code zero, we assume
+            // the update succeeded. A zero exit can mean "another instance is running",
+            // which is entirely normal — so only a non-zero code means the new build is broken.
             if (!proc.WaitForExit(20_000)) return 0;
             try { if (proc.ExitCode == 0) return 0; } catch { return 0; }
 
@@ -95,7 +95,7 @@ public static class UpdateApplier
         catch (Exception ex)
         {
             Log($"update failed: {ex.Message}");
-            // مهم‌تر از همه: کاربر نباید با یک پنجرهٔ بسته و بدونِ برنامه بماند.
+            // Above all: the user must not be left with a closed window and no app.
             try { if (backedUp) TryRestore(targetDir); } catch { }
             try { Launch(exePath, targetDir, reconnect); } catch { }
             return 0;
@@ -209,7 +209,7 @@ public static class UpdateApplier
                 Path.Combine(dir, "update.log"),
                 $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}{Environment.NewLine}");
         }
-        catch { /* آخرین راهِ گزارش هم از کار افتاده باشد، آپدیت نباید بایستد */ }
+        catch { /* if even the last reporting resort is down, the update must not stop */ }
     }
 
     public static void CleanupStaging()

@@ -34,24 +34,24 @@ public sealed class TranslationManager : INotifyPropertyChanged
 
     private CultureInfo _culture = CultureInfo.GetCultureInfo("fa");
 
-    // منبعِ خنثیِ این پروژه (Strings.resx) فارسی است و فایلِ جداگانه‌ای به نام
-    // Strings.fa.resx نداریم؛ یعنی "fa" خودِ همان منبعِ خنثی است.
+    // This project's neutral resource (Strings.resx) is Persian and there is no
+    // separate Strings.fa.resx; "fa" IS the neutral resource.
     //
-    // دانستنِ این نکته حیاتی است: ResourceManager وقتی با tryParents: false بخواهید،
-    // فقط فایلِ خودِ همان زبان را نگاه می‌کند و اگر نبود null می‌دهد. اگر "fa" را هم
-    // مثلِ بقیه جست‌وجو می‌کردیم، هیچ‌چیز پیدا نمی‌شد و همه‌چیز به انگلیسی می‌پرید —
-    // یعنی زبانِ پیشفرضِ فارسی، بی‌صدا انگلیسی می‌شد. پس فارسی همیشه مستقیم از
-    // خودِ منبعِ خنثی خوانده می‌شود و زنجیره فقط برایِ زبان‌هایِ دیگر به کار می‌رود.
+    // Knowing this is vital: with tryParents: false the ResourceManager only
+    // looks at that language's own file and returns null when missing. Had we
+    // looked up "fa" too, nothing would be found and all strings would fall
+    // back to English — the default Persian would silently turn English. So
+    // Persian is read straight from the neutral resource; the chain is for the rest.
     private const string NeutralLang = "fa";
 
-    // زبانِ دومِ زنجیره: برایِ هر کلیدِ هنوز ترجمه‌نشده، به‌جایِ فارسی انگلیسی نشان
-    // داده می‌شود. بدونِ این، هر کلیدِ جاافتاده در ۱۲ زبانِ دیگر مستقیم فارسی بود.
+    // Second language in the chain: untranslated keys show English instead of
+    // Persian. Without it, missed keys in the 12 other languages came out Persian.
     private static readonly CultureInfo Fallback = CultureInfo.GetCultureInfo("en");
 
-    // منبعِ خنثیِ این پروژه همین زبان است. عمداً از InvariantCulture استفاده نمی‌کنیم:
-    // GetString رویِ "fa" همان مسیرِ قدیمی را می‌رود (fa ← خنثی) و همان چیزی را می‌دهد
-    // که پیش از این تغییر می‌داد؛ نتیجه همان است، فقط بدونِ اتکا بهِ اینکه خنثی
-    // دقیقاً چطور نگاشت می‌شود.
+    // This project's neutral resource is exactly this language. We deliberately
+    // do not use InvariantCulture: GetString on "fa" walks the same old path
+    // (fa ← neutral) and returns what it always returned; the result is the
+    // same, just without depending on how the neutral culture maps.
     private static readonly CultureInfo Neutral = CultureInfo.GetCultureInfo(NeutralLang);
 
     public CultureInfo Culture
@@ -71,22 +71,22 @@ public sealed class TranslationManager : INotifyPropertyChanged
     {
         get
         {
-            // ۱) منبعِ خنثی (فارسی): هم پیشفرض، هم پناهگاهِ آخر برایِ هر کلیدِ
-            //    جاافتاده در هر زبانی.
+            // 1) Neutral resource (Persian): both the default and the last
+            //    refuge for any key missing from any language.
             string? persian = NeutralGet(key);
 
-            // زبانِ فعال همان فارسی است؛ دیگر چیزی برایِ جست‌وجو نداریم.
+            // The active language is Persian itself; nothing left to look up.
             if (IsNeutralSelected) return persian ?? $"[{key}]";
 
-            // ۲) زبانِ فعال — فقط اگر واقعاً در فایلِ خودِ آن زبان باشد.
+            // 2) Active language — but only if really present in its own file.
             string? own = ExactGet(key, _culture, persian);
             if (own != null) return own;
 
-            // ۳) انگلیسی برایِ کلیدهایِ ترجمه‌نشده.
+            // 3) English for keys that are not translated.
             string? english = ExactGet(key, Fallback, persian);
             if (english != null) return english;
 
-            // ۴) کلیدی که اصلاً در پروژه نیست: همان رفتارِ قدیمی.
+            // 4) A key that is not in the project at all: the old behavior.
             return persian ?? $"[{key}]";
         }
     }
@@ -95,7 +95,7 @@ public sealed class TranslationManager : INotifyPropertyChanged
         _culture.Name.Length == 0 ||
         _culture.Name.Equals(NeutralLang, StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>مقدارِ فارسی، مستقیم از منبعِ خنثیِ مونتاژ — بی‌آنکه بهِ fallback وابسته باشد.</summary>
+    /// <summary>Persian value, read straight from the assembly's neutral resource — never depending on the fallback.</summary>
     private static string? NeutralGet(string key)
     {
         try
@@ -106,19 +106,19 @@ public sealed class TranslationManager : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// فقط اگر کلید واقعاً در فایلِ خودِ همان زبان باشد، همان را برمی‌گرداند.
+    /// Returns it only when the key really exists in that language's own file.
     ///
-    /// دو نکته:
+    /// Two points:
     /// <list type="bullet">
-    /// <item>tryParents باید false باشد، وگرنه ResourceManager بی‌صدا به منبعِ خنثیِ
-    /// فارسی برمی‌گشت و دیگر نمی‌شد فهمید زبانِ مقصر کدام است — یعنی همان باگی که
-    /// داشتیم دوباره سر می‌زد.</item>
-    /// <item>createIfNotExists باید true باشد، وگرنه اگر مونتاژِ زبانِ مقصد هنوز
-    /// بارگذاری نشده بود، null می‌داد و ترجمهِ موجود هم بی‌دلیل رد می‌شد.</item>
+    /// <item>tryParents must be false, or ResourceManager would silently fall
+    /// back to the Persian neutral resource and there would be no way to tell
+    /// which language was at fault — the very bug we had would return.</item>
+    /// <item>createIfNotExists must be true, or a not-yet-loaded target
+    /// language assembly would return null and reject a valid translation.</item>
     /// </list>
     ///
-    /// مقدار با فارسی هم مقایسه می‌شود: اگر یکی بود یعنی آن زبان کلید را ندارد و
-    /// نباید همان فارسی را به‌عنوانِ «ترجمه» پس بدهیم.
+    /// The value is also compared against Persian: if identical, that language
+    /// lacks the key and we must not hand the Persian back as a "translation".
     /// </summary>
     private static string? ExactGet(string key, CultureInfo culture, string? persian)
     {
@@ -136,9 +136,9 @@ public sealed class TranslationManager : INotifyPropertyChanged
     public static string Get(string key) => Instance[key];
 
     /// <summary>
-    /// آیا زبانِ فعلی راست‌به‌چپ است؟ از خودِ دانشنامهٔ زبانِ .NET می‌پرسیم، نه از یک
-    /// فهرستِ دستی. قبلاً فقط "fa" و "ar" در فهرست بودند و "ur" (اردو) — که آن هم
-    /// راست‌به‌چپ است — جا می‌ماند و با چیدمانِ چپ‌به‌راست نشان داده می‌شد.
+    /// Is the current language right-to-left? We ask .NET's own culture info
+    /// rather than a manual list. Previously only "fa" and "ar" were listed and
+    /// "ur" (Urdu) — also RTL — was missed and shown with a LTR layout.
     /// </summary>
     public bool IsRightToLeft
     {
@@ -151,7 +151,7 @@ public sealed class TranslationManager : INotifyPropertyChanged
 
     public void SetCulture(string code)
     {
-        // کدِ زبان از فایل تنظیمات می‌آید؛ مقدار خراب/ناشناخته نباید برنامه را بیندازد.
+        // The language code comes from the settings file; a broken/unknown value must not take the app down.
         try
         {
             Culture = string.IsNullOrWhiteSpace(code)

@@ -23,7 +23,7 @@ using System.Net.Sockets;
 
 namespace Roxa.Core;
 
-/// <summary>تست TCP مستقیم (بدون پروکسی) — برای مرتب‌سازی اولیه.</summary>
+/// <summary>Direct TCP test (no proxy) — used for the initial sort.</summary>
 public static class LatencyTester
 {
     public static async Task<(bool Ok, int Ms)> TcpAsync(string host, int port, int timeoutMs = 3000, TestRouteScope? scope = null)

@@ -28,7 +28,7 @@ using Roxa.Models;
 
 namespace Roxa.Core;
 
-/// <summary>مدیریت پروسس موتور xray: دانلود خودکار، اجرا، توقف. کراس‌پلتفرم.</summary>
+/// <summary>Manages the xray engine process: automatic download, start, stop. Cross-platform.</summary>
 public sealed class XrayEngine : IDisposable
 {
     private Process? _process;
@@ -41,8 +41,8 @@ public sealed class XrayEngine : IDisposable
     private string? _tempConfigPath;
     private AppSettings? _settings;
     private readonly object _lock = new();
-    // قطع اتصال اکنون در پس‌زمینه اجرا می‌شود و ممکن است همزمان با StartAsync دو Stop
-    // روی دو رشته بیفتد؛ این گیت هر دو را سریالایز می‌کند تا kill/process/proxy دوبار اجرا نشود.
+    // Disconnecting now runs in the background, and two Stop calls may land on two
+    // threads concurrently with StartAsync; this gate serializes both so kill/process/proxy don't run twice.
     private readonly SemaphoreSlim _stopGate = new(1, 1);
 
     public event Action<string>? Output;
@@ -64,8 +64,8 @@ public sealed class XrayEngine : IDisposable
     public static string EnginePath => Path.Combine(EngineDir, EngineBinary);
 
     /// <summary>
-    /// آیا این پوشه واقعاً قابلِ نوشتن است؟ فقط وجودِ پوشه کافی نیست: در Program Files
-    /// پوشه هست ولی کاربرِ غیر-ارتقاشده حقِ نوشتن ندارد.
+    /// Is this folder actually writable? The folder's existence alone is not enough: in Program Files
+    /// the folder exists but a non-elevated user has no write permission.
     /// </summary>
     private static bool IsDirWritable(string dir)
     {
@@ -87,10 +87,10 @@ public sealed class XrayEngine : IDisposable
 
     private static string? _engineVersionCache;
 
-    /// <summary>حداقل نسخه‌ای که پیکربندی‌های فعلی (finalmask/mkcp جدید) روی آن آزمایش شده‌اند.</summary>
+    /// <summary>The minimum version on which the current configurations (new finalmask/mkcp) have been tested.</summary>
     public const int MinEngineMajor = 26;
 
-    /// <summary>نسخه‌ی باینری موتور را یک بار می‌خواند و کش می‌کند؛ در صورت خطا "؟" برمی‌گرداند.</summary>
+    /// <summary>Reads and caches the engine binary's version once; returns "?" on error.</summary>
     public static async Task<string> GetVersionAsync(CancellationToken ct = default)
     {
         if (_engineVersionCache != null) return _engineVersionCache;
@@ -110,7 +110,7 @@ public sealed class XrayEngine : IDisposable
             if (p == null) return _engineVersionCache = "?";
             var stdoutTask = p.StandardOutput.ReadToEndAsync();
             var stderrTask = p.StandardError.ReadToEndAsync();
-            // WaitForExit همزمان رشتهٔ UI را نگه می‌دارد (اولین اتصال چند صدم ثانیه).
+            // WaitForExit blocks the UI thread at the same time (the first connection takes a few hundredths of a second).
             using var exitCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             exitCts.CancelAfter(TimeSpan.FromSeconds(5));
             try
@@ -130,7 +130,7 @@ public sealed class XrayEngine : IDisposable
         return _engineVersionCache;
     }
 
-    /// <summary>آیا نسخه‌ی داده‌شده حداقل MinEngineMajor هست؟ نسخه‌ی ناخواندنی را رد نمی‌کند (قضاوت نکردن بهتر از خطای کاذب است).</summary>
+    /// <summary>Is the given version at least MinEngineMajor? Unreadable versions are not rejected (not judging is better than a false error).</summary>
     public static bool IsVersionSupported(string version)
     {
         if (!TryParseVersion(version, out int major, out _)) return true;
@@ -202,9 +202,9 @@ public sealed class XrayEngine : IDisposable
     }
 
     /// <summary>
-    /// بافرِ لاگِ موتور را می‌نویسد. قبلاً هر خطِ خروجیِ xray یعنی CreateDirectory +
-    /// File.Exists + FileInfo.Length + AppendAllText؛ چهار عملیاتِ فایل روی همان
-    /// رشته‌ای که خروجیِ لوله را می‌خواند و ایستادنِ آن موتور را هم می‌گیرد.
+    /// Flushes the engine log buffer. Previously every line of xray output meant CreateDirectory +
+    /// File.Exists + FileInfo.Length + AppendAllText; four file operations on the same
+    /// thread that reads the pipe output, whose stalling also stalls the engine.
     /// </summary>
     public static void FlushEngineLog()
     {
@@ -217,24 +217,24 @@ public sealed class XrayEngine : IDisposable
                 chunk = _engineLogBuf.ToString();
             }
 
-            // مسیرِ لاگِ تونل را تکرار نمی‌کنیم: همان ResolveLogDir می‌داند پوشهٔ
-            // برنامه قابلِ نوشتن هست یا نه (نصبِ در Program Files).
+            // We don't duplicate the tunnel log path logic: the same ResolveLogDir already knows whether
+            // the app folder is writable (installing in Program Files).
             string dir = TunManager.LogDirectory;
             string file = Path.Combine(dir, "engine.log");
             try
             {
                 var fi = new FileInfo(file);
-                // جایگزینی با .old به‌جایِ صفرکردنِ کامل: پاک‌کردنِ فایل یعنی از بین
-                // رفتنِ تمامِ تاریخچه، و تاریخچه دقیقاً همان چیزی است که وقتِ بررسیِ
-                // یک اشکالِ گزارش‌شده لازم است.
+                // Rotate to .old instead of truncating completely: deleting the file means losing
+                // the entire history, and the history is exactly what is needed when investigating
+                // a reported bug.
                 if (fi.Exists && fi.Length + chunk.Length > EngineLogMaxBytes)
                     File.Move(file, file + ".old", true);
             }
             catch { }
             File.AppendAllText(file, chunk);
 
-            // فقط بعد از نوشتنِ واقعی از بافر بردار؛ وگرنه یک خطای دیسک همان خطوط
-            // را برایِ همیشه می‌ساخت.
+            // Only remove from the buffer after the actual write; otherwise a disk error would lose
+            // those lines forever.
             lock (_engineLogGate)
             {
                 bool stillThere = _engineLogBuf.Length >= chunk.Length
@@ -244,8 +244,8 @@ public sealed class XrayEngine : IDisposable
         }
         catch
         {
-            // نوشتن شکست؛ با فلَشِ بعدی دوباره تلاش می‌شود، ولی سقفی هم هست تا
-            // برنامه با انباشته‌شدنِ بافر خفه نشود.
+            // The write failed; it will be retried on the next flush, but there is also a cap so the
+            // program doesn't choke on buffer buildup.
             lock (_engineLogGate)
             {
                 if (_engineLogBuf.Length > EngineLogMaxBytes)
@@ -258,11 +258,11 @@ public sealed class XrayEngine : IDisposable
     {
         if (!force && File.Exists(EnginePath)) return;
 
-        // دانلودِ موتور داخلِ پوشهٔ برنامه می‌نشیند. اگر کاربر برنامه را در Program
-        // Files نصب کرده باشد (نصابِ اجراشده با «Run as administrator») و خودِ برنامه
-        // asInvoker باشد، اینجا نوشتن ممکن نیست. قبلاً همان UnauthorizedAccessException
-        // کلِ زنجیرهٔ اتصال را می‌شکست و کاربر فقط یک خطای مبهم می‌دید؛ حالا دلیل و
-        // راه‌حلش را هم می‌گوید.
+        // The engine download lands inside the app folder. If the user installed the app in Program
+        // Files (an installer run with «Run as administrator») while the app itself runs
+        // asInvoker, writing here is impossible. Previously that same UnauthorizedAccessException
+        // broke the entire connection chain and the user only saw a vague error; now the reason and
+        // the fix are given as well.
         if (!IsDirWritable(EngineDir))
         {
             string msg = TranslationManager.Get("Eng_DirNotWritable");
@@ -384,8 +384,8 @@ public sealed class XrayEngine : IDisposable
     public async Task StartAsync(ServerInfo server, bool setSystemProxy, AppSettings? settings = null, CancellationToken ct = default, IEnumerable<string>? tunExclusionHosts = null, Action<string>? progress = null)
     {
         var perf = System.Diagnostics.Stopwatch.StartNew();
-        // هر مرحله هم در لاگ موتور می‌نشیند (از طریق Output) و هم از طریق
-        // progress به Status سربرگ می‌رسد تا UI هنگام اتصال TUN از عملیات عقب نماند.
+        // Each stage both lands in the engine log (via Output) and reaches the header
+        // Status via progress, so the UI doesn't fall behind during the TUN connection.
         void Stage(string key)
         {
             string text = TranslationManager.Get(key);
@@ -393,20 +393,20 @@ public sealed class XrayEngine : IDisposable
             progress?.Invoke(text);
         }
         Stage("Stg_Cleanup");
-        // پاکسازی قبلی (kill پروسه، حذف مسیرها، بازگردانی DNS با powershell) سنگین است؛
-        // در پس‌زمینهٔ LongRunning اجرا می‌شود تا هم رشتهٔ UI هنگ نکند و هم
-        // با بلوکه‌شدن رشته‌های Thread-Pool پیوست‌های ادامهٔ کار به تعویق نیفتد.
+        // The previous cleanup (killing the process, removing routes, restoring DNS via powershell) is heavy;
+        // it runs on a LongRunning background thread so the UI thread doesn't hang and
+        // blocking Thread-Pool threads doesn't delay the continuations of the work.
         await Task.Factory.StartNew(Stop, TaskCreationOptions.LongRunning);
         Stage("Stg_Engine");
         _settings = settings;
-        // نصب در Program Files یعنی پوشهٔ موتور برای کاربرِ عادی فقط-خواندنی است.
-        // پس ترمیمِ موتور فقط با ارتقا مجاز است. بدونِ آن، به‌جایِ دانلودِ دوباره که
-        // اصلاً ممکن نیست و فقط یک شکستِ مبهم در میانهٔ اتصال می‌ساخت، خطای واضح
-        // می‌دهیم و می‌ایستیم؛ این‌جا حتی واردِ شبکه هم نمی‌شویم.
+        // Installing in Program Files means the engine folder is read-only for a regular user.
+        // So engine repair is only allowed when elevated. Without it, instead of re-downloading — which
+        // is impossible anyway and would only produce an obscure failure mid-connection — we throw a clear
+        // error and stop; here we don't even touch the network.
         if (!File.Exists(EnginePath))
         {
-            // EnsureEngineAsync پیش از هر دانلودی قابلِ نوشتن بودن را می‌سنجد و با
-            // Eng_DirNotWritable می‌ایستد، پس غیرِارتقاشده هرگز دانلود نمی‌کند.
+            // EnsureEngineAsync checks writability before any download and stops with
+            // Eng_DirNotWritable, so a non-elevated user never downloads anything.
             Log(TranslationManager.Get("Eng_NotFound"));
             await EnsureEngineAsync(false, ct);
         }
@@ -467,7 +467,7 @@ public sealed class XrayEngine : IDisposable
                     if (_process == null || _process.HasExited)
                         throw new InvalidOperationException(TranslationManager.Get("Eng_ExitedUnexpectedly"));
                 }
-                // اتصال TCP همزمان روی رشتهٔ UI، سربرگ را در هر نوبت ۲۰۰ms کوتاه قفل می‌کرد.
+                // A synchronous TCP connect on the UI thread briefly locked the header on every 200ms tick.
                 if (await Task.Run(() => TryConnect(HttpPort))) { ready = true; break; }
             }
             if (!ready) throw new InvalidOperationException(TranslationManager.Get("Eng_PortNotUp"));
@@ -498,11 +498,11 @@ public sealed class XrayEngine : IDisposable
             if (useTun && XrayConfigBuilder.LastDnsStub)
             {
                 Stage("Stg_Dns");
-                // ترتیب مهم است: اول عکسِ DNS فعلی گرفته و در TunState ثبت می‌شود،
-                // بعد سیستم عوض می‌شود. اگر برعکس باشد و برنامه در همین بازه بمیرد
-                // (کرش یا kill از Task Manager)، هیچ‌کس نمی‌ماند بداند DNS کاربر قبلاً
-                // چه بوده و جاروبِ بعدی تنظیمِ استاتیکِ دستیِ او را بی‌صدا به DHCP
-                // تبدیل می‌کرد؛ یعنی تنظیمی که خودش دستی وارد کرده برای همیشه گم می‌شد.
+                // The order matters: first a snapshot of the current DNS is taken and recorded in TunState,
+                // then the system is changed. If it were the other way around and the app died in between
+                // (a crash or a kill from Task Manager), nothing would remain to know what the user's DNS was
+                // before, and the next sweep would silently turn their manual static setting into DHCP —
+                // i.e. the setting they entered by hand would be lost forever.
                 var snap = await Task.Run(TunDns.PrepareApply);
                 if (snap != null)
                 {
@@ -511,7 +511,7 @@ public sealed class XrayEngine : IDisposable
                         st.DnsApplied = true;
                         st.DnsPrev = snap;
                     });
-                    // اعمال خودش هم ممکن است چند ثانیه طول بکشد (fallback به powershell).
+                    // Applying it may itself take a few seconds (fallback to powershell).
                     bool applied = await Task.Run(() => TunDns.TryApply(snap));
                     if (applied)
                         Log("DNS -> 127.0.0.1 (local stub)");
@@ -543,11 +543,11 @@ public sealed class XrayEngine : IDisposable
                     _prevProxyOverride = prevOverride;
                     _proxyValue = proxyValue;
                 }
-                // اول ثبت، بعد تغییرِ سیستم. RestoreProxyIfOurs مقدارِ فعلیِ رجیستری را
-                // با ProxySet می‌سنجد، پس این ثبتِ زودهنگام اگر هنوز چیزی عوض نشده
-                // باشد بی‌اثر است؛ ولی اگر برعکس باشد و برنامه بینِ تغییر و ثبت بمیرد،
-                // پروکسیِ قبلیِ کاربر (مثلاً پروکسیِ سازمانی‌اش) برای همیشه گم می‌شد و
-                // فقط ProxyEnable صفر می‌شد.
+                // Record first, then change the system. RestoreProxyIfOurs checks the current registry
+                // value against ProxySet, so this early recording is a no-op if nothing has been changed
+                // yet; but if it were the other way around and the app died between the change and the recording,
+                // the user's previous proxy (e.g. their corporate proxy) would be lost forever and
+                // only ProxyEnable would be set to zero.
                 UpdateState(process, st =>
                 {
                     st.ProxySet = proxyValue;
@@ -569,8 +569,8 @@ public sealed class XrayEngine : IDisposable
         }
         catch
         {
-            // Stop() پشت گیت سریالایز می‌شود؛ اجرای همزمان آن روی رشتهٔ UI می‌توانست
-            // هنگام شکست اتصال، UI را تا آزادشدن گیت نگه دارد.
+            // Stop() is serialized behind the gate; running it synchronously on the UI thread could
+            // hold the UI until the gate was released when the connection failed.
             await Task.Factory.StartNew(Stop, TaskCreationOptions.LongRunning);
             throw;
         }
@@ -913,13 +913,13 @@ public sealed class XrayEngine : IDisposable
     }
 
     /// <summary>
-    /// کانفیگ‌های موقتِ نشست‌های قبلی را از %TEMP% جارو می‌کند.
-    /// کانفیگِ نشستِ جاری عمداً برایِ عیب‌یابی می‌ماند («Keep temp config for
-    /// diagnosis»)، ولی شناسهٔ سرور با هر بار به‌روزرسانیِ اشتراک عوض می‌شود و
-    /// فایلِ تازه‌ای به‌جا می‌ماند؛ بدونِ این جاروکشی تعدادشان بی‌نهایت می‌شود
-    /// (روی یک سیستم ۱۷۰ فایلِ کهنه جمع شده بود). فقط فایل‌های قدیمی‌تر از
-    /// ۲۴ ساعت پاک می‌شوند تا نشستِ در حالِ اجرا و نشستِ تازه‌بسته‌شده
-    /// دست‌نخورده بمانند. فایل‌های مربوط بهِ آپدیت عمداً در فهرست نیستند.
+    /// Sweeps stale temp configs of previous sessions out of %TEMP%.
+    /// The current session's config deliberately stays for diagnosis («Keep temp config for
+    /// diagnosis»), but the server id changes with every subscription update and
+    /// leaves a fresh file behind; without this sweep their number grows unbounded
+    /// (on one system 170 stale files had accumulated). Only files older than
+    /// 24 hours are deleted, so the running session and a freshly closed
+    /// session stay untouched. Files related to updates are deliberately not listed.
     /// </summary>
     public static void SweepTempConfigs(int maxAgeHours = 24)
     {

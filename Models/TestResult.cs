@@ -22,7 +22,7 @@ namespace Roxa.Models;
 
 public enum TestStatus { Ok, Timeout, Error, Cancelled }
 
-/// <summary>نتیجه یک تست شبکه. Extra برای دیاگنوستیک (warmup، jitter و غیره).</summary>
+/// <summary>Result of one network test. Extra holds diagnostics (warmup, jitter, etc.).</summary>
 public sealed class TestResult
 {
     public TestStatus Status { get; init; }

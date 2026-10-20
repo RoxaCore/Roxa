@@ -69,11 +69,11 @@ public static class IpRoute
         return BitConverter.ToUInt32(addr.GetAddressBytes(), 0);
     }
 
-    /// <summary>برعکسِ ParseIp: مقدار uint مسیر MIB را به رشتهٔ IP تبدیل می‌کند.</summary>
+    /// <summary>The inverse of ParseIp: converts a MIB route uint value into an IP string.</summary>
     public static string IpToString(uint ip) => new IPAddress(BitConverter.GetBytes(ip)).ToString();
 
     /// <summary>
-    /// ایندکس رابط شبکه‌ای که به مقصدِ ip می‌رسد (برای گرفتن IfIndex گیت‌وی پیش‌فرض).
+    /// Index of the network interface that reaches destination ip (used for the default gateway's IfIndex).
     /// </summary>
     public static uint GetIfIndexForIp(string ip)
     {
@@ -88,9 +88,9 @@ public static class IpRoute
     }
 
     /// <summary>
-    /// افزودن مسیر با API بومی بدون هیچ پروسه‌ای؛ خطای «از قبل موجود» (5010)
-    /// موفقیت حساب می‌شود. در شکست (دسترسی ادمین، مقدار نامعتبر) false و
-    /// فراخواننده به route.exe برمی‌گردد.
+    /// Adds a route through the native API without spawning any process; the
+    /// "already exists" error (5010) counts as success. On failure (admin
+    /// access, invalid value) it returns false and the caller falls back.
     /// </summary>
     public static bool TryAddRoute(string dest, string mask, string via, uint gatewayIfIndex, uint metric = 0xFFFF)
     {
@@ -104,7 +104,7 @@ public static class IpRoute
             NextHop = v,
             IfIndex = gatewayIfIndex,
             Type = 3,   // MIB_IPROUTE_TYPE: indirect (next-hop ≠ destination)
-            Proto = 3,  // MIB_IPPROTO_NETMGMT (همان مقداری که route.exe می‌گذارد)
+            Proto = 3,  // MIB_IPPROTO_NETMGMT (the same value route.exe writes)
             Metric1 = metric
         };
         try

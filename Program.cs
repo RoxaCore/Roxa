@@ -26,11 +26,11 @@ namespace Roxa;
 
 sealed class Program
 {
-    // نام‌هایِ بینِ پروسه‌ای، همه در فضایِ Global.
+    // Inter-process names, all in the `Global` namespace.
     //
-    // بدونِ `Global\`، هر سشن (Fast User Switching، RDP) نمونهٔ خودش را می‌دید و
-    // کاربر با یک نصب، دو برنامهٔ همزمان داشت که هرکدام می‌خواستند TUN و پروکسیِ
-    // سیستم را بگیرند.
+    // Without `Global\`, every session (Fast User Switching, RDP) would see only
+    // its own instance, and one install left the user with two programs running
+    // side by side, both fighting over TUN and the system proxy.
     private const string MutexName = @"Global\Roxa.SingleInstance";
     private const string ShowSignalName = @"Global\RoxaShowSignal";
     private const string ExitSignalName = @"Global\RoxaExitSignal";
@@ -52,10 +52,10 @@ sealed class Program
             return;
         }
 
-        // آپدیتِ خودکار در این نسخه غیرفعال است: برنامه دیگر بستهٔ به‌روزرسانی را دانلود
-        // نمی‌کند و این مسیر را هم اجرا نمی‌کند. به‌جایِ ردِ بی‌صدا — که اعمال نشدنِ یک
-        // به‌روزرسانی را پنهان می‌کرد — باقی‌مانده را پاک می‌کنیم و با کدِ غیرصفر
-        // برمی‌گردیم تا زنجیرهٔ فراخواننده بداند هیچ چیزی اعمال نشد.
+        // Auto-update is disabled in this release: the app no longer downloads the
+        // update package and never runs this path. Instead of returning silently —
+        // which hid the fact that an update had not been applied — we clean the
+        // staging leftovers and exit non-zero so the caller knows nothing applied.
         if (args.Length > 0 && args[0] == "--update-apply")
         {
             try { Core.UpdateApplier.CleanupStaging(); } catch { }
@@ -63,12 +63,12 @@ sealed class Program
             return;
         }
 
-        // پاکسازیِ هنگامِ حذفِ برنامه. نصاب این را پیش از پاک‌کردنِ فایل‌ها اجرا می‌کند.
-        // بدونِ آن، اگر کاربر درست قبلِ حذف کرش کرده باشد یا اتصال باز مانده باشد،
-        // DNS روی 127.0.0.1، پروکسیِ loopback، مسیرهای یتیم و قواعدِ فایروالِ
-        // RoxaTunExcl_* برای همیشه رویِ سیستم می‌مانند؛ و بعد از حذفِ برنامه دیگر
-        // هیچ‌کس آن‌ها را پاک نخواهد کرد — کاربر فقط می‌ماند با اینترنتِ مرده.
-        // عمداً پیش از mutex: نصاب ممکن است در حالی اجرا شود که نمونه‌ای در کار نیست.
+        // Cleanup on uninstall: the installer runs this before deleting files.
+        // Without it, if the user crashed right before uninstalling or left a
+        // connection open, the 127.0.0.1 DNS, the loopback proxy, orphan routes
+        // and the RoxaTunExcl_* firewall rules stay on the machine forever, and
+        // nobody cleans them up afterwards. Deliberately before the mutex: the
+        // installer may run while no instance is up.
         if (Array.Exists(args, a => a == "--cleanup"))
         {
             try { Core.TunRecovery.RecoverOnStartup(); } catch { }
@@ -80,7 +80,7 @@ sealed class Program
             return;
         }
 
-        // خروج آرام از راه دور: بدون kill کردن (kill آیکون سینی را شبح می‌کند).
+        // Quiet remote exit: no killing (killing would leave a ghost tray icon).
         if (Array.Exists(args, a => a == "--exit"))
         {
             try
@@ -97,9 +97,9 @@ sealed class Program
 
         bool waitExit = Array.Exists(args, a => a == "--wait-exit");
 
-        // نمونهٔ قبلی که در حالِ خروج است را صبر می‌کنیم تا واقعاً بمیرد. فقط با یک
-        // حلقهٔ ثابتِ mutex نمی‌شد فهمید آیا کند است یا اصلاً نمرده؛ در حالتِ دوم
-        // نمونهٔ جدید بعد از ۱۰ ثانیه بی‌صدا می‌مرد و برنامه ناپدید می‌شد.
+        // Wait for the previous, exiting instance to actually die. A fixed mutex
+        // loop alone could not tell "slow" from "never died"; in the second case
+        // the new instance silently died after 10 seconds and the app vanished.
         if (waitExit)
         {
             int waitPid = 0;
@@ -112,7 +112,7 @@ sealed class Program
                     using var oldProc = System.Diagnostics.Process.GetProcessById(waitPid);
                     if (!oldProc.HasExited) oldProc.WaitForExit(30_000);
                 }
-                catch { /* پروسه از قبل رفته یا دسترسی نیست؛ mutex همین حالا آزاد است */ }
+                catch { /* process already gone or no access; the mutex is free now */ }
             }
         }
 
@@ -135,8 +135,8 @@ sealed class Program
         }
         catch
         {
-            // نمونهٔ elevated/غیر-elevated دیگری ممکن است مالک mutex باشد و دسترسی
-            // ندهد؛ به‌جای کرش، مثل «نمونه موجود» رفتار کن.
+            // Another elevated/non-elevated instance may own the mutex and deny
+            // access; rather than crash, behave as if an instance already exists.
             createdNew = false;
         }
 
@@ -152,11 +152,11 @@ sealed class Program
             catch { }
             mutex?.Dispose();
 
-            // نمونهٔ دیگری اجراست و پنجره‌اش را آوردیم — پس چیزی برای گفتن نیست.
-            // ولی اگر تحویل هم نشد (مثلاً نمونهٔ متعلق به کاربرِ دیگر، یا مالکِ mutex
-            // دسترسی نمی‌دهد)، کاربر دابل‌کلیک می‌زند و هیچ اتفاقی نمی‌افتد: نه
-            // پنجره، نه خطا، نه حتی سرنخی برای فهمیدن چرا. این پیام دقیقاً همان
-            // یک درصدِ کور است که قبلاً بی‌صدا بلعیده می‌شد.
+            // Another instance is running and we brought its window forward — so
+            // there is nothing to report. But if delivery failed too (say the
+            // instance belongs to another user, or the mutex owner denies access),
+            // a double-click does nothing: no window, no error, not even a hint as
+            // to why. That is exactly the blind case that used to be swallowed.
             if (!handedOff)
                 WarnInstanceBlocked();
 
@@ -198,12 +198,12 @@ sealed class Program
     }
 
     /// <summary>
-    /// وقتی نمونهٔ دیگری mutex را دارد ولی نتوانستیم سیگنالِ نمایشِ پنجره را به آن
-    /// برسانیم، کاربر هیچ چیزی نمی‌بیند: نه پنجره، نه خطا، نه سرنخی. این تنها
-    /// حالتِ واقعاً «کورِ» اجرای برنامه است و باید دیده شود.
+    /// When another instance owns the mutex but we could not deliver the
+    /// show-window signal to it, the user sees nothing: no window, no error,
+    /// not even a clue. That is the only truly blind case, and it must surface.
     ///
-    /// پیش از Avalonia بالا می‌آییم، پس به یک پیامِ سیستمی نیاز است — نه MessageBox
-    /// که به WPF/WinForms وابسته باشد. همین user32 کافی است.
+    /// We come up before Avalonia, so we need a system message — not a MessageBox
+    /// tied to WPF/WinForms. This user32 call is enough.
     /// </summary>
     private static void WarnInstanceBlocked()
     {
@@ -219,12 +219,12 @@ sealed class Program
             const uint MB_SETFOREGROUND = 0x10000;
             MessageBoxW(IntPtr.Zero, text, "Roxa", MB_OK | MB_ICONWARNING | MB_SETFOREGROUND);
         }
-        catch { /* نمایشِ پیام هم شکست خورد؛ اشکالی نیست، فقط نباید کرش کند */ }
+        catch { /* showing the message failed too; that is fine, it just must not crash */ }
     }
 
-    // ExactSpelling لازم است: پیش‌فرضِ false باعث می‌شود runtime نامِ ورودی را به
-    // "MessageBoxWW" تبدیل کند و پیدایش نکند — یعنی پیامِ ما بی‌صدا گم می‌شود.
-    // Unicode هم لازم است چون متنِ پیام فارسی/عربی است.
+    // ExactSpelling is required: the default of false makes the runtime rewrite
+    // the entry name to "MessageBoxWW", which is never found — our message would
+    // be lost silently. Unicode is required too: the message text is Persian.
     [System.Runtime.InteropServices.DllImport("user32.dll",
         CharSet = System.Runtime.InteropServices.CharSet.Unicode,
         ExactSpelling = true)]
@@ -237,20 +237,20 @@ sealed class Program
             .WithDeveloperTools()
 #endif
             .WithInterFont()
-            // گلیف‌هایی که در فونتِ اصلی نیستند از اینجا پُر می‌شوند.
+            // Glyphs missing from the primary font are filled in from here.
             //
-            // Vazirmatn فقط لاتین و عربی/فارسی دارد؛ چینی، ژاپنی، کره‌ای، روسی و هندی
-            // را ندارد و بدونِ این، کلِ متنِ آن زبان‌ها مربع نشان داده می‌شد (□□□).
+            // Vazirmatn only ships Latin and Arabic/Persian; Chinese, Japanese,
+            // Korean, Russian and Indic are missing, so their text showed as boxes.
             //
-            // عمداً کام‌گذاری‌شده داخلِ خودِ FontFamily نیست: Avalonia از fallbackِ
-            // چندفونتیِ درونِ FontFamily پشتیبانی نمی‌کند و آن لیست بی‌صدا دور ریخته
-            // می‌شود (AvaloniaUI/Avalonia#19362). FontManagerOptions راهِ درست است:
-            // برایِ هر گلیفِ ناموجود، به‌ترتیب از میانِ اینها می‌گردد و اولینی را که
-            // کاراکتر را دارد برمی‌دارد. اگر فونتی رویِ سیستمِ کاربر نباشد، رد می‌شود.
+            // Deliberately not comma-separated inside FontFamily itself: Avalonia
+            // does not support multi-font fallback there and silently discards it
+            // (AvaloniaUI/Avalonia#19362). FontManagerOptions is the right place:
+            // for each missing glyph it searches these in order and takes the
+            // first font that has the character, skipping any not installed.
             //
-            // ترتیب مهم است: Segoe UI اول چون کریلیش و یونانی و لاتین را دارد؛ فونت‌های
-            // CJK و هندی فقط برایِ کاراکترهایِ خودشان خوانده می‌شوند، پس فارسی و
-            // انگلیسی همچنان Vazirmatn می‌مانند.
+            // Order matters: Segoe UI first because it covers Cyrillic, Greek and
+            // Latin; CJK and Indic are read only for their own scripts, so Persian
+            // and English still come out as Vazirmatn.
             .With(new FontManagerOptions
             {
                 FontFallbacks = new[]

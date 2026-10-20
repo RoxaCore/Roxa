@@ -24,7 +24,7 @@ using Roxa.Models;
 
 namespace Roxa.Core;
 
-/// <summary>ساخت لینک اشتراک‌گذاری از روی ServerInfo (معکوس UrlParser).</summary>
+/// <summary>Builds a share link from a ServerInfo (the inverse of UrlParser).</summary>
 public static class UrlBuilder
 {
     public static string Build(ServerInfo s) => s.Protocol switch

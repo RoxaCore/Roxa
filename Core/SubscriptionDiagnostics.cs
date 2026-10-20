@@ -23,7 +23,7 @@ using Roxa.Localization;
 
 namespace Roxa.Core;
 
-/// <summary>نتیجه‌ی عیب‌یابی: خط‌های گزارش + اینکه آیا مشکلی دیده شده است.</summary>
+/// <summary>The diagnostic result: the report lines plus whether any problem was seen.</summary>
 public sealed class DiagReport
 {
     public List<string> Lines { get; } = new();
@@ -39,9 +39,9 @@ public sealed class DiagReport
 }
 
 /// <summary>
-/// عیب‌یابی زنجیره‌ی دریافت اشتراک به همان ترتیبی که واقعاً خراب می‌شود:
-/// DNS سیستم ← پراکسی ← دریافت HTTP از پنل ← نسخه‌ی موتور.
-/// برای دکمه‌ی «عیب‌یابی اتصال» در سربرگ اشتراک.
+/// Diagnosing the subscription fetch chain in the exact order it really breaks:
+/// system DNS ← proxy ← HTTP fetch from the panel ← engine version.
+/// For the "diagnose connection" button in the subscription header.
 /// </summary>
 public static class SubscriptionDiagnostics
 {
@@ -49,7 +49,7 @@ public static class SubscriptionDiagnostics
     {
         var report = new DiagReport();
 
-        // ۱) DNS: اول باقی‌مانده‌ی 127.0.0.1 را پیدا و (در صورت امکان) ترمیم می‌کنیم، بعد resolve می‌گیریم
+        // 1) DNS: first locate and (if possible) repair a leftover 127.0.0.1, then resolve
         if (OperatingSystem.IsWindows())
         {
             var dead = TunDns.FindDeadStubAdapters();
@@ -90,7 +90,7 @@ public static class SubscriptionDiagnostics
             }
         }
 
-        // ۲) پراکسی سیستم (اگر مرده/خراب باشد، برنامه‌های دیگر را هم گیج می‌کند)
+        // 2) The system proxy (if dead or broken it confuses other apps too)
         bool systemProxyOn = false;
         if (SystemProxy.GetCurrent(out bool enable, out string server, out _))
         {
@@ -100,7 +100,7 @@ public static class SubscriptionDiagnostics
             else report.Lines.Add(string.Format(TranslationManager.Get("Diag_ProxyOn"), server));
         }
 
-        // ۳) دریافت واقعی همان لینک اشتراک
+        // 3) Actually fetching that same subscription link
         if (string.IsNullOrWhiteSpace(url))
         {
             report.Lines.Add(TranslationManager.Get("Diag_NoUrl"));
@@ -122,8 +122,8 @@ public static class SubscriptionDiagnostics
                 report.Lines.Add(string.Format(TranslationManager.Get("Diag_FetchOk"), probe.StatusCode, probe.ServerCount, probe.ElapsedMs));
             }
 
-            // اگر مسیرِ تنظیم‌شده شکست خورد، بلافاصله بدون هیچ پراکسی‌ای هم امتحان می‌کنیم؛
-            // جوابِ این تست دقیقاً می‌گوید مقصر پراکسی است یا شبکه/پنل.
+            // If the configured path fails, we also try right away with no proxy at all;
+            // this test says exactly whether the proxy or the network/panel is to blame.
             if (!probe.Success && probe.Error == null)
             {
                 var direct = await SubscriptionManager.ProbeAsync(url, proxyAddress: null, forceDirect: true, ct);
@@ -138,7 +138,7 @@ public static class SubscriptionDiagnostics
             }
         }
 
-        // ۴) نسخه‌ی موتور
+        // 4) The engine version
         string version = await XrayEngine.GetVersionAsync(ct);
         if (version == "?")
         {

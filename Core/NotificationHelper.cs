@@ -67,11 +67,11 @@ public static class NotificationHelper
     private static int _generation;
     private const int RemoveDelayMs = 5000;
 
-    /// <summary>وقتی false است هیچ بالونی در ناحیه اعلان ویندوز نمایش داده نمی‌شود (تنظیم کاربر).</summary>
+    /// <summary>When false, no balloon is shown in the Windows notification area (user setting).</summary>
     public static bool Enabled { get; set; } = true;
 
-    // هندل آیکون یک بار ساخته می‌شود؛ ساختن LoadImage در هر بار نمایش پنجره،
-    // بدون DestroyIcon باعث نشت GDI handle می‌شد.
+    // The icon handle is built once; creating it with LoadImage on every window
+    // show, without DestroyIcon, leaked GDI handles.
     private static IntPtr _hIcon;
 
     private static bool AddIcon()

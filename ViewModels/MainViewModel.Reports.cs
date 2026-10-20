@@ -26,7 +26,7 @@ namespace Roxa.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    /// <summary>دیالوگ گزارش: (متن اطلاعات خودکار، تابع ارسال با متن کاربر).</summary>
+    /// <summary>Report dialog: (automatic info text, the send function carrying the user's text).</summary>
     public Action<string, Func<string, Task>>? ShowBugReportHandler { get; set; }
 
     [RelayCommand]
@@ -35,7 +35,7 @@ public partial class MainViewModel : ViewModelBase
         ShowBugReportHandler?.Invoke(BuildReportInfoText(), SendBugReportAsync);
     }
 
-    /// <summary>بخش خودکار گزارش: نسخه، سیستم‌عامل، شناسه و وضعیت اتصال.</summary>
+    /// <summary>The automatic part of a report: version, OS, id and connection state.</summary>
     private string BuildReportInfoText()
     {
         string state = IsConnected
@@ -72,7 +72,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    /// <summary>آخرین خطوط لاگ برای ضمیمه به گزارش (برای کرش هم از همین استفاده می‌شود).</summary>
+    /// <summary>The last log lines attached to a report (also used for crashes).</summary>
     public string GetLogTail(int max)
     {
         lock (_logLock)

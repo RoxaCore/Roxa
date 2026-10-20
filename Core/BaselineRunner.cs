@@ -23,7 +23,7 @@ using Roxa.Models;
 
 namespace Roxa.Core;
 
-/// <summary>اجرای چندباره تست تأخیر واقعی روی ۱۰ سرور با تأخیر پخش‌شده و ذخیره نتایج برای مقایسه.</summary>
+/// <summary>Runs the real delay test repeatedly over 10 servers with staggered delays and saves the results for comparison.</summary>
 public static class BaselineRunner
 {
     public sealed class Sample

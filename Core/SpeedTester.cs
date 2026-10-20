@@ -24,7 +24,7 @@ using Roxa.Models;
 
 namespace Roxa.Core;
 
-/// <summary>تست سرعت تخمینی دانلود از طریق پروکسی Xray (برای مرتب‌سازی نسبی).</summary>
+/// <summary>Estimated download speed test through the Xray proxy (for relative sorting).</summary>
 public static class SpeedTester
 {
     public const int MaxConcurrency = 5;
@@ -94,7 +94,7 @@ public static class SpeedTester
         }
     }
 
-    /// <summary>تست سرعت دسته‌ای با یک پروسه Xray مشترک (multi-outbound)؛ در صورت شکست به تست تکی برمی‌گردد.</summary>
+    /// <summary>Batch speed test over one shared Xray process (multi-outbound); falls back to the single test when it fails.</summary>
     public static async Task<Dictionary<string, TestResult>> TestBatchAsync(
         IReadOnlyList<ServerInfo> servers,
         CancellationToken ct = default,

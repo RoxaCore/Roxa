@@ -40,7 +40,7 @@ public partial class MainViewModel : ViewModelBase
              s.IsChecked = value;
      }
 
-    /// <summary>بازسازی گروه‌های تاشو از روی سرورها و ساب‌ها. وضعیت باز/بسته هر گروه حفظ می‌شود.</summary>
+    /// <summary>Rebuilds the collapsible groups from servers and subscriptions. Each group's open/closed state is preserved.</summary>
     public void RefreshGroups()
     {
         var keepSelected = SelectedServer;
@@ -54,15 +54,15 @@ public partial class MainViewModel : ViewModelBase
         int dupeCount = 0;
         foreach (var s in Servers)
         {
-            // کلید واحد (آدرس+پورت+پروتکل+ترنسپورت)؛ باید عیناً با کلید
-            // RemoveDuplicates یکی باشد تا شمارندهٔ دکمه همان چیزی را حذف کند که می‌شمارد.
+            // The single key (address+port+protocol+transport); it must be identical to the
+            // RemoveDuplicates key so the button's counter removes exactly what it counts.
             if (!seen.Add(DupeKey(s))) dupeCount++;
         }
         DuplicateCount = dupeCount;
 
         var built = new List<ServerGroup>();
 
-        // ساب‌ها — جدیدترین بالاتر
+        // Subscriptions — newest first
         foreach (var sub in Subscriptions.AsEnumerable().Reverse())
         {
             bool isExp = expanded.TryGetValue(sub.Name, out bool e) ? e : !_settings.CollapsedGroups.Contains(sub.Name);
@@ -84,7 +84,7 @@ public partial class MainViewModel : ViewModelBase
             built.Add(group);
         }
 
-        // تب «همه سرورها» — آخرین تب، بسته به صورت پیش‌فرض
+        // The "all servers" tab — the last tab, depending on the default
         bool allExp = expanded.TryGetValue("__all__", out bool ae) ? ae : false;
         var allGroup = new ServerGroup(this, "__all__", TranslationManager.Instance["AllServers_Title"], null, allExp);
         var allServers = Servers.ToList();
@@ -103,8 +103,8 @@ public partial class MainViewModel : ViewModelBase
         RefreshConnectionFlags();
     }
 
-    /// <summary>ترتیب ذخیره‌شدهٔ سربرگ‌های گروه (درگ با موس) را اعمال می‌کند؛
-    /// گروه‌های تازه‌ای که در ترتیب ذخیره‌شده نیستند بالاتر از «همه سرورها» قرار می‌گیرند.</summary>
+    /// <summary>Applies the saved order of the group tabs (mouse drag); groups
+    /// that are not in the saved order are placed above "all servers".</summary>
     private List<ServerGroup> ApplySavedGroupOrder(List<ServerGroup> built)
     {
         if (_settings.GroupOrder is not { Count: > 0 } order)
@@ -128,7 +128,7 @@ public partial class MainViewModel : ViewModelBase
         return result;
     }
 
-    /// <summary>ترتیب جدید سربرگ‌های گروه را بعد از درگ با موس ذخیره می‌کند.</summary>
+    /// <summary>Saves the new order of the group tabs after a mouse drag.</summary>
     public void PersistGroupOrder()
     {
         _settings.GroupOrder = Groups.Select(g => g.Key).ToList();
@@ -137,8 +137,8 @@ public partial class MainViewModel : ViewModelBase
 
     private void UpdateGroupContent(ServerGroup group)
     {
-        // تب «همه سرورها» کلیدش «__all__» است و هیچ سروری چنین SubscriptionName ندارد؛
-        // بدون این شاخه، بعد از به‌روزرسانی اشتراک این تب خالی می‌شد.
+        // The "all servers" tab has the key "__all__" and no server has such a SubscriptionName;
+        // without this branch the tab went empty after a subscription refresh.
         var servers = group.Key == "__all__"
             ? Servers.ToList()
             : Servers.Where(s =>
@@ -301,6 +301,6 @@ public partial class MainViewModel : ViewModelBase
           SortAscending = !SortAscending;
       }
 
-      // --- متدهای عمومی برای Tray Menu ---
+      // --- public methods for the Tray Menu ---
 
 }

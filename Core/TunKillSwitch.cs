@@ -28,10 +28,10 @@ public static class TunKillSwitch
     private const string RulePrefix = "RoxaKillSw_";
     private const int ProbeIntervalMs = 1000;
     private const int HttpProbeEvery = 5;
-    // هر پروبِ HTTP ۸ ثانیه فرصت دارد؛ با آستانهٔ قبلی (۳ ثانیه) ترافیکِ کاملاً سالمِ ایران
-    // هم «خوانده‌نشده» حساب می‌شد و کیل‌سوییچ کلِ اینترنت را چند ثانیه مسدود می‌کرد.
+    // Each HTTP probe gets 8 seconds; with the previous threshold (3 s), even completely
+    // healthy Iranian traffic counted as "unread" and the kill switch blocked the whole internet for a few seconds.
     private const int HttpProbeTimeoutMs = 8000;
-    // سه شکستِ متوالیِ HTTP لازم است تا اصلاً «بد» حساب شود (≈۱۵ ثانیه).
+    // Three consecutive HTTP failures are required before it counts as "bad" (≈15 s).
     private const int MaxHttpFails = 3;
     private const int MaxBadTicks = 6;
     private const int GoodTicksToRecover = 5;
@@ -69,15 +69,15 @@ public static class TunKillSwitch
     private static int _appliedGen;
     private static int _appliedEngaged;
 
-    // وقتی خودِ برنامه عمداً اتصال را قطع می‌کند (تعویضِ سرور، قطعِ دستی، وصلِ مجددِ
-    // خودکارِ بعد از تغییرِ شبکه)، بلاکِ WFP درست است ولی اعلانِ «اینترنت مسدود شد»
-    // چیزی جز اضطراب نیست — کاربر خودش دکمه زده و می‌داند چه خبر است.
-    // فقط از دستِ رفتنِ واقعیِ تونل (تشخیصِ پروب) باید خبر بدهد.
+    // When the app itself deliberately drops the connection (server switch, manual disconnect,
+    // automatic reconnect after a network change), the WFP block is correct but the "Internet blocked" toast
+    // notification is nothing but anxiety — the user pressed the button
+    // themselves and knows what is going on. Only a real tunnel loss (probe detection) must be reported.
     private static volatile bool _expectedDown;
 
     /// <summary>
-    /// آیا آخرینِ تغییرِ وضعیتِ بلاک، نتیجهٔ قطعِ عمدیِ خودِ برنامه بوده؟
-    /// UI بر اساسِ آن تصمیم می‌گیرد اعلان نشان بدهد یا نه.
+    /// Was the last block-state transition the result of the app's own deliberate shutdown?
+    /// The UI uses it to decide whether to show a notification.
     /// </summary>
     public static bool LastTransitionExpected => _expectedDown;
 
@@ -115,13 +115,13 @@ public static class TunKillSwitch
             }
             timerOn = _timer != null;
         }
-        // عمداً فایروالِ ویندوز را دست نمی‌زنیم:
-        // کیل‌سوییچِ Roxa کاملاً با WFP (لایهٔ کِرنل) کار می‌کند و به فایروالِ ویندوز نیازی ندارد.
-        // قبلاً اینجا «netsh advfirewall set allprofiles state on» می‌زدیم؛ دستورِ روشن‌کردنِ فایروال
-        // هیچ‌وقت بازگردانده نمی‌شد و سیستمِ کاربر را برای همیشه تغییر می‌داد — رویِ بعضی سیستم‌ها
-        // (پروفایلِ خروجیِ مسدود، یا AVِ جایگزین) هم کلِ اینترنت را می‌انداخت.
-        // قانون‌های TunExclusion فقط وقتی اثر دارند که فایروالِ خودِ کاربر روشن باشد؛ اگر خاموش است،
-        // چیزی هم برای مسدودکردن وجود ندارد، پس الزامی‌کردنِ آن لازم نیست.
+        // We deliberately never touch the Windows firewall:
+        // the Roxa kill switch works entirely through WFP (the kernel layer) and needs no Windows firewall.
+        // We used to run «netsh advfirewall set allprofiles state on» here; that enabling command
+        // was never undone and changed the user's system forever — on some systems
+        // (outbound-blocked profile, or third-party AV) it also took down the whole internet.
+        // TunExclusion rules only take effect when the user's own firewall is on; if it is off,
+        // there is nothing to block anyway, so forcing it on is unnecessary.
         TunManager.Log($"kill-switch configure enabled={enabled} paths={n} timer={timerOn} gen={gen}");
         Apply(gen);
     }
@@ -130,8 +130,8 @@ public static class TunKillSwitch
     {
         int gen;
         int portNow;
-        // بالا رفتنِ تونل یعنی از این به بعد هر قطعیِ تونل غیرمنتظره است؛
-        // پایین آمدنش از همین‌جا یعنی خودِ برنامه عمداً قطع کرده (قطع/تعویض سرور/وصل مجدد).
+        // Tunnel up means every tunnel drop from now on is unexpected;
+        // going down from here means the app itself deliberately cut it (disconnect/server switch/reconnect).
         _expectedDown = !up;
         lock (_lock)
         {
@@ -275,8 +275,8 @@ public static class TunKillSwitch
                         _appliedEngaged = 0;
                         TunManager.Log("kill-switch engage failed");
                         RaiseState(false, count);
-                        // در حالت «تونل قطع است» هیچ تغییر وضعیت دیگری رخ نمی‌دهد تا
-                        // Apply دوباره صدا زده شود؛ بدون retry، کلید قطع برای همیشه می‌ماند.
+                        // In the "tunnel down" state no other state change occurs until
+                        // Apply is called again; without a retry the off switch would stay forever.
                         ScheduleEngageRetry(gen);
                         return;
                     }
@@ -318,8 +318,8 @@ public static class TunKillSwitch
         _ = Task.Run(async () =>
         {
             try { await Task.Delay(EngageRetryDelayMs); } catch { }
-            // want دوباره محاسبه می‌شود؛ اگر در این فاصله تونل برگشته یا کلید قطع
-            // شده باشد، هیچ اتفاقی نمی‌افتد.
+            // want is recomputed; if the tunnel came back or the kill switch was turned
+            // off in the meantime, nothing happens.
             Apply(gen);
         });
     }
@@ -507,16 +507,16 @@ public static class TunKillSwitch
             _goodStreak = 0;
             if (!up) return;
 
-            // «http-stale» عمداً صفر است: فقط وضعیتِ بد را نگه می‌دارد و ثانیه‌به‌ثانیه شمارش را بالا نمی‌برد.
-            // باآستانهٔ قبلی، پروبِ HTTP هر ۵ ثانیه اجرا می‌شد ولی بینِ آن‌ها هر ثانیه +۱ می‌خورد؛
-            // نتیجه این بود که یک تایم‌اوتِ تنها ظرفِ ~۵ ثانیه کلِ ترافیک را مسدود و ~۶ ثانیه بعد رها می‌کرد.
+            // "http-stale" is deliberately worth 0: it only holds the bad state and does not bump the count every second.
+            // With the previous threshold the HTTP probe ran every 5 seconds but earned +1 each second in between;
+            // so a single timeout alone blocked all traffic within ~5 s and released it ~6 s later.
             _badTicks += fail == "http-stale" ? 0 : fail.StartsWith("http:") ? 3 : critical ? 2 : 1;
             TunManager.Log($"kill-switch probe ({_badTicks}/{MaxBadTicks}): {fail} port={port}");
             if (_badTicks < MaxBadTicks) return;
 
             TunManager.Log("kill-switch: tunnel lost, engaging");
-            // از دست رفتنِ تونل را خودِ پروب تشخیص داده؛ یعنی واقعی و غیرمنتظره است
-            // و ارزشِ خبر دارد (برخلافِ قطعِ عمدیِ خودِ برنامه).
+            // The probe itself detected the tunnel loss, so it is real and unexpected
+            // and worth reporting (unlike the app's own deliberate shutdown).
             _expectedDown = false;
             int gen;
             lock (_lock)

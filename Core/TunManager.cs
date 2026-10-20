@@ -33,8 +33,8 @@ public static class TunManager
     private const int CaptureTimeoutMs = 15000;
     private const int CaptureRetryDelayMs = 300;
     private const int ResolveTimeoutMs = 2500;
-    // هر چند ثانیه گیت‌ویِ مسیرهای کپچر را چک کنیم و چند نوبتِ پایداری برای پذیرشِ
-    // گیت‌ویِ جدید لازم است (کارتِ در حال قطع‌شدن چند ثانیه هنوز مسیرِ کم‌metric دارد).
+    // Every how many seconds to check the gateway of the capture routes, and how many
+    // stability ticks are needed to accept a new gateway (a card that is going down still has a low-metric route for a few seconds).
     private const int GatewayWatchEvery = 5;
     private const int GatewayStableTicks = 2;
 
@@ -55,26 +55,26 @@ public static class TunManager
     ];
 
     /// <summary>
-    /// آدرسِ ثابتِ آداپتورِ TUN. Wintun بدونِ آدرسِ تعریف‌شده خودش یک APIPA
-    /// (169.254.x.x) می‌گیرد و آن‌وقت ویندوز 169.254.255.255 را «بِرودکستِ همان
-    /// زیرشبکهٔ خودِ آداپتور» حساب می‌کند و کلِ NBNS/LLMNR/mDNS را — بی‌آنکه سرِ
-    /// جدولِ مسیر برود — مستقیم داخلِ تونل می‌ریزد. برایِ همین هیچ مسیرِ استثنایی
-    /// فایده نداشت: این تصمیم از رویِ آدرسِ آداپتور گرفته می‌شود، نه از رویِ
-    /// مسیر. در یک نوبت ۱۶۳۰۹ بستهٔ NBNS روی پورت ۱۳۷ در یک دقیقه ثبت شد و
-    /// حافظهٔ xray تا ۹۴۱ مگابایت بالا رفت. با آدرسِ ثابت، آداپتور دیگر
-    /// لینک‌لوکال نیست و آن بِرودکست‌ها اصلاً ساخته نمی‌شوند. v2rayN هم همین کار
-    /// را می‌کند (آداپتورش singbox_tun آدرسِ 172.19.0.1/30 دارد). دامنهٔ
-    /// 198.18.0.0/15 برایِ سنجشِ شبکه رزرو شده (RFC 2544) و رویِ شبکه‌های واقعی
-    /// استفاده نمی‌شود؛ /30 هم یعنی آداپتور فقط یک همسایه دارد.
+    /// The static address of the TUN adapter. Without a defined address Wintun picks
+    /// an APIPA (169.254.x.x) address itself, and then Windows treats 169.254.255.255
+    /// as "broadcast of the adapter's own subnet" and drops all NBNS/LLMNR/mDNS —
+    /// without even consulting the route table — straight into the tunnel. That is why
+    /// no exception route helped: this decision is made from the adapter address, not
+    /// from the route. In one run, 16309 NBNS packets on port 137 were logged in a
+    /// single minute and xray's memory climbed to 941 MB. With a static address the
+    /// adapter is no longer link-local and those broadcasts are never generated.
+    /// v2rayN does the same thing (its adapter singbox_tun has address 172.19.0.1/30).
+    /// The 198.18.0.0/15 range is reserved for network benchmarking (RFC 2544) and is
+    /// not used on real networks; /30 also means the adapter has only one neighbor.
     /// </summary>
     private const string TunAddress = "198.18.0.1";
     private const string TunAddressMask = "255.255.255.252";
     private static int _tunAddressSet;
 
     /// <summary>
-    /// آدرسِ ثابت را رویِ آداپتورِ TUN می‌گذارد. فقط یک‌بار در هر نوبتِ اتصال
-    /// اجرا می‌شود؛ اگر آداپتور تازه بالا آمده باشد netsh ممکن است یکی دو بار
-    /// جواب ندهد، پس کوتاه تکرار می‌کنیم.
+    /// Sets the static address on the TUN adapter. Runs only once per connection;
+    /// if the adapter has just come up, netsh may fail to answer once or twice,
+    /// so we retry briefly.
     /// </summary>
     private static bool EnsureTunAddress()
     {
@@ -95,15 +95,15 @@ public static class TunManager
     }
 
     /// <summary>
-    /// آدرسِ پیش‌فرض را برمی‌گرداند، مگر اینکه آداپتورِ دیگری همان‌جا را
-    /// اشغال کرده باشد؛ آن‌وقت اولین /30ِ خالیِ داخلِ همان /15 را برمی‌گرداند.
-    /// دلیل: 198.18.0.1 دقیقاً آدرسِ پیش‌فرضِ TUN در clash/mihomo است
-    /// (fake-ip-range پیش‌فرضِشان 198.18.0.0/16 است و آدرسِ TUN هم از همینجا
-    /// گرفته می‌شود). اگر کاربر clash را روشن داشته باشد دو آداپتور یک IP
-    /// می‌گیرند و مسیریابی به‌هم می‌ریزد. هر آدرسی که همین‌جا انتخاب شود
-    /// داخلِ 198.18.0.0/15 می‌ماند، پس همان معنایِ PrivateIpCidrs و همان
-    /// جلوگیری از broadcast لینک‌لوکال دست‌نخورده می‌ماند. اگر چیزی گرفته
-    /// نشده یا جدولِ مسیر در دسترس نبود، دقیقاً همان رفتارِ امروزی برمی‌گردد.
+    /// Returns the default address unless another adapter already occupies that spot;
+    /// then it returns the first free /30 inside the same /15.
+    /// Reason: 198.18.0.1 is exactly the default TUN address in clash/mihomo
+    /// (their default fake-ip-range is 198.18.0.0/16 and the TUN address is also
+    /// taken from there). If the user has clash running, the two adapters get the
+    /// same IP and routing breaks. Any address chosen here stays inside
+    /// 198.18.0.0/15, so the meaning of PrivateIpCidrs and the link-local broadcast
+    /// prevention remain untouched. If nothing is taken or the route table was not
+    /// available, exactly the current behavior is returned.
     /// </summary>
     private static string PickTunAddress()
     {
@@ -113,17 +113,17 @@ public static class TunManager
             if (table == null || table.Count == 0) return TunAddress;
 
             uint tunIf = IpRoute.GetIfIndex(TunAdapterName);
-            // ParseIp و مقادیرِ MIB هر دو در نمایِ بایتِ جابه‌جا‌شده‌اند (همان
-            // قراردادی که MatchesRecord با آن کار می‌کند)، پس مقایسهٔ عددي
-            // با < و > بی‌معناست: مثلاً 192.168.1.0 در این نما از 198.18.0.0
-            // «بزرگ‌تر» درمی‌آید و فیلترِ دامنه خطا می‌کرد. عضویت در دامنه را
-            // باید با ماسک سنجید. ماسکِ /15 در بایت 255.254.0.0 است، نه
-            // 255.255.0.0، چون دامنه 198.18 و 198.19 را می‌پوشاند.
+            // ParseIp and the MIB values are both in byte-swapped form (the same
+            // convention MatchesRecord works with), so a numeric comparison with
+            // < and > is meaningless: for example 192.168.1.0 appears "greater"
+            // than 198.18.0.0 in this view and the range filter would be wrong.
+            // Range membership must be tested with the mask. The /15 mask in bytes
+            // is 255.254.0.0, not 255.255.0.0, because the range covers 198.18 and 198.19.
             uint base15 = IpRoute.ParseIp("198.18.0.0");
             uint mask15 = IpRoute.ParseIp("255.254.0.0");
             uint m30 = IpRoute.ParseIp("255.255.255.252");
 
-            // مسیرهایی که داخلِ دامنهٔ ما نشسته‌اند و مالِ خودِ TUN نیستند.
+            // Routes that sit inside our range and do not belong to the TUN itself.
             var taken = new List<(uint Net, uint Mask)>();
             foreach (var row in table)
             {
@@ -134,7 +134,7 @@ public static class TunManager
             }
             if (taken.Count == 0) return TunAddress;
 
-            // کلِ /15 یعنی 198.18 و 198.19؛ هر چهار آدرس یک /30 است.
+            // The whole /15 means 198.18 and 198.19; every four addresses make a /30.
             for (uint second = 18; second <= 19; second++)
             {
                 for (uint third = 0; third < 256; third += 4)
@@ -143,7 +143,7 @@ public static class TunManager
                     bool busy = false;
                     foreach (var (net, mask) in taken)
                     {
-                        // دو زیرشبکه وقتی هم‌پوشانی دارند که یکی داخلِ دیگری باشد.
+                        // Two subnets overlap only when one is inside the other.
                         if ((net & m30) == cand || (cand & mask) == net) { busy = true; break; }
                     }
                     if (busy) continue;
@@ -156,7 +156,7 @@ public static class TunManager
             }
         }
         catch { }
-        // هیچ جای خالی پیدا نشد (یا هر خطایی رخ داد): همان آدرسِ پیش‌فرض.
+        // No free spot was found (or some error occurred): the default address.
         return TunAddress;
     }
 
@@ -164,14 +164,14 @@ public static class TunManager
     private static readonly string _wintunPath = Path.Combine(_wintunDirectory, "wintun.dll");
     private static readonly string _logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
 
-    // وینتین از نسخهٔ ۰٫۱۴٫۱ فقط یک بستهٔ واحد منتشر می‌کند که شاملِ DLL هر چهار
-    // معماری (amd64/x86/arm64/arm) است. آدرس‌هایِ قدیمیِ جداگانه مثلِ
-    // wintun-amd64-0.14.1.zip از سایت حذف شده‌اند و هر دو ۴۰۴ می‌دهند؛ کدِ قبلی همان
-    // آدرسِ مرده را می‌گرفت و هشِ یک فایلِ واحد را رویِ بستهٔ معماریِ خاص می‌سنجید،
-    // پس همیشه شکست می‌خورد و حالتِ TUN بی‌صدا به پروکسی برمی‌گشت.
+    // Since version 0.14.1 wintun publishes only a single bundle that contains the DLL
+    // for all four architectures (amd64/x86/arm64/arm). The old separate URLs like
+    // wintun-amd64-0.14.1.zip were removed from the site and both return 404; the old
+    // code fetched that dead URL and hashed one file against the arch-specific package,
+    // so it always failed and TUN mode silently fell back to proxy.
     private const string WintunUrl = "https://www.wintun.net/builds/wintun-0.14.1.zip";
 
-    // هشِ منتشرشده در سایتِ رسمی برایِ همان یک فایل؛ برایِ هر دو معماری درست است.
+    // The hash published on the official site for that single file; correct for both architectures.
     private const string WintunSha256 = "07c256185d6ee3652e09fa55c0b673e2624b565e02c4b9091c79ca7d2f24ef51";
 
     public static string WintunDirectory => _wintunDirectory;
@@ -214,7 +214,7 @@ public static class TunManager
             System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, WintunDirectory, true);
             try { File.Delete(zipPath); } catch { }
 
-            // بستهٔ واحد شاملِ هر چهار معماری است؛ باید معماریِ همین سیستم را انتخاب کنیم.
+            // The single bundle contains all four architectures; we must pick this system's architecture.
             if (!File.Exists(_wintunPath) && !PickWintunDllForThisArch())
             {
                 Log($"wintun archive contained no DLL for {RuntimeInformation.OSArchitecture}.");
@@ -235,10 +235,10 @@ public static class TunManager
     }
 
     /// <summary>
-    /// از بینِ همهٔ wintun.dll هایِ استخراج‌شده، نسخهٔ معماریِ همین سیستم را به
-    /// engine\wintun.dll منتقل می‌کند. به ساختارِ دقیقِ بسته وابسته نیست: دنبالِ
-    /// نامِ فایل و نامِ پوشهٔ معماری می‌گردد، پس هم برایِ بستهٔ امروز درست است
-    /// و هم اگر ساختارِ داخلی عوض شد از کار نمی‌افتد.
+    /// Copies the build matching this system's architecture out of all the extracted
+    /// wintun.dll files into engine\wintun.dll. It does not depend on the exact package
+    /// layout: it looks for the file name and the architecture folder name, so it is
+    /// correct for today's package and keeps working if the internal layout changes.
     /// </summary>
     private static bool PickWintunDllForThisArch()
     {
@@ -270,8 +270,8 @@ public static class TunManager
     }
 
     /// <summary>
-    /// فایلِ نهایی جا‌به‌جا شد؛ درختِ استخراج‌شده (bin\amd64\… و wintun.h) دیگر لازم
-    /// نیست. فقط چیزی را حذف می‌کنیم که همین الان خودِ بسته ساخته است.
+    /// The final file has been copied; the extracted tree (bin\amd64\… and wintun.h) is
+    /// no longer needed. We only delete what the package itself just created.
     /// </summary>
     private static void CleanupExtractedWintunTree()
     {
@@ -282,7 +282,7 @@ public static class TunManager
             foreach (var header in Directory.GetFiles(WintunDirectory, "wintun.h"))
                 File.Delete(header);
         }
-        catch { /* بهترین تلاش؛ فایلِ زائد فقط شلوغ است و آسیبی نمی‌زند */ }
+        catch { /* best effort; the stray file is only clutter and does no harm */ }
     }
 
     public static async Task<bool> AddCaptureRoutesAsync(IEnumerable<string>? hosts, Action<string>? log = null)
@@ -296,7 +296,7 @@ public static class TunManager
                 return false;
             }
 
-            // اجرای route print در پس‌زمینه تا رشتهٔ UI هنگام اتصال TUN قفل نشود.
+            // Run route print in the background so the UI thread does not freeze during the TUN connection.
             string? via = await Task.Run(GetDefaultGatewayVia);
             long tGateway = Environment.TickCount64;
             if (via == null)
@@ -305,15 +305,15 @@ public static class TunManager
                 return false;
             }
 
-            // همه میزبان‌های داده‌شده را resolve می‌کنیم (قبلاً فقط اولی در نظر گرفته
-            // می‌شد و بقیهٔ آدرس‌های سرور زیر TUN گم می‌شدند).
+            // Resolve all the given hosts (previously only the first one was taken into
+            // account and the rest of the server addresses were lost under the TUN).
             var hostList = hosts?.Where(h => !string.IsNullOrWhiteSpace(h)).ToList();
             var serverIps = await ResolveServerIpsAsync(hostList == null || hostList.Count == 0 ? null : hostList);
             long tDns = Environment.TickCount64;
 
-            // هر AddRoute دو بار route.exe اجرا می‌کند (delete+add)؛ با ده‌ها سرور
-            // ده‌ها پروسه می‌شود. LongRunning تا رشته‌های Thread-Pool در چند ثانیهٔ
-            // اجرای همزمان route.exe بلوکه نشوند و پیوست‌های UI به تعویق نیفتند.
+            // Each AddRoute runs route.exe twice (delete+add); with dozens of servers that is
+            // dozens of processes. LongRunning so the Thread-Pool threads are not blocked
+            // during the few seconds of concurrent route.exe runs and UI updates are not delayed.
             await Task.Factory.StartNew(() =>
             {
                 foreach (var ip in serverIps)
@@ -325,23 +325,23 @@ public static class TunManager
                 AddRoute($"add 10.0.0.0 mask 255.0.0.0 {via}");
                 AddRoute($"add 172.16.0.0 mask 255.240.0.0 {via}");
                 AddRoute($"add 192.168.0.0 mask 255.255.0.0 {via}");
-                // لینک‌لوکال. آداپتورِ TUN آدرسِ 169.254.x.x دارد، پس ویندوز بِرودکستِ
-                // همان زیرشبکه (169.254.255.255 روی پورت‌های 138/1947) را به تونل
-                // می‌فرستاد؛ در یک نوبت ۲۳۲۱ بسته در ۸ ثانیه ثبت شد و xray به‌ازایِ
-                // هر کدام یک خط لاگ نوشت. TunExclusion.IsPrivate همین دامنه را
-                // محلی حساب می‌کند، ولی اینجا جا افتاده بود.
+                // Link-local. The TUN adapter has a 169.254.x.x address, so Windows was
+                // sending the broadcast of that same subnet (169.254.255.255 on ports
+                // 138/1947) into the tunnel; in one run 2321 packets were logged in 8
+                // seconds and xray wrote one log line for each. TunExclusion.IsPrivate
+                // treats this range as local, but it was missing here.
                 AddRoute($"add 169.254.0.0 mask 255.255.0.0 {via}");
-                // بِرودکستِ محدود و مالتی‌کست. مسیرِ تونل (0.0.0.0/1 + 128.0.0.0/1) کلِ
-                // فضای IPv4 را می‌پوشاند، پس این دو هم داخلِ تونل می‌افتادند. برایِ
-                // همین اضافه کردنِ 169.254.0.0/16 کافی نبود: نیمی از طوفانِ ۳۳۲۷
-                // بسته‌ایِ پورت ۱۹۴۷ مقصدش 255.255.255.255 بود. فرستنده را پیدا
-                // کردم — hasplms.exe، سرویسِ لایسنسِ HASP/SafeNet است که برایِ پیدا
-                // کردنِ دانگِلِ USB هر چند ثانیه broadcast می‌زند و این کار را حتی
-                // وقتی دانگِلی وصل نیست هم ادامه می‌دهد. هر بسته در xray یک «اتصالِ
-                // UDP» می‌ساخت؛ حافظه‌اش تا ۹۱۱ مگابایت بالا رفت، CPU سوخت و بازهٔ
-                // پورت‌های یک‌بارمصرفِ ویندوز هم تمام شد (رویدادِ Tcpip 4266).
-                // مسیرِ 224.0.0.0/4 هم برایِ همین دلیل اضافه می‌شود؛ v2rayN هم رویِ
-                // آداپتورِ خودش همین دو را دارد.
+                // Limited broadcast and multicast. The tunnel routes (0.0.0.0/1 +
+                // 128.0.0.0/1) cover the entire IPv4 space, so these two also fell into
+                // the tunnel. That is why adding 169.254.0.0/16 was not enough: half of
+                // the 3327-packet storm on port 1947 was destined for 255.255.255.255. I
+                // found the sender — hasplms.exe, the HASP/SafeNet license service, which
+                // broadcasts every few seconds to find a USB dongle and keeps doing so
+                // even when no dongle is plugged in. Each packet created a "UDP
+                // connection" in xray; its memory climbed to 911 MB, the CPU burned, and
+                // Windows' ephemeral port range was exhausted (Tcpip event 4266). The
+                // 224.0.0.0/4 route is added for the same reason; v2rayN also has both of
+                // these on its own adapter.
                 AddRoute($"add 255.255.255.255 mask 255.255.255.255 {via}");
                 AddRoute($"add 224.0.0.0 mask 240.0.0.0 {via}");
             }, TaskCreationOptions.LongRunning);
@@ -378,8 +378,8 @@ public static class TunManager
     {
         StopGatewayWatch();
         _captureVia = null;
-        // آداپتور با قطعِ اتصال از بین می‌رود؛ پرچم را هم ریست می‌کنیم تا در
-        // اتصالِ بعدی دوباره آدرسِ ثابت گذاشته شود.
+        // The adapter goes away when the connection drops; we reset the flag too so
+        // the static address is set again on the next connection.
         Interlocked.Exchange(ref _tunAddressSet, 0);
         List<TunRouteRecord> snapshot;
         lock (_routesLock)
@@ -429,22 +429,22 @@ public static class TunManager
         long deadline = Environment.TickCount64 + CaptureTimeoutMs;
         while (true)
         {
-            // تا آداپتر roxa0 بالا نیامده netsh بیهوده پروسه می‌سازد (هر نوبت ۲ پروسه
-            // هر ۳۰۰ms) و رشتهٔ UI را هم پشت همین انتظار نگه می‌داشت؛ اول با
-            // GetIfIndex بومی چک می‌شود و فقط بعد از ظاهرشدن آداپتر route اضافه می‌شود.
+            // Until the roxa0 adapter comes up, netsh spawns processes in vain (2 per round
+            // every 300ms) and it also held the UI thread behind this same wait; first the
+            // native GetIfIndex checks, and routes are only added after the adapter appears.
             if (IpRoute.GetIfIndex(TunAdapterName) == 0)
             {
                 if (Environment.TickCount64 >= deadline) return false;
                 await Task.Delay(CaptureRetryDelayMs);
                 continue;
             }
-            // آداپتر بالا آمد. قبل از افزودنِ مسیرها آدرسِ ثابت را می‌گذاریم تا
-            // لینک‌لوکال نشود؛ این کار فقط یک‌بار در هر نوبتِ اتصال انجام می‌شود.
+            // The adapter came up. Before adding the routes we set the static address so
+            // it does not go link-local; this runs only once per connection.
             await Task.Run(EnsureTunAddress);
             bool allAdded = true;
             foreach (var (prefix, dest, mask) in _capturePrefixes)
             {
-                // netsh هم پروسهٔ جدا می‌خواهد؛ در پس‌زمینه اجرا می‌شود.
+                // netsh also wants its own process; it runs in the background.
                 bool ok = await Task.Run(() => RunNetsh($"interface ipv4 add route prefix={prefix} interface={TunAdapterName}") == 0);
                 if (ok)
                 {
@@ -462,16 +462,16 @@ public static class TunManager
         }
     }
 
-    /// <summary>آخرین گیت‌ویِ در لاگ آمده؛ تا پایشِ هر ۵ ثانیه یک خطِ تکراری ننویسد.</summary>
+    /// <summary>Last gateway that appeared in the log; so the every-5-seconds watch does not write a duplicate line.</summary>
     private static string? _lastLoggedGateway;
 
     public static string? GetDefaultGatewayVia()
     {
         try
         {
-            // اولویت با گیت‌ویِ کارت شبکهٔ فیزیکی: وقتی TUN دیگری (مثل v2rayN) فعال است،
-            // مسیرِ پیش‌فرضِ کمترین metric مالِ اوست و قبلاً excl/test ما واردِ TUNِ بیگانه
-            // می‌شد؛ باید مستقیم به گیت‌وی واقعی برود.
+            // The physical NIC's gateway takes priority: when another TUN (e.g. v2rayN) is
+            // active, the lowest-metric default route belongs to it and previously excl/test
+            // would enter the foreign TUN; it must go straight to the real gateway.
             string? physical = FindPhysicalDefaultGateway();
             if (physical != null)
             {
@@ -511,9 +511,9 @@ public static class TunManager
     }
 
     /// <summary>
-    /// لاگِ گیت‌وی فقط وقتی مقدار واقعاً عوض شده. پایشِ هر چند ثانیه همان یک
-    /// خطِ «Default gateway via=… (physical)» را بی‌قید و شرط می‌نوشت — تا ۱۸ بار
-    /// در دقیقه، برایِ ساعت‌ها، در حالی که هیچ چیزی عوض نشده بود.
+    /// Log the gateway only when the value really changed. The every-few-seconds watch
+    /// used to write that one "Default gateway via=… (physical)" line unconditionally —
+    /// up to 18 times a minute, for hours, while nothing had actually changed.
     /// </summary>
     private static void LogGatewayOnce(string via, string detail)
     {
@@ -526,8 +526,8 @@ public static class TunManager
     }
 
     /// <summary>
-    /// گیت‌ویِ پیش‌فرضی که واقعاً به کارت شبکهٔ فیزیکی تعلق دارد: مسیر 0.0.0.0/0 با
-    /// NextHop غیرصفر، غیر از آداپترهای TUN (نام/شرح)، و دقیقاً همان گیت‌ویِ ثبت‌شده روی آداپتر.
+    /// The default gateway that really belongs to a physical NIC: a 0.0.0.0/0 route with a
+    /// non-zero NextHop, excluding TUN adapters (name/description), and exactly the gateway registered on that adapter.
     /// </summary>
     private static string? FindPhysicalDefaultGateway()
     {
@@ -565,11 +565,11 @@ public static class TunManager
     }
 
     /// <summary>
-    /// آیا هنوز یک مسیر 0.0.0.0/0 با این next-hop روی کارتِ شبکهٔ غیر-TUN وجود دارد؟
-    /// برای تشخیصِ اینکه گیت‌ویِ فعلیِ مسیرهای سنجاق‌شدهٔ «معافیت TUN» هنوز زنده است یا
-    /// آداپتر عوض شده و آن مسیرها به سیاه‌چاله تبدیل شده‌اند. ویندوز مسیرهای /32 را
-    /// نگه می‌دارد، ولی next-hopِ مرده را حذف نمی‌کند.
-    /// در شکِ تشخیص، گیت‌وی زنده فرض می‌شود تا بی‌جهت مسیرها پاک نشوند.
+    /// Is there still a 0.0.0.0/0 route with this next-hop on a non-TUN network card?
+    /// Used to detect whether the gateway of the pinned "TUN exclusion" routes is still
+    /// alive, or the adapter has changed and those routes have become black holes.
+    /// Windows keeps /32 routes but does not remove the dead next-hop.
+    /// When detection fails, the gateway is assumed alive so the routes are not cleared for nothing.
     /// </summary>
     public static bool IsPhysicalGatewayPresent(string gateway)
     {
@@ -600,9 +600,9 @@ public static class TunManager
     }
 
     /// <summary>
-    /// روشن کردنِ مشاهدهٔ گیت‌ویِ مسیرهای کپچر. این مسیرها (سرور VPN و شبکه‌های داخلی)
-    /// به گیت‌ویِ فیزیکی وابسته‌اند؛ اگر آداپتر یا اینترنت عوض شود، next-hop مرده می‌ماند
-    /// و سرور VPN از دسترس خارج می‌شود. قبلاً فقط هنگامِ راه‌اندازی بازسازی می‌شدند.
+    /// Starts watching the gateway of the capture routes. These routes (the VPN server
+    /// and internal networks) depend on the physical gateway; if the adapter or the
+    /// internet changes, the next-hop stays dead and the VPN server becomes unreachable. Previously they were only rebuilt at startup.
     /// </summary>
     private static void StartGatewayWatch(string via)
     {
@@ -624,14 +624,14 @@ public static class TunManager
         Timer? t;
         lock (_routesLock)
         {
-            // شمارهٔ نسل بالا می‌رود تا اگر بازاعمالِ مسیرها در میانهٔ کار باشد،
-            // مسیرهای تازه‌اش را خودش حذف کند و بعد از قطعِ اتصال جا نماند.
+            // The generation number goes up so that if a route re-apply is mid-flight,
+            // it deletes its own fresh routes itself and nothing is left behind after the disconnect.
             _captureGen++;
             t = _gatewayTimer;
             _gatewayTimer = null;
             _watchCandidate = null;
             _watchStreak = 0;
-            // در اتصالِ بعدی، گیتِوی دوباره در لاگ بیاید.
+            // So the gateway shows up in the log again on the next connection.
             _lastLoggedGateway = null;
         }
         t?.Dispose();
@@ -653,25 +653,25 @@ public static class TunManager
             }
 
             string? gw = GetDefaultGatewayVia();
-            if (gw == null) return;   // تعویض آداپتر؛ تا گیت‌ویِ معتبر داریم دست نزن.
+            if (gw == null) return;   // adapter switching; don't touch anything while we still have a valid gateway.
 
             if (gw == via)
             {
-                // GetDefaultGatewayVia گیت‌وی را از روی خودِ کارتِ فیزیکی خوانده، پس
-                // حضورش ثابت شده؛ فراخوانیِ IsPhysicalGatewayPresent اینجا فقط یک
-                // پیمایشِ تکراریِ کارت‌های شبکه است و عمداً حذف شد.
+                // GetDefaultGatewayVia read the gateway from the physical card itself, so
+                // its presence is proven; calling IsPhysicalGatewayPresent here would only
+                // be a redundant scan of the network cards and was deliberately removed.
                 lock (_routesLock) { _watchCandidate = null; _watchStreak = 0; }
                 return;
             }
 
-            // فقط وقتی گیت‌وی عوض شده لازم است بفهمیم قدیمی اصلاً رفته یا نه؛
-            // «رفته» یعنی بی‌درنگ بازسازی کن، وگرنه دو نوبت پایداری صبر کن.
+            // Only when the gateway has changed do we need to find out whether the old one
+            // has actually left; "gone" means rebuild immediately, otherwise wait two stable ticks.
             bool dead = !IsPhysicalGatewayPresent(via);
 
             if (!dead)
             {
-                // گیت‌ویِ پیشنهادی باید دو نوبت پشت‌سرهم پایدار باشد؛ کارتِ در حال
-                // قطع‌شدن چند ثانیه هنوز مسیرِ پیش‌فرضِ کم‌metric دارد.
+                // The candidate gateway must be stable for two ticks in a row; a card that
+                // is going down still has a low-metric default route for a few seconds.
                 lock (_routesLock)
                 {
                     if (!string.Equals(_watchCandidate, gw, StringComparison.Ordinal))
@@ -698,16 +698,16 @@ public static class TunManager
     }
 
     /// <summary>
-    /// ساختنِ دوبارهٔ همهٔ مسیرهای کپچر با گیت‌ویِ تازه. حذفِ مسیرِ کهنه باید
-    /// <b>قبل</b> از افزودنِ جدید انجام شود؛ CreateIpForwardEntry خطای «از قبل موجود»
-    /// را موفقیت حساب می‌کند، وگرنه next-hopِ مرده سرِ جایش می‌ماند.
+    /// Rebuilds all capture routes with the new gateway. Deleting the old route must
+    /// happen <b>before</b> adding the new one; CreateIpForwardEntry treats the "already
+    /// exists" error as success, otherwise the dead next-hop stays in place.
     /// </summary>
     private static void ReapplyCaptureRoutes(string newVia, int gen)
     {
         List<TunRouteRecord> old;
         lock (_routesLock)
         {
-            if (gen != _captureGen) return;   // اتصال در این فاصله قطع شده
+            if (gen != _captureGen) return;   // the connection dropped in the meantime
             old = _routes.ToList();
         }
         if (old.Count == 0) return;
@@ -715,11 +715,11 @@ public static class TunManager
         var fresh = new List<TunRouteRecord>();
         foreach (var rec in old)
         {
-            // حذف و افزودن برایِ همهٔ مسیرها، حتی وقتی گیت‌ویِ تازه با قدیمی یکی است؛
-            // سیستم ممکن است خودش مسیر را در میانهٔ تعویضِ آداپتر پاک کرده باشد و
-            // «ادامه بدون افزودن» آن را برایِ همیشه گم کند.
+            // Delete and add for every route, even when the new gateway equals the old one;
+            // the system may have removed the route itself mid-adapter-swap and
+            // "continue without adding" would lose it forever.
             try { RunRoute($"delete {rec.Dest} mask {rec.Mask} {rec.Via}"); }
-            catch { /* ممکن است از قبل رفته باشد */ }
+            catch { /* it may already be gone */ }
             try
             {
                 if (!IpRoute.TryAddRoute(rec.Dest, rec.Mask, newVia, IpRoute.GetIfIndexForIp(newVia)))
@@ -747,8 +747,8 @@ public static class TunManager
         }
         if (raced)
         {
-            // قطعِ اتصال همزمان انجام شد؛ مسیرهای تازهٔ خودمان را هم پاک کن تا بعد از
-            // خروج، مسیرِ گیت‌ویِ مرده روی سیستم جا نماند. (بیرون از قفل؛ route.exe کند است)
+            // The disconnect happened concurrently; clear our own fresh routes too so that
+            // after exit the dead-gateway route does not linger on the system. (outside the lock; route.exe is slow)
             foreach (var r in fresh)
                 try { RunRoute($"delete {r.Dest} mask {r.Mask} {r.Via}"); }
                 catch { }
@@ -767,8 +767,8 @@ public static class TunManager
         s.Contains("clash", StringComparison.OrdinalIgnoreCase) ||
         s.Contains("neko", StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>آیا الان مسیر پیش‌فرضِ متعلق به یک TUN (بیگانه یا خودمان) هست؟
-    /// برای تصمیمِ «لازم است برای دریافت/تست دور بزنیم یا نه».</summary>
+    /// <summary>Is there currently a default route belonging to a TUN (foreign or ours)?
+    /// Used to decide "whether we need to bypass for fetch/test".</summary>
     public static bool AnyTunDefaultRoute()
     {
         try
@@ -853,8 +853,8 @@ public static class TunManager
         string mask = parts[3];
         string? via = parts.Length > 4 ? parts[4] : null;
 
-        // ابتدا API بومی بدون هیچ پروسه‌ای؛ ۱۹۵ پروسهٔ route.exe در هر اتصال TUN ≈ ۱۵ ثانیه طول می‌کشید.
-        // (فقط برای مسیرهای استثنا با گیت‌وی مشخص؛ بقیهٔ مسیرها از همان مسیر route.exe می‌روند)
+        // Native API first, without spawning a single process; 195 route.exe processes per TUN connection took ≈ 15 seconds.
+        // (only for the exception routes with an explicit gateway; the rest of the routes still go through route.exe)
         if (via != null && IpRoute.TryAddRoute(dest, mask, via, IpRoute.GetIfIndexForIp(via)))
         {
             lock (_routesLock) _routes.Add(new TunRouteRecord { Dest = dest, Mask = mask, Via = via });
@@ -890,11 +890,11 @@ public static class TunManager
     }
 
     /// <summary>
-    /// گیت‌ویِ مسیرِ /32 که الان برایِ این IP رویِ سیستم هست؛ null یعنی مسیری نیست.
+    /// The gateway of the /32 route currently on the system for this IP; null means no route exists.
     ///
-    /// برایِ حفظِ مسیرِ ازپیش‌موجودِ خودِ کاربر لازم است. مسیرِ /32ِ مقصد یکتاست،
-    /// پس برایِ گذاشتنِ مسیرِ خودمان بایدِ قبلی را حذف کنیم — و اگر ندانیم چیزی
-    /// آنجا بوده، آن را هرگز برنمی‌گردانیم.
+    /// Needed to preserve the user's pre-existing route. The /32 destination route is
+    /// unique, so to place our own route we must delete the previous one — and if we
+    /// did not know something was there, we never restore it.
     /// </summary>
     public static string? GetHostRouteVia(string ip)
     {
@@ -907,8 +907,8 @@ public static class TunManager
                 var parts = line.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (parts.Length < 5) continue;
                 if (parts[0] != ip || parts[1] != "255.255.255.255") continue;
-                // ستونِ سوم گیت‌وی است. ممکن است "On-link" باشد که بازسازی‌اش با
-                // route.exe ممکن نیست؛ صریع همان را برمی‌گردانیم تا صاحبش تصمیم بگیرد.
+                // The third column is the gateway. It may be "On-link", which cannot be
+                // rebuilt via route.exe; we return exactly that so its owner can decide.
                 return parts[2];
             }
         }
@@ -938,8 +938,8 @@ public static class TunManager
             return -1;
         }
 
-        // هر دو استریم را موازی می‌خوانیم؛ خواندن متوالی/همزمانِ sync می‌تواند
-        // وقتی بافر خطای پروسه پر شود کل فراخواننده را برای همیشه مسدود کند.
+        // We read both streams in parallel; sequential blocking sync reads can block the
+        // entire caller forever once the process's error buffer fills up.
         var outTask = proc.StandardOutput.ReadToEndAsync();
         var errTask = proc.StandardError.ReadToEndAsync();
         bool exited = proc.WaitForExit(5000);
@@ -972,10 +972,10 @@ public static class TunManager
     private const long LogMaxBytes = 2L * 1024 * 1024;
 
     /// <summary>
-    /// لاگِ تونل را بافر می‌کند. قبلاً هر فراخوانی یک Directory.CreateDirectory و یک
-    /// File.AppendAllTextِ کامل (باز/بستنِ فایل، هر بار اسکنِ آنتی‌ویروس) بود؛ حالا
-    /// حداکثر یک بار در ثانیه و در یک نوشتنِ واحد انجام می‌شود. اگر بافر بزرگ شود
-    /// همان لحظه می‌نویسیم تا در دوره‌های پُرلاگ چیزی گم نشود.
+    /// Buffers the tunnel log. Previously every call did one Directory.CreateDirectory
+    /// and one full File.AppendAllText (open/close the file, an antivirus scan every
+    /// time); now it runs at most once a second and in a single write. If the buffer
+    /// grows large we write immediately so nothing is lost during heavy-log periods.
     /// </summary>
     public static void Log(string message)
     {
@@ -996,8 +996,8 @@ public static class TunManager
     }
 
     /// <summary>
-    /// نوشتنِ یک‌جاِ بافر و برشِ فایلِ لاگ. فراخوانی چندباره بی‌خطر است؛ روی مسیرِ
-    /// خروج هم صدا زده می‌شود تا آخرین خطوط قبل از پایانِ پروسه روی دیسک باشند.
+    /// Writes the whole buffer at once and rotates the log file. Calling it several times is safe;
+    /// it is also invoked on the exit path so the last lines are on disk before the process ends.
     /// </summary>
     public static void FlushLog()
     {
@@ -1020,8 +1020,8 @@ public static class TunManager
             catch { }
             File.AppendAllText(logFile, chunk);
 
-            // فقط بعد از نوشتنِ واقعی از بافر بردار. کدِ قبلی اول بافر را خالی می‌کرد و
-            // بعد می‌نوشت؛ یک خطای دیسک در همان گذار، همان خطوط را برایِ همیشه می‌ساخت.
+            // Remove from the buffer only after the write really happened. The old code emptied
+            // the buffer first and wrote afterwards; a disk error right then lost those lines forever.
             lock (_logGate)
             {
                 bool stillThere = _logBuf.Length >= chunk.Length
@@ -1031,8 +1031,8 @@ public static class TunManager
         }
         catch
         {
-            // نوشتن شکست (پوشهٔ غیرقابلِ نوشتن یا دیسکِ پر). با فلَشِ بعدی دوباره تلاش
-            // می‌شود؛ ولی اگر بی‌نهایت رشد کند برنامه را خفه می‌کند، پس سقف می‌گذاریم.
+            // The write failed (unwritable folder or full disk). The next flush retries;
+            // but if it grows without bound it would choke the program, so we cap it.
             lock (_logGate)
             {
                 if (_logBuf.Length > LogMaxBytes)
@@ -1041,18 +1041,18 @@ public static class TunManager
         }
     }
 
-    // نصبِ برنامه در Program Files فقط با ارتقا ممکن است، ولی خودِ برنامه asInvoker
-    // اجرا می‌شود و در پوشهٔ خودش حقِ نوشتن ندارد. بدونِ این مسیرِ جایگزین، کلِ لاگ
-    // بی‌صدا گم می‌شد — و بعد هیچ‌کس نمی‌توانست اشکالِ گزارش‌شده را بررسی کند، چون
-    // همان لاگ تنها سندِ موجود بود.
+    // Installing the program under Program Files is only possible with elevation, but
+    // the program itself runs asInvoker and has no write permission in its own folder.
+    // Without this alternative path the whole log was silently lost — and then nobody
+    // could investigate the reported bug, because that log was the only evidence.
     private static string? _logDirResolved;
 
     private static string FallbackLogDir =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Roxa", "logs");
 
     /// <summary>
-    /// اولین مسیری که واقعاً قابلِ نوشتن باشد را انتخاب و برایِ همین اجرا نگه می‌داریم؛
-    /// اسکنِ مجدد در هر فلَشِ لاگ هزینهٔ بیهوده است.
+    /// Picks the first path that is actually writable and keeps it for the rest of the
+    /// run; re-scanning on every log flush is pointless overhead.
     /// </summary>
     private static string ResolveLogDir()
     {
@@ -1076,6 +1076,6 @@ public static class TunManager
         return _logDirResolved;
     }
 
-    /// <summary>مسیرِ واقعاً قابلِ نوشتن برایِ لاگ‌ها؛ لاگِ موتور هم همین‌جا می‌نویسد.</summary>
+    /// <summary>The actually writable path for the logs; the engine's log also writes here.</summary>
     public static string LogDirectory => ResolveLogDir();
 }

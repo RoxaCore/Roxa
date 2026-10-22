@@ -473,11 +473,15 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             StartRemoteChecks();
+            bool refreshedLists = false;
             if (AutoUpdateSubs && Subscriptions.Count > 0)
             {
                 var since = DateTime.Now - _settings.LastSubscriptionUpdate;
                 if (since.TotalHours >= AutoUpdateIntervalHours)
+                {
                     await UpdateSubscriptions();
+                    refreshedLists = true;
+                }
             }
             bool restartReconnect = Program.StartupArgs.Length > 0 && Array.Exists(Program.StartupArgs, a => a == "--reconnect");
             // A restart after an intentional disconnect (e.g. changing the language) must not reconnect;
@@ -493,6 +497,12 @@ public partial class MainViewModel : ViewModelBase
                     ToastHandler?.Invoke(TranslationManager.Instance["Toast_AutoConnectSelect"]);
                 }
             }
+
+            // Usage and expiry are shown for every subscription, so they are brought up to date
+            // on every launch instead of only when the periodic list refresh falls due. It runs
+            // after the connection attempt: a slow or unreachable panel must never delay
+            // connecting, and once connected the fetch goes through the engine.
+            if (!refreshedLists) await RefreshSubscriptionUsageAsync();
         }
         catch (Exception ex)
         {

@@ -38,6 +38,36 @@ public partial class MainViewModel : ViewModelBase
     /// it only sets the order of the automatic chain, it is not a limit.</summary>
     private string? EngineSubProxy => IsConnected && _engine.HttpPort > 0 ? $"127.0.0.1:{_engine.HttpPort}" : null;
 
+    /// <summary>True for the node the live connection runs on. It has to survive a refresh:
+    /// ServerInfo.Id is a fresh Guid on every fetch, so deleting that one object took the
+    /// selection (restored by Id) and the engine's reference with it, and the tunnel stayed
+    /// down — which is exactly why a manual refresh used to disconnect.</summary>
+    private bool IsConnectedNode(ServerInfo s)
+        => IsConnected && (ReferenceEquals(SelectedServer, s) || ReferenceEquals(_engine.CurrentServer, s));
+
+    /// <summary>
+    /// Removes the previous servers of one subscription after a fetch, without touching a live
+    /// connection. The connected node keeps its object, and its twin in <paramref name="fetched"/>
+    /// is then skipped by the duplicate key, so the list is rebuilt while the selection and the
+    /// tunnel stay exactly where they were. If the panel no longer lists that node, it stays in
+    /// the list until the first refresh after the user disconnects.
+    /// </summary>
+    private void RemoveStaleServers(string subName, List<ServerInfo> fetched)
+    {
+        var fetchedKeys = new HashSet<string>(fetched.Select(DupeKey), StringComparer.Ordinal);
+        foreach (var o in Servers.Where(s => s.SubscriptionName == subName).ToList())
+        {
+            if (IsConnectedNode(o))
+            {
+                if (!fetchedKeys.Contains(DupeKey(o)))
+                    TunManager.Log($"subscription refresh: kept the connected node {o.Address}:{o.Port} (the panel no longer lists it)");
+                continue;
+            }
+            if (ReferenceEquals(SelectedServer, o)) SelectedServer = null;
+            Servers.Remove(o);
+        }
+    }
+
     private static string GuessSubName(string url)
     {
         try
@@ -96,11 +126,7 @@ public partial class MainViewModel : ViewModelBase
     private void MergeServers(string subName, List<ServerInfo> fetched)
     {
         string? activeId = SelectedServer?.Id;
-        foreach (var o in Servers.Where(s => s.SubscriptionName == subName).ToList())
-        {
-            if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
-            Servers.Remove(o);
-        }
+        RemoveStaleServers(subName, fetched);
         int added = 0;
         foreach (var server in fetched)
         {
@@ -159,12 +185,10 @@ public partial class MainViewModel : ViewModelBase
                     AppendLog(string.Format(TranslationManager.Instance["Log_FetchNoneKept"], sub.Name));
                     continue;
                 }
-                foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
-                {
-                    if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
-                    if (ReferenceEquals(SelectedServer, o)) SelectedServer = null;
-                    Servers.Remove(o);
-                }
+                // Refreshing the list must never tear down the connection: the connected node
+                // keeps its object (see RemoveStaleServers) and its twin below is skipped as a
+                // duplicate, so only the rest of the list is rebuilt.
+                RemoveStaleServers(sub.Name, servers);
                 foreach (var server in servers)
                 {
                     Enrich(server);
@@ -203,6 +227,51 @@ public partial class MainViewModel : ViewModelBase
         RefreshGroups();
     }
 
+    /// <summary>
+    /// Brings the usage and expiry shown for every subscription up to date — used on launch, so
+    /// the numbers are not stuck at whatever the last save wrote.
+    ///
+    /// Only the Subscription-Userinfo headers are applied; the server list arriving in the same
+    /// response is deliberately discarded, so this path cannot alter the list — and therefore
+    /// cannot touch a live connection at all. A failed fetch only goes to the log: at startup an
+    /// unreachable panel must not surface as an error, the values simply keep their last known
+    /// number.
+    ///
+    /// LastSubscriptionUpdate is deliberately not written: it times the periodic full list
+    /// refresh, and counting this header-only pass as an update would postpone that refresh for
+    /// ever.
+    /// </summary>
+    private async Task RefreshSubscriptionUsageAsync()
+    {
+        if (Subscriptions.Count == 0) return;
+        string? engineProxy = EngineSubProxy;
+        bool changed = false;
+        foreach (var sub in Subscriptions.ToList())
+        {
+            try
+            {
+                var (_, info) = await SubscriptionManager.FetchSmartAsync(
+                    sub.Url, engineProxy, preferDirect: !UseProxyForSubscriptions, progress: null);
+                if (info == null) continue;   // no headers in the answer: keep what is shown
+                sub.DataLimit = info.DataLimit;
+                sub.UsedTraffic = info.UsedTraffic;
+                sub.ExpireDate = info.ExpireDate;
+                foreach (var s in Servers.Where(s => s.SubscriptionName == sub.Name))
+                {
+                    s.SubDataLimit = sub.DataLimit;
+                    s.SubUsedTraffic = sub.UsedTraffic;
+                    s.SubExpireDate = sub.ExpireDate;
+                }
+                changed = true;
+            }
+            catch (Exception ex)
+            {
+                AppendLog(string.Format(TranslationManager.Instance["Log_SubError"], sub.Name, ex.Message));
+            }
+        }
+        if (changed) SaveSubs();
+    }
+
     [RelayCommand]
     private async Task UpdateSingleSubscription(SubscriptionInfo? sub)
     {
@@ -221,11 +290,7 @@ public partial class MainViewModel : ViewModelBase
                 return;
             }
             string? activeId = SelectedServer?.Id;
-            foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
-            {
-                if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
-                Servers.Remove(o);
-            }
+            RemoveStaleServers(sub.Name, fetched);
             int added = 0;
             foreach (var server in fetched)
             {
@@ -426,12 +491,16 @@ public partial class MainViewModel : ViewModelBase
                 return;
             }
             string? activeId = SelectedServer?.Id;
-            foreach (var o in Servers.Where(s => s.SubscriptionName == sub.Name).ToList())
+            RemoveStaleServers(sub.Name, fetched);
+            foreach (var s in fetched)
             {
-                if (ReferenceEquals(SelectedServer, o) && IsConnected) Disconnect();
-                Servers.Remove(o);
+                s.SubscriptionName = sub.Name;
+                // The connected node keeps its own object (RemoveStaleServers), so without this
+                // the same node would appear twice: once kept, once straight from the panel.
+                string ndk = DupeKey(s);
+                if (Servers.Any(x => string.Equals(DupeKey(x), ndk, StringComparison.Ordinal))) continue;
+                Servers.Add(s);
             }
-            foreach (var s in fetched) { s.SubscriptionName = sub.Name; Servers.Add(s); }
             if (subInfo != null) { sub.DataLimit = subInfo.DataLimit; sub.UsedTraffic = subInfo.UsedTraffic; sub.ExpireDate = subInfo.ExpireDate; }
             sub.ServerCount = fetched.Count;
             sub.LastUpdated = DateTime.Now;

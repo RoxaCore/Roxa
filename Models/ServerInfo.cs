@@ -294,16 +294,24 @@ public partial class ServerInfo : ObservableObject
 
         if (siblings == null || siblings.Count == 0) return string.Join(" ", noCc);
 
+        // A majority is enough here, not every sibling: the node kept across a refresh still
+        // carries its old name until the sync in RemoveStaleServers catches up, and that single
+        // outlier used to defeat this predicate for the whole group — nothing was cut and the
+        // table showed every name in full.
+        int agreement = siblings.Count / 2 + 1;
+        bool Shared(Func<string[], bool> match) => siblings.Count(s => match(s)) >= agreement;
+
         int prefixLen = 0;
-        int maxPrefix = Math.Min(myTokens.Length, siblings.Min(s => s.Length));
-        while (prefixLen < maxPrefix && siblings.All(s => s[prefixLen].Equals(myTokens[prefixLen], StringComparison.OrdinalIgnoreCase)))
+        int maxPrefix = Math.Min(myTokens.Length, siblings.Max(s => s.Length));
+        while (prefixLen < maxPrefix &&
+               Shared(s => prefixLen < s.Length && s[prefixLen].Equals(myTokens[prefixLen], StringComparison.OrdinalIgnoreCase)))
             prefixLen++;
 
         int suffixLen = 0;
-        int maxSuffix = Math.Min(myTokens.Length - prefixLen, siblings.Min(s => s.Length - Math.Min(prefixLen, s.Length)));
+        int maxSuffix = Math.Min(myTokens.Length - prefixLen, siblings.Max(s => s.Length - Math.Min(prefixLen, s.Length)));
         while (suffixLen < maxSuffix &&
                myTokens.Length - 1 - suffixLen >= prefixLen &&
-               siblings.All(s => s.Length - 1 - suffixLen >= 0 && s[s.Length - 1 - suffixLen].Equals(myTokens[myTokens.Length - 1 - suffixLen], StringComparison.OrdinalIgnoreCase)))
+               Shared(s => s.Length - 1 - suffixLen >= 0 && s[s.Length - 1 - suffixLen].Equals(myTokens[myTokens.Length - 1 - suffixLen], StringComparison.OrdinalIgnoreCase)))
             suffixLen++;
 
         int keepFrom = prefixLen;

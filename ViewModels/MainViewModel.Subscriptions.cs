@@ -61,6 +61,21 @@ public partial class MainViewModel : ViewModelBase
             {
                 if (!fetchedKeys.Contains(DupeKey(o)))
                     TunManager.Log($"subscription refresh: kept the connected node {o.Address}:{o.Port} (the panel no longer lists it)");
+                else
+                {
+                    // The kept object still carries the panel's previous name. When the panel
+                    // renames a node, that stale name no longer shares a prefix or suffix with
+                    // its freshly fetched siblings, RemoveCommonParts then found nothing common
+                    // for anyone in the group and the table showed every name in full.
+                    var twin = fetched.FirstOrDefault(f => string.Equals(DupeKey(f), DupeKey(o), StringComparison.Ordinal));
+                    if (twin != null && !string.Equals(o.Name, twin.Name, StringComparison.Ordinal))
+                    {
+                        o.Name = twin.Name;
+                        TunManager.Log($"subscription refresh: the connected node is now named \"{twin.Name}\"");
+                    }
+                    if (twin != null && !string.Equals(o.CountryCode, twin.CountryCode, StringComparison.Ordinal))
+                        o.CountryCode = twin.CountryCode;
+                }
                 continue;
             }
             if (ReferenceEquals(SelectedServer, o)) SelectedServer = null;
@@ -246,13 +261,15 @@ public partial class MainViewModel : ViewModelBase
         if (Subscriptions.Count == 0) return;
         string? engineProxy = EngineSubProxy;
         bool changed = false;
+        int total = 0, updated = 0, noHeaders = 0, failed = 0;
         foreach (var sub in Subscriptions.ToList())
         {
+            total++;
             try
             {
                 var (_, info) = await SubscriptionManager.FetchSmartAsync(
                     sub.Url, engineProxy, preferDirect: !UseProxyForSubscriptions, progress: null);
-                if (info == null) continue;   // no headers in the answer: keep what is shown
+                if (info == null) { noHeaders++; continue; }   // no headers in the answer: keep what is shown
                 sub.DataLimit = info.DataLimit;
                 sub.UsedTraffic = info.UsedTraffic;
                 sub.ExpireDate = info.ExpireDate;
@@ -263,13 +280,19 @@ public partial class MainViewModel : ViewModelBase
                     s.SubExpireDate = sub.ExpireDate;
                 }
                 changed = true;
+                updated++;
             }
             catch (Exception ex)
             {
+                failed++;
                 AppendLog(string.Format(TranslationManager.Instance["Log_SubError"], sub.Name, ex.Message));
             }
         }
         if (changed) SaveSubs();
+        // One line per launch, in tun.log: a panel that answered without the
+        // Subscription-Userinfo header and a fetch that never ran looked exactly the same as a
+        // working refresh before this existed.
+        TunManager.Log($"usage refresh: {updated}/{total} updated, no-header={noHeaders}, failed={failed}");
     }
 
     [RelayCommand]

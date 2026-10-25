@@ -502,7 +502,15 @@ public partial class MainViewModel : ViewModelBase
             // on every launch instead of only when the periodic list refresh falls due. It runs
             // after the connection attempt: a slow or unreachable panel must never delay
             // connecting, and once connected the fetch goes through the engine.
-            if (!refreshedLists) await RefreshSubscriptionUsageAsync();
+            //
+            // Its own try/catch: this call used to sit in the same try as the auto-connect above,
+            // so a Connect() that threw jumped straight to the handler at the bottom and the
+            // numbers silently stayed whatever the last save wrote — the reported regression.
+            if (!refreshedLists)
+            {
+                try { await RefreshSubscriptionUsageAsync(); }
+                catch (Exception ex) { AppendLog(string.Format(TranslationManager.Instance["Log_Error"], ex.Message)); }
+            }
         }
         catch (Exception ex)
         {

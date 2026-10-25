@@ -484,6 +484,12 @@ public sealed class XrayEngine : IDisposable
                 Log(TranslationManager.Get("Eng_TunFallback"));
                 useTun = false;
             }
+            else if (useTun)
+            {
+                // Claim ownership the moment the routes exist: if anything below throws, this
+                // instance's Stop() still has to tear the tunnel state it just created down.
+                IsTunActive = true;
+            }
 
             if (useTun && settings?.UseTunMode == false)
             {
@@ -663,10 +669,19 @@ public sealed class XrayEngine : IDisposable
         _stopGate.Wait();
         try
         {
+            // The TUN, its capture routes, the app exclusion and the DNS switch are process-wide
+            // state, owned by the engine that brought them up. The real-delay tester starts a
+            // second engine and Stop() is the very first thing that engine runs: without this
+            // guard it tore down the routes of the live session, so the tester's own dial to
+            // each server fell back into the TUN and looped — no real delay could be measured.
+            bool ownsTunnelState = IsTunActive;
             IsTunActive = false;
-            TunExclusion.Stop();
-            TunManager.RemoveCaptureRoutes();
-            try { TunDns.RestoreFromState(); } catch { }
+            if (ownsTunnelState)
+            {
+                TunExclusion.Stop();
+                TunManager.RemoveCaptureRoutes();
+                try { TunDns.RestoreFromState(); } catch { }
+            }
             Process? process;
             JobObject? job;
             lock (_lock)
@@ -793,10 +808,18 @@ public sealed class XrayEngine : IDisposable
         ReleaseSystemProxy();
         if (!expected)
         {
+            // Same ownership rule as Stop(): this instance tears the tunnel state down only if
+            // it is the one that started it. A test engine exiting must leave the live session
+            // (routes, exclusion, DNS) alone — otherwise every finished batch of real-delay
+            // tests silently cut the connected server out of the tunnel.
+            bool ownsTunnelState = IsTunActive;
             IsTunActive = false;
-            TunExclusion.Stop();
-            TunManager.RemoveCaptureRoutes();
-            try { TunDns.RestoreFromState(); } catch { }
+            if (ownsTunnelState)
+            {
+                TunExclusion.Stop();
+                TunManager.RemoveCaptureRoutes();
+                try { TunDns.RestoreFromState(); } catch { }
+            }
             try
             {
                 var st = TunState.Load();

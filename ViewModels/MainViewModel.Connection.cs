@@ -107,7 +107,15 @@ public partial class MainViewModel : ViewModelBase
         var server = SelectedServer;
         bool? tunReconnect = _tunToggleReconnect;
         _tunToggleReconnect = null;
-        if (server == null || !Servers.Contains(server)) return;
+        if (server == null) return;
+        if (!Servers.Contains(server))
+        {
+            // A node replaced by a subscription refresh must not swallow the request silently:
+            // find-better would disconnect to switch and then nothing happened, which looks to
+            // the user like the app "only ever reconnects to the same server".
+            TunManager.Log($"connect refused: {server.Address}:{server.Port} is no longer in the list");
+            return;
+        }
         if (IsConnecting) return;
         IsConnecting = true;
         ConnectCommand.NotifyCanExecuteChanged();
@@ -491,6 +499,14 @@ public partial class MainViewModel : ViewModelBase
         }
         // Internet down? Say so before wasting time on the test, so «no server responded» never shows.
         if (await NoInternetAsync()) return;
+
+        // A refresh (or any other change of the list) replaces ServerInfo objects; the pool
+        // would keep testing detached copies — their ping and delay results never reach the
+        // table (the columns stay "—") and switching to one is refused by Connect(). Drop
+        // anything that is no longer listed before the expiry check below.
+        int stale = _searchPool.RemoveAll(s => !Servers.Contains(s));
+        if (stale > 0)
+            TunManager.Log($"find-better: dropped {stale} stale pool entries (the server list changed)");
 
         // Expiry check: if 15 minutes have passed, start over
         if (_searchPool.Count == 0 || (DateTime.Now - _lastSearchTime) > SearchExpiry)

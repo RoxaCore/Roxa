@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
-    <AvaloniaResource Include="Assets\**" Exclude="Assets\Fonts\OFL-*.txt" />
+    <AvaloniaResource Include="Assets\**" Exclude="Assets\Fonts\OFL-*.txt;Assets\Flags\*.txt" />
     <None Update="Assets\roxa-icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -24,16 +24,21 @@
 
   <ItemGroup>
     <!--
-     These two must be real files inside the installer, not embedded in the
-     assembly. MPL-2.0 section 3.2(b) requires telling recipients where the
-     Xray-core source lives, and SIL OFL-1.1 condition 2 requires the licence
-     text to accompany every copy of the fonts. A user cannot read either one
-     out of a compiled assembly.
+     These licence texts must be real files inside the installer, not
+     embedded in the assembly. MPL-2.0 section 3.2(b) requires telling
+     recipients where the Xray-core source lives, SIL OFL-1.1 condition 2
+     requires the licence text to accompany every copy of the fonts, and
+     CC BY 4.0 section 3(a)(1) requires a copyright notice, a notice that
+     refers to that licence, and its text or URI beside the flag
+     artwork. A user cannot read any of them out of a compiled assembly.
     -->
     <Content Include="THIRD-PARTY-NOTICES.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Fonts\OFL-*.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Flags\CC-BY-4.0.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="engine\**">

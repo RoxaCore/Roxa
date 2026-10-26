@@ -239,38 +239,40 @@ next to Roxa.exe.
 ================================================================
 
   Files     Assets\Flags\*.png  (90 files: 89 two-letter country
-            codes plus _unknown.png, the fallback used when no
-            code matches)
-  License   Not recorded - see below
-  Source    Not recorded
+            codes plus _unknown.png, the globe used when no code
+            matches)
+  Version   Twemoji v17.0.3 (tag of 2026-06-01)
+  License   Creative Commons Attribution 4.0 International
+            (CC BY 4.0) - the artwork only
+  Copyright Copyright (c) 2022-present Jason Sofonia and Justine
+            De Caires; Copyright (c) 2014-2021 Twitter, Inc. and
+            other contributors
+  Source    https://github.com/jdecked/twemoji
+            assets/72x72/*.png (the maintained fork of
+            twitter/twemoji)
+  License   Full licence text at Assets\Flags\CC-BY-4.0.txt and
+            at https://creativecommons.org/licenses/by/4.0/
   Used for  The country shown next to a server, and the country
             filter
 
-  These images entered this repository in a single commit with no
-  accompanying note of where they came from. No licence text, no
-  attribution line and no upstream URL travelled with them, and the
-  project cannot reconstruct any of that now. Rather than leave the
-  gap silent, it is recorded here.
+  Attribution: Twemoji, https://github.com/jdecked/twemoji,
+  licensed CC BY 4.0.
 
-  What follows from that:
+  Each file carries the two-letter ISO 3166-1 alpha-2 code; the
+  upstream asset is the pair of Unicode regional-indicator letters
+  for that code (de.png, for example, is 1f1e9-1f1ea.png).
+  _unknown.png is Twemoji's globe glyph (1f310.png).
 
-    - Roxa claims no copyright and no licence over these files.
-      They are NOT covered by the GPL-3.0 that covers Roxa's code,
-      and nothing in this file should be read as relicensing them.
-    - Roxa does not claim that they are in the public domain, nor
-      that they may be freely redistributed. The absence of a
-      recorded licence is not a licence.
-    - They are rendered as they are: no file is edited, recoloured
-      or otherwise modified.
-    - The two-letter codes themselves are ISO 3166-1 alpha-2
-      values, which are not subject to copyright. Only the
-      artwork is in question.
+  Changes, stated as CC BY 4.0 section 3(a)(1)(B) requires: every
+  asset was cropped to its non-transparent bounding box and centred
+  on a transparent 96x72 canvas so that the images share one size
+  in the server list. Nothing was recoloured or redrawn.
 
-  If you hold rights in any of these images and want them removed
-  or replaced, contact roxacore.admin@gmail.com and the file will
-  be taken down or swapped for an icon set whose licence is
-  recorded here in full. Until such a set is chosen, treat these
-  files as unlicensed material of unknown provenance.
+  Roxa claims no copyright and no licence over these files. They
+  are NOT covered by the GPL-3.0 that covers Roxa's code, and
+  nothing in this file should be read as relicensing them. The
+  two-letter codes are ISO 3166-1 alpha-2 values, which are not
+  subject to copyright; the licence above covers the artwork.
 
 
 ================================================================

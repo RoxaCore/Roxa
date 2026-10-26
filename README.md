@@ -29,8 +29,8 @@ neither the runtime nor Roxa can.
 
    | File | Size | Needs internet |
    |---|---|---|
-   | `Roxa-Setup-<version>.exe` | 75 MiB | **No** — the .NET Desktop Runtime is packed inside |
-   | `Roxa-Setup-<version>-online.exe` | 19 MiB | Only if .NET is missing |
+   | `Roxa-Setup-<version>.exe` | 75.3 MiB | **No** - the .NET Desktop Runtime is packed inside |
+   | `Roxa-Setup-<version>-online.exe` | 19.6 MiB | Only if .NET is missing |
 
    Pick the offline one on a slow, filtered or metered connection. Both
    install exactly the same program.
@@ -171,20 +171,17 @@ linking them into a single work.
 
 ### Country flag images
 
-`Assets/Flags/*.png` (90 files) entered this repository in a single commit
-with no note of where they came from: no licence, no attribution, no upstream
-URL. That gap is recorded here rather than glossed over.
-
-- **Roxa does not claim these images.** They are not covered by the GPL-3.0
-  that covers the code, and nothing here should be read as relicensing them.
-- **Roxa does not claim they are free to redistribute.** An unrecorded
-  licence is not a licence; treat them as unlicensed material of unknown
-  provenance.
-- They are rendered unmodified — no file is edited or recoloured.
-
-If you hold rights in any of these images, write to `roxacore.admin@gmail.com`
-and the file will be removed or replaced. The two-letter codes are ISO 3166-1
-alpha-2 values, which carry no copyright; only the artwork is in question.
+The flags in `Assets/Flags/*.png` (90 files) are artwork from
+[Twemoji](https://github.com/jdecked/twemoji) v17.0.3, licensed
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) and credited to
+Jason Sofonia, Justine De Caires, Twitter, Inc. and the other Twemoji
+contributors. Each PNG was cropped to its content and centred on a
+transparent 96x72 canvas so that the images share one size in the server
+list; the artwork itself was not recoloured or redrawn. Roxa claims no
+rights over these files, and they are not covered by the GPL that covers
+the code. The full licence text ships beside them as
+`Assets/Flags/CC-BY-4.0.txt`, with the source and attribution recorded in
+[`THIRD-PARTY-NOTICES.txt`](THIRD-PARTY-NOTICES.txt), section 6.
 
 ---
 

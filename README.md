@@ -7,10 +7,6 @@ full TUN mode with a kill-switch, per-application bypass, live delay
 measurement, and update notifications. The interface is available in 14
 languages.
 
-> Roxa is a VPN client for Windows, built on Xray-core. It offers both
-> system-proxy mode and full TUN mode, with a kill-switch, per-application
-> bypass, live delay measurement, and update notifications, in 14 languages.
-
 ---
 
 ## Requirements
@@ -22,12 +18,8 @@ languages.
 | **.NET** | .NET Desktop Runtime 8 — **installed automatically by setup** |
 | **Administrator** | Once for installation, and again for TUN mode |
 
-Windows 7, 8 and 8.1 are not supported: Microsoft no longer ships the .NET 8
-runtime for them, so neither the runtime nor Roxa can run there.
-
-> Windows 7, 8 and 8.1 are not supported because Microsoft no longer ships
-> the .NET 8 runtime for them. Setup needs administrator rights once; after
-> that system-proxy mode works without them, and TUN mode needs them again.
+Windows 7, 8 and 8.1 are not supported: .NET 8 does not run on them, so
+neither the runtime nor Roxa can.
 
 ---
 
@@ -62,17 +54,6 @@ restored before the files are removed. The install folder and
 `%ProgramData%\Roxa` go with it; your servers and settings in
 `%APPDATA%\Roxa` are left in place.
 
-> There are two installers: a 75 MB one with the .NET runtime packed
-> inside, whose setup does not depend on the internet, and a 19 MB one
-> (`-online`) that fetches the runtime from Microsoft on the spot —
-> with a progress display, a Cancel button, a 10-minute deadline and
-> a SHA-256 check before running. If anything fails, Microsoft's
-> download page opens. Setup asks for administrator rights once and
-> installs for all users under `C:\Program Files\Roxa`; running the
-> app in proxy mode needs no admin. To uninstall, use *Apps & features*;
-> uninstall first runs a cleanup pass (adapter, routes, firewall,
-> system proxy).
-
 ---
 
 ## Windows SmartScreen warning
@@ -93,34 +74,23 @@ not because anything is wrong with it. The SHA-256 of every published build
 is posted alongside the download so you can verify the file yourself:
 
 ```powershell
-Get-FileHash .\Roxa-Setup-3.0.8.exe -Algorithm SHA256
+Get-FileHash .\Roxa-Setup-<version>.exe -Algorithm SHA256
 ```
-
-> Because the installer has no digital signature, Windows shows the
-> "Windows protected your PC" message. Click **More info**, then
-> **Run anyway**. The message means there is no certificate, not that
-> there is a security problem. The SHA-256 of each release is posted next to the download link.
 
 ---
 
 ## Reporting a problem
 
 - **In-app:** use the bug report entry in Settings. If you have enabled
-  *Send crash reports*, a report containing the exception and the tail of the
-  log is queued and uploaded. This is **off by default** and only ever sends
-  what you see in the report preview.
+  *Send crash reports*, a report containing the exception and the last 4000
+  characters of the log is queued and uploaded. This is **off by default**
+  and only ever sends what you see in the report preview.
 - **Manually:** the logs are written to the `logs` folder next to `Roxa.exe`
   (`tun.log`, `engine.log`, `parser.log`). Attach the relevant one when you
   report a problem.
 
 When reporting a connection problem, include the operating system version and
 whether you were in TUN mode or system-proxy mode.
-
-> From inside the app, use the bug report entry in Settings. If you have
-> enabled *Send crash reports* (off by default), the report is sent together
-> with the last 4000 characters of the log. The logs live in the `logs` folder
-> next to `Roxa.exe`. When reporting a connection problem, mention your
-> Windows version and whether you were in TUN mode or proxy mode.
 
 ---
 
@@ -149,10 +119,6 @@ offline installer contacts no one.
 Your server list is encrypted with Windows DPAPI and never leaves your
 machine except as part of an actual connection.
 
-> Roxa has no telemetry and no automatic crash reporting. The full list of
-> connections is in `THIRD-PARTY-NOTICES.txt`. Your server list is encrypted
-> with Windows DPAPI and goes nowhere except during an actual connection.
-
 ---
 
 ## Building from source
@@ -164,7 +130,8 @@ tools\build-installer.ps1
 
 The app is framework-dependent and publishes to `installer\publish`, which
 `setup.iss` packages. `engine\xray.exe` and `engine\wintun.dll` are the only
-bundled binaries.
+bundled binaries. Building the installers additionally needs **Inno Setup 6**
+(`ISCC.exe`) next to the .NET SDK.
 
 ---
 
@@ -193,11 +160,6 @@ This is the trademark reservation permitted by section 7(e) of the GPL. It
 protects users from mistaking an unofficial build for the real one; it does
 not restrict what you do with the code.
 
-> Roxa's code is free software under GPL-3.0. But **the name "Roxa", the
-> logo and the project's visual identity belong to the project and are not
-> transferred with the GPL.** You may modify and distribute the source, but
-> may not use the name or logo without written permission. This is section 7(e) of the GPL.
-
 ### Third-party components
 
 Third-party components keep their own licenses and are listed in
@@ -223,12 +185,6 @@ URL. That gap is recorded here rather than glossed over.
 If you hold rights in any of these images, write to `roxacore.admin@gmail.com`
 and the file will be removed or replaced. The two-letter codes are ISO 3166-1
 alpha-2 values, which carry no copyright; only the artwork is in question.
-
-> The flag images (`Assets/Flags/*.png`) entered the repository without a
-> recorded source or license. Roxa neither claims ownership of them nor
-> counts them as part of the GPL, nor says they are free. Until a licensed
-> set is chosen, treat them as unlicensed material of unknown provenance.
-> If you hold rights to any, write to `roxacore.admin@gmail.com` to have it removed or replaced.
 
 ---
 

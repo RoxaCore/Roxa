@@ -413,32 +413,63 @@ public partial class MainViewModel : ViewModelBase
 
             foreach (var c in candidates) { c.RealDelayMs = -1; c.RealDelaySuccessRate = -1; c.RealDelayJitter = 0; }
 
-            try
+            // Right after a reboot the network stack and DNS are often not ready yet:
+            // every warmup request then misses its short deadline, all candidates fail
+            // and smart connect used to give up immediately. One delayed retry rides
+            // out that window instead of reporting "real delay failed". Every failure
+            // is written to the disk log with its fail_reason, because a permanent
+            // problem must be diagnosable from tun.log afterwards.
+            ServerInfo? finalBest = null;
+            const int maxRealDelayAttempts = 2;
+            for (int attempt = 1; attempt <= maxRealDelayAttempts; attempt++)
             {
-                await RealDelayTester.TestBatchAsync(candidates, ct, (s, result) =>
+                if (attempt > 1)
                 {
-                    Post(() => s.RecordRealDelay(result));
-                    int done = Interlocked.Increment(ref tested);
-                    Post(() => { SearchTestedCount = done; OnPropertyChanged(nameof(SearchProgressText)); });
-                });
+                    TunManager.Log($"smart-connect: all {candidates.Count} real delay tests failed, retrying once in 5s (attempt {attempt}/{maxRealDelayAttempts})");
+                    try { await Task.Delay(5000, ct); }
+                    catch (OperationCanceledException) { throw; }
+                    tested = 0;
+                    SearchTestedCount = 0;
+                    foreach (var c in candidates) { c.RealDelayMs = -1; c.RealDelaySuccessRate = -1; c.RealDelayJitter = 0; }
+                }
+
+                try
+                {
+                    await RealDelayTester.TestBatchAsync(candidates, ct, (s, result) =>
+                    {
+                        if (!result.Ok && result.Status != TestStatus.Cancelled)
+                        {
+                            result.Extra.TryGetValue("fail_reason", out var reason);
+                            result.Extra.TryGetValue("phase_tcp_ms", out var tcpMs);
+                            result.Extra.TryGetValue("phase_warmup_ms", out var warmMs);
+                            result.Extra.TryGetValue("warmup_log", out var warmLog);
+                            TunManager.Log($"smart-connect: real delay failed '{s.Name}' ({s.Address}) reason={reason ?? result.Status.ToString().ToLowerInvariant()} tcp={tcpMs} warmup={warmMs} warmup_log={warmLog}");
+                        }
+                        Post(() => s.RecordRealDelay(result));
+                        int done = Interlocked.Increment(ref tested);
+                        Post(() => { SearchTestedCount = done; OnPropertyChanged(nameof(SearchProgressText)); });
+                    });
+                }
+                catch (OperationCanceledException) { }
+                if (ct.IsCancellationRequested) throw new OperationCanceledException(ct);
+
+                await Dispatcher.UIThread.InvokeAsync(() => { });
+
+                // --- Final selection: lowest real delay ---
+                finalBest = candidates
+                    .Where(s => s.RealDelayMs > 0 && s.LatencyMs > 0)
+                    .OrderBy(s => s.RealDelayMs)
+                    .ThenBy(s => s.LatencyMs)
+                    .FirstOrDefault();
+                if (finalBest != null) break;
             }
-            catch (OperationCanceledException) { }
-            if (ct.IsCancellationRequested) throw new OperationCanceledException(ct);
-
-            await Dispatcher.UIThread.InvokeAsync(() => { });
-
-            // --- Final selection: lowest real delay ---
-            var finalBest = candidates
-                .Where(s => s.RealDelayMs > 0 && s.LatencyMs > 0)
-                .OrderBy(s => s.RealDelayMs)
-                .ThenBy(s => s.LatencyMs)
-                .FirstOrDefault();
 
             IsTesting = false;
             IsSmartConnecting = false;
 
             if (finalBest == null)
             {
+                TunManager.Log($"smart-connect: giving up, no server produced a real delay after {maxRealDelayAttempts} attempt(s); see the 'real delay failed' lines above for fail_reason");
                 Status = TranslationManager.Instance["Status_SmartRealFailed"];
                 ToastHandler?.Invoke(TranslationManager.Instance["Toast_RealDelayFailed"]);
                 NotificationHelper.ShowError(TranslationManager.Get("Notify_SmartRealDelayFailed"));

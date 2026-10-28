@@ -83,6 +83,8 @@
   <data name="Set_AutoUpdate" xml:space="preserve"><value>خودکار سبسکرپشن اپ ڈیٹ</value></data>
   <data name="Set_Interval" xml:space="preserve"><value>ہر {0} گھنٹے میں اپ ڈیٹ</value></data>
   <data name="Set_Language" xml:space="preserve"><value>ایپ زبان</value></data>
+  <data name="LangPick_Title" xml:space="preserve"><value>ایپ کی زبان منتخب کریں</value></data>
+  <data name="LangPick_Continue" xml:space="preserve"><value>جاری رکھیں</value></data>
   <data name="Set_Connection" xml:space="preserve"><value>کنکشن</value></data>
   <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>خودکار سبسکرپشن اپ ڈیٹ</value></data>
   <data name="Set_LeaveProxy" xml:space="preserve"><value>سسٹم پراکسی نہ بدلیں</value></data>

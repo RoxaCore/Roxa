@@ -39,9 +39,9 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty] private bool _useProxyForSubscriptions;
 
-    public string[] LanguageOptions { get; } = ["فارسی", "English", "العربية", "中文", "Русский", "Türkçe", "اردو", "Español", "Français", "한국어", "Deutsch", "日本語", "Português", "हिन्दी"];
-    private static readonly (string name, string code)[] _languages = [("فارسی", "fa"), ("English", "en"), ("العربية", "ar"), ("中文", "zh"), ("Русский", "ru"), ("Türkçe", "tr"), ("اردو", "ur"), ("Español", "es"), ("Français", "fr"), ("한국어", "ko"), ("Deutsch", "de"), ("日本語", "ja"), ("Português", "pt-br"), ("हिन्दी", "hi")];
-    [ObservableProperty] private string _selectedLanguage = "فارسی";
+    public string[] LanguageOptions { get; } = Languages.All.Select(l => l.Name).ToArray();
+    private static readonly (string name, string code)[] _languages = Languages.All;
+    [ObservableProperty] private string _selectedLanguage = Languages.DefaultName;
     partial void OnSelectedLanguageChanged(string value)
     {
         var match = _languages.FirstOrDefault(l => l.name == value);

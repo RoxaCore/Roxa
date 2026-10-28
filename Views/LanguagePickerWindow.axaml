@@ -1,0 +1,14 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Roxa.Views.LanguagePickerWindow"
+        Title="Roxa" Width="420" Height="600"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False">
+  <StackPanel Margin="24" Spacing="14">
+    <TextBlock x:Name="TitleText" FontSize="18" FontWeight="Bold"
+               HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
+    <ListBox x:Name="LangList" FontSize="15" HorizontalAlignment="Stretch"/>
+    <Button x:Name="ContinueBtn" HorizontalAlignment="Stretch" Padding="12,10"
+            FontSize="14" Click="Continue_Click"/>
+  </StackPanel>
+</Window>

@@ -209,6 +209,12 @@
   <data name="Set_Language" xml:space="preserve">
     <value>🌍 Uygulama Dili</value>
   </data>
+  <data name="LangPick_Title" xml:space="preserve">
+    <value>Uygulama dilini seçin</value>
+  </data>
+  <data name="LangPick_Continue" xml:space="preserve">
+    <value>Devam</value>
+  </data>
   <data name="Set_Connection" xml:space="preserve">
     <value>🔌 Bağlantı</value>
   </data>

@@ -209,8 +209,8 @@ public partial class MainViewModel : ViewModelBase
             _useTunMode = _settings.UseTunMode;
         }
         var savedLang = _languages.FirstOrDefault(l => l.code == _settings.Language);
-        _selectedLanguage = savedLang.name ?? "فارسی";
-        Localization.TranslationManager.Instance.SetCulture(_settings.Language ?? "fa");
+        _selectedLanguage = savedLang.name ?? Languages.DefaultName;
+        Localization.TranslationManager.Instance.SetCulture(_settings.Language ?? Languages.DefaultCode);
         if (_settings.TunExcludedApps != null)
             foreach (var app in _settings.TunExcludedApps)
                 if (!string.IsNullOrWhiteSpace(app))

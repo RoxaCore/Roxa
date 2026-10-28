@@ -91,6 +91,8 @@
   <data name="Set_AutoUpdate" xml:space="preserve"><value>Автообновление подписок</value></data>
   <data name="Set_Interval" xml:space="preserve"><value>Обновлять каждые {0} часов</value></data>
   <data name="Set_Language" xml:space="preserve"><value>Язык программы</value></data>
+  <data name="LangPick_Title" xml:space="preserve"><value>Выберите язык приложения</value></data>
+  <data name="LangPick_Continue" xml:space="preserve"><value>Продолжить</value></data>
   <data name="Set_Connection" xml:space="preserve"><value>Подключение</value></data>
   <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>Автообновление подписок</value></data>
   <data name="Set_LeaveProxy" xml:space="preserve"><value>Не изменять системный прокси</value></data>

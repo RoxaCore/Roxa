@@ -9,7 +9,7 @@
     <Product>Roxa</Product>
     <AssemblyTitle>Roxa</AssemblyTitle>
     <Company>Roxa</Company>
-    <Version>3.0.8</Version>
+    <Version>3.0.9</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\roxa-icon.ico</ApplicationIcon>
   </PropertyGroup>

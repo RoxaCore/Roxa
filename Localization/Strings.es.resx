@@ -83,6 +83,8 @@
   <data name="Set_AutoUpdate"><value>Actualización Automática de Suscripciones</value></data>
   <data name="Set_Interval"><value>Actualizar cada {0} horas</value></data>
   <data name="Set_Language"><value>Idioma de la App</value></data>
+  <data name="LangPick_Title"><value>Elija el idioma de la aplicación</value></data>
+  <data name="LangPick_Continue"><value>Continuar</value></data>
   <data name="Set_Connection"><value>Conexión</value></data>
   <data name="Set_SubscriptionUpdate"><value>Actualización Automática de Suscripción</value></data>
   <data name="Set_LeaveProxy"><value>No cambiar proxy del sistema</value></data>

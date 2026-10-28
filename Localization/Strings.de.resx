@@ -83,6 +83,8 @@
   <data name="Set_AutoUpdate" xml:space="preserve"><value>Abonnements automatisch aktualisieren</value></data>
   <data name="Set_Interval" xml:space="preserve"><value>Alle {0} Stunden aktualisieren</value></data>
   <data name="Set_Language" xml:space="preserve"><value>App-Sprache</value></data>
+  <data name="LangPick_Title" xml:space="preserve"><value>App-Sprache wählen</value></data>
+  <data name="LangPick_Continue" xml:space="preserve"><value>Weiter</value></data>
   <data name="Set_Connection" xml:space="preserve"><value>Verbindung</value></data>
   <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>Abonnement automatisch aktualisieren</value></data>
   <data name="Set_LeaveProxy" xml:space="preserve"><value>System-Proxy nicht ändern</value></data>

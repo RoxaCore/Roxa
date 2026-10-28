@@ -91,6 +91,8 @@
   <data name="Set_AutoUpdate" xml:space="preserve"><value>Auto Update Subscriptions</value></data>
   <data name="Set_Interval" xml:space="preserve"><value>Update every {0} hours</value></data>
   <data name="Set_Language" xml:space="preserve"><value>App Language</value></data>
+  <data name="LangPick_Title" xml:space="preserve"><value>Choose the app language</value></data>
+  <data name="LangPick_Continue" xml:space="preserve"><value>Continue</value></data>
   <data name="Set_Connection" xml:space="preserve"><value>Connection</value></data>
   <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>Auto Update Subscription</value></data>
   <data name="Set_LeaveProxy" xml:space="preserve"><value>Don't change system proxy</value></data>

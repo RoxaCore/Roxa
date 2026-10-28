@@ -221,6 +221,14 @@ public static class Storage
         catch { Quarantine(SettingsFile); return new AppSettings(); }
     }
 
+    /// <summary>
+    /// True only when settings.json has never existed: a genuinely fresh install.
+    /// The language picker is shown exactly then; an existing file (even an empty
+    /// or broken one) means the user has run the app before and their choice —
+    /// or the default — must be kept, not asked again.
+    /// </summary>
+    public static bool FirstRun => !File.Exists(SettingsFile);
+
     public static void SaveSettings(AppSettings settings)
         => WriteAtomic(SettingsFile, JsonSerializer.Serialize(settings, Options));
 

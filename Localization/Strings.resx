@@ -99,6 +99,8 @@
   <data name="Set_AutoUpdate" xml:space="preserve"><value>بروزرسانی خودکار اشتراک‌ها</value></data>
   <data name="Set_Interval" xml:space="preserve"><value>هر {0} ساعت بروزرسانی شود</value></data>
   <data name="Set_Language" xml:space="preserve"><value>زبان برنامه</value></data>
+  <data name="LangPick_Title" xml:space="preserve"><value>زبان برنامه را انتخاب کنید</value></data>
+  <data name="LangPick_Continue" xml:space="preserve"><value>ادامه</value></data>
   <data name="Set_Connection" xml:space="preserve"><value>اتصال</value></data>
   <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>بروزرسانی خودکار اشتراک</value></data>
   <data name="Set_LeaveProxy" xml:space="preserve"><value>تغییر ندادن پروکسی سیستم</value></data>

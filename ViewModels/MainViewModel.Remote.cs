@@ -73,7 +73,7 @@ public partial class MainViewModel : ViewModelBase
         _remoteChecking = true;
         try
         {
-            var lang = string.IsNullOrWhiteSpace(_settings.Language) ? "fa" : _settings.Language;
+            var lang = string.IsNullOrWhiteSpace(_settings.Language) ? Localization.Languages.DefaultCode : _settings.Language;
             // The id is not built here: the main constructor in MainViewModel runs
             // when the ViewModel is created and also notifies DeviceId; repeating it
             // here only produced a less complete version that never raised OnPropertyChanged.

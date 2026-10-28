@@ -140,7 +140,7 @@ public class AppSettings
     public bool LeaveSystemProxyAsIs { get; set; }
     public bool ClearProxyOnDisconnect { get; set; } = true;
     public bool UseProxyForSubscriptions { get; set; } = true;
-    public string Language { get; set; } = "fa";
+    public string Language { get; set; } = "en";
     public int LastSeenAnnouncementId { get; set; }
     public string LastUpdateAttempt { get; set; } = "";
     public int ShownAnnouncementId { get; set; }

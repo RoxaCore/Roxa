@@ -83,6 +83,8 @@
   <data name="Set_AutoUpdate" xml:space="preserve"><value>सब्सक्रिप्शन ऑटो अपडेट करें</value></data>
   <data name="Set_Interval" xml:space="preserve"><value>हर {0} घंटे अपडेट करें</value></data>
   <data name="Set_Language" xml:space="preserve"><value>ऐप भाषा</value></data>
+  <data name="LangPick_Title" xml:space="preserve"><value>ऐप की भाषा चुनें</value></data>
+  <data name="LangPick_Continue" xml:space="preserve"><value>जारी रखें</value></data>
   <data name="Set_Connection" xml:space="preserve"><value>कनेक्शन</value></data>
   <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>सब्सक्रिप्शन ऑटो अपडेट करें</value></data>
   <data name="Set_LeaveProxy" xml:space="preserve"><value>सिस्टम प्रॉक्सी न बदलें</value></data>

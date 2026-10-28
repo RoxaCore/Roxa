@@ -32,7 +32,9 @@ public sealed class TranslationManager : INotifyPropertyChanged
         "Roxa.Localization.Strings",
         typeof(TranslationManager).Assembly);
 
-    private CultureInfo _culture = CultureInfo.GetCultureInfo("fa");
+    // English until the saved language is applied: the product default, so a fresh
+    // install shows English even in the tiny window before SetCulture runs.
+    private CultureInfo _culture = CultureInfo.GetCultureInfo(Languages.DefaultCode);
 
     // This project's neutral resource (Strings.resx) is Persian and there is no
     // separate Strings.fa.resx; "fa" IS the neutral resource.
@@ -152,15 +154,17 @@ public sealed class TranslationManager : INotifyPropertyChanged
     public void SetCulture(string code)
     {
         // The language code comes from the settings file; a broken/unknown value must not take the app down.
+        // The fallback is English, the product default: a fresh install and a broken
+        // settings file must land on the same language, not on Persian.
         try
         {
             Culture = string.IsNullOrWhiteSpace(code)
-                ? CultureInfo.GetCultureInfo("fa")
+                ? CultureInfo.GetCultureInfo(Languages.DefaultCode)
                 : CultureInfo.GetCultureInfo(code);
         }
         catch (CultureNotFoundException)
         {
-            Culture = CultureInfo.GetCultureInfo("fa");
+            Culture = CultureInfo.GetCultureInfo(Languages.DefaultCode);
         }
     }
 

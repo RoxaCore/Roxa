@@ -91,6 +91,8 @@
   <data name="Set_AutoUpdate" xml:space="preserve"><value>تحديث تلقائي للاشتراكات</value></data>
   <data name="Set_Interval" xml:space="preserve"><value>تحديث كل {0} ساعات</value></data>
   <data name="Set_Language" xml:space="preserve"><value>لغة البرنامج</value></data>
+  <data name="LangPick_Title" xml:space="preserve"><value>اختر لغة البرنامج</value></data>
+  <data name="LangPick_Continue" xml:space="preserve"><value>متابعة</value></data>
   <data name="Set_Connection" xml:space="preserve"><value>الاتصال</value></data>
   <data name="Set_SubscriptionUpdate" xml:space="preserve"><value>تحديث تلقائي للاشتراكات</value></data>
   <data name="Set_LeaveProxy" xml:space="preserve"><value>عدم تغيير بروكسي النظام</value></data>

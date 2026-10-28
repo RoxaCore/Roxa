@@ -49,7 +49,7 @@ public partial class App : Application
     {
         AvaloniaXamlLoader.Load(this);
         var settings = Storage.LoadSettings();
-        var lang = settings.Language ?? "fa";
+        var lang = settings.Language ?? Languages.DefaultCode;
         TranslationManager.Instance.SetCulture(lang);
         TunRecovery.RecoverOnStartup();
         TunKillSwitch.CleanupLeftovers();
@@ -135,19 +135,34 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // We ask the culture info, not a manual list; otherwise an RTL
-            // language like Urdu was missed and shown with an LTR layout.
-            bool isRtl = TranslationManager.Instance.IsRightToLeft;
-
-            MainWindow = new MainWindow
+            // First install: ask for the language before any other window, so the whole
+            // UI is built in it instead of opening Persian and restarting later. Closing
+            // the picker without a choice exits; the next run asks again because
+            // settings.json still does not exist.
+            if (Storage.FirstRun)
             {
-                DataContext = new MainViewModel(),
-            };
+                var picker = new LanguagePickerWindow();
+                picker.LanguageChosen += _ =>
+                {
+                    // The culture is already applied by the picker, so this main window
+                    // is built in the chosen language; no restart is involved.
+                    MainWindow = BuildMainWindow();
+                    desktop.MainWindow = MainWindow;
+                    MainWindow.Show();
 
-            if (!isRtl)
-                MainWindow.FlowDirection = FlowDirection.LeftToRight;
-
-            desktop.MainWindow = MainWindow;
+                    // The tray was built with the default (English) labels while the
+                    // picker was open; rebuild it so its text follows the choice too.
+                    // DisposeTray also stops the sync timer, so it must be restarted.
+                    try { DisposeTray(); } catch { }
+                    SetupTrayIcon();
+                    StartTraySync();
+                };
+                desktop.MainWindow = picker;
+            }
+            else
+            {
+                desktop.MainWindow = MainWindow = BuildMainWindow();
+            }
 
             SetupTrayIcon();
             StartTraySync();
@@ -160,6 +175,22 @@ public partial class App : Application
             };
         }
         base.OnFrameworkInitializationCompleted();
+    }
+
+    /// <summary>
+    /// The main window in the currently active language. We ask the culture info,
+    /// not a manual list; otherwise an RTL language like Urdu was missed and shown
+    /// with an LTR layout.
+    /// </summary>
+    private static MainWindow BuildMainWindow()
+    {
+        var win = new MainWindow
+        {
+            DataContext = new MainViewModel(),
+        };
+        if (!TranslationManager.Instance.IsRightToLeft)
+            win.FlowDirection = FlowDirection.LeftToRight;
+        return win;
     }
 
     private void SetupTrayIcon()

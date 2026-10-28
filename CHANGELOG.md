@@ -7,8 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.9] - 2026-10-29
+
 ### Added
 
+- A language picker on first run. A fresh install asks for the language
+  before any other window opens, so the whole UI is built in it instead
+  of opening Persian and needing a restart to change. The list uses each
+  language's own endonym, English is preselected, and the choice is
+  applied live. Closing the picker without choosing exits and the next
+  run asks again.
 - Export and import of the subscription list, as buttons on the Subscriptions
   page. This exists because DPAPI binds `subscriptions.json` to one Windows
   account: moving to another machine, or reinstalling Windows, used to mean
@@ -16,6 +24,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it must not be tied to an account — and the page says so, because it
   contains the links themselves. Import never removes or replaces anything:
   an identical URL is skipped and a name collision gets a distinct name.
+
+### Changed
+
+- English is the default language. Every fallback for a missing, empty or
+  broken saved value now lands on English instead of Persian; the Persian
+  neutral resource itself is untouched.
+- Smart connect retries the whole real-delay stage once, five seconds
+  later, when every candidate failed. Right after a reboot the network
+  and DNS are often not ready, every warmup request missed its deadline,
+  and the old single attempt reported "real delay failed" immediately.
+- Every real-delay failure is written to `tun.log` with its `fail_reason`,
+  the TCP and warmup phase durations and the warmup log, so a persistent
+  failure is diagnosable from the log instead of only visible as a toast.
+- The bundled flag images are replaced with Twemoji (CC BY 4.0), with the
+  attribution file shipped inside the installers and noted in
+  `THIRD-PARTY-NOTICES.txt`.
 
 ### Security
 

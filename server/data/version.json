@@ -1,13 +1,13 @@
 {
-    "latest": "3.0.6",
-    "notes": "",
-    "sha256": "",
+    "latest": "3.0.9",
+    "notes": "نسخهٔ ۳.۰.۹: انتخاب زبان در اولین اجرا (پیش‌فرض انگلیسی)، تلاش مجدد خودکار اتصال هوشمند بعد از بوت، ثبت علت شکست تست واقعی در لاگ، و پرچم‌های جدید Twemoji.",
+    "sha256": "382b907cbb324f7f16ecc8bf8f7962fdb08ce0d2bfefee8939da99692dd0bf3a",
     "force": true,
     "active": true,
-    "published": "2026-10-09T03:21:23+03:30",
-    "url": "https://up.roxacore.com/dl/roxa-3.0.6.zip",
-    "file": null,
-    "size": 0,
+    "published": "2026-10-29T02:23:50+03:30",
+    "url": "https://up.roxacore.com/dl/roxa-3.0.9.zip",
+    "file": "roxa-3.0.9.zip",
+    "size": 13399647,
     "countries": "",
     "langs": "*"
 }

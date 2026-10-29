@@ -191,6 +191,7 @@ public partial class MainViewModel : ViewModelBase
         _notificationsEnabled = _settings.NotificationsEnabled;
         Core.NotificationHelper.Enabled = _settings.NotificationsEnabled;
         _sendUsageStats = _settings.SendUsageStats;
+        _autoUpdateApp = _settings.AutoUpdateApp;
         if (string.IsNullOrWhiteSpace(_settings.ClientId))
         {
             _settings.ClientId = Guid.NewGuid().ToString("D");
@@ -676,6 +677,24 @@ public partial class MainViewModel : ViewModelBase
           // Drop the pending settings save here too, so it is not lost.
           SaveSettingsNow();
           try { SaveServers(); } catch { }
+          // An update staged by the automatic path is applied right here, while
+          // this process is still alive: LaunchUpdater starts the second-stage
+          // updater with our PID; it waits for the exit, swaps the files and
+          // starts the new build (rolling back if it does not stay up). The
+          // banner button may have launched it already — UpdaterLaunched keeps
+          // that from running twice. If the download never finished, nothing is
+          // staged and the next run simply downloads it again.
+          if (UpdateInstaller.IsStaged && _settings.AutoUpdateApp && !UpdateInstaller.UpdaterLaunched)
+          {
+              try
+              {
+                  // The connection dies with this process, so if the user was
+                  // connected at exit, the new build reconnects to the same server.
+                  if (IsConnected) UpdateInstaller.MarkReconnectAfterUpdate();
+                  UpdateInstaller.LaunchUpdater();
+              }
+              catch { }
+          }
           _engine.Dispose();
       }
  }

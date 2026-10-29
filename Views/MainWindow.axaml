@@ -959,6 +959,17 @@
               </StackPanel>
             </Border>
 
+            <!-- Auto-update: downloaded in the background, installed when the app exits. -->
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <ToggleSwitch IsChecked="{Binding AutoUpdateApp}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdateApp}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AutoUpdateApp_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Privacy}" FontWeight="Bold" FontSize="13"/>

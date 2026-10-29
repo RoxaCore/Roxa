@@ -38,6 +38,13 @@ public partial class MainViewModel : ViewModelBase
     private bool _remoteChecking;
     private bool _updateNotified;
     private bool _installRunning;
+    // The automatic update path: _autoStaging is true while the background
+    // download runs, _autoStagedVersion is the version already sitting verified
+    // in %TEMP% waiting for the exit, _autoAttemptedVersion stops a failed
+    // download from retrying on every hourly check within the same session.
+    private bool _autoStaging;
+    private string? _autoStagedVersion;
+    private string? _autoAttemptedVersion;
     private readonly HashSet<int> _toastedAnnouncements = new();
 
     // Download progress of the update package, shown inside the banner. The
@@ -152,12 +159,13 @@ public partial class MainViewModel : ViewModelBase
                     TranslationManager.Instance["Upd_Notify"],
                     string.Format(TranslationManager.Instance["Upd_BannerTitle"], _pendingUpdate.Latest));
             }
-            // Installing is only ever user-driven: the banner button starts
-            // InstallUpdateAsync, which stages the payload and then exits this
-            // app so --update-apply can replace the files. Nothing runs on its
-            // own here — even a forced update only insists, it never acts.
-            // LastUpdateAttempt still records the attempt, so a failed download
-            // is not retried in a loop on every hourly check.
+            // The banner button installs immediately (InstallUpdateAsync). The
+            // automatic path, gated by the AutoUpdateApp setting, downloads the
+            // payload in the background now and applies it when the app exits
+            // (see StartAutoStage and MainViewModel.Shutdown). Nothing ever
+            // installs mid-session: the swap needs this process gone.
+            if (_settings.AutoUpdateApp)
+                StartAutoStage(_pendingUpdate);
         }
         if (freshAnnouncement != null)
         {
@@ -190,9 +198,12 @@ public partial class MainViewModel : ViewModelBase
     private void ShowUpdateBanner(UpdateInfo update)
     {
         if (_dismissedUpdateVersion == update.Latest && !update.Force) return;
-        // While the install is running the hourly check must not re-enable the
-        // buttons: the payload is already staged and the app is about to close.
-        if (!_installRunning) IsBannerBusy = false;
+        // While the automatic download or a manual install owns the banner, the
+        // hourly check must not repaint it: the progress or "installs on exit"
+        // text would be replaced by the notes. The same holds once the payload
+        // is staged — the banner keeps saying it will install at exit.
+        if (_autoStaging || _installRunning || _autoStagedVersion == update.Latest) return;
+        IsBannerBusy = false;
         BannerTitle = string.Format(TranslationManager.Instance["Upd_BannerTitle"], update.Latest);
         BannerBody = update.Force
             ? TranslationManager.Instance["Upd_ForceMsg"] +
@@ -303,13 +314,18 @@ public partial class MainViewModel : ViewModelBase
         BannerBody = TranslationManager.Instance["Upd_Downloading"];
         try
         {
-            BeginUpdateProgress();
-            var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
             var info = _pendingUpdate;
-            var progress = new Progress<double>(SetUpdateDownloadPercent);
-            await Task.Run(() => UpdateInstaller.StageAsync(info, proxyPort, progress));
-            _settings.LastUpdateAttempt = info.Latest;
-            SaveSettings();
+            // If the automatic path already downloaded and verified this exact
+            // version, there is nothing left to fetch: go straight to the swap.
+            if (!(UpdateInstaller.IsStaged && _autoStagedVersion == info.Latest))
+            {
+                BeginUpdateProgress();
+                var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
+                var progress = new Progress<double>(SetUpdateDownloadPercent);
+                await Task.Run(() => UpdateInstaller.StageAsync(info, proxyPort, progress));
+                _settings.LastUpdateAttempt = info.Latest;
+                SaveSettings();
+            }
             if (wasConnected)
                 UpdateInstaller.MarkReconnectAfterUpdate();
             // From here there is no percentage left to show: the files are on
@@ -328,6 +344,58 @@ public partial class MainViewModel : ViewModelBase
             EndUpdateProgress();
             IsBannerBusy = false;
             _installRunning = false;
+        }
+    }
+
+    /// <summary>
+    /// The automatic update path. As soon as a new version is announced, the
+    /// payload is downloaded and verified in the background and kept staged on
+    /// disk; the swap itself only happens when the app exits (see Shutdown), so
+    /// a running session is never interrupted. One attempt per version per
+    /// session: a failed download leaves the banner — and its Install button —
+    /// as the fallback and is retried on the next run, not on every hourly check.
+    /// </summary>
+    private void StartAutoStage(UpdateInfo update)
+    {
+        if (_installRunning || _autoStaging) return;          // a download or an install is already running
+        if (string.IsNullOrWhiteSpace(update.Url)) return;    // nothing to fetch
+        if (_autoStagedVersion == update.Latest) return;      // already on disk, waiting for the exit
+        if (_autoAttemptedVersion == update.Latest) return;   // failed once this session
+        _autoAttemptedVersion = update.Latest;
+        _ = AutoStageAsync(update);
+    }
+
+    /// <summary>Download + verify in the background, reporting progress in the banner.</summary>
+    private async Task AutoStageAsync(UpdateInfo update)
+    {
+        _autoStaging = true;
+        try
+        {
+            IsBannerBusy = true;   // the Install button must not start a second download
+            BeginUpdateProgress();
+            BannerBody = TranslationManager.Instance["Upd_Downloading"];
+            var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
+            var progress = new Progress<double>(SetUpdateDownloadPercent);
+            await Task.Run(() => UpdateInstaller.StageAsync(update, proxyPort, progress));
+            _settings.LastUpdateAttempt = update.Latest;
+            SaveSettings();
+            _autoStagedVersion = update.Latest;
+            EndUpdateProgress();
+            IsBannerBusy = false;
+            // The banner may have been dismissed while the download ran; then
+            // the notes stay hidden and only a later check shows them again.
+            if (_dismissedUpdateVersion != update.Latest || update.Force)
+                BannerBody = TranslationManager.Instance["Upd_AutoReady"];
+        }
+        catch (Exception ex)
+        {
+            AppendLog($"Auto update download failed: {ex.Message}");
+            EndUpdateProgress();
+            IsBannerBusy = false;
+        }
+        finally
+        {
+            _autoStaging = false;
         }
     }
 

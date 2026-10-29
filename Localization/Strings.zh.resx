@@ -335,6 +335,7 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>安装</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>正在下载更新…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>下载完成；应用将关闭以进行安装</value></data>
+  <data name="Upd_AutoReady" xml:space="preserve"><value>新版本已下载；退出应用时将自动安装。</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>正在安装更新…</value></data>
   <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>更新下载失败</value></data>

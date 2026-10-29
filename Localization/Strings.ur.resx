@@ -319,6 +319,7 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>انسٹال کریں</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>اپ ڈیٹ ڈاؤن لوڈ ہو رہی ہے…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>ڈاؤن لوڈ مکمل؛ انسٹال کے لیے ایپ بند ہوگی</value></data>
+  <data name="Upd_AutoReady" xml:space="preserve"><value>نیا ورژن ڈاؤن لوڈ ہو گیا ہے؛ ایپ سے باہر نکلنے پر یہ انسٹال ہو جائے گا۔</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>اپ ڈیٹ انسٹال هو رهی هے…</value></data>
   <data name="Upd_Percent" xml:space="preserve"><value>{0}٪</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>اپ ڈیٹ ڈاؤن لوڈ ناکام</value></data>

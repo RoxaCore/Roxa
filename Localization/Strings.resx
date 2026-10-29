@@ -328,6 +328,7 @@
   <data name="Upd_Btn_OpenPage" xml:space="preserve"><value>باز کردنِ صفحهٔ دانلود</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>در حال دانلود آپدیت…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>دانلود کامل شد؛ برنامه برای نصب بسته می‌شود</value></data>
+  <data name="Upd_AutoReady" xml:space="preserve"><value>دانلود نسخه جدید کامل شد؛ هنگام خروج از برنامه نصب خواهد شد</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>در حال نصب آپدیت…</value></data>
   <data name="Upd_Percent" xml:space="preserve"><value>{0}٪</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>دانلود آپدیت ناموفق بود</value></data>

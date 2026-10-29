@@ -319,6 +319,7 @@ Status: {3}</value>
   <data name="Upd_Btn_Install" xml:space="preserve"><value>Installieren</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>Update wird heruntergeladen…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>Download abgeschlossen; die App wird zum Installieren geschlossen</value></data>
+  <data name="Upd_AutoReady" xml:space="preserve"><value>Die neue Version wurde heruntergeladen; sie wird beim Beenden der App installiert</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>Update wird installiert…</value></data>
   <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>Update-Download fehlgeschlagen</value></data>

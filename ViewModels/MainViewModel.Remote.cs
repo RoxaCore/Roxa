@@ -37,7 +37,26 @@ public partial class MainViewModel : ViewModelBase
     private bool _remoteStarted;
     private bool _remoteChecking;
     private bool _updateNotified;
+    private bool _installRunning;
     private readonly HashSet<int> _toastedAnnouncements = new();
+
+    // Download progress of the update package, shown inside the banner. The
+    // indeterminate flag flips on once the bytes are all in: from there to the
+    // app closing there is no percentage to report, only "installing".
+    [ObservableProperty] private bool _isUpdateProgressVisible;
+    [ObservableProperty] private bool _isUpdateProgressIndeterminate;
+    [ObservableProperty] private double _updateProgress;
+    [ObservableProperty] private string _updateProgressText = "";
+
+    partial void OnIsBannerVisibleChanged(bool value)
+    {
+        if (!value && !_installRunning)
+        {
+            IsUpdateProgressVisible = false;
+            UpdateProgress = 0;
+            UpdateProgressText = "";
+        }
+    }
 
     [ObservableProperty] private bool _isBannerVisible;
     [ObservableProperty] private bool _bannerCanDismiss = true;
@@ -56,6 +75,10 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private IBrush _annBannerForeground = new SolidColorBrush(Color.Parse("#1D4ED8"));
     [ObservableProperty] private bool _annBannerHasAction;
     [ObservableProperty] private string _annBannerActionText = "";
+
+    /// <summary>Raised once the update payload is staged and the updater is about to
+    /// take over: the app must exit so the files it is running from can be replaced.</summary>
+    public event Action? UpdateShutdownRequested;
 
     public void StartRemoteChecks()
     {
@@ -129,10 +152,12 @@ public partial class MainViewModel : ViewModelBase
                     TranslationManager.Instance["Upd_Notify"],
                     string.Format(TranslationManager.Instance["Upd_BannerTitle"], _pendingUpdate.Latest));
             }
-            // Silent install was deliberately removed: this version neither downloads the
-            // update package nor runs --update-apply. Version checking ends here with a
-            // notification and the banner; the banner button simply opens the release page.
-            // So even a forced update only insists — it never acts on its own.
+            // Installing is only ever user-driven: the banner button starts
+            // InstallUpdateAsync, which stages the payload and then exits this
+            // app so --update-apply can replace the files. Nothing runs on its
+            // own here — even a forced update only insists, it never acts.
+            // LastUpdateAttempt still records the attempt, so a failed download
+            // is not retried in a loop on every hourly check.
         }
         if (freshAnnouncement != null)
         {
@@ -165,7 +190,9 @@ public partial class MainViewModel : ViewModelBase
     private void ShowUpdateBanner(UpdateInfo update)
     {
         if (_dismissedUpdateVersion == update.Latest && !update.Force) return;
-        IsBannerBusy = false;
+        // While the install is running the hourly check must not re-enable the
+        // buttons: the payload is already staged and the app is about to close.
+        if (!_installRunning) IsBannerBusy = false;
         BannerTitle = string.Format(TranslationManager.Instance["Upd_BannerTitle"], update.Latest);
         BannerBody = update.Force
             ? TranslationManager.Instance["Upd_ForceMsg"] +
@@ -173,7 +200,7 @@ public partial class MainViewModel : ViewModelBase
             : update.Notes;
         BannerBackground = new SolidColorBrush(Color.Parse("#F5F3FF"));
         BannerForeground = new SolidColorBrush(Color.Parse("#6D28D9"));
-        BannerActionText = TranslationManager.Instance["Upd_Btn_OpenPage"];
+        BannerActionText = TranslationManager.Instance["Upd_Btn_Install"];
         BannerHasAction = !string.IsNullOrWhiteSpace(update.Url);
         BannerCanDismiss = !update.Force;
         IsBannerVisible = true;
@@ -246,24 +273,87 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// The update banner button. This version downloads nothing and applies no update,
-    /// so it only opens the release page. Same rule as AnnBannerAction: UseShellExecute
-    /// hands a URI to whatever handles it, so anything from the network must be filtered
-    /// here before opening; only https is accepted.
+    /// The update banner button: stages the payload (download, sha256 check,
+    /// extract) and hands over to the second-stage updater. Everything after the
+    /// click runs inside the app — the user never sees a browser or a raw zip.
     /// </summary>
     [RelayCommand]
-    private void BannerAction()
+    private async Task BannerAction()
     {
-        if (_pendingUpdate is not { UpdateAvailable: true } || string.IsNullOrWhiteSpace(_pendingUpdate.Url))
-            return;
-        if (!Uri.TryCreate(_pendingUpdate.Url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
-            return;
+        await InstallUpdateAsync();
+    }
+
+    /// <summary>
+    /// Download + stage the update, then close the app so --update-apply can
+    /// replace the files. The staged copy is verified against the sha256 the
+    /// feed published, so a tampered package stops here.
+    ///
+    /// Failure is always recoverable: the banner shows it, the buttons come
+    /// back and the current version keeps running untouched.
+    /// </summary>
+    [RelayCommand]
+    private async Task InstallUpdateAsync()
+    {
+        if (_pendingUpdate is not { UpdateAvailable: true } || IsBannerBusy || _installRunning) return;
+        IsBannerBusy = true;
+        _installRunning = true;
+        // The connection is torn down by the restart, so remember it: after the
+        // update is applied the app can come back up on the same server.
+        bool wasConnected = IsConnected;
+        BannerBody = TranslationManager.Instance["Upd_Downloading"];
         try
         {
-            Process.Start(new ProcessStartInfo(_pendingUpdate.Url) { UseShellExecute = true });
+            BeginUpdateProgress();
+            var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
+            var info = _pendingUpdate;
+            var progress = new Progress<double>(SetUpdateDownloadPercent);
+            await Task.Run(() => UpdateInstaller.StageAsync(info, proxyPort, progress));
+            _settings.LastUpdateAttempt = info.Latest;
+            SaveSettings();
+            if (wasConnected)
+                UpdateInstaller.MarkReconnectAfterUpdate();
+            // From here there is no percentage left to show: the files are on
+            // disk and only the swap itself remains (a few seconds at most).
+            SetUpdateDownloadPercent(100);
+            IsUpdateProgressIndeterminate = true;
+            UpdateProgressText = TranslationManager.Instance["Upd_Installing"];
+            BannerBody = TranslationManager.Instance["Upd_Done"];
+            UpdateInstaller.LaunchUpdater();
+            UpdateShutdownRequested?.Invoke();
         }
-        catch
+        catch (Exception ex)
         {
+            AppendLog($"Update failed: {ex.Message}");
+            BannerBody = TranslationManager.Instance["Upd_Failed"];
+            EndUpdateProgress();
+            IsBannerBusy = false;
+            _installRunning = false;
         }
+    }
+
+    /// <summary>Show an empty progress bar at 0% before the download starts.</summary>
+    private void BeginUpdateProgress()
+    {
+        UpdateProgress = 0;
+        IsUpdateProgressIndeterminate = false;
+        IsUpdateProgressVisible = true;
+        SetUpdateDownloadPercent(0);
+    }
+
+    /// <summary>Called from the download loop with the received percentage.</summary>
+    private void SetUpdateDownloadPercent(double percent)
+    {
+        double p = Math.Clamp(percent, 0, 100);
+        UpdateProgress = p;
+        UpdateProgressText = string.Format(TranslationManager.Instance["Upd_Percent"], (int)Math.Round(p));
+    }
+
+    /// <summary>Hide the progress row when there is nothing left to report.</summary>
+    private void EndUpdateProgress()
+    {
+        IsUpdateProgressVisible = false;
+        IsUpdateProgressIndeterminate = false;
+        UpdateProgress = 0;
+        UpdateProgressText = "";
     }
 }

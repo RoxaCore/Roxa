@@ -52,14 +52,17 @@ sealed class Program
             return;
         }
 
-        // Auto-update is disabled in this release: the app no longer downloads the
-        // update package and never runs this path. Instead of returning silently —
-        // which hid the fact that an update had not been applied — we clean the
-        // staging leftovers and exit non-zero so the caller knows nothing applied.
-        if (args.Length > 0 && args[0] == "--update-apply")
+        // --update-apply is the second-stage updater: UpdateInstaller launches it
+        // with the staged payload, our own PID, the install directory and the exe
+        // name. It waits for this process to exit, backs up the current build,
+        // copies the new one over, starts it and rolls back if the new build does
+        // not stay up. A wrong argument count means the caller is not our own
+        // updater, so nothing is touched and the non-zero exit says so.
+        if (args.Length == 5 && args[0] == "--update-apply")
         {
-            try { Core.UpdateApplier.CleanupStaging(); } catch { }
-            Environment.Exit(2);
+            int appPid = int.TryParse(args[2], out var p) ? p : 0;
+            int code = Core.UpdateApplier.Run(args[1], appPid, args[3], args[4]);
+            Environment.Exit(code);
             return;
         }
 

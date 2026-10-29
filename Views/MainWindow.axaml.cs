@@ -362,6 +362,7 @@ public partial class MainWindow : Window
             btnRestart.Click += (_, _) => { Core.AdminHelper.RestartAsAdmin(); win.Close(); };
             win.ShowDialog(this);
         };
+        vm.UpdateShutdownRequested += () => (Application.Current as App)?.ExitApp();
         vm.ShowBugReportHandler = (info, submit) =>
         {
             var tr = Localization.TranslationManager.Instance;

@@ -104,20 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $url = str_cut($url, 400);
     }
 
-    jwrite($storeFile, [
-        'latest' => $latest,
-        'notes' => str_cut($notes, 4000),
-        'sha256' => $sha,
-        'force' => $force,
-        'active' => $active,
-        'published' => date('c'),
-        'url' => $url,
-        'file' => $file,
-        'size' => $size,
-        'countries' => $countries,
-        'langs' => $langs,
-    ]);
-    audit_log('publish', 'نسخه ' . $latest . ($active ? ' منتشر شد' : ' ذخیره شد (غیرفعال)') . ' — ' . (string)($file ?: $url));
+    version_publish($latest, $notes, $force, $active, $url, $file, $sha, $size, $countries, $langs);
     $respond(true, $active ? 'نسخه ' . $latest . ' منتشر شد.' : 'نسخه ' . $latest . ' ذخیره شد (غیرفعال — برای انتشار تیک فعال را بزنید).');
 }
 
@@ -127,20 +114,9 @@ $activeBadge = !empty($ver['active'])
     ? '<span class="badge b-on">در حال انتشار</span>'
     : '<span class="badge b-off">انتشار نشده</span>';
 
-// The real upload cap = the smaller positive of upload_max_filesize and
-// post_max_size. It is shown in the help and checked in the browser before the
-// form is sent, so instead of a 413 page you get a clear Persian message and no oversized file is chosen.
-$capUp = ini_bytes((string)ini_get('upload_max_filesize'));
-$capPost = ini_bytes((string)ini_get('post_max_size'));
-$caps = [];
-if ($capUp > 0) {
-    $caps[] = $capUp;
-}
-if ($capPost > 0) {
-    $caps[] = $capPost;
-}
-$cap = $caps ? min($caps) : 0;
-$capMb = $cap > 0 ? number_format($cap / 1048576, 0, '.', '') : '0';
+// No per-request cap check here anymore: the browser now uploads in 512KB
+// chunks (admin/upart.php), so upload_max_filesize / post_max_size no longer
+// gate publishing. The values are only shown in the form hint for reference.
 
 echo '<div class="grid">';
 echo '<div class="stat"><div class="k">نسخهٔ فعلی سرور</div><div class="v">' . h((string)($ver['latest'] ?: '—')) . '</div></div>';
@@ -172,7 +148,7 @@ echo '<div class="row"><div><label>شمارهٔ نسخه</label><input type="tex
 echo '<div><label>نحوهٔ تحویل فایل</label><select name="mode" id="mode" onchange="document.getElementById(\'up\').style.display=this.value===\'upload\'?\'\':\'none\';document.getElementById(\'ur\').style.display=this.value===\'url\'?\'\':\'none\'">';
 echo '<option value="upload">آپلود zip از اینجا</option><option value="url">لینک مستقیم (هاست دیگر)</option></select></div></div>';
 echo '<div id="up"><label>فایل zip آپدیت (محتوای پوشهٔ برنامه)</label><input type="file" name="zip" id="zipfile" accept=".zip">';
-echo '<div class="hint">محدودیت آپلود سرور: ' . h((string)ini_get('upload_max_filesize')) . ' (POST: ' . h((string)ini_get('post_max_size')) . ') — سقف مؤثر <b>' . h($capMb) . ' مگابایت</b> است؛ فایل بزرگ‌تر از این، ارسال نمی‌شود و باید از «لینک مستقیم» استفاده کنید.</div></div>';
+echo '<div class="hint">آپلود به‌صورت قطعه‌های ۵۱۲KB انجام می‌شود و سقفِ آپلودِ PHP دیگر مانعِ فایل‌های بزرگ نیست (حداکثر حجم کل: ' . (int)round(UPART_TOTAL_MAX / 1048576) . ' مگابایت). سقف فعلیِ سرور: ' . h((string)ini_get('upload_max_filesize')) . ' (POST: ' . h((string)ini_get('post_max_size')) . ').</div></div>';
 echo '<div id="ur" style="display:none"><label>لینک مستقیم فایل zip</label><input type="text" name="url" placeholder="https://.../roxa.zip">';
 echo '<label>هش SHA-256 فایل (اختیاری، برای اعتبارسنجی کلاینت)</label><input type="text" name="sha" placeholder="64 کاراکتر hex" dir="ltr"></div>';
 echo '<label>یادداشت انتشار (برای کاربر نمایش داده می‌شود)</label><textarea name="notes" placeholder="مثلاً: بهبود پایداری اتصال و رفع باگ TUN"></textarea>';
@@ -213,8 +189,8 @@ echo '<style>
 
 echo '<script>
 (function () {
-  var cap = ' . (int)$cap . ';
-  var capMb = ' . json_encode($capMb) . ';
+  var maxTotal = ' . (int)UPART_TOTAL_MAX . ';
+  var CHUNK = 524288; // 512KB — under typical per-request proxy limits (nginx default 1MB)
   var form = document.getElementById("verform");
   var zip = document.getElementById("zipfile");
   var mode = document.getElementById("mode");
@@ -226,6 +202,8 @@ echo '<script>
   var speed = document.getElementById("upspeed");
   var eta = document.getElementById("upeta");
   var msg = document.getElementById("upmsg");
+  var csrfInput = form ? form.querySelector("input[name=csrf]") : null;
+  var csrfVal = csrfInput ? csrfInput.value : "";
   var busy = false;
 
   function toMb(n) { return (n / 1048576).toFixed(1) + " MB"; }
@@ -251,6 +229,50 @@ echo '<script>
     btn.textContent = "انتشار / ذخیره نسخه";
   }
 
+  function token() {
+    var a = new Uint8Array(16);
+    (window.crypto || window.msCrypto).getRandomValues(a);
+    var s = "";
+    for (var i = 0; i < a.length; i++) s += ("0" + a[i].toString(16)).slice(-2);
+    return s;
+  }
+
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function post(fd, onProgress) {
+    return new Promise(function (resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "upart.php", true);
+      xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+      if (onProgress) {
+        xhr.upload.addEventListener("progress", function (ev) {
+          if (ev.lengthComputable) onProgress(ev.loaded);
+        });
+      }
+      xhr.addEventListener("load", function () {
+        var res = null;
+        try { res = JSON.parse(xhr.responseText); } catch (err) {}
+        if (xhr.status >= 200 && xhr.status < 300 && res && res.ok) { resolve(res); return; }
+        var er = new Error((res && res.msg) ? res.msg : "");
+        er.fromServer = !!(res && res.msg);
+        er.status = xhr.status;
+        reject(er);
+      });
+      xhr.addEventListener("error", function () {
+        var er = new Error("");
+        er.fromServer = false;
+        reject(er);
+      });
+      xhr.addEventListener("abort", function () {
+        var er = new Error("");
+        er.fromServer = false;
+        er.aborted = true;
+        reject(er);
+      });
+      xhr.send(fd);
+    });
+  }
+
   if (!form || !btn) return;
 
   form.addEventListener("submit", function (e) {
@@ -270,16 +292,16 @@ echo '<script>
     }
 
     var file = zip.files[0];
-    if (cap > 0 && file.size > cap) {
-      say("حجم فایل انتخاب‌شده " + toMb(file.size) + " است و از سقف مؤثر آپلود سرور (" + capMb + " MB) بیشتر است. "
-        + "upload_max_filesize و post_max_size را در پنل هاست یا php.ini بالا ببرید، یا در «نحوهٔ تحویل فایل» گزینهٔ «لینک مستقیم» را انتخاب کنید.", "err");
+    if (file.size > maxTotal) {
+      say("حجم فایل انتخاب‌شده " + toMb(file.size) + " است و از حداکثر مجاز (" + Math.round(maxTotal / 1048576) + " MB) بیشتر است.", "err");
       return;
     }
 
-    var data = new FormData(form);
     var started = Date.now();
-    var total = file.size;
-    var xhr = new XMLHttpRequest();
+    var totalSize = file.size;
+    var parts = Math.max(1, Math.ceil(totalSize / CHUNK));
+    var tk = token();
+    var sentBytes = 0;
 
     busy = true;
     btn.disabled = true;
@@ -287,68 +309,92 @@ echo '<script>
     prog.style.display = "block";
     fill.style.width = "0%";
     pct.textContent = "۰٪";
-    size.textContent = "0 / " + toMb(total);
+    size.textContent = "0 / " + toMb(totalSize);
     speed.textContent = "—";
     eta.textContent = "محاسبه…";
 
-    xhr.upload.addEventListener("progress", function (ev) {
-      if (!ev.lengthComputable) return;
-      total = ev.total || total;
-      var done = ev.loaded;
-      var p = done / total;
+    function render(done) {
+      var p = totalSize > 0 ? done / totalSize : 1;
       fill.style.width = (p * 100).toFixed(1) + "%";
       pct.textContent = Math.floor(p * 100) + "٪";
-      size.textContent = toMb(done) + " / " + toMb(total);
+      size.textContent = toMb(done) + " / " + toMb(totalSize);
       var sec = (Date.now() - started) / 1000;
       var rate = sec > 0 ? done / sec : 0;
       speed.textContent = rate > 0 ? (rate / 1048576).toFixed(1) + " MB/s" : "—";
       if (p >= 1) {
         eta.textContent = "در حال پردازش سمت سرور…";
       } else {
-        eta.textContent = left((total - done) / (rate > 0 ? rate : 1));
+        eta.textContent = left((totalSize - done) / (rate > 0 ? rate : 1));
       }
-    });
+    }
 
-    xhr.addEventListener("load", function () {
-      var res = null;
-      try { res = JSON.parse(xhr.responseText); } catch (err) {}
-      if (xhr.status >= 200 && xhr.status < 300 && res && res.ok) {
-        fill.style.width = "100%";
-        pct.textContent = "۱۰۰٪";
-        speed.textContent = "—";
-        eta.textContent = "تمام شد";
-        idle();
-        say(res.msg, "ok");
-        setTimeout(function () { window.location.reload(); }, 2500);
+    function sendChunk(i, attempt) {
+      var start = i * CHUNK;
+      var blob = file.slice(start, Math.min(totalSize, start + CHUNK));
+      var fd = new FormData();
+      fd.append("act", "chunk");
+      fd.append("csrf", csrfVal);
+      fd.append("token", tk);
+      fd.append("index", String(i));
+      fd.append("total", String(parts));
+      fd.append("part", blob, "part.bin");
+      var base = sentBytes;
+      return post(fd, function (loaded) {
+        render(base + loaded);
+      }).then(function () {
+        sentBytes = base + blob.size;
+        render(sentBytes);
+      }).catch(function (er) {
+        if (er.aborted) throw er;
+        // A network-level hiccup on one 512KB piece is retried in place;
+        // a real server answer (CSRF, validation) is shown right away.
+        if (!er.fromServer && attempt < 3) {
+          return wait(700 * attempt).then(function () {
+            return sendChunk(i, attempt + 1);
+          });
+        }
+        throw er;
+      });
+    }
+
+    var chain = Promise.resolve();
+    for (var i = 0; i < parts; i++) {
+      chain = chain.then(function (idx) {
+        return function () { return sendChunk(idx, 1); };
+      }(i));
+    }
+
+    chain.then(function () {
+      var fd = new FormData(form);
+      fd.delete("zip");
+      fd.append("act", "finish");
+      fd.append("token", tk);
+      fd.append("total", String(parts));
+      return post(fd);
+    }).then(function (res) {
+      fill.style.width = "100%";
+      pct.textContent = "۱۰۰٪";
+      speed.textContent = "—";
+      eta.textContent = "تمام شد";
+      idle();
+      say(res.msg, "ok");
+      setTimeout(function () { window.location.reload(); }, 2500);
+    }).catch(function (er) {
+      idle();
+      if (er && er.aborted) {
+        say("ارسال فایل لغو شد.", "err");
         return;
       }
-      idle();
-      if (res && res.msg) {
-        say(res.msg, "err");
-      } else if (xhr.status === 413) {
-        say("حجم درخواست از سقف سرور بیشتر است؛ upload_max_filesize و post_max_size را بالا ببرید یا از «لینک مستقیم» استفاده کنید.", "err");
-      } else if (xhr.status === 419) {
-        say("نشست شما منقضی شده است؛ صفحه را تازه‌سازی کنید و دوباره تلاش کنید.", "err");
-      } else if (!res && xhr.status === 200) {
-        say("پاسخ سرور قابل فهم نبود؛ احتمالاً حجم درخواست از سقف post_max_size بیشتر است. سقف آپلود را در پنل هاست بالا ببرید یا از «لینک مستقیم» استفاده کنید.", "err");
-      } else {
-        say("خطا در ارسال فایل (کد " + xhr.status + "). صفحه را تازه‌سازی کنید و دوباره تلاش کنید.", "err");
+      if (er && er.fromServer) {
+        if (er.status === 419) {
+          say("نشست شما منقضی شده است؛ صفحه را تازه‌سازی کنید و دوباره تلاش کنید.", "err");
+        } else {
+          say(er.message, "err");
+        }
+        return;
       }
+      say("آپلود یکی از قطعه‌ها ناموفق ماند و اتصال قطع شد. بعد از چند تلاش خودکار، دکمهٔ انتشار را دوباره بزنید؛ اگر ادامه داد از «لینک مستقیم» استفاده کنید.", "err");
     });
-
-    xhr.addEventListener("error", function () {
-      idle();
-      say("اتصال به سرور قطع شد و فایل ارسال نشد. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.", "err");
-    });
-
-    xhr.addEventListener("abort", function () {
-      idle();
-      say("ارسال فایل لغو شد.", "err");
-    });
-
-    xhr.open("POST", form.action || window.location.href, true);
-    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    xhr.send(data);
   });
 })();
 </script>';

@@ -606,6 +606,55 @@ function ver_safe(string $v): string
     return substr($v, 0, 32);
 }
 
+/**
+ * Chunked upload limits — shared by the version form (version.php, for the
+ * client-side check) and the chunk endpoint (admin/upart.php).
+ *
+ * A chunk stays under 1.1MB so it survives any per-request proxy limit
+ * (nginx client_max_body_size default is 1MB); the assembled file may reach
+ * UPART_TOTAL_MAX as long as every individual request remains small.
+ */
+const UPART_CHUNK_MAX = 1100000;
+const UPART_TOTAL_MAX = 134217728;    // 128 MB
+const UPART_CHUNKS_MAX = 1024;
+const UPART_STALE_SEC = 7200;
+
+/**
+ * Publishing a version — the single write path used by both the classic form
+ * (version.php) and the chunked uploader (admin/upart.php), so the stored JSON
+ * shape and the audit line can never drift apart.
+ *
+ * $file is a name inside DL_DIR (upload mode), $url a direct https link.
+ * The sha256 is the hash of the file the *client* downloads.
+ */
+function version_publish(
+    string $latest,
+    string $notes,
+    bool $force,
+    bool $active,
+    ?string $url,
+    ?string $file,
+    string $sha,
+    int $size,
+    string $countries,
+    string $langs
+): void {
+    jwrite(DATA_DIR . '/version.json', [
+        'latest' => $latest,
+        'notes' => str_cut($notes, 4000),
+        'sha256' => $sha,
+        'force' => $force,
+        'active' => $active,
+        'published' => date('c'),
+        'url' => $url,
+        'file' => $file,
+        'size' => $size,
+        'countries' => $countries,
+        'langs' => $langs,
+    ]);
+    audit_log('publish', 'نسخه ' . $latest . ($active ? ' منتشر شد' : ' ذخیره شد (غیرفعال)') . ' — ' . (string)($file ?: (string)$url));
+}
+
 function lang_ok(?string $lang): string
 {
     $lang = strtolower(trim((string)$lang));

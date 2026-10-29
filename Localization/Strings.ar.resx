@@ -335,6 +335,7 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>تثبيت</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>جارٍ تنزيل التحديث…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>اكتمل التنزيل؛ سيتم إغلاق التطبيق للتثبيت</value></data>
+  <data name="Upd_AutoReady" xml:space="preserve"><value>تم تنزيل النسخة الجديدة؛ سيتم تثبيتها عند إغلاق التطبيق</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>جارً تثبیت التحدیث…</value></data>
   <data name="Upd_Percent" xml:space="preserve"><value>{0}٪</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>فشل تنزيل التحديث</value></data>

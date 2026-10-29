@@ -319,6 +319,7 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>설치</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>업데이트 다운로드 중…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>다운로드 완료. 설치를 위해 앱이 종료됩니다</value></data>
+  <data name="Upd_AutoReady" xml:space="preserve"><value>새 버전 다운로드가 완료되었습니다. 앱을 종료하면 설치됩니다.</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>업들이트 설고 중…</value></data>
   <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>업데이트 다운로드에 실패했습니다</value></data>

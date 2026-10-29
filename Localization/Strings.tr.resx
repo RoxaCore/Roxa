@@ -676,6 +676,7 @@ Durum: {3}</value>
   <data name="Upd_Btn_Install" xml:space="preserve"><value>Yükle</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>Güncelleme indiriliyor…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>İndirme tamamlandı; kurulum için uygulama kapanacak</value></data>
+  <data name="Upd_AutoReady" xml:space="preserve"><value>Yeni sürüm indirildi; uygulamadan çıkıldığında yüklenecek</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>Güncleme kuruluyor…</value></data>
   <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>Güncelleme indirilemedi</value></data>

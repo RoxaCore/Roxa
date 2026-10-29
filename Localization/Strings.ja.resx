@@ -319,6 +319,7 @@
   <data name="Upd_Btn_Install" xml:space="preserve"><value>インストール</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>アップデートをダウンロード中…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>ダウンロード完了。インストールのためアプリを終了します</value></data>
+  <data name="Upd_AutoReady" xml:space="preserve"><value>新しいバージョンのダウンロードが完了しました。アプリを終了するとインストールされます。</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>アップデートをインストール中…</value></data>
   <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>アップデートのダウンロードに失敗しました</value></data>

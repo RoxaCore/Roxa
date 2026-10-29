@@ -33,6 +33,11 @@ public static class UpdateInstaller
 
     public static bool IsStaged => _stagedRoot != null && _stagedPayload != null;
 
+    /// <summary>True once the second-stage updater has been started. Launching it
+    /// twice would run two updaters over the same install directory, so every
+    /// caller (the banner button and the exit-time automatic path) checks this.</summary>
+    public static bool UpdaterLaunched { get; private set; }
+
     public static Task StageAsync(UpdateInfo info, int? proxyPort, CancellationToken ct)
         => StageAsync(info, proxyPort, null, ct);
 
@@ -139,6 +144,7 @@ public static class UpdateInstaller
         psi.ArgumentList.Add(target);
         psi.ArgumentList.Add(exe);
         Process.Start(psi);
+        UpdaterLaunched = true;
     }
 
     private static string Sanitize(string value)

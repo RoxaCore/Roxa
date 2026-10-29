@@ -320,6 +320,7 @@ State: {3}</value>
   <data name="Upd_Btn_OpenPage" xml:space="preserve"><value>Open download page</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>Downloading update…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>Download complete; the app will close to install</value></data>
+  <data name="Upd_AutoReady" xml:space="preserve"><value>The new version has been downloaded; it will be installed when you exit the app</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>Installing update…</value></data>
   <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>Update download failed</value></data>

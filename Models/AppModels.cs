@@ -143,6 +143,10 @@ public class AppSettings
     public string Language { get; set; } = "en";
     public int LastSeenAnnouncementId { get; set; }
     public string LastUpdateAttempt { get; set; } = "";
+    // On by default: a new version is downloaded in the background as soon as
+    // it is announced and installed when the app exits. The banner button still
+    // installs immediately; this switch only gates the automatic path.
+    public bool AutoUpdateApp { get; set; } = true;
     public int ShownAnnouncementId { get; set; }
     public int ShownAnnouncementCount { get; set; }
     public string Country { get; set; } = "";

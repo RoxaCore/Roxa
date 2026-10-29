@@ -319,6 +319,7 @@ Estado: {3}</value>
   <data name="Upd_Btn_Install" xml:space="preserve"><value>Instalar</value></data>
   <data name="Upd_Downloading" xml:space="preserve"><value>Descargando la actualización…</value></data>
   <data name="Upd_Done" xml:space="preserve"><value>Descarga completa; la aplicación se cerrará para instalar</value></data>
+  <data name="Upd_AutoReady" xml:space="preserve"><value>La nueva versión se ha descargado; se instalará al salir de la aplicación</value></data>
   <data name="Upd_Installing" xml:space="preserve"><value>Instalando la actualizacion…</value></data>
   <data name="Upd_Percent" xml:space="preserve"><value>{0}%</value></data>
   <data name="Upd_Failed" xml:space="preserve"><value>Error al descargar la actualización</value></data>

@@ -192,6 +192,16 @@ public partial class MainViewModel : ViewModelBase
         if (!value) Core.BugReport.DiscardPending();
     }
 
+    // The automatic update path (download in the background, install on exit).
+    // Turning it off leaves only the banner button, which installs immediately.
+    [ObservableProperty] private bool _autoUpdateApp;
+
+    partial void OnAutoUpdateAppChanged(bool value)
+    {
+        _settings.AutoUpdateApp = value;
+        SaveSettings();
+    }
+
     public string DeviceId => _settings.ClientId;
 
     [ObservableProperty] private bool _notificationsEnabled;

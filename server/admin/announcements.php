@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return $store;
             });
             flash('اعلان ثبت شد.');
+            audit_log('announce.add', $title);
         }
     } elseif ($action === 'toggle') {
         $id = (int)($_POST['id'] ?? 0);
@@ -61,6 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return $store;
         });
         flash($found ? 'وضعیت اعلان عوض شد.' : 'اعلان پیدا نشد.', $found ? 'ok' : 'err');
+        if ($found) {
+            audit_log('announce.toggle', 'اعلان #' . $id);
+        }
     } elseif ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
         $found = false;
@@ -81,6 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return $store;
         });
         flash($found ? 'اعلان حذف شد.' : 'اعلان پیدا نشد.', $found ? 'ok' : 'err');
+        if ($found) {
+            audit_log('announce.delete', 'اعلان #' . $id);
+        }
     }
     header('Location: announcements.php');
     exit;

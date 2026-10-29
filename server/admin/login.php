@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['auth'] = true;
             $_SESSION['auth_at'] = time();
             $_SESSION['username'] = 'admin';
+            audit_log('login', 'ورود موفق به پنل');
             header('Location: index.php');
             exit;
         }

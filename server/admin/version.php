@@ -117,6 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'countries' => $countries,
         'langs' => $langs,
     ]);
+    audit_log('publish', 'نسخه ' . $latest . ($active ? ' منتشر شد' : ' ذخیره شد (غیرفعال)') . ' — ' . (string)($file ?: $url));
     $respond(true, $active ? 'نسخه ' . $latest . ' منتشر شد.' : 'نسخه ' . $latest . ' ذخیره شد (غیرفعال — برای انتشار تیک فعال را بزنید).');
 }
 

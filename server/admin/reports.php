@@ -67,12 +67,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return $store;
         });
         flash('گزارش حذف شد.');
+        audit_log('report.delete', 'گزارش #' . $n . ' حذف شد');
     } elseif ($action === 'deleteall') {
         jupdate(DATA_DIR . '/reports.json', function (array $store) {
             $store['items'] = [];
             return $store;
         });
         flash('همه گزارش‌ها حذف شد.');
+        audit_log('report.deleteall', 'همهٔ گزارش‌ها حذف شد');
     }
     header('Location: reports.php');
     exit;
@@ -84,6 +86,48 @@ foreach (($store['items'] ?? []) as $it) {
     if (empty($it['seen'])) {
         $newCount++;
     }
+}
+
+// Filters (GET): kind, state, free-text — the badge counts stay global so the
+// "new" number never depends on how the list is currently filtered.
+$ftype = (string)($_GET['type'] ?? 'all');
+if (!in_array($ftype, ['all', 'crash', 'manual'], true)) {
+    $ftype = 'all';
+}
+$fst = (string)($_GET['st'] ?? 'all');
+if (!in_array($fst, ['all', 'new', 'seen'], true)) {
+    $fst = 'all';
+}
+$fq = trim((string)($_GET['q'] ?? ''));
+
+$view = [];
+foreach ($items as $it) {
+    $isCrash = (string)($it['type'] ?? '') === 'crash';
+    if ($ftype === 'crash' && !$isCrash) {
+        continue;
+    }
+    if ($ftype === 'manual' && $isCrash) {
+        continue;
+    }
+    if ($fst === 'new' && !empty($it['seen'])) {
+        continue;
+    }
+    if ($fst === 'seen' && empty($it['seen'])) {
+        continue;
+    }
+    if ($fq !== '') {
+        $hay = strtolower(implode(' ', [
+            (string)($it['message'] ?? ''),
+            (string)($it['error'] ?? ''),
+            (string)($it['ver'] ?? ''),
+            (string)($it['id'] ?? ''),
+            (string)($it['os'] ?? ''),
+        ]));
+        if (strpos($hay, strtolower($fq)) === false) {
+            continue;
+        }
+    }
+    $view[] = $it;
 }
 
 page_head('گزارش‌ها', 'rep');
@@ -105,9 +149,34 @@ echo '</div></div>';
 if (!$items) {
     echo '<div class="card"><div class="hint">هنوز گزارشی ثبت نشده است.</div></div>';
 } else {
-    echo '<div class="card"><h2>لیست گزارش‌ها (' . count($items) . ')</h2><table>';
+    echo '<div class="card"><h2>فیلتر</h2><form method="get"><div class="row">';
+    echo '<div><label>جستجو در متن، خطا، نسخه، شناسه</label><input type="text" name="q" value="' . h($fq) . '"></div>';
+    echo '<div><label>نوع</label><select name="type">';
+    foreach (['all' => 'همه', 'crash' => 'کرش', 'manual' => 'دستی'] as $k => $lb) {
+        echo '<option value="' . $k . '"' . ($ftype === $k ? ' selected' : '') . '>' . h($lb) . '</option>';
+    }
+    echo '</select></div>';
+    echo '<div><label>وضعیت</label><select name="st">';
+    foreach (['all' => 'همه', 'new' => 'جدید', 'seen' => 'خوانده‌شده'] as $k => $lb) {
+        echo '<option value="' . $k . '"' . ($fst === $k ? ' selected' : '') . '>' . h($lb) . '</option>';
+    }
+    echo '</select></div>';
+    echo '<div><button class="btn" type="submit" style="margin-top:26px">اعمال فیلتر</button></div>';
+    echo '</div></form>';
+    if ($fq !== '' || $ftype !== 'all' || $fst !== 'all') {
+        echo '<div class="hint">نمایشِ ' . count($view) . ' از ' . count($items) . ' — <a href="reports.php">حذفِ فیلترها</a></div>';
+    } else {
+        echo '<div class="hint">بدون فیلتر، همهٔ ' . count($items) . ' گزارش نمایش داده می‌شود.</div>';
+    }
+    echo '</div>';
+}
+
+if ($items && !$view) {
+    echo '<div class="card"><div class="hint">موردی با این فیلتر پیدا نشد. <a href="reports.php">همه را نشان بده</a></div></div>';
+} elseif ($items) {
+    echo '<div class="card"><h2>لیست گزارش‌ها (' . count($view) . ($view !== $items ? ' از ' . count($items) : '') . ')</h2><table>';
     echo '<tr><th>#</th><th>نوع</th><th>کاربر</th><th>مشکل</th><th>تاریخ</th><th>وضعیت</th><th>عملیات</th></tr>';
-    foreach ($items as $it) {
+    foreach ($view as $it) {
         $n = (int)($it['n'] ?? 0);
         $isCrash = (string)($it['type'] ?? '') === 'crash';
         $seen = !empty($it['seen']);

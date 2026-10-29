@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $a['hash'] = password_hash($p1, PASSWORD_DEFAULT);
         $a['changed'] = date('c');
         jwrite(auth_file(), $a);
+        audit_log('password', 'تغییر رمز پنل');
         flash('رمز عبور تغییر کرد.');
         header('Location: password.php');
         exit;

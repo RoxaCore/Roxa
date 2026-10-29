@@ -11,6 +11,9 @@ function page_head(string $title, string $active): void
         'ann' => ['اعلان‌ها', 'announcements.php'],
         'rep' => ['گزارش‌ها', 'reports.php'],
         'ver' => ['نسخه و آپدیت', 'version.php'],
+        'chk' => ['چک‌لیست و سلامت', 'checks.php'],
+        'bak' => ['پشتیبان‌گیری', 'backup.php'],
+        'aud' => ['لاگ تغییرات', 'audit.php'],
         'pw' => ['تغییر رمز', 'password.php'],
     ];
     $user = '';

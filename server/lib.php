@@ -738,6 +738,7 @@ function stats_touch(string $id, array $meta = []): void
             $st['clients'] = [];
         }
         $now = date('c');
+        $isNew = false;
         if (isset($st['clients'][$id]) && is_array($st['clients'][$id])) {
             $st['clients'][$id]['last'] = $now;
         } else {
@@ -746,6 +747,7 @@ function stats_touch(string $id, array $meta = []): void
                 return;
             }
             $st['clients'][$id] = ['first' => $now, 'last' => $now];
+            $isNew = true;
         }
         foreach ($meta as $k => $v) {
             if ($v === null || $v === '') {
@@ -768,6 +770,9 @@ function stats_touch(string $id, array $meta = []): void
         }
         unset($row);
         jwrite($file, $st);
+        // Daily chart counters go to their own file *after* the main stats, so
+        // a chart-side failure can never cost the check-in itself.
+        daily_touch($id, $isNew);
     } finally {
         if ($lock) {
             flock($lock, LOCK_UN);
@@ -847,6 +852,168 @@ function stats_online(array $c, int $window = 1200): bool
 {
     $t = strtotime((string)($c['last'] ?? '')) ?: 0;
     return $t > 0 && time() - $t <= $window;
+}
+
+/**
+ * Daily counters for the dashboard charts (data/daily.json):
+ *   days["2026-10-29"] = {"new": 3, "active": {"<guid>": 1, ...}}
+ * Downloads per day are already counted by api/dl.php into dlstats.json.
+ *
+ * Two retentions in one file: counters stay 90 days (same window dlstats
+ * keeps), the active-id sets only 30 — a set holds one GUID per client that
+ * checked in that day and the whole file is rewritten on every check-in.
+ *
+ * Counting must never break a check-in: every failure is swallowed.
+ */
+function daily_touch(string $id, bool $isNew): void
+{
+    if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $id)) {
+        return;
+    }
+    $day = date('Y-m-d');
+    $cutCounter = date('Y-m-d', time() - 90 * 86400);
+    $cutActive = date('Y-m-d', time() - 30 * 86400);
+    try {
+        jupdate(DATA_DIR . '/daily.json', function (array $d) use ($id, $isNew, $day, $cutCounter, $cutActive) {
+            $days = is_array($d['days'] ?? null) ? $d['days'] : [];
+            $slot = is_array($days[$day] ?? null) ? $days[$day] : [];
+            if ($isNew) {
+                $slot['new'] = (int)($slot['new'] ?? 0) + 1;
+            }
+            $set = is_array($slot['active'] ?? null) ? $slot['active'] : [];
+            $set[$id] = 1;
+            $slot['active'] = $set;
+            $days[$day] = $slot;
+            foreach (array_keys($days) as $old) {
+                if ((string)$old < $cutCounter) {
+                    unset($days[$old]);
+                } elseif ((string)$old < $cutActive) {
+                    unset($days[$old]['active']);
+                    if ($days[$old] === []) {
+                        unset($days[$old]);
+                    }
+                }
+            }
+            return ['days' => $days];
+        });
+    } catch (Throwable $e) {
+        // A lost chart point beats a lost check-in.
+    }
+}
+
+/**
+ * Panel audit trail (data/audit.json): what was changed, by whom, from which
+ * origin — last 500 entries are kept, so the file cannot grow forever.
+ *
+ * The origin is stored as the same one-way key the login limiter uses
+ * (ip_key), so the trail correlates events without becoming a second,
+ * permanent copy of addresses.
+ *
+ * Logging must never break the action being recorded.
+ */
+function audit_log(string $action, string $detail = ''): void
+{
+    $entry = [
+        't' => date('c'),
+        'a' => str_cut($action, 40),
+        'd' => str_cut($detail, 300),
+        'u' => (string)($_SESSION['username'] ?? ''),
+        'k' => substr(ip_key(client_ip()), 0, 12),
+    ];
+    try {
+        jupdate(DATA_DIR . '/audit.json', function (array $d) use ($entry) {
+            $items = is_array($d['items'] ?? null) ? $d['items'] : [];
+            $items[] = $entry;
+            if (count($items) > 500) {
+                $items = array_slice($items, -500);
+            }
+            return ['items' => $items];
+        });
+    } catch (Throwable $e) {
+        // An audit failure must not break the action it describes.
+    }
+}
+
+/**
+ * One-click backup of DATA_DIR: an archive with every data file (auth,
+ * stats, reports, counters, audit), minus what is transient — flock files
+ * and PHP sessions.
+ *
+ * Format is chosen by capability: ZipArchive when the extension exists,
+ * otherwise a .tar.gz built with PharData (both read without extra tools;
+ * Windows 10/11 ship tar). Returns the final path, entry count and size.
+ */
+function backup_build(string $destBase): array
+{
+    $files = [];
+    $it = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator(DATA_DIR, FilesystemIterator::SKIP_DOTS)
+    );
+    foreach ($it as $f) {
+        if (!$f->isFile()) {
+            continue;
+        }
+        $rel = str_replace('\\', '/', substr($f->getPathname(), strlen(DATA_DIR) + 1));
+        if ($rel === 'backup.json') {
+            continue; // meta about backups, not backup content
+        }
+        if (preg_match('#(^|/)sessions(/|$)#', $rel) || preg_match('/\.lock$/', $rel)) {
+            continue;
+        }
+        $files[] = [$f->getPathname(), $rel];
+    }
+    if (!$files) {
+        throw new RuntimeException('data dir is empty');
+    }
+
+    if (class_exists('ZipArchive')) {
+        $path = $destBase . '.zip';
+        $zip = new ZipArchive();
+        if ($zip->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            throw new RuntimeException('zip create failed');
+        }
+        foreach ($files as [$abs, $rel]) {
+            $zip->addFile($abs, $rel);
+        }
+        $zip->close();
+        $fmt = 'zip';
+    } else {
+        // PharData honors the .tar name but keeps members uncompressed no
+        // matter what the extension says, so the tar is built first and then
+        // gzipped by hand — otherwise the ".tar.gz" would be plain tar.
+        $tar = $destBase . '.tar';
+        $path = $destBase . '.tar.gz';
+        @unlink($tar);
+        @unlink($path);
+        $phar = new PharData($tar);
+        foreach ($files as [$abs, $rel]) {
+            $phar->addFile($abs, $rel);
+        }
+        unset($phar); // release the archive before reading it back
+        $in = @fopen($tar, 'rb');
+        if ($in === false) {
+            throw new RuntimeException('tar read failed');
+        }
+        $out = gzopen($path, 'wb6');
+        if ($out === false) {
+            fclose($in);
+            throw new RuntimeException('gzip write failed');
+        }
+        while (!feof($in)) {
+            $chunk = fread($in, 262144);
+            if ($chunk === false) {
+                break;
+            }
+            if ($chunk !== '') {
+                gzwrite($out, $chunk);
+            }
+        }
+        gzclose($out);
+        fclose($in);
+        @unlink($tar);
+        $fmt = 'tar.gz';
+    }
+    return ['path' => $path, 'files' => count($files), 'bytes' => (int)@filesize($path), 'fmt' => $fmt];
 }
 
 function ip_public(string $ip): bool

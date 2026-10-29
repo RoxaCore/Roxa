@@ -12,6 +12,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
 sess_start();
 if (authed()) {
     csrf_check();
+    audit_log('logout', 'خروج از پنل');
 }
 
 $_SESSION = [];

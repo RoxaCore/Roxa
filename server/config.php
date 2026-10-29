@@ -4,7 +4,18 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     exit;
 }
 
-define('BASE_URL', 'https://up.roxacore.com');
+// Public base URL of the panel. ROXA_BASE_URL overrides it for a staging copy
+// or a local test server; production never sets it, so the real address stays
+// the single source of truth (health checks in the panel probe this URL).
+function base_url(): string
+{
+    $env = getenv('ROXA_BASE_URL');
+    if (is_string($env) && trim($env) !== '' && preg_match('#^https?://#i', trim($env))) {
+        return rtrim(trim($env), '/');
+    }
+    return 'https://up.roxacore.com';
+}
+define('BASE_URL', base_url());
 define('DL_DIR', __DIR__ . '/dl');
 define('TZ', 'Asia/Tehran');
 define('SESSION_LIFETIME', 28800);

@@ -239,17 +239,48 @@ echo '<script>
 
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
-  function post(fd, onProgress) {
+  function post(fd, onProgress, timeoutMs, stallMs) {
+    // timeoutMs caps the whole request; stallMs aborts it when no byte has
+    // moved for a while. Without either, a server that goes quiet mid-request
+    // hangs the bar on that percent forever: the XHR then fires no error and
+    // no timeout by itself. finish (assembly + hashing server-side) gets a
+    // long timeout and no stall watchdog, since there the server is working,
+    // not silent.
     return new Promise(function (resolve, reject) {
       var xhr = new XMLHttpRequest();
       xhr.open("POST", "upart.php", true);
+      xhr.timeout = timeoutMs || 60000;
       xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+      var lastEvent = Date.now();
+      var watchdog = null;
+      var stalled = false;
+      if (stallMs > 0) {
+        watchdog = setInterval(function () {
+          if (Date.now() - lastEvent > stallMs) {
+            clearInterval(watchdog);
+            watchdog = null;
+            stalled = true;
+            try { xhr.abort(); } catch (err) {}
+            var er = new Error("");
+            er.fromServer = false;
+            er.timedOut = true;
+            reject(er);
+          }
+        }, 1000);
+      }
+      function done() {
+        if (watchdog !== null) { clearInterval(watchdog); watchdog = null; }
+      }
       if (onProgress) {
         xhr.upload.addEventListener("progress", function (ev) {
-          if (ev.lengthComputable) onProgress(ev.loaded);
+          if (ev.lengthComputable) {
+            lastEvent = Date.now();
+            onProgress(ev.loaded);
+          }
         });
       }
       xhr.addEventListener("load", function () {
+        done();
         var res = null;
         try { res = JSON.parse(xhr.responseText); } catch (err) {}
         if (xhr.status >= 200 && xhr.status < 300 && res && res.ok) { resolve(res); return; }
@@ -258,12 +289,22 @@ echo '<script>
         er.status = xhr.status;
         reject(er);
       });
+      xhr.addEventListener("timeout", function () {
+        done();
+        var er = new Error("");
+        er.fromServer = false;
+        er.timedOut = true;
+        reject(er);
+      });
       xhr.addEventListener("error", function () {
+        done();
         var er = new Error("");
         er.fromServer = false;
         reject(er);
       });
       xhr.addEventListener("abort", function () {
+        done();
+        if (stalled) return; // the watchdog already rejected with timedOut
         var er = new Error("");
         er.fromServer = false;
         er.aborted = true;
@@ -339,16 +380,22 @@ echo '<script>
       fd.append("total", String(parts));
       fd.append("part", blob, "part.bin");
       var base = sentBytes;
+      // 512KB needs well under a minute even on a slow uplink; 15s of silence
+      // means the connection died without closing, so abort and retry.
       return post(fd, function (loaded) {
         render(base + loaded);
-      }).then(function () {
+        if (loaded >= blob.size) eta.textContent = "در انتظار پاسخ سرور…";
+      }, 60000, 15000).then(function () {
         sentBytes = base + blob.size;
         render(sentBytes);
       }).catch(function (er) {
         if (er.aborted) throw er;
-        // A network-level hiccup on one 512KB piece is retried in place;
-        // a real server answer (CSRF, validation) is shown right away.
+        // A network-level hiccup on one 512KB piece is retried in place —
+        // already-sent pieces stay on the server, so the upload continues
+        // from this same chunk instead of starting over.
+        // A real server answer (CSRF, validation) is shown right away.
         if (!er.fromServer && attempt < 3) {
+          say("قطعه " + (i + 1) + " از " + parts + " جواب نداد؛ تلاش مجدد " + (attempt + 1) + " از ۳…", "err");
           return wait(700 * attempt).then(function () {
             return sendChunk(i, attempt + 1);
           });
@@ -370,7 +417,10 @@ echo '<script>
       fd.append("act", "finish");
       fd.append("token", tk);
       fd.append("total", String(parts));
-      return post(fd);
+      // finish assembles and hashes the whole file server-side, so it gets a
+      // long hard cap (no stall watchdog: silence here means the server is
+      // working, and killing it would throw away a completed upload).
+      return post(fd, null, 300000, 0);
     }).then(function (res) {
       fill.style.width = "100%";
       pct.textContent = "۱۰۰٪";

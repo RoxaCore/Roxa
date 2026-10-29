@@ -20,6 +20,8 @@ $lang = lang_ok(isset($_GET['lang']) ? (string)$_GET['lang'] : 'fa');
 $cc = country_client();
 
 $id = (string)($_GET['id'] ?? '');
+$pendingIsp = null;   // ip to enrich *after* the response is out
+$pendingId = '';
 if ($id !== '') {
     $ipRemote = (string)($_SERVER['REMOTE_ADDR'] ?? '');
     $ipOk = filter_var($ipRemote, FILTER_VALIDATE_IP) !== false ? $ipRemote : '';
@@ -51,20 +53,46 @@ if ($id !== '') {
             'conn' => $conn > 0 ? $conn : null,
         ]);
 
+        // ISP lookup is an external call (up to 3s) and is deferred below: the
+        // client must get its answer first, not wait behind ipwho.is.
         if ($direct && $ipOk !== '') {
             $row = stats_find($id);
             if (is_array($row) && empty($row['isp_done']) && ipinfo_allow()) {
-                $info = ip_info($ipOk);
-                if ($info !== null) {
-                    ip_info_save($id, $info);
-                }
+                $pendingIsp = $ipOk;
+                $pendingId = $id;
             }
         }
     }
 }
 
+// Send the JSON before any slow follow-up work. Content-Length is set
+// explicitly so the client learns the response is complete without waiting
+// for the connection to close — the script may keep running for the ISP
+// lookup below, and clients must not wait for that.
+$send = static function (array $payload): void {
+    $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    header('Content-Length: ' . strlen($json));
+    echo $json;
+    if (ob_get_level() > 0) {
+        @ob_end_flush();
+    }
+    flush();
+};
+
+// The deferred ISP lookup runs after the client already has its answer.
+$enrich = static function () use ($pendingIsp, $pendingId): void {
+    if ($pendingIsp === null) {
+        return;
+    }
+    $info = ip_info($pendingIsp);
+    if ($info !== null) {
+        ip_info_save($pendingId, $info);
+    }
+};
+
 if (empty($ver['active']) || empty($ver['latest'])) {
-    echo json_encode(['ok' => true, 'latest' => null], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $send(['ok' => true, 'latest' => null]);
+    $enrich();
     exit;
 }
 
@@ -77,7 +105,7 @@ $updateAvailable = country_ok((string)($ver['countries'] ?? ''), $cc)
     && lang_matches(langs_parse((string)($ver['langs'] ?? '')), $lang)
     && ($current === '' ? true : version_compare((string)$ver['latest'], $current, '>'));
 
-echo json_encode([
+$send([
     'ok' => true,
     'latest' => (string)$ver['latest'],
     'current' => $current,
@@ -89,4 +117,5 @@ echo json_encode([
     'size' => (int)($ver['size'] ?? 0),
     'published' => $ver['published'] ?? null,
     'lang' => $lang,
-], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+]);
+$enrich();

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.12] - 2026-10-29
+
+### Fixed
+
+- The update download no longer hangs at some percent forever. A connection
+  that goes quiet mid-transfer (VPN restart, captive portal, server hiccup)
+  used to produce neither progress nor an error, because the response body
+  stream has no timeout of its own. Every read now carries a 45-second stall
+  budget, and a stalled or reset download retries up to four times — resuming
+  with a Range request when the server supports it, so a 13MB file does not
+  start over from zero. The hash check is unchanged: a truncated or tampered
+  file still fails, it just fails after retrying instead of waiting.
+
 ## [3.0.9] - 2026-10-29
 
 ### Added

@@ -91,6 +91,14 @@ if ($csrf === '' || empty($_SESSION['csrf']) || !hash_equals((string)$_SESSION['
     upart_fail('نشست شما منقضی شده است؛ صفحه را تازه‌سازی کنید و دوباره تلاش کنید.', 419);
 }
 
+// Release the session lock right after the CSRF check. act=finish assembles
+// the whole zip (seconds on a 13MB file) and every chunk request used to hold
+// the same lock, so each other panel page opened during a publish queued
+// behind this request — the panel felt frozen exactly while uploading.
+// Nothing below reads $_SESSION again (audit_log only reads the in-memory
+// copy, which session_write_close keeps).
+session_write_close();
+
 $act = (string)($_POST['act'] ?? '');
 $token = strtolower((string)($_POST['token'] ?? ''));
 if (!preg_match('/^[0-9a-f]{32}$/', $token)) {

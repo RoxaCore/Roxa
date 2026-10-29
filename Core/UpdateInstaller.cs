@@ -71,23 +71,31 @@ public static class UpdateInstaller
         {
             using var http = new HttpClient(handler) { Timeout = TimeSpan.FromMinutes(10) };
             http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Roxa/3.0");
-            using var resp = await http.GetAsync(info.Url, HttpCompletionOption.ResponseHeadersRead, ct);
-            resp.EnsureSuccessStatusCode();
-            await using var input = await resp.Content.ReadAsStreamAsync(ct);
-            await using (var fs = File.Create(zipPath))
+
+            // A quiet connection is the failure mode that used to hang the
+            // progress bar at some percent forever: after ResponseHeadersRead
+            // the body stream has no timeout of its own, so a stalled link
+            // produced neither an error nor any progress. Every read now
+            // carries a stall budget; when it trips (or the connection is
+            // reset), the download retries — resuming with a Range request
+            // when the server supports it — before ever giving up.
+            const int stallSeconds = 45;
+            const int maxAttempts = 4;
+
+            for (int attempt = 1; ; attempt++)
             {
-                var buffer = new byte[81920];
-                long total = resp.Content.Headers.ContentLength ?? 0;
-                long copied = 0;
-                int read;
-                while ((read = await input.ReadAsync(buffer.AsMemory(), ct)) > 0)
+                try
                 {
-                    await fs.WriteAsync(buffer.AsMemory(0, read), ct);
-                    copied += read;
-                    if (total > 0)
-                        progress?.Report(copied * 100.0 / total);
+                    await DownloadWithStallGuardAsync(http, info.Url, zipPath, stallSeconds, progress, ct);
+                    break;
                 }
-                progress?.Report(100);
+                catch (Exception ex) when (
+                    !ct.IsCancellationRequested
+                    && attempt < maxAttempts
+                    && ex is OperationCanceledException or IOException or HttpRequestException)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(2 * attempt), ct);
+                }
             }
 
             await using (var hs = File.OpenRead(zipPath))
@@ -119,6 +127,88 @@ public static class UpdateInstaller
         finally
         {
             try { File.Delete(zipPath); } catch { }
+        }
+    }
+
+    /// <summary>One download pass: GET (with a Range resume when a partial file
+    /// is left over from an interrupted attempt), then stream to disk with a
+    /// per-read stall budget. Throws on stall/reset so the caller retries.</summary>
+    private static async Task DownloadWithStallGuardAsync(
+        HttpClient http, string url, string zipPath, int stallSeconds, IProgress<double>? progress, CancellationToken ct)
+    {
+        long have = File.Exists(zipPath) ? new FileInfo(zipPath).Length : 0;
+
+        HttpResponseMessage resp;
+        bool resumed = false;
+        if (have > 0)
+        {
+            var req = new HttpRequestMessage(HttpMethod.Get, url);
+            req.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(have, null);
+            resp = await http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct);
+            if (resp.StatusCode == System.Net.HttpStatusCode.RequestedRangeNotSatisfiable)
+            {
+                // The saved prefix is unusable (larger than the file, or the file
+                // changed on the server): drop it and fetch from scratch.
+                resp.Dispose();
+                try { File.Delete(zipPath); } catch { }
+                throw new IOException("update range not satisfiable");
+            }
+            resumed = resp.StatusCode == System.Net.HttpStatusCode.PartialContent;
+            if (!resumed)
+            {
+                // The server ignored the Range header and sent the full body.
+                resp.Dispose();
+                have = 0;
+                resp = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
+            }
+        }
+        else
+        {
+            resp = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
+        }
+
+        using (resp)
+        {
+            resp.EnsureSuccessStatusCode();
+            long remaining = resp.Content.Headers.ContentLength ?? 0;
+            long total = resumed && remaining > 0 ? have + remaining : remaining;
+
+            await using var input = await resp.Content.ReadAsStreamAsync(ct);
+            await using var fs = new FileStream(
+                zipPath,
+                resumed ? FileMode.Append : FileMode.Create,
+                FileAccess.Write,
+                FileShare.None,
+                81920,
+                useAsync: true);
+
+            var buffer = new byte[81920];
+            long copied = have;
+            using var stallCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            while (true)
+            {
+                // CancelAfter restarts on every read, so this trips only when no
+                // new byte has arrived for stallSeconds — a live but slow transfer
+                // is never interrupted.
+                stallCts.CancelAfter(TimeSpan.FromSeconds(stallSeconds));
+                int read;
+                try
+                {
+                    read = await input.ReadAsync(buffer.AsMemory(), stallCts.Token);
+                    if (read <= 0)
+                        break;
+                    await fs.WriteAsync(buffer.AsMemory(0, read), stallCts.Token);
+                }
+                catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+                {
+                    // Stall, not a user cancel: surface it as a retryable IO error.
+                    throw new IOException("update download stalled");
+                }
+                copied += read;
+                if (total > 0)
+                    progress?.Report(Math.Min(100, copied * 100.0 / total));
+            }
+            progress?.Report(100);
         }
     }
 

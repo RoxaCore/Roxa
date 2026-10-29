@@ -126,17 +126,58 @@ if ($act === 'chunk') {
     if ((int)$f['size'] > UPART_CHUNK_MAX) {
         upart_fail('حجم قطعه از حد مجاز بیشتر است.');
     }
+
+    // Where this request continues the chunk. A body cut mid-transfer never
+    // reaches PHP, so the stored chunk still ends where the client last heard
+    // back from us — the retry resumes from that byte instead of starting over.
+    // A gap (offset beyond what is stored) would splice the file, so it is
+    // rejected rather than guessed at.
+    $offset = (int)($_POST['offset'] ?? 0);
+
     $dir = upart_dir($token);
     if (!is_dir($dir) && !@mkdir($dir, 0700, true)) {
         upart_fail('ذخیرهٔ قطعه ممکن نشد — دسترسی پوشه داده را بررسی کنید.', 500);
     }
     @file_put_contents($dir . '/.total', (string)$total);
-    if (!move_uploaded_file((string)$f['tmp_name'], $dir . '/' . sprintf('%06d', $index) . '.part')) {
-        upart_fail('انتقال قطعه ممکن نشد — دسترسی پوشه داده را بررسی کنید.', 500);
+
+    $path = $dir . '/' . sprintf('%06d', $index) . '.part';
+    $cur = is_file($path) ? (int)@filesize($path) : 0;
+    if ($offset < 0 || $offset > $cur) {
+        upart_fail('آفست قطعه نامعتبر است.');
     }
+    if ($offset < $cur && !@truncate($path, $offset)) {
+        upart_fail('بازنویسی قطعه ممکن نشد — دسترسی پوشه داده را بررسی کنید.', 500);
+    }
+
+    // c+b: create when missing, never truncate — the piece is appended at
+    // $offset. is_uploaded_file() keeps the check move_uploaded_file() gave us.
+    $out = @fopen($path, 'c+b');
+    if ($out === false) {
+        upart_fail('ذخیرهٔ قطعه ممکن نشد — دسترسی پوشه داده را بررسی کنید.', 500);
+    }
+    if ($offset > 0) {
+        @fseek($out, $offset);
+    }
+    $in = @fopen((string)$f['tmp_name'], 'rb');
+    $ok = $in !== false
+        && is_uploaded_file((string)$f['tmp_name'])
+        && @stream_copy_to_stream($in, $out) !== false;
+    if ($in !== false) {
+        fclose($in);
+    }
+    fclose($out);
+    if (!$ok) {
+        @unlink($path);
+        upart_fail('ذخیرهٔ قطعه ممکن نشد — دسترسی پوشه داده را بررسی کنید.', 500);
+    }
+    if ((int)@filesize($path) > UPART_CHUNK_MAX) {
+        @unlink($path);
+        upart_fail('حجم قطعه از حد مجاز بیشتر است.');
+    }
+
     // Keep the dir mtime fresh so the sweep never eats an upload in progress.
     @touch($dir);
-    upart_json(true, '', ['index' => $index]);
+    upart_json(true, '', ['index' => $index, 'offset' => $offset, 'size' => (int)@filesize($path)]);
 }
 
 if ($act === 'finish') {
@@ -158,6 +199,30 @@ if ($act === 'finish') {
     if ($size > UPART_TOTAL_MAX || $size <= 0) {
         upart_rm($dir);
         upart_fail('حجم کل فایل نامعتبر است.');
+    }
+
+    // The client also sends the original size and the logical chunk size, so
+    // every stored chunk can be checked for its exact expected length. Without
+    // this a piece lost mid-chunk would still assemble into a file that only
+    // fails much later, inside the client's hash check.
+    $fs = (int)($_POST['filesize'] ?? 0);
+    $ck = (int)($_POST['chunk'] ?? 0);
+    if ($fs > 0 && $ck > 0) {
+        $bad = ($size !== $fs);
+        if (!$bad) {
+            for ($i = 0; $i < $total; $i++) {
+                $expect = min($ck, $fs - $i * $ck);
+                $actual = (int)@filesize($dir . '/' . sprintf('%06d', $i) . '.part');
+                if ($expect <= 0 || $actual !== $expect) {
+                    $bad = true;
+                    break;
+                }
+            }
+        }
+        if ($bad) {
+            upart_rm($dir);
+            upart_fail('یکی از قطعه‌ها ناقص است؛ آپلود را دوباره انجام دهید.');
+        }
     }
 
     // Zip magic on the first chunk — catches a truncated/corrupt transfer

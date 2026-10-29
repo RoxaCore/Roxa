@@ -148,7 +148,7 @@ echo '<div class="row"><div><label>شمارهٔ نسخه</label><input type="tex
 echo '<div><label>نحوهٔ تحویل فایل</label><select name="mode" id="mode" onchange="document.getElementById(\'up\').style.display=this.value===\'upload\'?\'\':\'none\';document.getElementById(\'ur\').style.display=this.value===\'url\'?\'\':\'none\'">';
 echo '<option value="upload">آپلود zip از اینجا</option><option value="url">لینک مستقیم (هاست دیگر)</option></select></div></div>';
 echo '<div id="up"><label>فایل zip آپدیت (محتوای پوشهٔ برنامه)</label><input type="file" name="zip" id="zipfile" accept=".zip">';
-echo '<div class="hint">آپلود به‌صورت قطعه‌های ۵۱۲KB انجام می‌شود و سقفِ آپلودِ PHP دیگر مانعِ فایل‌های بزرگ نیست (حداکثر حجم کل: ' . (int)round(UPART_TOTAL_MAX / 1048576) . ' مگابایت). سقف فعلیِ سرور: ' . h((string)ini_get('upload_max_filesize')) . ' (POST: ' . h((string)ini_get('post_max_size')) . ').</div></div>';
+echo '<div class="hint">آپلود به‌صورت قطعه‌های ۵۱۲KB انجام می‌شود و اگر مسیر ارتباطی اجازهٔ درخواست بزرگ ندهد، اندازهٔ هر درخواست خودکار کوچک‌تر و ارسال از همان نقطه ادامه می‌یابد (سقفِ آپلودِ PHP دیگر مانعِ فایل‌های بزرگ نیست؛ حداکثر حجم کل: ' . (int)round(UPART_TOTAL_MAX / 1048576) . ' مگابایت). سقف فعلیِ سرور: ' . h((string)ini_get('upload_max_filesize')) . ' (POST: ' . h((string)ini_get('post_max_size')) . ').</div></div>';
 echo '<div id="ur" style="display:none"><label>لینک مستقیم فایل zip</label><input type="text" name="url" placeholder="https://.../roxa.zip">';
 echo '<label>هش SHA-256 فایل (اختیاری، برای اعتبارسنجی کلاینت)</label><input type="text" name="sha" placeholder="64 کاراکتر hex" dir="ltr"></div>';
 echo '<label>یادداشت انتشار (برای کاربر نمایش داده می‌شود)</label><textarea name="notes" placeholder="مثلاً: بهبود پایداری اتصال و رفع باگ TUN"></textarea>';
@@ -190,7 +190,9 @@ echo '<style>
 echo '<script>
 (function () {
   var maxTotal = ' . (int)UPART_TOTAL_MAX . ';
-  var CHUNK = 524288; // 512KB — under typical per-request proxy limits (nginx default 1MB)
+  var CHUNK = 524288; // 512KB logical chunk — one .part file server-side
+  var START_PIECE = 131072; // 128KB first request: fits almost every per-request body limit
+  var MIN_PIECE = 8192;     // floor, for hosts/proxies that cut bodies even smaller
   var form = document.getElementById("verform");
   var zip = document.getElementById("zipfile");
   var mode = document.getElementById("mode");
@@ -238,6 +240,20 @@ echo '<script>
   }
 
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  // Learned piece size: if a proxy/host cuts bodies at some size, the upload
+  // halves its request size until it fits and remembers that for this tab, so
+  // the next publish does not pay the same failed attempts again.
+  function loadPiece() {
+    try {
+      var v = parseInt(sessionStorage.getItem("roxa_upart_piece") || "", 10);
+      if (v >= MIN_PIECE && v <= CHUNK) return v;
+    } catch (e) {}
+    return START_PIECE;
+  }
+  function savePiece(v) {
+    try { sessionStorage.setItem("roxa_upart_piece", String(v)); } catch (e) {}
+  }
 
   function post(fd, onProgress, timeoutMs, stallMs) {
     // timeoutMs caps the whole request; stallMs aborts it when no byte has
@@ -287,6 +303,14 @@ echo '<script>
         var er = new Error((res && res.msg) ? res.msg : "");
         er.fromServer = !!(res && res.msg);
         er.status = xhr.status;
+        // A 4xx that is not JSON (a WAF/proxy error page) is still a definite
+        // answer: retrying the same request cannot change it, so surface the
+        // code instead of treating it as a dropped connection.
+        if (!er.fromServer && xhr.status >= 400 && xhr.status < 500 &&
+            xhr.status !== 408 && xhr.status !== 429) {
+          er.fromServer = true;
+          er.message = "پاسخ نامعتبر از سرور (کد " + xhr.status + ").";
+        }
         reject(er);
       });
       xhr.addEventListener("timeout", function () {
@@ -342,7 +366,9 @@ echo '<script>
     var totalSize = file.size;
     var parts = Math.max(1, Math.ceil(totalSize / CHUNK));
     var tk = token();
-    var sentBytes = 0;
+    var sentBytes = 0;       // bytes the server has confirmed so far
+    var piece = loadPiece(); // size of the next request; shrinks when cut
+    var minFails = 0;        // consecutive failures at the smallest size
 
     busy = true;
     btn.disabled = true;
@@ -369,45 +395,61 @@ echo '<script>
       }
     }
 
-    function sendChunk(i, attempt) {
+    // One HTTP request carrying bytes [offset, end) of logical chunk i.
+    // Everything here is relative to the chunk start: chunkLen is the length of
+    // this logical chunk, offset/end index into it. (Comparing an absolute file
+    // position with a chunk-relative one never terminates the loop.)
+    // If the body gets cut, the server stores nothing for this request, so the
+    // retry resumes from the same offset with a smaller piece — the file is
+    // never restarted from zero, and a flaky link only loses the piece in flight.
+    function sendPiece(i, offset) {
       var start = i * CHUNK;
-      var blob = file.slice(start, Math.min(totalSize, start + CHUNK));
+      var chunkLen = Math.min(CHUNK, totalSize - start);
+      var end = Math.min(chunkLen, offset + piece);
+      var blob = file.slice(start + offset, start + end);
+      var mark = sentBytes;
       var fd = new FormData();
       fd.append("act", "chunk");
       fd.append("csrf", csrfVal);
       fd.append("token", tk);
       fd.append("index", String(i));
       fd.append("total", String(parts));
+      fd.append("offset", String(offset));
       fd.append("part", blob, "part.bin");
-      var base = sentBytes;
-      // 512KB needs well under a minute even on a slow uplink; 15s of silence
-      // means the connection died without closing, so abort and retry.
+      // A full piece needs well under a minute even on a slow uplink; 15s of
+      // silence means the connection died without closing, so abort and retry.
       return post(fd, function (loaded) {
-        render(base + loaded);
+        render(mark + loaded);
         if (loaded >= blob.size) eta.textContent = "در انتظار پاسخ سرور…";
       }, 60000, 15000).then(function () {
-        sentBytes = base + blob.size;
+        sentBytes = mark + blob.size;
+        minFails = 0;
         render(sentBytes);
+        if (end >= chunkLen) return;
+        return sendPiece(i, end);
       }).catch(function (er) {
-        if (er.aborted) throw er;
-        // A network-level hiccup on one 512KB piece is retried in place —
-        // already-sent pieces stay on the server, so the upload continues
-        // from this same chunk instead of starting over.
-        // A real server answer (CSRF, validation) is shown right away.
-        if (!er.fromServer && attempt < 3) {
-          say("قطعه " + (i + 1) + " از " + parts + " جواب نداد؛ تلاش مجدد " + (attempt + 1) + " از ۳…", "err");
-          return wait(700 * attempt).then(function () {
-            return sendChunk(i, attempt + 1);
-          });
+        if (er.aborted) throw er; // the user cancelled
+        if (er.fromServer) throw er; // a real answer from PHP — show it right away
+        // Network-level cut (status 0 / timeout / stall): the path could not
+        // carry this request, so make the next one smaller and keep going.
+        if (piece > MIN_PIECE) {
+          piece = Math.max(MIN_PIECE, Math.floor(piece / 2));
+          savePiece(piece);
+        } else {
+          minFails++;
+          if (minFails >= 3) throw er;
         }
-        throw er;
+        say("قطعه " + (i + 1) + " از " + parts + " برید؛ تلاش مجدد با قطعهٔ " + Math.round(piece / 1024) + "KB از همان نقطه…", "err");
+        return wait(700).then(function () {
+          return sendPiece(i, offset);
+        });
       });
     }
 
     var chain = Promise.resolve();
     for (var i = 0; i < parts; i++) {
       chain = chain.then(function (idx) {
-        return function () { return sendChunk(idx, 1); };
+        return function () { return sendPiece(idx, 0); };
       }(i));
     }
 
@@ -417,6 +459,11 @@ echo '<script>
       fd.append("act", "finish");
       fd.append("token", tk);
       fd.append("total", String(parts));
+      // Let the server verify every stored chunk against its expected length,
+      // so a piece lost mid-chunk is caught here instead of by the client-side
+      // hash check after the release has already been published.
+      fd.append("chunk", String(CHUNK));
+      fd.append("filesize", String(totalSize));
       // finish assembles and hashes the whole file server-side, so it gets a
       // long hard cap (no stall watchdog: silence here means the server is
       // working, and killing it would throw away a completed upload).
@@ -443,7 +490,12 @@ echo '<script>
         }
         return;
       }
-      say("آپلود یکی از قطعه‌ها ناموفق ماند و اتصال قطع شد. بعد از چند تلاش خودکار، دکمهٔ انتشار را دوباره بزنید؛ اگر ادامه داد از «لینک مستقیم» استفاده کنید.", "err");
+      // Not a server answer: say what kind of failure it was, so "status 0"
+      // (connection cut before any reply) is distinguishable from a timeout.
+      var why = "";
+      if (er && er.status) why = " (کد پاسخ سرور: " + er.status + ")";
+      else if (er && er.timedOut) why = " (پاسخی از سرور نرسید)";
+      say("آپلود یکی از قطعه‌ها ناموفق ماند و اتصال قطع شد. بعد از چند تلاش خودکار، دکمهٔ انتشار را دوباره بزنید؛ اگر ادامه داد از «لینک مستقیم» استفاده کنید." + why, "err");
     });
   });
 })();

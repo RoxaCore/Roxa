@@ -12,7 +12,9 @@ if (is_file($vj)) {
     }
 }
 $e = static function ($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); };
-$dlUrl = $ver['file'] !== '' ? 'dl/' . rawurlencode((string)$ver['file']) : '#download';
+// Downloads are counted by api/dl.php (a 302 to the same file); '#' stays the
+// placeholder when no file has been published yet.
+$dlUrl = $ver['file'] !== '' ? 'api/dl.php?f=' . rawurlencode((string)$ver['file']) : '#download';
 $mb = $ver['size'] ? number_format(((int)$ver['size']) / 1048576, 1) : '';
 
 // ---- language ----

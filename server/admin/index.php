@@ -51,6 +51,10 @@ foreach (($rep['items'] ?? []) as $r) {
 $dataWritable = is_writable(DATA_DIR);
 $dlWritable = is_writable(DL_DIR);
 $stats = stats_summary();
+$dlStats = jread(DATA_DIR . '/dlstats.json', ['total' => 0, 'days' => []]);
+$dlToday = (int)(is_array($dlStats['days'][date('Y-m-d')] ?? null)
+    ? ($dlStats['days'][date('Y-m-d')]['total'] ?? 0)
+    : 0);
 
 page_head('داشبورد', 'dash');
 
@@ -59,6 +63,7 @@ echo '<div class="stat"><div class="k">تعداد نصب</div><div class="v" id=
 echo '<div class="stat"><div class="k">آنلاین لحظه‌ای</div><div class="v" id="stat-online"><span class="badge b-live">' . (int)$stats['online'] . ' نفر</span></div></div>';
 echo '<div class="stat"><div class="k">کاربر فعال (۲۴ ساعت)</div><div class="v" id="stat-active24">' . $stats['active24'] . '</div></div>';
 echo '<div class="stat"><div class="k">کاربر فعال (۷ روز)</div><div class="v" id="stat-active7">' . $stats['active7'] . '</div></div>';
+echo '<div class="stat"><div class="k">دانلود نصب‌کننده</div><div class="v">' . (int)$dlStats['total'] . ' <small>امروز ' . $dlToday . '</small></div></div>';
 echo '<div class="stat"><div class="k">نسخه منتشرشده</div><div class="v">' . h((string)($ver['latest'] ?: '—')) . '</div></div>';
 echo '<div class="stat"><div class="k">وضعیت انتشار</div><div class="v"><span class="badge ' . (!empty($ver['active']) ? 'b-on">فعال' : 'b-off">غیرفعال') . '</span></div></div>';
 echo '<div class="stat"><div class="k">اعلان‌های فعال</div><div class="v">' . $activeCount . ' <small>از ' . count($ann['items'] ?? []) . '</small></div></div>';

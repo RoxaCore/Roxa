@@ -363,6 +363,32 @@ public partial class MainWindow : Window
             win.ShowDialog(this);
         };
         vm.UpdateShutdownRequested += () => (Application.Current as App)?.ExitApp();
+        // The small update window: check → download → install as one modal.
+        // Closing it (button or X) cancels the flow; the flow closes it itself
+        // when it cancels, and the app itself once the payload is staged.
+        vm.ShowUpdateWindowHandler = async updateVm =>
+        {
+            var win = new UpdateWindow { DataContext = updateVm };
+            bool closed = false;
+            updateVm.CloseWindow = () => Dispatcher.UIThread.Post(() =>
+            {
+                if (closed) return;
+                try { win.Close(); } catch { }
+            });
+            win.Closed += (_, _) =>
+            {
+                closed = true;
+                updateVm.CancelRequested?.Invoke();
+            };
+            await win.ShowDialog(this);
+        };
+        // The periodic yes/no question about a pending update.
+        vm.ShowUpdatePromptHandler = async info =>
+        {
+            var win = new UpdatePromptWindow(info);
+            await win.ShowDialog(this);
+            return win.Accepted;
+        };
         vm.ShowBugReportHandler = (info, submit) =>
         {
             var tr = Localization.TranslationManager.Instance;

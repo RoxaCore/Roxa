@@ -192,6 +192,7 @@ public partial class MainViewModel : ViewModelBase
         Core.NotificationHelper.Enabled = _settings.NotificationsEnabled;
         _sendUsageStats = _settings.SendUsageStats;
         _autoUpdateApp = _settings.AutoUpdateApp;
+        _updatePromptEnabled = _settings.UpdatePromptEnabled;
         if (string.IsNullOrWhiteSpace(_settings.ClientId))
         {
             _settings.ClientId = Guid.NewGuid().ToString("D");
@@ -212,6 +213,8 @@ public partial class MainViewModel : ViewModelBase
         var savedLang = _languages.FirstOrDefault(l => l.code == _settings.Language);
         _selectedLanguage = savedLang.name ?? Languages.DefaultName;
         Localization.TranslationManager.Instance.SetCulture(_settings.Language ?? Languages.DefaultCode);
+        // The manual-check button label, resolved after the saved language is applied.
+        UpdateCheckButtonText = TranslationManager.Instance["Set_UpdateCheck"];
         if (_settings.TunExcludedApps != null)
             foreach (var app in _settings.TunExcludedApps)
                 if (!string.IsNullOrWhiteSpace(app))

@@ -147,6 +147,13 @@ public class AppSettings
     // it is announced and installed when the app exits. The banner button still
     // installs immediately; this switch only gates the automatic path.
     public bool AutoUpdateApp { get; set; } = true;
+    // The periodic "a new version is waiting — install it?" question. It only
+    // ever fires when AutoUpdateApp is off (with it on the app downloads by
+    // itself and there is nothing to ask): at most once per new version, and
+    // the same pending version comes back no more often than every 10 days.
+    public bool UpdatePromptEnabled { get; set; } = true;
+    public DateTime LastUpdatePromptUtc { get; set; }
+    public string LastPromptedUpdateVersion { get; set; } = "";
     public int ShownAnnouncementId { get; set; }
     public int ShownAnnouncementCount { get; set; }
     public string Country { get; set; } = "";

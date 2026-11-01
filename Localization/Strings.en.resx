@@ -327,11 +327,28 @@ State: {3}</value>
   <data name="Btn_FullTest" xml:space="preserve"><value>Full test</value></data>
   <data name="Status_GroupFullDone" xml:space="preserve"><value>Full test of {0} finished</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>You must install the new version to continue</value></data>
+  <data name="UpdWin_Title" xml:space="preserve"><value>App update</value></data>
+  <data name="UpdWin_Checking" xml:space="preserve"><value>Checking for a new version…</value></data>
+  <data name="UpdWin_UpToDate" xml:space="preserve"><value>You are on the latest version</value></data>
+  <data name="UpdWin_CheckFailed" xml:space="preserve"><value>Could not check for a new version; check your internet connection</value></data>
+  <data name="UpdWin_NewVersion" xml:space="preserve"><value>Version {0} is available</value></data>
+  <data name="UpdWin_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="UpdWin_Retry" xml:space="preserve"><value>Try again</value></data>
+  <data name="UpdWin_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="UpdPrompt_Title" xml:space="preserve"><value>A new version is available</value></data>
+  <data name="UpdPrompt_Msg" xml:space="preserve"><value>Version {0} is ready to install. Download and install it now?</value></data>
+  <data name="UpdPrompt_Yes" xml:space="preserve"><value>Yes, install</value></data>
+  <data name="UpdPrompt_No" xml:space="preserve"><value>No</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>Close</value></data>
   <data name="Ann_View" xml:space="preserve"><value>View</value></data>
   <data name="Set_AppUpdate" xml:space="preserve"><value>App Update</value></data>
   <data name="Set_AutoUpdateApp" xml:space="preserve"><value>Install new versions automatically</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>When enabled, the app downloads and installs new versions automatically; it closes and reopens to apply the update.</value></data>
+  <data name="Set_UpdateCheck" xml:space="preserve"><value>Check for updates</value></data>
+  <data name="Set_UpdateChecking" xml:space="preserve"><value>Checking…</value></data>
+  <data name="Set_UpdateCheck_Desc" xml:space="preserve"><value>Checks for a new version manually; if one is available a small window opens, downloads it on its own and, when done, closes and reopens the app to install.</value></data>
+  <data name="Set_UpdatePrompt" xml:space="preserve"><value>Ask about new versions every 10 days</value></data>
+  <data name="Set_UpdatePrompt_Desc" xml:space="preserve"><value>When the automatic install is off and a new version exists, a yes/no window asks every 10 days whether to install it.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>Apps excluded from TUN</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>Traffic from these apps bypasses the VPN server and uses your real IP. Only applies while TUN mode is active.</value></data>
   <data name="Set_TunExclude_Note" xml:space="preserve"><value>Note: this list is generic — any app is accepted based on its executable file. In proxy mode (without TUN) it only affects apps that honor the system proxy. All system DNS still goes through the VPN, so blocked sites may open for these apps too.</value></data>

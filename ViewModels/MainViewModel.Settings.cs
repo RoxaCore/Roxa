@@ -202,6 +202,16 @@ public partial class MainViewModel : ViewModelBase
         SaveSettings();
     }
 
+    // The periodic yes/no question about a pending update (see MaybePromptUpdate).
+    // It is only ever asked when the automatic install above is off.
+    [ObservableProperty] private bool _updatePromptEnabled;
+
+    partial void OnUpdatePromptEnabledChanged(bool value)
+    {
+        _settings.UpdatePromptEnabled = value;
+        SaveSettings();
+    }
+
     public string DeviceId => _settings.ClientId;
 
     [ObservableProperty] private bool _notificationsEnabled;

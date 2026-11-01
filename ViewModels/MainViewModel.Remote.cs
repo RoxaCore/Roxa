@@ -166,6 +166,10 @@ public partial class MainViewModel : ViewModelBase
             // installs mid-session: the swap needs this process gone.
             if (_settings.AutoUpdateApp)
                 StartAutoStage(_pendingUpdate);
+            // With the automatic install off there is no background download —
+            // ask out loud instead (every 10 days / once per new version).
+            else
+                MaybePromptUpdate(_pendingUpdate);
         }
         if (freshAnnouncement != null)
         {
@@ -423,5 +427,211 @@ public partial class MainViewModel : ViewModelBase
         IsUpdateProgressIndeterminate = false;
         UpdateProgress = 0;
         UpdateProgressText = "";
+    }
+
+    // ---------- the small update window (manual check + the 10-day question) ----------
+
+    [ObservableProperty] private bool _isUpdateChecking;
+    [ObservableProperty] private string _updateCheckButtonText = "";
+
+    private UpdateWindowViewModel? _updateWindow;
+    private CancellationTokenSource? _updateWindowCts;
+    private bool _updateFlowRunning;
+    private bool _updatePromptOpen;
+
+    /// <summary>Opens the update window (modal) with the given state. Wired in MainWindow.</summary>
+    public Func<UpdateWindowViewModel, Task>? ShowUpdateWindowHandler { get; set; }
+
+    /// <summary>The yes/no question; returns true when the user picks "yes". Wired in MainWindow.</summary>
+    public Func<UpdateInfo, Task<bool>>? ShowUpdatePromptHandler { get; set; }
+
+    partial void OnIsUpdateCheckingChanged(bool value)
+        => UpdateCheckButtonText = TranslationManager.Instance[value ? "Set_UpdateChecking" : "Set_UpdateCheck"];
+
+    /// <summary>Settings → "check for updates": opens the window and runs the whole flow in it.</summary>
+    [RelayCommand]
+    private async Task CheckUpdateAsync()
+    {
+        // A window is already open, or the banner owns an install right now.
+        if (_updateWindow != null || _installRunning || UpdateInstaller.UpdaterLaunched) return;
+        await OpenUpdateWindowAsync(null);
+    }
+
+    /// <summary>
+    /// Opens the small window and runs the flow behind it: check (unless an
+    /// update is already known), download, then hand over to the updater. The
+    /// window can cancel at any point; on success the app closes itself and the
+    /// second-stage updater brings it back on the new version.
+    /// </summary>
+    private async Task OpenUpdateWindowAsync(UpdateInfo? known)
+    {
+        if (_updateWindow != null || ShowUpdateWindowHandler is null) return;
+        var vm = new UpdateWindowViewModel();
+        _updateWindow = vm;
+        _updateWindowCts = new CancellationTokenSource();
+        vm.CancelRequested = () => { try { _updateWindowCts?.Cancel(); } catch { } };
+        vm.RetryRequested = () => _ = RetryUpdateFlowAsync(vm);
+        try
+        {
+            var closed = ShowUpdateWindowHandler(vm);
+            await RunUpdateFlowAsync(vm, known, _updateWindowCts.Token);
+            // The flow leaves the window open when there is nothing to do
+            // (up to date / failed); wait until the user closes it.
+            await closed;
+        }
+        catch { }
+        finally
+        {
+            // Deliberately not disposed: a Retry task may still hold the token,
+            // and an undisposed CTS is safe — only a disposed one can throw.
+            _updateWindowCts = null;
+            _updateWindow = null;
+        }
+    }
+
+    /// <summary>Retry runs the whole flow again — the check included, so a stale result is never trusted.</summary>
+    private async Task RetryUpdateFlowAsync(UpdateWindowViewModel vm)
+    {
+        var cts = _updateWindowCts;
+        if (cts == null || _updateFlowRunning) return;
+        await RunUpdateFlowAsync(vm, null, cts.Token);
+    }
+
+    /// <summary>
+    /// check → download → install, all inside the window. The window owns the
+    /// visual state; this method only moves it from state to state. While it
+    /// runs, _installRunning keeps the banner from painting over the progress
+    /// or starting a second install of the same payload.
+    /// </summary>
+    private async Task RunUpdateFlowAsync(UpdateWindowViewModel vm, UpdateInfo? known, CancellationToken ct)
+    {
+        if (_updateFlowRunning) return;
+        _updateFlowRunning = true;
+        _installRunning = true;
+        bool handedOff = false;
+        try
+        {
+            var info = known;
+            if (info is not { UpdateAvailable: true })
+            {
+                vm.ShowChecking();
+                IsUpdateChecking = true;
+                try
+                {
+                    var lang = string.IsNullOrWhiteSpace(_settings.Language)
+                        ? Localization.Languages.DefaultCode : _settings.Language;
+                    var country = _settings.Country ?? "";
+                    var proxyPort = IsConnected ? _engine.HttpPort : (int?)null;
+                    info = await Task.Run(() => RemoteConfig.CheckUpdateAsync(lang, country, _settings.ClientId,
+                        proxyPort, _settings.ConnectCount, includeStats: SendUsageStats, ct), ct);
+                }
+                finally
+                {
+                    IsUpdateChecking = false;
+                }
+                ct.ThrowIfCancellationRequested();
+                // null means the check itself failed (no network, server error) —
+                // that is NOT the same as "no new version", which comes back as
+                // a real UpdateInfo with UpdateAvailable=false.
+                if (info is null)
+                {
+                    vm.ShowCheckFailed();
+                    return;
+                }
+                if (!info.UpdateAvailable)
+                {
+                    vm.ShowUpToDate();
+                    return;   // the window stays open with a Close button
+                }
+                _pendingUpdate = info;
+            }
+
+            vm.ShowVersion(info!);
+
+            // A background auto-stage of the same payload may already be running;
+            // a second download would only fight it over the same file.
+            while (_autoStaging)
+            {
+                ct.ThrowIfCancellationRequested();
+                await Task.Delay(250, ct);
+            }
+            ct.ThrowIfCancellationRequested();
+
+            vm.ShowDownloading(0);
+            if (!(UpdateInstaller.IsStaged && _autoStagedVersion == info!.Latest))
+            {
+                var port = IsConnected ? _engine.HttpPort : (int?)null;
+                var progress = new Progress<double>(p => vm.ShowDownloading(p));
+                await Task.Run(() => UpdateInstaller.StageAsync(info!, port, progress, ct), ct);
+                _settings.LastUpdateAttempt = info!.Latest;
+                SaveSettings();
+            }
+
+            ct.ThrowIfCancellationRequested();
+            // Everything is on disk; the swap needs this process gone.
+            if (IsConnected) UpdateInstaller.MarkReconnectAfterUpdate();
+            vm.ShowInstalling();
+            UpdateInstaller.LaunchUpdater();
+            handedOff = true;
+            UpdateShutdownRequested?.Invoke();
+        }
+        catch (OperationCanceledException)
+        {
+            vm.CloseNow();
+        }
+        catch (Exception ex)
+        {
+            AppendLog($"Update window failed: {ex.Message}");
+            vm.ShowFailed();
+        }
+        finally
+        {
+            IsUpdateChecking = false;
+            _updateFlowRunning = false;
+            // On success the process is on its way out and the flag must stay
+            // set; otherwise the banner would offer the same install again.
+            if (!handedOff) _installRunning = false;
+        }
+    }
+
+    /// <summary>
+    /// The every-10-days question, asked only with the automatic install off —
+    /// then the app downloads by itself and there is nothing to ask. A version
+    /// never asked about is asked right away; the same pending version comes
+    /// back as a reminder no more often than every 10 days. The answer is
+    /// recorded before the window opens: closing it with X still counts as
+    /// "asked", or the hourly check would pop it up again right away.
+    /// </summary>
+    private void MaybePromptUpdate(UpdateInfo update)
+    {
+        if (!_settings.UpdatePromptEnabled) return;
+        if (_settings.AutoUpdateApp) return;
+        if (_updateWindow != null || _updatePromptOpen || _installRunning || _autoStaging) return;
+
+        bool newVersion = _settings.LastPromptedUpdateVersion != update.Latest;
+        bool tenDaysPassed = _settings.LastUpdatePromptUtc == default
+            || (DateTime.UtcNow - _settings.LastUpdatePromptUtc).TotalDays >= 10;
+        if (!newVersion && !tenDaysPassed) return;
+
+        _settings.LastUpdatePromptUtc = DateTime.UtcNow;
+        _settings.LastPromptedUpdateVersion = update.Latest;
+        SaveSettings();
+        _ = PromptUpdateAsync(update);
+    }
+
+    private async Task PromptUpdateAsync(UpdateInfo update)
+    {
+        _updatePromptOpen = true;
+        try
+        {
+            if (ShowUpdatePromptHandler is null) return;
+            if (await ShowUpdatePromptHandler(update))
+                await OpenUpdateWindowAsync(update);
+        }
+        catch { }
+        finally
+        {
+            _updatePromptOpen = false;
+        }
     }
 }

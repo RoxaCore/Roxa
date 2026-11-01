@@ -970,6 +970,24 @@
               </StackPanel>
             </Border>
 
+            <!-- Manual check: opens the small update window, which downloads and installs by itself. -->
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_AppUpdate}" FontWeight="Bold" FontSize="13"/>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_UpdateCheck_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+                <Button Content="{Binding UpdateCheckButtonText}"
+                        Command="{Binding CheckUpdateCommand}"
+                        IsEnabled="{Binding IsUpdateChecking, Converter={StaticResource Not}}"
+                        HorizontalAlignment="Right" Padding="14,6" FontSize="13"/>
+                <Border Height="1" Background="{StaticResource BorderLight}"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <ToggleSwitch IsChecked="{Binding UpdatePromptEnabled}" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_UpdatePrompt}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_UpdatePrompt_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Privacy}" FontWeight="Bold" FontSize="13"/>

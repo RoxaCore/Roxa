@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Roxa.ViewModels"
+        xmlns:loc="using:Roxa.Localization"
+        x:Class="Roxa.Views.UpdateWindow"
+        x:DataType="vm:UpdateWindowViewModel"
+        Title="Roxa"
+        Width="440" Height="230" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="#F8F9FA">
+  <!-- The whole update as one small modal: the download starts by itself, the
+       bar follows it and the only choices are Cancel while it runs, Retry and
+       Close once it stopped. -->
+  <StackPanel Margin="24" Spacing="14">
+    <TextBlock Text="{Binding VersionText}" FontSize="15" FontWeight="Bold" TextWrapping="Wrap"/>
+    <TextBlock Text="{Binding StatusText}" FontSize="12" Foreground="#5C6E6A" TextWrapping="Wrap"/>
+    <StackPanel Spacing="6">
+      <ProgressBar Value="{Binding Progress}" Minimum="0" Maximum="100" Height="8"
+                   IsVisible="{Binding IsProgressVisible}"/>
+      <TextBlock Text="{Binding PercentText}" FontSize="11" Foreground="#5C6E6A"
+                 HorizontalAlignment="Center" IsVisible="{Binding IsProgressVisible}"/>
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+      <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=UpdWin_Cancel}"
+              Command="{Binding CancelCommand}" IsVisible="{Binding CanCancel}"
+              Padding="18,6" FontSize="13"/>
+      <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=UpdWin_Retry}"
+              Command="{Binding RetryCommand}" IsVisible="{Binding CanRetry}"
+              Padding="18,6" FontSize="13"/>
+      <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=UpdWin_Close}"
+              Command="{Binding CloseCommand}" IsVisible="{Binding CanClose}"
+              Padding="18,6" FontSize="13"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

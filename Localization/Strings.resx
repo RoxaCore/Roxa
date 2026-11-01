@@ -335,11 +335,28 @@
   <data name="Btn_FullTest" xml:space="preserve"><value>تست کامل</value></data>
   <data name="Status_GroupFullDone" xml:space="preserve"><value>تست کامل «{0}» پایان یافت</value></data>
   <data name="Upd_ForceMsg" xml:space="preserve"><value>برای ادامه کار باید نسخه جدید را نصب کنید</value></data>
+  <data name="UpdWin_Title" xml:space="preserve"><value>بروزرسانی برنامه</value></data>
+  <data name="UpdWin_Checking" xml:space="preserve"><value>در حال بررسی نسخه جدید…</value></data>
+  <data name="UpdWin_UpToDate" xml:space="preserve"><value>نسخه نصب‌شده شما به‌روز است</value></data>
+  <data name="UpdWin_CheckFailed" xml:space="preserve"><value>بررسی نسخه جدید ناموفق بود؛ اتصال اینترنت را بررسی کنید</value></data>
+  <data name="UpdWin_NewVersion" xml:space="preserve"><value>نسخه جدید {0} در دسترس است</value></data>
+  <data name="UpdWin_Cancel" xml:space="preserve"><value>لغو</value></data>
+  <data name="UpdWin_Retry" xml:space="preserve"><value>تلاش دوباره</value></data>
+  <data name="UpdWin_Close" xml:space="preserve"><value>بستن</value></data>
+  <data name="UpdPrompt_Title" xml:space="preserve"><value>نسخه جدید منتشر شده است</value></data>
+  <data name="UpdPrompt_Msg" xml:space="preserve"><value>نسخه جدید {0} آماده نصب است. هم‌الان دانلود و نصب شود؟</value></data>
+  <data name="UpdPrompt_Yes" xml:space="preserve"><value>بله، نصب کن</value></data>
+  <data name="UpdPrompt_No" xml:space="preserve"><value>خیر</value></data>
   <data name="Ann_Dismiss" xml:space="preserve"><value>بستن</value></data>
   <data name="Ann_View" xml:space="preserve"><value>مشاهده</value></data>
   <data name="Set_AppUpdate" xml:space="preserve"><value>به‌روزرسانی برنامه</value></data>
   <data name="Set_AutoUpdateApp" xml:space="preserve"><value>نصب خودکار نسخه جدید</value></data>
   <data name="Set_AutoUpdateApp_Desc" xml:space="preserve"><value>با فعال بودن این گزینه، برنامه هنگام اجرا نسخه جدید را دانلود و خودکار نصب می‌کند؛ برای اعمال، برنامه بسته و دوباره باز می‌شود.</value></data>
+  <data name="Set_UpdateCheck" xml:space="preserve"><value>بررسی بروزرسانی</value></data>
+  <data name="Set_UpdateChecking" xml:space="preserve"><value>در حال بررسی…</value></data>
+  <data name="Set_UpdateCheck_Desc" xml:space="preserve"><value>نسخه جدید را دستی بررسی می‌کند؛ اگر موجود باشد پنجره‌ای باز می‌شود که دانلود را خودش شروع می‌کند و پس از پایان، برنامه برای نصب بسته و دوباره باز می‌شود.</value></data>
+  <data name="Set_UpdatePrompt" xml:space="preserve"><value>اعلام نسخه جدید هر ۱۰ روز</value></data>
+  <data name="Set_UpdatePrompt_Desc" xml:space="preserve"><value>اگر «نصب خودکار» خاموش باشد و نسخه جدیدی منتشر شده باشد، هر ۱۰ روز یک بار با پنجره‌ای پرسیده می‌شود که آیا نصب شود.</value></data>
   <data name="Set_TunExclude" xml:space="preserve"><value>برنامه‌های معاف از TUN</value></data>
   <data name="Set_TunExclude_Desc" xml:space="preserve"><value>ترافیک این برنامه‌ها از سرور VPN عبور نمی‌کند و با IP واقعی اینترنت می‌روند. این گزینه فقط زمانی که حالت TUN فعال است اثر دارد.</value></data>
   <data name="Set_TunExclude_Note" xml:space="preserve"><value>نکته: این لیست عمومی است و هر برنامه‌ای بر اساس فایلِ اجرایی‌اش پذیرفته می‌شود. در حالت پروکسی (بدون TUN) فقط روی برنامه‌هایی اثر دارد که پروکسی سیستم را رعایت کنند. DNS کل سیستم همچنان از VPN می‌رود، پس ممکن است سایت‌های فیلترشده برای همین برنامه‌ها هم باز شوند.</value></data>

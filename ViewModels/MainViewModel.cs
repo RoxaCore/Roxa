@@ -100,7 +100,7 @@ public partial class MainViewModel : ViewModelBase
       // --- Incremental search state ---
       private List<ServerInfo> _searchPool = new();
       private DateTime _lastSearchTime = DateTime.MinValue;
-      private const int SearchBatchSize = 5;
+      private const int SearchBatchSize = 10;
       private static readonly TimeSpan SearchExpiry = TimeSpan.FromMinutes(15);
 
      public bool ShowSmartConnectButton => !IsSmartConnecting && !IsConnected;

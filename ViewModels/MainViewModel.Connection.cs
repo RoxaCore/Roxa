@@ -379,8 +379,8 @@ public partial class MainViewModel : ViewModelBase
             await Dispatcher.UIThread.InvokeAsync(() => { });
             AutoSortAfterTest("latency");
 
-            // --- Pick the top 12 candidates ---
-            var candidates = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).Take(12).ToList();
+            // --- Pick the top 20 candidates ---
+            var candidates = Servers.Where(s => s.LatencyMs > 0).OrderBy(s => s.LatencyMs).Take(20).ToList();
 
             // Save the remaining servers for the gradual search
             var candidateIds = new HashSet<string>(candidates.Select(c => c.Id));

@@ -3,9 +3,12 @@
 **A VPN client for Windows, built on Xray-core.**
 
 Roxa is a desktop GUI around Xray-core. It supports system-proxy mode and a
-full TUN mode with a kill-switch, per-application bypass, live delay
-measurement, and update notifications. The interface is available in 14
-languages.
+full TUN mode with a kill-switch, per-application bypass, and live delay
+measurement. Servers can be added by hand or fetched from a subscription
+link. Updates arrive inside the app: the new version is downloaded in the
+background and installed when you exit, and Settings holds a manual check
+with its own small download window. The interface is available in 14
+languages, picked on first run.
 
 ---
 
@@ -56,6 +59,26 @@ restored before the files are removed. The install folder and
 
 ---
 
+## Updating
+
+Roxa updates itself — no browser, no manual zip:
+
+- **Automatic (on by default):** a new version is downloaded in the
+  background and installed when you exit the app. The update banner keeps an
+  **Install now** button for installing immediately.
+- **Manual:** Settings → *App Update* → the check button opens a small window
+  that downloads on its own behind a percentage bar (Cancel while it runs,
+  Retry after a failure) and then installs and restarts the app.
+- **The question:** with the automatic install turned off, a yes/no window
+  asks about a pending new version — once per version, and about the same
+  version no more often than every 10 days.
+
+Every download is verified against the SHA-256 that accompanies the release
+before anything is installed; a mismatch aborts the update and the version
+you had stays in place.
+
+---
+
 ## Windows SmartScreen warning
 
 **The installer and `Roxa.exe` are currently not code-signed.** Windows will
@@ -81,10 +104,12 @@ Get-FileHash .\Roxa-Setup-<version>.exe -Algorithm SHA256
 
 ## Reporting a problem
 
-- **In-app:** use the bug report entry in Settings. If you have enabled
-  *Send crash reports*, a report containing the exception and the last 4000
-  characters of the log is queued and uploaded. This is **off by default**
-  and only ever sends what you see in the report preview.
+- **In-app:** use the bug report entry in Settings. A crash is also captured
+  automatically: the exception and the last 4000 characters of the log are
+  scrubbed (URLs, UUIDs and IP addresses), queued locally, and uploaded only
+  when the install's crash-report setting allows it. That setting is **off
+  by default** and is stored per install; anything queued but never sent is
+  deleted after 30 days.
 - **Manually:** the logs are written to the `logs` folder next to `Roxa.exe`
   (`tun.log`, `engine.log`, `parser.log`). Attach the relevant one when you
   report a problem.

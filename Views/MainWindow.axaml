@@ -990,22 +990,6 @@
 
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="12">
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Privacy}" FontWeight="Bold" FontSize="13"/>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <ToggleSwitch IsChecked="{Binding SendUsageStats}" VerticalAlignment="Center"/>
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Stats}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Stats_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_DeviceId}" VerticalAlignment="Center"/>
-                  <TextBlock Text="{Binding DeviceId}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_DeviceId_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
-              </StackPanel>
-            </Border>
-
-            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
-              <StackPanel Spacing="12">
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Reports}" FontWeight="Bold" FontSize="13"/>
                 <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Reports_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
                 <Button Content="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Btn_ReportBug}"

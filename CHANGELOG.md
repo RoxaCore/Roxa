@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The Privacy card is gone from Settings. This is a UI change only: the
+  stored setting keeps driving what it always drove — whether the update
+  check carries the install identifier and connection statistics, and
+  whether a queued crash report is uploaded — with the same off-by-default
+  value on a fresh install.
+
 ## [3.0.13] - 2026-11-01
 
 ### Added

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.13] - 2026-11-01
+
+### Added
+
+- An "App Update" section in Settings with a manual check. The button opens a
+  small window that checks for a new version, downloads it on its own behind a
+  percentage bar, installs it and restarts the app — no browser and no raw zip.
+  Cancel is available while the download runs and Retry once it stops; a failed
+  check says so instead of pretending you are up to date. Closing the window
+  cancels the flow, and the update banner never repaints its progress while the
+  window owns the update (a payload the background path already downloaded is
+  reused, not fetched twice).
+- A periodic update question: with "install new versions automatically" off, a
+  yes/no window now asks about a pending new version — once per version, and
+  about the same version no more often than every 10 days. With the automatic
+  install on nothing is asked, because the download already happens by itself.
+
 ## [3.0.12] - 2026-10-29
 
 ### Fixed

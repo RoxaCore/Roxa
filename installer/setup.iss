@@ -1,11 +1,11 @@
 #define MyAppName "Roxa"
-#define MyAppVersion "3.0.12"
+#define MyAppVersion "3.0.13"
 #define MyAppExeName "Roxa.exe"
 ; ---------------------------------------------------------------------------
 ; دو بیلد از همین یک فایل ساخته می‌شود:
 ;
-;   ISCC setup.iss           -> Roxa-Setup-3.0.12.exe         رانتایم داخلِ خودِ فایل
-;   ISCC /DOnline setup.iss  -> Roxa-Setup-3.0.12-online.exe  رانتایم را هنگامِ نصب
+;   ISCC setup.iss           -> Roxa-Setup-3.0.13.exe         رانتایم داخلِ خودِ فایل
+;   ISCC /DOnline setup.iss  -> Roxa-Setup-3.0.13-online.exe  رانتایم را هنگامِ نصب
 ;                                                         ازِ مایکروسافت می‌گیرد
 ;
 ; در بیلدِ باندل‌شده، فایلِ رانتایم در installer\runtime نشسته (در .gitignore) و

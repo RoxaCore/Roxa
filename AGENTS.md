@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Project Overview
-Roxa (project file `Roxa.csproj`, source folder still named `XrayClient`) is a desktop VPN/proxy client built with Avalonia UI 12.1.2 targeting .NET 8. The UI is in Persian (Farsi) with RTL layout. The product, assembly and process name is `Roxa`.
+Roxa (project file `Roxa.csproj`, source folder still named `XrayClient`) is a desktop VPN/proxy client built with Avalonia UI 12.1.2 targeting .NET 8. The UI ships in 14 languages (`Localization/Languages.cs`), a first-run picker asks for one and the default is English. The product, assembly and process name is `Roxa`.
 
 ## Build & Run
 ```powershell
@@ -39,7 +39,7 @@ if ($p.HasExited) { "CRASHED: exit code $($p.ExitCode)" } else { "RUNNING (PID $
 - **Always call `RefreshConnectionFlags()`** when connection state changes, otherwise UI won't update
 
 ### Sorting
-- ComboBox uses `ItemsSource="{Binding SortOptions}"` with Persian strings: "بدون مرتب", "تأخیر (کم)", "سرعت (بیش)", "نام"
+- ComboBox uses `ItemsSource="{Binding SortOptions}"`; the four labels come from the `Sort_None`, `Sort_Latency`, `Sort_Speed` and `Sort_Name` translation keys — never from hard-coded literals
 - `SortField` property triggers `RefreshGroups()` via `OnSortFieldChanged`
 - Sorting algorithm in `SortServers()` method
 
@@ -52,10 +52,10 @@ if ($p.HasExited) { "CRASHED: exit code $($p.ExitCode)" } else { "RUNNING (PID $
 - Package `Avalonia.Controls.DataGrid` Version 12.1.2 installed (match Avalonia version)
 
 ## Conventions
-- UI language: Persian (Farsi), RTL layout (`FlowDirection="RightToLeft"`)
+- UI language: whatever `TranslationManager` currently holds (14 languages, default `en`); every window sets `FlowDirection` from `TranslationManager.Instance.IsRightToLeft`, so no window may hard-code `RightToLeft`
 - Window name: `x:Name="RootWindow"` (don't change — causes conflicts with class name)
 - All binding paths use `#RootWindow.DataContext` for commands in DataTemplates
-- Default SortField: "بدون مرتب" (no sort)
+- Default SortField: the `Sort_None` translation key (no sort)
 - Server selection checkboxes use `IsChecked="{Binding IsChecked, Mode=TwoWay}"` on ServerInfo
 - Confirm dialogs use custom XAML window with Click handlers (not MessageBox)
 

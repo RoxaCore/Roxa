@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.0.14] - 2026-11-03
 
+### Added
+
+- An "About us" card in Settings: a short description of what the app is
+  for and what it is built with — C# on .NET 8, the Avalonia UI library
+  and the Xray-core engine — plus buttons that open the GitHub
+  repository and roxacore.com in the browser.
+- A "Donate" card in Settings with a button that opens
+  https://roxacore.com/Donate for anyone who wants to support the
+  project. All new strings ship in all 14 languages.
+
 ### Changed
 
 - The Privacy card is gone from Settings. This is a UI change only: the

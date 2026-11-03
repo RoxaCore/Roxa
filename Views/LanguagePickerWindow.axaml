@@ -4,11 +4,18 @@
         Title="Roxa" Width="420" Height="600"
         WindowStartupLocation="CenterScreen"
         CanResize="False">
-  <StackPanel Margin="24" Spacing="14">
-    <TextBlock x:Name="TitleText" FontSize="18" FontWeight="Bold"
+  <!-- Grid, not StackPanel: a StackPanel measures its children with infinite
+       height, so the 14-item list expanded past the fixed window and pushed
+       the Continue button ~114px below the visible edge, out of mouse reach.
+       The bounded middle row makes the list scroll internally and keeps the
+       button on screen at any DPI. -->
+  <Grid Margin="24" RowDefinitions="Auto,*,Auto">
+    <TextBlock x:Name="TitleText" Grid.Row="0" Margin="0,0,0,14"
+               FontSize="18" FontWeight="Bold"
                HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
-    <ListBox x:Name="LangList" FontSize="15" HorizontalAlignment="Stretch"/>
-    <Button x:Name="ContinueBtn" HorizontalAlignment="Stretch" Padding="12,10"
+    <ListBox x:Name="LangList" Grid.Row="1" FontSize="15" HorizontalAlignment="Stretch"/>
+    <Button x:Name="ContinueBtn" Grid.Row="2" Margin="0,14,0,0"
+            HorizontalAlignment="Stretch" Padding="12,10"
             FontSize="14" Click="Continue_Click"/>
-  </StackPanel>
+  </Grid>
 </Window>

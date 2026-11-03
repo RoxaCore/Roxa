@@ -10,11 +10,11 @@ link and connect in one click.**
 
 If you have a subscription link or a server address from a provider, Roxa is
 what turns it into a working connection: it reads the link, keeps a list of
-your servers, measures which one answers fastest and puts you behind it —
-either as a **system proxy** for the apps you choose, or as a **full TUN
-tunnel** with a kill-switch and per-application bypass, so nothing leaks if
-the tunnel drops. It runs on Xray-core, an open-source proxy engine, and it
-is free software under the GPL.
+your servers, measures which one answers fastest and routes your traffic
+through it — either as a **system proxy** for the apps you choose, or as a
+**full TUN tunnel** with a kill-switch and per-application bypass, so
+nothing leaks if the tunnel drops. It runs on Xray-core, an open-source
+proxy engine, and it is free software under the GPL.
 
 The interface ships in 14 languages — فارسی, English, العربية, 中文, Русский,
 Türkçe, اردو, Español, Français, 한국어, Deutsch, 日本語, Português (BR) and
@@ -206,47 +206,30 @@ Roxa is free software under the **GNU General Public License, version 3**
 (or, at your option, any later version). The full license text is in
 [`LICENSE`](LICENSE). Every source file carries the corresponding notice.
 
+The long version of each point below lives in
+[`LICENSE-NOTES.md`](LICENSE-NOTES.md).
+
 ### The name and logo are not covered
 
-The GPL gives you the right to run, study, modify and redistribute the
-*code*. It does not transfer the **"Roxa" name, the logo, or the visual
-identity** of this project — those remain with the Roxa project and are not
-licensed under the GPL.
-
-In practice that means:
-
-- You may fork this code, change it, and distribute your own build.
-- You must keep the GPL notices intact and make your own source available.
-- You must **not** call your build "Roxa", and must **not** reuse the Roxa
-  icon or branding, unless you have written permission from the project.
-- If you redistribute an unmodified build, you may keep calling it Roxa.
-
-This is the trademark reservation permitted by section 7(e) of the GPL. It
-protects users from mistaking an unofficial build for the real one; it does
-not restrict what you do with the code.
+You may fork the code and ship your own build, but the **"Roxa" name, the
+logo and the visual identity** are not licensed under the GPL: a modified
+build must not call itself Roxa or reuse the icon without written
+permission. That is the reservation section 7(e) of the GPL allows, and it
+does not restrict what you do with the code.
 
 ### Third-party components
 
-Third-party components keep their own licenses and are listed in
-[`THIRD-PARTY-NOTICES.txt`](THIRD-PARTY-NOTICES.txt): Xray-core is MPL-2.0,
-Wintun carries the WireGuard Prebuilt Binaries License, both fonts are
-SIL OFL-1.1, and every managed dependency is MIT. The GPL and these licenses
-coexist because Roxa runs those components as **separate programs**, not by
-linking them into a single work.
+Xray-core (MPL-2.0), Wintun, both fonts (SIL OFL-1.1) and every managed
+dependency (MIT) keep their own licenses, listed in
+[`THIRD-PARTY-NOTICES.txt`](THIRD-PARTY-NOTICES.txt). They coexist with the
+GPL because Roxa runs them as separate programs, not by linking them in.
 
 ### Country flag images
 
-The flags in `Assets/Flags/*.png` (90 files) are artwork from
-[Twemoji](https://github.com/jdecked/twemoji) v17.0.3, licensed
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) and credited to
-Jason Sofonia, Justine De Caires, Twitter, Inc. and the other Twemoji
-contributors. Each PNG was cropped to its content and centred on a
-transparent 96x72 canvas so that the images share one size in the server
-list; the artwork itself was not recoloured or redrawn. Roxa claims no
-rights over these files, and they are not covered by the GPL that covers
-the code. The full licence text ships beside them as
-`Assets/Flags/CC-BY-4.0.txt`, with the source and attribution recorded in
-[`THIRD-PARTY-NOTICES.txt`](THIRD-PARTY-NOTICES.txt), section 6.
+The 90 flags are Twemoji artwork under CC BY 4.0, cropped to one size and
+otherwise untouched; they are not covered by the GPL and Roxa claims no
+rights over them. Credits: [`THIRD-PARTY-NOTICES.txt`](THIRD-PARTY-NOTICES.txt),
+section 6.
 
 ---
 

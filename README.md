@@ -71,8 +71,8 @@ neither the runtime nor Roxa can.
 
    | File | Size | Needs internet |
    |---|---|---|
-   | `Roxa-Setup-<version>.exe` | 75.3 MiB | **No** - the .NET Desktop Runtime is packed inside |
-   | `Roxa-Setup-<version>-online.exe` | 19.6 MiB | Only if .NET is missing |
+   | `[Roxa-Setup-<version>.exe]([url](http://roxacore.com/dl/Roxa-Setup-3.0.14-offline.exe))` | 75.3 MiB | **No** - the .NET Desktop Runtime is packed inside |
+   | `[Roxa-Setup-<version>-online.exe]([url](https://roxacore.com/dl/Roxa-Setup-3.0.14.exe))` | 19.6 MiB | Only if .NET is missing |
 
    Pick the offline one on a slow, filtered or metered connection. Both
    install exactly the same program.
@@ -167,7 +167,7 @@ Connections it makes are listed in full in
 
 | Destination | Purpose |
 |---|---|
-| `up.roxacore.com` | Version check, announcements, opt-in crash reports |
+| `roxacore.com` | Version check, announcements, opt-in crash reports |
 | `get.geojs.io`, `ipwho.is` | Country detection, used to target announcements |
 | `api.github.com`, `gh-proxy.com` | Xray-core update check and download |
 | `wintun.net` | TUN driver download |

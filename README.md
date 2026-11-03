@@ -1,16 +1,24 @@
 # Roxa
 
-**A VPN client for Windows, built on Xray-core.**
+**A free VPN client for Windows: paste a VLESS, VMess, Trojan or Shadowsocks
+link and connect in one click.**
 
 ![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)
 ![Platform: Windows x64](https://img.shields.io/badge/platform-Windows%2010%20%26%2011%20x64-0078D6)
 ![.NET 8](https://img.shields.io/badge/.NET-8-512BD4)
 ![Version](https://img.shields.io/badge/version-3.0.14-brightgreen)
 
-Roxa is a desktop GUI around Xray-core: system-proxy or full TUN mode with a
-kill-switch, per-application bypass, live delay measurement, subscriptions,
-and updates that install themselves. The interface ships in 14 languages and
-asks for one on first run.
+If you have a subscription link or a server address from a provider, Roxa is
+what turns it into a working connection: it reads the link, keeps a list of
+your servers, measures which one answers fastest and puts you behind it —
+either as a **system proxy** for the apps you choose, or as a **full TUN
+tunnel** with a kill-switch and per-application bypass, so nothing leaks if
+the tunnel drops. It runs on Xray-core, an open-source proxy engine, and it
+is free software under the GPL.
+
+The interface ships in 14 languages — فارسی, English, العربية, 中文, Русский,
+Türkçe, اردو, Español, Français, 한국어, Deutsch, 日本語, Português (BR) and
+हिन्दी — and asks for one on first run.
 
 **Contents:** [Features](#features) · [Requirements](#requirements) ·
 [Installation](#installation) · [Updating](#updating) ·
@@ -28,11 +36,16 @@ asks for one on first run.
 |---|---|
 | **Smart connect** | One click: a fast TCP ping on every server, a real-delay test on the **top 20** candidates through the tunnel, then connect to the fastest responder. |
 | **Find better** | While connected, checks **10** more servers per batch in the background and switches when one answers faster (15-minute pool). |
+| **Protocols** | Share links in `vless://`, `vmess://`, `trojan://` and `ss://` (Shadowsocks), added one at a time or through a subscription URL. |
 | **Two proxy modes** | System-proxy for everyday use, or full TUN mode with a kill-switch and per-application bypass. |
 | **Subscriptions** | Add servers by hand or paste a subscription URL; lists refresh automatically and can be exported. |
 | **Live measurements** | TCP ping plus real proxied delay with jitter and success rate per server, and a full speed test. |
 | **In-app updates** | Background download and install on exit, a manual check window with progress / cancel / retry, and a 10-day question when auto-install is off. |
-| **14 languages** | Persian, English and 12 more, chosen on first run. |
+| **14 languages** | The list in the intro above, chosen on first run and changeable in Settings. |
+
+The **20** and **10** in the table are fixed values compiled into the
+program, not settings — they exist so one click stays fast on a large
+server list.
 
 ---
 
@@ -52,7 +65,9 @@ neither the runtime nor Roxa can.
 
 ## Installation
 
-1. Download one of two installers:
+1. Download one of two installers from the official download page —
+   **[up.roxacore.com](https://up.roxacore.com/)**, where the *Download*
+   button always offers the current version:
 
    | File | Size | Needs internet |
    |---|---|---|
@@ -73,7 +88,8 @@ neither the runtime nor Roxa can.
    a SHA-256 pinned inside the installer before running it. If anything goes
    wrong, setup opens Microsoft's download page and tells you the reason.
 
-4. Launch Roxa and add a server, or paste a subscription link.
+4. Launch Roxa and add a server by hand (`vless://`, `vmess://`, `trojan://`
+   or `ss://`), or paste a subscription link.
 
 To uninstall, use *Apps & features*. Uninstall runs a cleanup pass first, so
 the TUN adapter, its routes, the firewall rules and the system proxy are all

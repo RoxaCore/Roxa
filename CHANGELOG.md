@@ -19,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Smart connect now real-delay-tests the top 20 candidates instead of 12,
   and Find Better checks 10 servers per batch instead of 5.
 
+### Fixed
+
+- The first-run language picker no longer hides its Continue button below
+  the window edge. A StackPanel gave the 14-item list unbounded height and
+  pushed the button ~114px out of mouse reach, so on a fresh install the
+  language choice could not be confirmed with the mouse. The list now
+  scrolls inside a bounded row and the button stays on screen at any DPI;
+  the selection still opens on English, the product default.
+
 ## [3.0.13] - 2026-11-01
 
 ### Added

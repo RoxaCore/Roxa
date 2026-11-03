@@ -66,7 +66,7 @@ neither the runtime nor Roxa can.
 ## Installation
 
 1. Download one of two installers from the official download page —
-   **[up.roxacore.com](https://up.roxacore.com/)**, where the *Download*
+   **[roxacore.com](https://roxacore.com/)**, where the *Download*
    button always offers the current version:
 
    | File | Size | Needs internet |

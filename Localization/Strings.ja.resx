@@ -538,4 +538,9 @@
   <data name="Log_NetReconnecting" xml:space="preserve"><value>ネットワークの変更後、「{0}」に自動で再接続しています</value></data>
   <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>自動再接続の試行回数が上限に達しました。手動で再接続してください</value></data>
   <data name="Toast_NetDownReconnect" xml:space="preserve"><value>ネットワークが変更され、自動で再接続できませんでした。再接続してください</value></data>
+  <data name="Set_About" xml:space="preserve"><value>私たちについて</value></data>
+  <data name="Set_About_Desc" xml:space="preserve"><value>Roxa は Windows 向けの無料 VPN クライアントです。システムプロキシまたはキルスイッチ付きのフル TUN モードで接続し、実測遅延の計測やサブスクリプションの管理ができます。</value></data>
+  <data name="Set_About_Tech" xml:space="preserve"><value>このアプリは .NET 8 上の C# と Avalonia UI ライブラリで書かれており、接続には Xray-core エンジンを使用しています。</value></data>
+  <data name="Set_Donate" xml:space="preserve"><value>寄付</value></data>
+  <data name="Set_Donate_Desc" xml:space="preserve"><value>Roxa が役に立ったなら、開発とメンテナンスを支援できます。寄付ページは roxacore.com/Donate でご覧いただけます。</value></data>
 </root>

@@ -554,4 +554,9 @@ ID устройства {2}
   <data name="Log_NetReconnecting" xml:space="preserve"><value>Автоматическое переподключение к «{0}» после изменения сети</value></data>
   <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>Автоматическое переподключение не удалось слишком много раз; подключитесь вручную</value></data>
   <data name="Toast_NetDownReconnect" xml:space="preserve"><value>Сеть изменилась, и автоматическое переподключение невозможно; подключитесь снова</value></data>
+  <data name="Set_About" xml:space="preserve"><value>О нас</value></data>
+  <data name="Set_About_Desc" xml:space="preserve"><value>Roxa — бесплатный VPN-клиент для Windows: подключение через системный прокси или полноценный режим TUN с килл-свитчем, замер реальной задержки и управление подписками.</value></data>
+  <data name="Set_About_Tech" xml:space="preserve"><value>Приложение написано на C# на базе .NET 8 с библиотекой интерфейса Avalonia, для соединения используется движок Xray-core.</value></data>
+  <data name="Set_Donate" xml:space="preserve"><value>Поддержать</value></data>
+  <data name="Set_Donate_Desc" xml:space="preserve"><value>Если Roxa вам полезен, вы можете поддержать его разработку и поддержку. Страница пожертвований доступна по адресу roxacore.com/Donate.</value></data>
 </root>

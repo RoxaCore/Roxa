@@ -601,4 +601,9 @@
   <data name="Log_SubExported" xml:space="preserve"><value>اشتراک‌ها در {0} ذخیره شد</value></data>
   <data name="Status_SubStoredInClear" xml:space="preserve"><value>هشدار: لینک‌های اشتراک به‌صورت متنِ ساده روی دیسک ذخیره شدند</value></data>
   <data name="Toast_SubStoredInClear" xml:space="preserve"><value>رمزنگاریِ اشتراک‌ها در دسترس نبود؛ فایل متنی نوشته شد و در ذخیرهٔ بعدی دوباره رمزنگاری می‌شود</value></data>
+  <data name="Set_About" xml:space="preserve"><value>درباره ما</value></data>
+  <data name="Set_About_Desc" xml:space="preserve"><value>Roxa یک کلاینت VPN رایگان برای ویندوز است که اتصال از طریق پروکسی سیستم یا حالت TUN کامل (با سوییچ قاتل) را همراه با تست تاخیر واقعی و مدیریت اشتراک‌ها در اختیار شما می‌گذارد.</value></data>
+  <data name="Set_About_Tech" xml:space="preserve"><value>این برنامه با زبان C# روی فریم‌ورک .NET 8 و با کتابخانهٔ رابط کاربری Avalonia نوشته شده و از موتور Xray-core برای برقراری اتصال بهره می‌برد.</value></data>
+  <data name="Set_Donate" xml:space="preserve"><value>حمایت مالی (Donate)</value></data>
+  <data name="Set_Donate_Desc" xml:space="preserve"><value>اگر Roxa برایتان مفید بود، می‌توانید با حمایت مالی به توسعه و نگهداری آن کمک کنید. صفحهٔ حمایت مالی در نشانی roxacore.com/Donate در دسترس است.</value></data>
 </root>

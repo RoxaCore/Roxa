@@ -240,6 +240,23 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void OpenDnsSettings() => OpenDnsSettingsHandler?.Invoke();
 
+    // About / Donate links (settings page): handed to the OS so the default
+    // browser opens them. The app itself never fetches these addresses, so a
+    // broken link only costs a browser tab, never the program.
+    [RelayCommand]
+    private void OpenLink(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return;
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url)
+            {
+                UseShellExecute = true
+            });
+        }
+        catch { }
+    }
+
     [ObservableProperty] private ObservableCollection<TunExcludedItem> _tunExcludedApps = new();
     [ObservableProperty] private bool _tunExcludedEmpty = true;
 

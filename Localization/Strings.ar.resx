@@ -554,4 +554,9 @@
   <data name="Log_NetReconnecting" xml:space="preserve"><value>إعادة الاتصال تلقائيًا بـ «{0}» بعد تغيّر الشبكة</value></data>
   <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>فشلت إعادة الاتصال التلقائية مرات كثيرة؛ يرجى إعادة الاتصال يدويًا</value></data>
   <data name="Toast_NetDownReconnect" xml:space="preserve"><value>تغيّرت الشبكة ولم تكن إعادة الاتصال التلقائية ممكنة؛ يرجى إعادة الاتصال</value></data>
+  <data name="Set_About" xml:space="preserve"><value>من نحن</value></data>
+  <data name="Set_About_Desc" xml:space="preserve"><value>Roxa عميل VPN مجاني لنظام Windows يتصل عبر وكيل النظام أو وضع TUN الكامل مع مفتاح الإيقاف، ويقيس التأخير الحقيقي ويدير الاشتراكات.</value></data>
+  <data name="Set_About_Tech" xml:space="preserve"><value>كُتب التطبيق بلغة C# على إطار .NET 8 مع مكتبة واجهة Avalonia، ويستخدم محرك Xray-core لإجراء الاتصال.</value></data>
+  <data name="Set_Donate" xml:space="preserve"><value>تبرع</value></data>
+  <data name="Set_Donate_Desc" xml:space="preserve"><value>إذا كان Roxa مفيدًا لك، يمكنك دعم تطويره وصيانته. صفحة التبرع متاحة على العنوان roxacore.com/Donate.</value></data>
 </root>

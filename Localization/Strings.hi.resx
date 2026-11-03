@@ -538,4 +538,9 @@
   <data name="Log_NetReconnecting" xml:space="preserve"><value>नेटवर्क बदलने के बाद "{0}" को स्वतः पुनः कनेक्ट किया जा रहा है</value></data>
   <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>स्वतः पुनः कनेक्ट बहुत बार विफल रहा; कृपया स्वयं पुनः कनेक्ट करें</value></data>
   <data name="Toast_NetDownReconnect" xml:space="preserve"><value>नेटवर्क बदल गया और स्वतः पुनः कनेक्ट संभव नहीं हुआ; कृपया पुनः कनेक्ट करें</value></data>
+  <data name="Set_About" xml:space="preserve"><value>हमारे बारे में</value></data>
+  <data name="Set_About_Desc" xml:space="preserve"><value>Roxa विंडोज़ के लिए एक मुफ़्त VPN क्लाइंट है: यह सिस्टम प्रॉक्सी या किल-स्विच सहित पूर्ण TUN मोड से जुड़ता है, वास्तविक देरी मापता है और सब्सक्रिप्शन प्रबंधित करता है।</value></data>
+  <data name="Set_About_Tech" xml:space="preserve"><value>ऐप C# पर .NET 8 और Avalonia UI लाइब्रेरी के साथ लिखा गया है और कनेक्शन के लिए Xray-core इंजन का उपयोग करता है।</value></data>
+  <data name="Set_Donate" xml:space="preserve"><value>दान करें</value></data>
+  <data name="Set_Donate_Desc" xml:space="preserve"><value>अगर Roxa आपके लिए उपयोगी है तो आप इसके विकास और रखरखाव में सहायता कर सकते हैं। दान पेज roxacore.com/Donate पर उपलब्ध है।</value></data>
 </root>

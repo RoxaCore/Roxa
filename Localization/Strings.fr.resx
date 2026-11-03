@@ -556,4 +556,9 @@ ID d'appareil {2}
   <data name="Log_NetReconnecting" xml:space="preserve"><value>Reconnexion automatique à « {0} » après un changement de réseau</value></data>
   <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>La reconnexion automatique a échoué trop de fois ; veuillez vous reconnecter manuellement</value></data>
   <data name="Toast_NetDownReconnect" xml:space="preserve"><value>Le réseau a changé et la reconnexion automatique n'a pas été possible ; veuillez vous reconnecter</value></data>
+  <data name="Set_About" xml:space="preserve"><value>À propos</value></data>
+  <data name="Set_About_Desc" xml:space="preserve"><value>Roxa est un client VPN gratuit pour Windows : il se connecte via le proxy système ou en mode TUN complet avec kill-switch, mesure le délai réel et gère les abonnements.</value></data>
+  <data name="Set_About_Tech" xml:space="preserve"><value>L'application est écrite en C# sur .NET 8 avec la bibliothèque d'interface Avalonia et utilise le moteur Xray-core pour la connexion.</value></data>
+  <data name="Set_Donate" xml:space="preserve"><value>Faire un don</value></data>
+  <data name="Set_Donate_Desc" xml:space="preserve"><value>Si Roxa vous est utile, vous pouvez soutenir son développement et sa maintenance. La page de dons est disponible sur roxacore.com/Donate.</value></data>
 </root>

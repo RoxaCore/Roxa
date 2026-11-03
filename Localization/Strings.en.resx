@@ -593,4 +593,9 @@ State: {3}</value>
   <data name="Log_SubExported" xml:space="preserve"><value>Subscriptions written to {0}</value></data>
   <data name="Status_SubStoredInClear" xml:space="preserve"><value>Warning: your subscription links were stored on disk as plain text</value></data>
   <data name="Toast_SubStoredInClear" xml:space="preserve"><value>Encrypting subscriptions was not available, so the file was written as plain text and will be encrypted again on the next save</value></data>
+  <data name="Set_About" xml:space="preserve"><value>About us</value></data>
+  <data name="Set_About_Desc" xml:space="preserve"><value>Roxa is a free VPN client for Windows: it connects through the system proxy or full TUN mode with a kill-switch, measures real delay, and manages subscriptions.</value></data>
+  <data name="Set_About_Tech" xml:space="preserve"><value>The app is written in C# on .NET 8 with the Avalonia UI library, and uses the Xray-core engine for the connection.</value></data>
+  <data name="Set_Donate" xml:space="preserve"><value>Donate</value></data>
+  <data name="Set_Donate_Desc" xml:space="preserve"><value>If Roxa is useful to you, you can support its development and maintenance. The donation page is available at roxacore.com/Donate.</value></data>
 </root>

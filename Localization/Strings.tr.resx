@@ -895,4 +895,9 @@ Durum: {3}</value>
   <data name="Log_NetReconnecting" xml:space="preserve"><value>Ağ değişikliğinden sonra "{0}" otomatik yeniden bağlanıyor</value></data>
   <data name="Log_NetReconnectGaveUp" xml:space="preserve"><value>Otomatik yeniden bağlanma çok kez başarısız oldu; lütfen elle yeniden bağlanın</value></data>
   <data name="Toast_NetDownReconnect" xml:space="preserve"><value>Ağ değişti ve otomatik yeniden bağlanma mümkün olmadı; lütfen yeniden bağlanın</value></data>
+  <data name="Set_About" xml:space="preserve"><value>Hakkımızda</value></data>
+  <data name="Set_About_Desc" xml:space="preserve"><value>Roxa, Windows için ücretsiz bir VPN istemcisidir: sistem proxy'si veya tam TUN modu (kill-switch ile) üzerinden bağlanır, gecikmeyi gerçek ölçer ve abonelikleri yönetir.</value></data>
+  <data name="Set_About_Tech" xml:space="preserve"><value>Uygulama, C# ile .NET 8 üzerinde ve Avalonia arayüz kütüphanesiyle yazılmıştır; bağlantı için Xray-core motorunu kullanır.</value></data>
+  <data name="Set_Donate" xml:space="preserve"><value>Bağış yap</value></data>
+  <data name="Set_Donate_Desc" xml:space="preserve"><value>Roxa size faydalıysa, geliştirilmesine ve bakımına destek olabilirsiniz. Bağış sayfası roxacore.com/Donate adresinde mevcuttur.</value></data>
 </root>

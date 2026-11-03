@@ -71,24 +71,25 @@ neither the runtime nor Roxa can.
 
    | File | Size | Needs internet |
    |---|---|---|
-   | [Roxa-Setup-<version>.exe](https://roxacore.com/dl/Roxa-Setup-3.0.14.exe) | 75.3 MiB | **No** - the .NET Desktop Runtime is packed inside |
    | [Roxa-Setup-<version>-online.exe](https://roxacore.com/dl/Roxa-Setup-3.0.14.exe) | 19.6 MiB | Only if .NET is missing |
+   | [Roxa-Setup-<version>.exe-offline](https://roxacore.com/dl/Roxa-Setup-3.0.14.exe) | 75.3 MiB | **No** - the .NET Desktop Runtime is packed inside |
+   
 
    Pick the offline one on a slow, filtered or metered connection. Both
    install exactly the same program.
 
-2. Run it. Setup asks for administrator rights once and installs
+3. Run it. Setup asks for administrator rights once and installs
    **per-machine** into `C:\Program Files\Roxa`, which a normal account
    cannot write to.
 
-3. If the .NET Desktop Runtime is missing, the offline installer installs
+4. If the .NET Desktop Runtime is missing, the offline installer installs
    it silently. The online installer downloads it from Microsoft while you
    watch — live megabyte counter, working **Cancel**, a 10-minute deadline
    and an abort after 90 seconds without progress — and verifies it against
    a SHA-256 pinned inside the installer before running it. If anything goes
    wrong, setup opens Microsoft's download page and tells you the reason.
 
-4. Launch Roxa and add a server by hand (`vless://`, `vmess://`, `trojan://`
+5. Launch Roxa and add a server by hand (`vless://`, `vmess://`, `trojan://`
    or `ss://`), or paste a subscription link.
 
 To uninstall, use *Apps & features*. Uninstall runs a cleanup pass first, so

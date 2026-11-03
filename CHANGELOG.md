@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.14] - 2026-11-03
+
 ### Changed
 
 - The Privacy card is gone from Settings. This is a UI change only: the
@@ -14,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   check carries the install identifier and connection statistics, and
   whether a queued crash report is uploaded — with the same off-by-default
   value on a fresh install.
+- Smart connect now real-delay-tests the top 20 candidates instead of 12,
+  and Find Better checks 10 servers per batch instead of 5.
 
 ## [3.0.13] - 2026-11-01
 

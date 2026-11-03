@@ -2,13 +2,37 @@
 
 **A VPN client for Windows, built on Xray-core.**
 
-Roxa is a desktop GUI around Xray-core. It supports system-proxy mode and a
-full TUN mode with a kill-switch, per-application bypass, and live delay
-measurement. Servers can be added by hand or fetched from a subscription
-link. Updates arrive inside the app: the new version is downloaded in the
-background and installed when you exit, and Settings holds a manual check
-with its own small download window. The interface is available in 14
-languages, picked on first run.
+![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)
+![Platform: Windows x64](https://img.shields.io/badge/platform-Windows%2010%20%26%2011%20x64-0078D6)
+![.NET 8](https://img.shields.io/badge/.NET-8-512BD4)
+![Version](https://img.shields.io/badge/version-3.0.14-brightgreen)
+
+Roxa is a desktop GUI around Xray-core: system-proxy or full TUN mode with a
+kill-switch, per-application bypass, live delay measurement, subscriptions,
+and updates that install themselves. The interface ships in 14 languages and
+asks for one on first run.
+
+**Contents:** [Features](#features) · [Requirements](#requirements) ·
+[Installation](#installation) · [Updating](#updating) ·
+[SmartScreen](#windows-smartscreen-warning) ·
+[Reporting a problem](#reporting-a-problem) ·
+[What Roxa sends](#what-roxa-sends) ·
+[Building from source](#building-from-source) · [License](#license) ·
+[Security and privacy](#security-and-privacy)
+
+---
+
+## Features
+
+| | |
+|---|---|
+| **Smart connect** | One click: a fast TCP ping on every server, a real-delay test on the **top 20** candidates through the tunnel, then connect to the fastest responder. |
+| **Find better** | While connected, checks **10** more servers per batch in the background and switches when one answers faster (15-minute pool). |
+| **Two proxy modes** | System-proxy for everyday use, or full TUN mode with a kill-switch and per-application bypass. |
+| **Subscriptions** | Add servers by hand or paste a subscription URL; lists refresh automatically and can be exported. |
+| **Live measurements** | TCP ping plus real proxied delay with jitter and success rate per server, and a full speed test. |
+| **In-app updates** | Background download and install on exit, a manual check window with progress / cancel / retry, and a 10-day question when auto-install is off. |
+| **14 languages** | Persian, English and 12 more, chosen on first run. |
 
 ---
 

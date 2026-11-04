@@ -27,7 +27,14 @@ public static class TunRecovery
     public static bool LeftoverNeedsAdmin { get; private set; }
     private static int _cleanupDone;
 
-    public static void RecoverOnStartup()
+    /// <param name="sweepDeadProxy">
+    /// The "any dead loopback proxy" fallback in <see cref="CleanupStaleProxy"/>.
+    /// The boot task passes false: at logon another tool's proxy (v2rayN on
+    /// 127.0.0.1:10809, for one) may simply not be listening yet, and clearing
+    /// it would break the user's own setup. Our own leftovers are covered by
+    /// RestoreProxyIfOurs above, which matches the value we recorded.
+    /// </param>
+    public static void RecoverOnStartup(bool sweepDeadProxy = true)
     {
         if (!OperatingSystem.IsWindows()) return;
         try
@@ -42,7 +49,7 @@ public static class TunRecovery
             // If the state file is missing, RestoreFromState does nothing;
             // this line searches directly for a leftover 127.0.0.1 DNS (with no service on :53).
             TunDns.SweepDeadAdapters(out bool dnsStaleNeedsAdmin);
-            CleanupStaleProxy();
+            if (sweepDeadProxy) CleanupStaleProxy();
 
             int swept = IpRoute.SweepOrphanRoutes(state);
             if (swept > 0) TunManager.Log($"Recovery removed {swept} leftover route(s).");

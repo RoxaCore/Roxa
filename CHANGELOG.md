@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The internet no longer stays dead after a reboot until Roxa is opened.
+  A TUN session leaves 127.0.0.1 in the physical adapter's DNS, that value
+  lives in the registry, and a reboot mid-session kept it: after the next
+  boot nothing listened on :53, so every name lookup failed until the user
+  happened to open the app, whose startup recovery was the only thing that
+  swept it back. The program now registers a "Roxa Boot Recovery" task
+  whenever it runs elevated, and at every logon that task runs
+  `Roxa.exe --recover` — the same recovery, headless, and only when no
+  other instance is running. Uninstall removes the task again. The boot
+  sweep skips the dead-loopback proxy fallback, so another tool's proxy
+  that has not started yet (v2rayN on 127.0.0.1:10809) is never cleared
+  by mistake.
+
 ## [3.0.14] - 2026-11-03
 
 ### Added

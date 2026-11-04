@@ -79,7 +79,43 @@ sealed class Program
             try { Core.TunKillSwitch.CleanupLeftovers(); } catch { }
             try { Core.TestRouteBypass.ReleaseOrphanedHostRoutes(); } catch { }
             try { Core.TunRecovery.EmergencyCleanup(); } catch { }
+            // The boot task must not outlive the program it points at.
+            try { Core.BootRecoveryTask.Remove(); } catch { }
             try { Core.TunManager.FlushLog(); } catch { }
+            return;
+        }
+
+        // Headless boot recovery, run by the "Roxa Boot Recovery" scheduled task
+        // at logon. A TUN session leaves 127.0.0.1 in the adapter's DNS, and a
+        // reboot mid-session leaves it there for good: after the next boot
+        // nothing listens on :53, so the machine has no name resolution at all
+        // until this program is opened and its startup recovery runs. Doing it
+        // from a task means the repair happens whether or not anyone opens Roxa.
+        //
+        // Never run it under a live instance: that instance recovered when it
+        // started, and sweeping DNS, routes and firewall rules out from under a
+        // working connection would break it. The single-instance mutex is the
+        // signal - it exists exactly while an instance is up. When it cannot be
+        // opened at all (ACL across sessions), assume an instance is there.
+        //
+        // Unlike --cleanup it skips the dead-loopback proxy fallback: at logon
+        // a foreign proxy on 127.0.0.1 may just not be listening yet.
+        if (Array.Exists(args, a => a == "--recover"))
+        {
+            bool instanceRunning;
+            try { using var m = Mutex.OpenExisting(MutexName); instanceRunning = true; }
+            catch (WaitHandleCannotBeOpenedException) { instanceRunning = false; }
+            catch { instanceRunning = true; }
+
+            if (!instanceRunning)
+            {
+                try { Core.TunRecovery.RecoverOnStartup(sweepDeadProxy: false); } catch { }
+                try { Core.TunExclusion.CleanupLeftovers(); } catch { }
+                try { Core.TunKillSwitch.CleanupLeftovers(); } catch { }
+                try { Core.TestRouteBypass.ReleaseOrphanedHostRoutes(); } catch { }
+                try { Core.TunRecovery.EmergencyCleanup(); } catch { }
+                try { Core.TunManager.FlushLog(); } catch { }
+            }
             return;
         }
 
@@ -167,6 +203,14 @@ sealed class Program
         }
 
         try { Core.UpdateApplier.CleanupStaging(); } catch { }
+
+        // Register the boot-recovery task while we know we are elevated - a TUN
+        // user always passes through an elevated instance, because connecting
+        // asks for UAC - and in the background, so the PowerShell call cannot
+        // delay the window. Re-registering on every start keeps the action
+        // pointing at this exe after a portable copy is moved.
+        if (Core.AdminHelper.IsRunningAsAdmin())
+            System.Threading.Tasks.Task.Run(static () => Core.BootRecoveryTask.EnsureRegistered());
 
         using var showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, ShowSignalName);
         ThreadPool.RegisterWaitForSingleObject(showSignal, static (_, _) =>

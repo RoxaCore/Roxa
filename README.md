@@ -97,6 +97,16 @@ restored before the files are removed. The install folder and
 `%ProgramData%\Roxa` go with it; your servers and settings in
 `%APPDATA%\Roxa` are left in place.
 
+### Portable (no install)
+
+The same build is also published as a zip on the GitHub Releases page —
+**[github.com/RoxaCore/Roxa/releases](https://github.com/RoxaCore/Roxa/releases/latest)**.
+Extract `Roxa-<version>-portable.zip` anywhere and run `Roxa.exe`: no
+installer, and no administrator rights until you connect in TUN mode.
+Servers and settings are stored in `%APPDATA%\Roxa`, exactly like the
+installed copy. The portable build needs the .NET Desktop Runtime 8 that the
+installers bring; if it is missing, install it once from Microsoft.
+
 ---
 
 ## Updating

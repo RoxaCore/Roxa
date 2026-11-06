@@ -92,7 +92,10 @@ public partial class MainViewModel : ViewModelBase
         if (_remoteStarted) return;
         _remoteStarted = true;
         _ = CheckRemoteAsync();
-        _remoteTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(60) };
+        // Every 15 minutes so the server's 30-minute "online" window always
+        // covers the gap between two check-ins (it used to be 60 minutes, which
+        // made the dashboard count a fraction of the real online users).
+        _remoteTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(15) };
         _remoteTimer.Tick += (_, _) => _ = CheckRemoteAsync();
         _remoteTimer.Start();
     }

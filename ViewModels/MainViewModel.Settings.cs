@@ -187,8 +187,17 @@ public partial class MainViewModel : ViewModelBase
     {
         _settings.SendUsageStats = value;
         SaveSettings();
-        // Explicitly turning it off means "not right now", so whatever was already
-        // queued must go too, rather than waiting for a consent that was never given.
+    }
+
+    // The crash queue is drained when this switch goes off: "not right now"
+    // means what is already queued must go too, rather than waiting for a
+    // consent that was never given.
+    [ObservableProperty] private bool _sendCrashReports;
+
+    partial void OnSendCrashReportsChanged(bool value)
+    {
+        _settings.SendCrashReports = value;
+        SaveSettings();
         if (!value) Core.BugReport.DiscardPending();
     }
 

@@ -291,7 +291,9 @@ ID d'appareil {2}
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>Internet est OK : le chemin direct est sain ; le tunnel ne répond pas après le changement de réseau</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>Confidentialité</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>Envoyer les statistiques de connexion au panneau</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>Toutes les 60 minutes, la version, la langue, le pays et l'ID d'appareil sont envoyés au panneau pour vérifier les mises à jour. Les désactiver conserve la vérification des mises à jour mais n'envoie aucun ID ni statistique ; votre nom d'ordinateur n'est jamais envoyé.</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>Toutes les 15 minutes, la version, la langue, le pays et l'ID d'appareil sont envoyés au panneau pour vérifier les mises à jour. Les désactiver conserve la vérification des mises à jour mais n'envoie aucun ID ni statistique ; votre nom d'ordinateur n'est jamais envoyé.</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>Envoyer automatiquement les rapports de plantage</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>Désactivé par défaut. Une fois activé, après un plantage les détails de l'erreur, les 4 000 derniers caractères du journal et votre ID d'appareil sont envoyés au développeur ; le désactiver vide la file d'attente.</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>ID d'appareil</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>Un ID unique généré par l'application pour ce système (pas votre nom d'ordinateur), affiché dans le panneau d'administration.</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>Une connexion résiduelle d'une exécution précédente a été trouvée.&amp;#10;Pour un nettoyage complet, l'application doit être relancée en tant qu'administrateur.</value></data>

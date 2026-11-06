@@ -300,7 +300,9 @@
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>اینترنت قطع نیست: مسیر مستقیم سالم است، تونل بعد از تغییر شبکه پاسخ نمی‌دهد</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>حریم خصوصی</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>ارسال آمار اتصال به پنل</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>هر ۶۰ دقیقه نسخهٔ برنامه، زبان، کشور و شناسهٔ دستگاه برای بررسی بهروزرسانی به پنل فرستاده می‌شود. با خاموش کردن این گزینه، بررسی بهروزرسانی همچنان انجام می‌شود اما هیچ شناسه یا آماری ارسال نخواهد شد؛ نام رایانه هرگز فرستاده نمی‌شود.</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>هر ۱۵ دقیقه نسخهٔ برنامه، زبان، کشور و شناسهٔ دستگاه برای بررسی بهروزرسانی به پنل فرستاده می‌شود. با خاموش کردن این گزینه، بررسی بهروزرسانی همچنان انجام می‌شود اما هیچ شناسه یا آماری ارسال نخواهد شد؛ نام رایانه هرگز فرستاده نمی‌شود.</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>ارسال خودکار گزارش خرابی</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>به‌صورت پیش‌فرض خاموش است؛ وقتی روشن باشد، پس از کرش برنامه جزئیات خطا و ۴۰۰۰ کاراکتر آخر لاگ به‌همراه شناسهٔ دستگاه برای توسعه‌دهنده فرستاده می‌شود. خاموش کردن این گزینه، صفِ گزارش‌های ذخیره‌شده را پاک می‌کند.</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>شناسهٔ دستگاه</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>شناسهٔ یکتایی که خود برنامه برای همین سیستم ساخته است (نه نام رایانه) و در پنل مدیریت نمایش داده می‌شود.</value></data>
   <data name="Home_SwitchingServer" xml:space="preserve"><value>در حال اتصال به سرور جدید</value></data>

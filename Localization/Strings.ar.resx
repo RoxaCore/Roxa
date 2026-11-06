@@ -289,7 +289,9 @@
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>الإنترنت ليس مقطوعًا: المسار المباشر سليم لكن النفق لا يستجيب بعد تغيير الشبكة</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>الخصوصية</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>إرسال إحصاءات الاتصال إلى اللوحة</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>كل 60 دقيقة تُرسل إصدار البرنامج واللغة والبلد ومعرّف الجهاز إلى اللوحة للتحقق من التحديثات. عند إيقاف ذلك يستمر فحص التحديثات لكن دون إرسال أي معرّف أو إحصاءات؛ ولا يُرسل اسم حاسوبك أبدًا.</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>كل 15 دقيقة تُرسل إصدار البرنامج واللغة والبلد ومعرّف الجهاز إلى اللوحة للتحقق من التحديثات. عند إيقاف ذلك يستمر فحص التحديثات لكن دون إرسال أي معرّف أو إحصاءات؛ ولا يُرسل اسم حاسوبك أبدًا.</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>إرسال تقارير الأعطال تلقائيًا</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>معطّل افتراضيًا. عند تفعيله تُرسل تفاصيل الخطأ وآخر 4000 حرف من السجل ومعرّف الجهاز للمطوّر بعد الانهيار؛ وإيقافه يفرغ قائمة الانتظار.</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>معرّف الجهاز</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>معرّف فريد يولّده البرنامج لهذا النظام (وليس اسم حاسوبك) ويُعرض في لوحة الإدارة.</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>تم العثور على اتصال متبقٍّ من تشغيل سابق.&amp;#10;لإتمام التنظيف، يجب إعادة تشغيل البرنامج بصلاحيات المسؤول.</value></data>

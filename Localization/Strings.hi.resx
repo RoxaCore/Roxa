@@ -273,7 +273,9 @@
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>इंटरनेट ठीक है: सीधा रास्ता स्वस्थ है; नेटवर्क बदलने के बाद टनल जवाब नहीं दे रहा</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>गोपनीयता</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>कनेक्शन आँकड़े पैनल को भेजें</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>हर 60 मिनट में ऐप संस्करण, भाषा, देश और डिवाइस ID अपडेट जाँच के लिए पैनल को भेजा जाता है। इसे बंद करने पर अपडेट जाँच चलती रहती है लेकिन कोई ID या आँकड़े नहीं भेजे जाते; आपका कंप्यूटर नाम कभी नहीं भेजा जाता।</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>हर 15 मिनट में ऐप संस्करण, भाषा, देश और डिवाइस ID अपडेट जाँच के लिए पैनल को भेजा जाता है। इसे बंद करने पर अपडेट जाँच चलती रहती है लेकिन कोई ID या आँकड़े नहीं भेजे जाते; आपका कंप्यूटर नाम कभी नहीं भेजा जाता।</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>क्रैश रिपोर्ट स्वतः भेजें</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>डिफ़ॉल्ट रूप से बंद। चालू करने पर क्रैश के बाद त्रुटि विवरण, लॉग के अंतिम 4,000 अक्षर और डिवाइस ID डेवलपर को भेजे जाते हैं; बंद करने पर कतार खाली हो जाती है।</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>डिवाइस ID</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>इस सिस्टम के लिए ऐप द्वारा बनाया गया अद्वितीय ID (आपका कंप्यूटर नाम नहीं), प्रबंधन पैनल में दिखता है।</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>पिछले रन से बचा हुआ कनेक्शन मिला।&amp;#10;पूरी सफाई के लिए ऐप को एडमिन के रूप में पुनः आरंभ करना होगा।</value></data>

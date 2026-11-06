@@ -289,7 +289,9 @@
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>网络正常：直连路径健康；切换网络后隧道无响应</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>隐私</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>向面板发送连接统计</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>每60分钟将版本、语言、国家/地区和设备 ID 发送到面板以检查更新。关闭后仍会检查更新，但不会发送任何 ID 或统计信息；计算机名称永不发送。</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>每15分钟将版本、语言、国家/地区和设备 ID 发送到面板以检查更新。关闭后仍会检查更新，但不会发送任何 ID 或统计信息；计算机名称永不发送。</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>自动发送崩溃报告</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>默认关闭。开启后，崩溃时会把错误详情、最近 4000 字符日志和设备 ID 发送给开发者；关闭会清空待发送队列。</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>设备 ID</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>程序为本系统生成的唯一 ID（不是计算机名称），在管理面板中显示。</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>发现上次运行残留的连接。&amp;#10;要完全清理，需要以管理员身份重新启动程序。</value></data>

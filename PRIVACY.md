@@ -2,9 +2,10 @@
 
 **Short version:** Roxa has no telemetry, no analytics, no advertising and no
 crash reporting by default. It makes only the network connections listed
-below.
+below — including a version check every 15 minutes that carries an anonymous
+install identifier unless you switch that off in Settings › Privacy.
 
-Last reviewed: 2026-10-15, against Roxa 3.0.8.
+Last reviewed: 2026-11-06, against Roxa 3.0.14.
 
 ## What stays on your machine
 
@@ -34,8 +35,8 @@ sooner, deleting `%TEMP%\roxa-config-*.json` while Roxa is closed is safe.
 
 | Destination | Sent | Received | When |
 |---|---|---|---|
-| `up.roxacore.com/api/check.php` | App version, interface language, country code, **install identifier**, a one-way hash of the address you came from, and (only if *Send usage statistics* is on) the number of connections you have made | Available update, announcements | On start, then **every 60 minutes** |
-| `up.roxacore.com/api/announcements.php` | Last-seen announcement id, language, country code | Announcements | On start, then every 60 minutes |
+| `up.roxacore.com/api/check.php` | App version, interface language, country code; and, while *Send connection stats to the panel* is on (**default: on**, switch in Settings › Privacy), your **install identifier**, the number of connections you have made and a one-way hash of the address you came from | Available update, announcements | On start, then **every 15 minutes** |
+| `up.roxacore.com/api/announcements.php` | Last-seen announcement id, language, country code | Announcements | On start, then every 15 minutes |
 | `up.roxacore.com/api/report.php` | Crash report: exception, up to 4 000 characters of log tail, install identifier, and a one-way hash of the address you came from | — | **Only if you turn on "Send crash reports"** |
 | `get.geojs.io`, `ipwho.is` | Your IP address (implicitly — you cannot ask for a country without revealing it) | Country code | On every check **while you are not connected**. The result is cached in `settings.json` and is not requested again while the tunnel is up |
 | `api.github.com/repos/XTLS/Xray-core/releases/latest` | Your IP address (implicitly — any web request reveals it) | Xray-core release metadata | When checking for an engine update |
@@ -53,9 +54,13 @@ you ask for them, or automatically if you enable *Auto-update subscriptions*.
 
 A random GUID is generated on first run and stored in `settings.json`. It is
 **not tied to crash reporting** — it is sent with every version check, which
-happens on start and then every 60 minutes, and additionally with crash
+happens on start and then every 15 minutes, and additionally with crash
 reports if you have enabled those. The server therefore knows how many
-installs are checking in and how often, but nothing else about you.
+installs are checking in and how often, but nothing else about you. The whole
+row is controlled by one switch, *Send connection stats to the panel* in
+Settings › Privacy: it is on by default, and turning it off stops sending the
+identifier, the connection count and the source hash — the version check
+itself keeps working.
 
 It contains no personal information and cannot be traced to you by itself.
 You can remove it by deleting the `ClientId` entry from `settings.json` while
@@ -121,7 +126,10 @@ yourself is sent as you wrote it.
 
 ## What Roxa does not do
 
-- No telemetry, analytics, crash analytics, or usage statistics.
+- No telemetry, analytics, or crash analytics. The version check carries your
+  install identifier and connection count only while *Send connection stats to
+  the panel* stays on — it defaults to on, and one switch in Settings ›
+  Privacy turns it off completely.
 - No advertising, tracking pixels, or third-party SDKs.
 - No selling or sharing of data with third parties.
 - No reading of your browsing history, files, or other applications' data.

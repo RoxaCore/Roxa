@@ -997,6 +997,29 @@
               </StackPanel>
             </Border>
 
+            <!-- Privacy: the two switches behind the panel's counters — the install
+                 id / online count, and the crash queue (off by default). -->
+            <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Privacy}" FontWeight="Bold" FontSize="13"/>
+                <StackPanel Spacing="4">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ToggleSwitch IsChecked="{Binding SendUsageStats}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Stats}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                  </StackPanel>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_Stats_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+                </StackPanel>
+                <Border Height="1" Background="{StaticResource BorderLight}"/>
+                <StackPanel Spacing="4">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ToggleSwitch IsChecked="{Binding SendCrashReports}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_CrashReports}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                  </StackPanel>
+                  <TextBlock Text="{Binding Converter={x:Static loc:TranslateConverter.Instance}, ConverterParameter=Set_CrashReports_Desc}" FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
             <!-- About: what the program does, what it is built with, and the two official links. -->
             <Border CornerRadius="6" Padding="16" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderLight}" BorderThickness="1">
               <StackPanel Spacing="8">

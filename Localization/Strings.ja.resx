@@ -273,7 +273,9 @@
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>インターネットは問題ありません：直接経路は正常、ネットワーク変更後にトンネルが応答しません</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>プライバシー</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>接続統計をパネルへ送信</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>60分ごとにアプリのバージョン、言語、国、デバイスIDを更新確認のためパネルへ送信します。オフにすると更新確認は続きますが、IDや統計は送信されず、コンピューター名が送信されることもありません。</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>15分ごとにアプリのバージョン、言語、国、デバイスIDを更新確認のためパネルへ送信します。オフにすると更新確認は続きますが、IDや統計は送信されず、コンピューター名が送信されることもありません。</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>クラッシュレポートを自動送信</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>既定ではオフです。オンにすると、クラッシュ後にエラー詳細・ログの末尾 4,000 文字・端末 ID が開発者に送信されます。オフにすると送信キューは破棄されます。</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>デバイスID</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>このシステム用にアプリが生成した一意のID（コンピューター名ではありません）。管理パネルに表示されます。</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>以前の実行からの残留接続が見つかりました。&amp;#10;完全にクリーンアップするには、管理者として再起動する必要があります。</value></data>

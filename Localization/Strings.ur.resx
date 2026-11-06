@@ -273,7 +273,9 @@
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>انٹرنٹ ٹھیک ہے: براہِ راست راستہ ٹھیک ہے، نیٹ ورک تبدیل ہونے کے بعد ٹنل جواب نہیں دیتا</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>رازداری</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>کنکشن کے اعداد و شمار پینل کو بھیجیں</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>ہر 60 منٹ میں ایپ ورژن، زبان، ملک اور ڈیوائس ID اپڈیٹ چیک کے لیے پینل کو بھیجا جاتا ہے۔ اسے بند کرنے پر اپڈیٹ چیک جاری رہتا ہے مگر کوئی ID یا اعداد و شمار نہیں جاتے؛ آپ کا کمپیوٹر نام کبھی نہیں بھیجا جاتا۔</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>ہر 15 منٹ میں ایپ ورژن، زبان، ملک اور ڈیوائس ID اپڈیٹ چیک کے لیے پینل کو بھیجا جاتا ہے۔ اسے بند کرنے پر اپڈیٹ چیک جاری رہتا ہے مگر کوئی ID یا اعداد و شمار نہیں جاتے؛ آپ کا کمپیوٹر نام کبھی نہیں بھیجا جاتا۔</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>کریش رپورٹس خودکار بھیجیں</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>طے شدہ طور پر بند۔ آن کرنے پر کریش کے بعد غلطی کی تفصیلات، لاگ کے آخری 4000 حروف اور ڈیوائس ID ڈویلپر کو بھیجی جاتی ہیں؛ بند کرنے سے قطار خالی ہو جاتی ہے۔</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>ڈیوائس ID</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>اس سسٹم کے لیے ایپ کی طرف سے بنایا گیا منفرد ID (آپ کا کمپیوٹر نام نہیں)، منتظمی پینل میں نظر آتا ہے۔</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>پچھلے رن سے بچا ہوا کنکشن ملا۔&amp;#10;مکمل صفائی کے لیے ایپ کو ایڈمن کے طور پر دوبارہ شروع کرنا ہوگا۔</value></data>

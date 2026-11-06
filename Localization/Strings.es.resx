@@ -273,7 +273,9 @@ Estado: {3}</value>
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>Internet está bien: la ruta directa está sana; el túnel no responde tras el cambio de red</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>Privacidad</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>Enviar estadísticas de conexión al panel</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>Cada 60 minutos se envían la versión, el idioma, el país y el ID del dispositivo al panel para comprobar actualizaciones. Al desactivarlo, la comprobación sigue funcionando pero no se envía ningún ID ni estadística; su nombre de equipo nunca se envía.</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>Cada 15 minutos se envían la versión, el idioma, el país y el ID del dispositivo al panel para comprobar actualizaciones. Al desactivarlo, la comprobación sigue funcionando pero no se envía ningún ID ni estadística; su nombre de equipo nunca se envía.</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>Enviar informes de error automáticamente</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>Desactivado de forma predeterminada. Si se activa, tras un error se envían los detalles, los últimos 4 000 caracteres del registro y su ID de dispositivo; desactivarlo vacía la cola.</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>ID del dispositivo</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>Un ID único generado por la aplicación para este sistema (no su nombre de equipo), visible en el panel de administración.</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>Se encontró una conexión residual de una ejecución anterior.&amp;#10;Para una limpieza completa, la aplicación debe reiniciarse como administrador.</value></data>

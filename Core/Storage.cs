@@ -216,7 +216,20 @@ public static class Storage
         try
         {
             if (!File.Exists(SettingsFile)) return new AppSettings();
-            return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(SettingsFile)) ?? new AppSettings();
+            var json = File.ReadAllText(SettingsFile);
+            var s = JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
+            // One-time migration, detected by the marker key being *absent* from
+            // the file: settings written before this version stored SendUsageStats
+            // off, which left the panel counting only the users who had switched
+            // it on by hand. Flip it on once — a file that already carries the
+            // marker keeps whatever the user chose afterwards, so the switch in
+            // Settings can still be turned off and stays off.
+            if (json.IndexOf("\"SendUsageStatsMigrated\"", StringComparison.Ordinal) < 0)
+            {
+                s.SendUsageStats = true;
+                s.SendUsageStatsMigrated = true;
+            }
+            return s;
         }
         catch { Quarantine(SettingsFile); return new AppSettings(); }
     }

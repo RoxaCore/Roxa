@@ -273,7 +273,9 @@
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>인터넷은 정상입니다: 직접 경로는 정상이고 네트워크 변경 후 터널이 응답하지 않습니다</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>개인정보 보호</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>연결 통계를 패널로 전송</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>60분마다 앱 버전, 언어, 국가, 장치 ID를 업데이트 확인을 위해 패널로 보냅니다. 끄면 업데이트 확인은 유지되지만 ID나 통계는 전송되지 않으며 컴퓨터 이름은 절대 전송되지 않습니다.</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>15분마다 앱 버전, 언어, 국가, 장치 ID를 업데이트 확인을 위해 패널로 보냅니다. 끄면 업데이트 확인은 유지되지만 ID나 통계는 전송되지 않으며 컴퓨터 이름은 절대 전송되지 않습니다.</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>충돌 보고서 자동 전송</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>기본값은 꺼짐입니다. 켜면 오류 세부 정보, 로그 마지막 4,000자, 기기 ID가 개발자에게 전송됩니다. 끄면 대기열이 비워집니다.</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>장치 ID</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>이 시스템용으로 앱이 생성한 고유 ID(컴퓨터 이름 아님)로, 관리 패널에 표시됩니다.</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>이전 실행에서 남은 연결이 발견되었습니다.&amp;#10;완전히 정리하려면 관리자 권한으로 다시 시작해야 합니다.</value></data>

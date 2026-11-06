@@ -630,7 +630,9 @@ Durum: {3}</value>
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>İnternet iyi: doğrudan yol sağlıklı, ağ değişiminden sonra tünel yanıt vermiyor</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>Gizlilik</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>Bağlantı istatistiklerini panele gönder</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>Her 60 dakikada bir sürüm, dil, ülke ve cihaz kimliği güncelleme kontrolü için panele gönderilir. Kapatırsanız güncelleme kontrolü sürer ancak hiçbir kimlik veya istatistik gönderilmez; bilgisayar adınız asla gönderilmez.</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>Her 15 dakikada bir sürüm, dil, ülke ve cihaz kimliği güncelleme kontrolü için panele gönderilir. Kapatırsanız güncelleme kontrolü sürer ancak hiçbir kimlik veya istatistik gönderilmez; bilgisayar adınız asla gönderilmez.</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>Çökme raporlarını otomatik gönder</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>Varsayılan olarak kapalıdır. Açıkken, çökmeden sonra hata ayrıntıları, günlüğün son 4.000 karakteri ve cihaz kimliğiniz geliştiriciye gönderilir; kapatmak kuyruğu boşaltır.</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>Cihaz kimliği</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>Uygulamanın bu sistem için ürettiği tekil kimlik (bilgisayar adınız değil), yönetim panelinde görünür.</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>Önceki çalıştırmadan kalan bir bağlantı bulundu.&amp;#10;Tam temizlik için uygulamanın yönetici olarak yeniden başlatılması gerekiyor.</value></data>

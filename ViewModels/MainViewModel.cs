@@ -191,6 +191,7 @@ public partial class MainViewModel : ViewModelBase
         _notificationsEnabled = _settings.NotificationsEnabled;
         Core.NotificationHelper.Enabled = _settings.NotificationsEnabled;
         _sendUsageStats = _settings.SendUsageStats;
+        _sendCrashReports = _settings.SendCrashReports;
         _autoUpdateApp = _settings.AutoUpdateApp;
         _updatePromptEnabled = _settings.UpdatePromptEnabled;
         if (string.IsNullOrWhiteSpace(_settings.ClientId))

@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A "Privacy" card back in Settings, with two switches and a short
+  explanation each: *Send connection stats to the panel* (the install
+  identifier, connection count and source hash that feed the dashboard's
+  install and online counters) and *Send crash reports* (the crash-queue
+  upload). Both labels and descriptions ship in all 14 languages.
+
+### Changed
+
+- Sending connection stats to the panel is now **on by default**. The
+  panel counted installs and online users only from check-ins carrying an
+  install identifier, and since 3.0.14 removed the Privacy card no user
+  could switch that on at all — both counters sat near zero. Settings
+  written by older versions are migrated once on first load, so the switch
+  can still be turned off afterwards.
+- The version check runs every 15 minutes instead of every 60, and the
+  panel's "online" window is now 30 minutes instead of 20, so the online
+  counter covers the gap between two check-ins instead of missing it. The
+  per-IP write cap of the stats endpoint moved with it (60 → 180 per
+  minute) so several clients behind one NAT keep reporting.
+- Crash reports keep their own switch, **off by default**. They used to
+  follow the stats flag, so switching stats on would have started
+  uploading stack traces too; the two consents are separate now, and
+  turning the crash switch off still empties the queue.
+
+### Security
+
+- `PRIVACY.md` updated to match: the 15-minute interval, the default-on
+  stats switch in Settings › Privacy, and the crash queue's own
+  default-off switch.
+
 ### Fixed
 
 - The internet no longer stays dead after a reboot until Roxa is opened.

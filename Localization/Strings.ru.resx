@@ -289,7 +289,9 @@ ID устройства {2}
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>Интернет в порядке: прямой путь исправен; туннель не отвечает после смены сети</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>Конфиденциальность</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>Отправлять статистику подключений в панель</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>Раз в 60 минут версия, язык, страна и ID устройства отправляются в панель для проверки обновлений. Если выключить, проверка обновлений продолжится, но ID и статистика отправляться не будут; имя компьютера никогда не отправляется.</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>Раз в 15 минут версия, язык, страна и ID устройства отправляются в панель для проверки обновлений. Если выключить, проверка обновлений продолжится, но ID и статистика отправляться не будут; имя компьютера никогда не отправляется.</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>Отправлять отчёты о сбоях автоматически</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>По умолчанию выключено. Когда включено, после сбоя разработчику отправляются подробности ошибки, последние 4 000 символов журнала и ID устройства; выключение очищает очередь.</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>ID устройства</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>Уникальный ID, созданный приложением для этой системы (не имя компьютера), отображается в панели управления.</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>Обнаружено остаточное соединение от предыдущего запуска.&amp;#10;Для полной очистки приложение нужно перезапустить от имени администратора.</value></data>

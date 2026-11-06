@@ -106,7 +106,10 @@ public static class BugReport
     /// </summary>
     private static bool ConsentAllowsSend()
     {
-        try { return Storage.LoadSettings().SendUsageStats; }
+        // The crash queue is gated by its own switch (off by default), not by
+        // the usage-stats one: the panel id and a stack trace are different
+        // consents and are toggled separately in Settings > Privacy.
+        try { return Storage.LoadSettings().SendCrashReports; }
         catch { return false; } // couldn't read consent ⇒ no consent ⇒ don't send
     }
 

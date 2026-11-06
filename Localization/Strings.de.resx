@@ -273,7 +273,9 @@ Status: {3}</value>
   <data name="Log_TunnelDeadDirectOk" xml:space="preserve"><value>Internet ist in Ordnung: der direkte Weg ist gesund, der Tunnel antwortet nach dem Netzwerkwechsel nicht</value></data>
   <data name="Set_Privacy" xml:space="preserve"><value>Datenschutz</value></data>
   <data name="Set_Stats" xml:space="preserve"><value>Verbindungsstatistiken an das Panel senden</value></data>
-  <data name="Set_Stats_Desc" xml:space="preserve"><value>Alle 60 Minuten werden App-Version, Sprache, Land und Geräte-ID an das Panel gesendet, um nach Updates zu suchen. Wird dies deaktiviert, laufen Update-Prüfungen weiter, aber es werden keine IDs oder Statistiken gesendet; Ihr Computername wird nie gesendet.</value></data>
+  <data name="Set_Stats_Desc" xml:space="preserve"><value>Alle 15 Minuten werden App-Version, Sprache, Land und Geräte-ID an das Panel gesendet, um nach Updates zu suchen. Wird dies deaktiviert, laufen Update-Prüfungen weiter, aber es werden keine IDs oder Statistiken gesendet; Ihr Computername wird nie gesendet.</value></data>
+  <data name="Set_CrashReports" xml:space="preserve"><value>Absturzberichte automatisch senden</value></data>
+  <data name="Set_CrashReports_Desc" xml:space="preserve"><value>Standardmäßig aus. Wenn aktiviert, werden nach einem Absturz die Fehlerdetails, die letzten 4.000 Zeichen des Logs und Ihre Geräte-ID an den Entwickler gesendet; das Deaktivieren leert die Warteschlange.</value></data>
   <data name="Set_DeviceId" xml:space="preserve"><value>Geräte-ID</value></data>
   <data name="Set_DeviceId_Desc" xml:space="preserve"><value>Eine eindeutige ID, die die App für dieses System erstellt (nicht Ihr Computername), sichtbar im Verwaltungspanel.</value></data>
   <data name="Dlg_LeftoverAdminMsg" xml:space="preserve"><value>Eine Restverbindung eines früheren Laufs wurde gefunden.&amp;#10;Für eine vollständige Bereinigung muss die App mit Administratorrechten neu gestartet werden.</value></data>

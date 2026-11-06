@@ -76,7 +76,7 @@ public partial class App : Application
         {
             // Crash report: the automatic part (exception + stack + recent log)
             // is queued and either sent here or on the next run. Sending depends
-            // on user consent (SendUsageStats); the local write always happens.
+            // on its own consent (SendCrashReports); the local write always happens.
             try { BugReport.ReportCrash(e.ExceptionObject as Exception, SafeLogTail()); }
             catch { }
             try { DisposeTray(); } catch { }

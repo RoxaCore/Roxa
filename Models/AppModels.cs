@@ -158,10 +158,22 @@ public class AppSettings
     public int ShownAnnouncementCount { get; set; }
     public string Country { get; set; } = "";
     public string ClientId { get; set; } = "";
-    // Off by default: a fresh install must not send anything without consent.
-    // The crash-report send gate (BugReport.ConsentAllowsSend) rests on this;
-    // turning it on must be the user's own choice.
-    public bool SendUsageStats { get; set; }
+    // On by default: the install id, the connection count and the country are
+    // sent to the update endpoint so the admin panel counts installs and online
+    // users, and the crash-report gate (BugReport.ConsentAllowsSend) rests on
+    // this too. One migration flips old settings on (Storage.LoadSettings);
+    // after that turning it off stays the user's own choice.
+    public bool SendUsageStats { get; set; } = true;
+    // One-time migration marker, written into settings.json only after the
+    // upgrade has switched SendUsageStats on. Storage.LoadSettings treats its
+    // absence in the file (not its value) as "still un-migrated", so a fresh
+    // install and an already-migrated one are never touched again.
+    public bool SendUsageStatsMigrated { get; set; }
+    // Crash uploads keep their own gate, off by default: sending the install id
+    // with a version check and uploading a stack trace after a crash are two
+    // different consents, and PRIVACY.md promises the crash queue stays local
+    // unless the user opts in.
+    public bool SendCrashReports { get; set; }
     public int ConnectCount { get; set; }
     public List<string> TunExcludedApps { get; set; } = new();
     public List<string> TunExcludedAppsDisabled { get; set; } = new();

@@ -66,13 +66,13 @@ neither the runtime nor Roxa can.
 ## Installation
 
 1. Download one of two installers from the official download page —
-   **[up.roxacore.com](https://up.roxacore.com/)**, where the *Download*
+   **[roxacore.com](https://roxacore.com/)**, where the *Download*
    button always offers the current version:
 
    | File | Size | Needs internet |
    |---|---|---|
-   | `Roxa-Setup-<version>.exe` | 75.3 MiB | **No** - the .NET Desktop Runtime is packed inside |
-   | `Roxa-Setup-<version>-online.exe` | 19.6 MiB | Only if .NET is missing |
+   | [Roxa-Setup-3.0.14.exe](https://roxacore.com/dl/Roxa-Setup-3.0.14.exe) | 75.3 MiB | **No** - the .NET Desktop Runtime is packed inside |
+   | [Roxa-Setup-3.0.14-offline.exe](https://roxacore.com/dl/Roxa-Setup-3.0.14-offline.exe) | 19.6 MiB | Only if .NET is missing |
 
    Pick the offline one on a slow, filtered or metered connection. Both
    install exactly the same program.

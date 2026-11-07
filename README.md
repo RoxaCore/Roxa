@@ -99,13 +99,15 @@ restored before the files are removed. The install folder and
 
 ### Portable (no install)
 
-The same build is also published as a zip on the GitHub Releases page —
+The same build is also published on the GitHub Releases page —
 **[github.com/RoxaCore/Roxa/releases](https://github.com/RoxaCore/Roxa/releases/latest)**.
-Extract `Roxa-<version>-portable.zip` anywhere and run `Roxa.exe`: no
-installer, and no administrator rights until you connect in TUN mode.
-Servers and settings are stored in `%APPDATA%\Roxa`, exactly like the
-installed copy. The portable build needs the .NET Desktop Runtime 8 that the
-installers bring; if it is missing, install it once from Microsoft.
+Download `Roxa-<version>-portable.exe` and run it from wherever you put
+it: a single file, no installer, nothing to unpack, and no administrator
+rights until you connect in TUN mode. Servers and settings are stored in
+`%APPDATA%\Roxa`, exactly like the installed copy. The portable exe needs
+the .NET Desktop Runtime 8 that the installers bring; if it is missing,
+install it once from Microsoft. The bundle unpacks itself to
+`%TEMP%\.net` on the first start.
 
 ---
 

@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   follow the stats flag, so switching stats on would have started
   uploading stack traces too; the two consents are separate now, and
   turning the crash switch off still empties the queue.
+- The portable build on the GitHub Releases page is now a single
+  `Roxa-<version>-portable.exe` instead of a zip: engine, fonts, licence
+  notices and native libraries are bundled into the executable, which
+  unpacks itself to `%TEMP%\.net` on its first run. The zip was deleted
+  from the release, and README points at the exe.
 
 ### Security
 

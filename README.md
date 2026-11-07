@@ -8,6 +8,9 @@ link and connect in one click.**
 ![.NET 8](https://img.shields.io/badge/.NET-8-512BD4)
 ![Version](https://img.shields.io/badge/version-3.0.14-brightgreen)
 
+**Download the portable exe (v3.0.14):**
+[github.com/RoxaCore/Roxa/releases/tag/v3.0.14](https://github.com/RoxaCore/Roxa/releases/tag/v3.0.14)
+
 If you have a subscription link or a server address from a provider, Roxa is
 what turns it into a working connection: it reads the link, keeps a list of
 your servers, measures which one answers fastest and routes your traffic

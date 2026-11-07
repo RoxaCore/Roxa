@@ -14,11 +14,10 @@ installer/runtime/
 
 # Release packages: uploaded via the panel, they have no place in git history
 upload-*.zip
-server/dl/*.zip
-# Screenshots and panel images: they must never enter the repository.
-# index.html of this folder is deliberately excepted because it is committed.
-server/dl/*.png
-server/dl/*.jpg
+
+# The admin panel is deliberately NOT part of this repository: its PHP sources
+# are deployed separately to up.roxacore.com and stay off the public tree.
+server/
 
 # Large engines that are not in the update package and not referenced by the code
 engine/sing-box.exe
